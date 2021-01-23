@@ -16,25 +16,17 @@ use aes_gcm::{
     aead::{generic_array::GenericArray, Aead, NewAead},
     Aes256Gcm,
 };
-use getrandom::getrandom;
-use matrix_sdk_common::{
-    encryption::DeviceKeys,
-    identifiers::{DeviceKeyAlgorithm, DeviceKeyId},
-};
+use ed25519_dalek::{ExpandedSecretKey, PublicKey, SecretKey, Signature};
+use rand::{thread_rng, RngCore};
 use serde::{Deserialize, Serialize};
 use serde_json::{json, Error as JsonError, Value};
 use std::{collections::BTreeMap, convert::TryInto, sync::Arc};
 use thiserror::Error;
-use zeroize::Zeroizing;
-
-use olm_rs::pk::OlmPkSigning;
-
-#[cfg(test)]
-use olm_rs::{errors::OlmUtilityError, utility::OlmUtility};
 
 use matrix_sdk_common::{
     api::r0::keys::{CrossSigningKey, KeyUsage},
-    identifiers::UserId,
+    encryption::DeviceKeys,
+    identifiers::{DeviceKeyAlgorithm, DeviceKeyId, UserId},
     locks::Mutex,
     CanonicalJsonValue,
 };
@@ -42,7 +34,10 @@ use matrix_sdk_common::{
 use crate::{
     error::SignatureError,
     identities::{MasterPubkey, SelfSigningPubkey, UserSigningPubkey},
-    utilities::{decode_url_safe as decode, encode_url_safe as encode, DecodeError},
+    utilities::{
+        decode_url_safe as decode, encode as encode_standard, encode_url_safe as encode,
+        DecodeError,
+    },
     UserIdentity,
 };
 
@@ -66,22 +61,44 @@ pub enum SigningError {
 
 #[derive(Clone)]
 pub struct Signing {
-    inner: Arc<Mutex<OlmPkSigning>>,
-    seed: Arc<Zeroizing<Vec<u8>>>,
-    public_key: PublicSigningKey,
+    secret_key: Arc<SecretKey>,
+    expanded_key: Arc<Mutex<ExpandedSecretKey>>,
+    public_key: Arc<PublicKey>,
+}
+
+impl PartialEq for Signing {
+    fn eq(&self, other: &Self) -> bool {
+        &self.public_key == &other.public_key
+    }
 }
 
 impl std::fmt::Debug for Signing {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         f.debug_struct("Signing")
-            .field("public_key", &self.public_key.as_str())
+            .field("public_key", self.public_key.as_bytes())
             .finish()
     }
 }
 
-impl PartialEq for Signing {
-    fn eq(&self, other: &Signing) -> bool {
-        self.seed == other.seed
+#[derive(Clone, Debug)]
+pub struct EncodedSignature(String);
+
+impl From<&Signature> for EncodedSignature {
+    fn from(s: &Signature) -> Self {
+        EncodedSignature(encode_standard(s.to_bytes()))
+    }
+}
+
+impl From<Signature> for EncodedSignature {
+    fn from(s: Signature) -> Self {
+        EncodedSignature(encode_standard(s.to_bytes()))
+    }
+}
+
+#[cfg(test)]
+impl EncodedSignature {
+    pub fn as_str(&self) -> &str {
+        &self.0
     }
 }
 
@@ -116,13 +133,6 @@ pub struct PickledSelfSigning {
     public_key: CrossSigningKey,
 }
 
-impl Signature {
-    #[cfg(test)]
-    pub fn as_str(&self) -> &str {
-        &self.0
-    }
-}
-
 impl PickledSigning {
     pub fn as_str(&self) -> &str {
         &self.0
@@ -130,9 +140,9 @@ impl PickledSigning {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]
-pub struct PublicSigningKey(Arc<str>);
+pub struct EncodedPublicKey(Arc<str>);
 
-impl PublicSigningKey {
+impl EncodedPublicKey {
     pub fn as_str(&self) -> &str {
         &self.0
     }
@@ -140,6 +150,12 @@ impl PublicSigningKey {
     #[allow(clippy::inherent_to_string)]
     fn to_string(&self) -> String {
         self.0.to_string()
+    }
+}
+
+impl From<&PublicKey> for EncodedPublicKey {
+    fn from(p: &PublicKey) -> Self {
+        EncodedPublicKey(encode_standard(p.as_bytes()).into())
     }
 }
 
@@ -213,7 +229,7 @@ impl UserSigning {
             .insert(
                 DeviceKeyId::from_parts(
                     DeviceKeyAlgorithm::Ed25519,
-                    self.inner.public_key.as_str().into(),
+                    self.inner.public_key().as_str().into(),
                 )
                 .to_string(),
                 serde_json::to_value(signature.0)?,
@@ -242,7 +258,10 @@ impl SelfSigning {
         PickledSelfSigning { pickle, public_key }
     }
 
-    pub async fn sign_device_helper(&self, value: Value) -> Result<Signature, SignatureError> {
+    pub async fn sign_device_helper(
+        &self,
+        value: Value,
+    ) -> Result<EncodedSignature, SignatureError> {
         self.inner.sign_json(value).await
     }
 
@@ -265,7 +284,7 @@ impl SelfSigning {
             .insert(
                 DeviceKeyId::from_parts(
                     DeviceKeyAlgorithm::Ed25519,
-                    self.inner.public_key.as_str().into(),
+                    self.inner.public_key().as_str().into(),
                 ),
                 signature.0,
             );
@@ -305,27 +324,30 @@ pub struct PickledSignings {
     pub self_signing_key: Option<PickledSelfSigning>,
 }
 
-#[derive(Debug, Clone)]
-pub struct Signature(String);
-
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct PickledSigning(String);
 
 impl Signing {
     pub fn new() -> Self {
-        let seed = OlmPkSigning::generate_seed();
-        Self::from_seed(seed)
+        let mut rng = thread_rng();
+        let secret_key = SecretKey::generate(&mut rng);
+        Self::from_secret_key(secret_key)
+    }
+
+    fn from_secret_key(secret_key: SecretKey) -> Self {
+        let public_key = PublicKey::from(&secret_key);
+        let expanded_key = ExpandedSecretKey::from(&secret_key);
+
+        Signing {
+            secret_key: secret_key.into(),
+            expanded_key: Mutex::new(expanded_key).into(),
+            public_key: public_key.into(),
+        }
     }
 
     pub fn from_seed(seed: Vec<u8>) -> Self {
-        let inner = OlmPkSigning::new(seed.clone()).expect("Unable to create pk signing object");
-        let public_key = PublicSigningKey(inner.public_key().into());
-
-        Signing {
-            inner: Arc::new(Mutex::new(inner)),
-            seed: Arc::new(Zeroizing::from(seed)),
-            public_key,
-        }
+        let secret_key = SecretKey::from_bytes(&seed).expect("Unable to create pk signing object");
+        Self::from_secret_key(secret_key)
     }
 
     pub fn from_pickle(pickle: PickledSigning, pickle_key: &[u8]) -> Result<Self, SigningError> {
@@ -350,11 +372,11 @@ impl Signing {
         let cipher = Aes256Gcm::new(key);
 
         let mut nonce = vec![0u8; NONCE_SIZE];
-        getrandom(&mut nonce).expect("Can't generate nonce to pickle the signing object");
+        thread_rng().fill_bytes(&mut nonce);
         let nonce = GenericArray::from_slice(nonce.as_slice());
 
         let ciphertext = cipher
-            .encrypt(nonce, self.seed.as_slice())
+            .encrypt(nonce, self.secret_key.as_bytes().as_ref())
             .expect("Can't encrypt signing pickle");
 
         let ciphertext = encode(ciphertext);
@@ -368,8 +390,8 @@ impl Signing {
         PickledSigning(serde_json::to_string(&pickle).expect("Can't encode pickled signing"))
     }
 
-    pub fn public_key(&self) -> &PublicSigningKey {
-        &self.public_key
+    pub fn public_key(&self) -> EncodedPublicKey {
+        EncodedPublicKey::from(self.public_key.as_ref())
     }
 
     pub fn cross_signing_key(&self, user_id: UserId, usage: KeyUsage) -> CrossSigningKey {
@@ -396,13 +418,20 @@ impl Signing {
     pub async fn verify(
         &self,
         message: &str,
-        signature: &Signature,
-    ) -> Result<bool, OlmUtilityError> {
-        let utility = OlmUtility::new();
-        utility.ed25519_verify(self.public_key.as_str(), message, signature.as_str())
+        signature: &EncodedSignature,
+    ) -> Result<(), SignatureError> {
+        use crate::utilities::decode as decode_standard;
+        use ed25519_dalek::Verifier;
+        use std::convert::TryFrom;
+
+        let signature = decode_standard(signature.as_str()).unwrap();
+        let signature = Signature::try_from(signature.as_slice()).unwrap();
+        self.public_key
+            .verify(message.as_bytes(), &signature)
+            .map_err(|_| SignatureError::VerificationError)
     }
 
-    pub async fn sign_json(&self, mut json: Value) -> Result<Signature, SignatureError> {
+    pub async fn sign_json(&self, mut json: Value) -> Result<EncodedSignature, SignatureError> {
         let json_object = json.as_object_mut().ok_or(SignatureError::NotAnObject)?;
         let _ = json_object.remove("signatures");
         let canonical_json: CanonicalJsonValue =
@@ -410,7 +439,11 @@ impl Signing {
         Ok(self.sign(&canonical_json.to_string()).await)
     }
 
-    pub async fn sign(&self, message: &str) -> Signature {
-        Signature(self.inner.lock().await.sign(message))
+    pub async fn sign(&self, message: &str) -> EncodedSignature {
+        self.expanded_key
+            .lock()
+            .await
+            .sign(message.as_bytes(), &self.public_key)
+            .into()
     }
 }
