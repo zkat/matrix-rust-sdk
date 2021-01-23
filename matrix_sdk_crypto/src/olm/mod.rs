@@ -33,7 +33,7 @@ pub(crate) use group_sessions::{GroupSessionKey, OutboundGroupSession};
 pub use olm_rs::{account::IdentityKeys, PicklingMode};
 pub use session::{PickledSession, Session, SessionPickle};
 pub use signing::{PickledCrossSigningIdentity, PrivateCrossSigningIdentity};
-pub(crate) use utility::Utility;
+pub(crate) use utility::verify_json;
 
 #[cfg(test)]
 pub(crate) mod test {

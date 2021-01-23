@@ -31,7 +31,7 @@ use matrix_sdk_common::{
 
 #[cfg(test)]
 use crate::olm::PrivateCrossSigningIdentity;
-use crate::{error::SignatureError, olm::Utility, ReadOnlyDevice};
+use crate::{error::SignatureError, olm::verify_json, ReadOnlyDevice};
 
 use super::{atomic_bool_deserializer, atomic_bool_serializer};
 
@@ -243,8 +243,7 @@ impl MasterPubkey {
             return Err(SignatureError::UserIdMissmatch);
         }
 
-        let utility = Utility::new();
-        utility.verify_json(
+        verify_json(
             &self.0.user_id,
             &key_id,
             key,
@@ -295,8 +294,7 @@ impl UserSigningPubkey {
 
         // TODO check that the usage is OK.
 
-        let utility = Utility::new();
-        utility.verify_json(
+        verify_json(
             &self.0.user_id,
             &DeviceKeyId::try_from(key_id.as_str())?,
             key,
@@ -343,8 +341,7 @@ impl SelfSigningPubkey {
 
         // TODO check that the usage is OK.
 
-        let utility = Utility::new();
-        utility.verify_json(
+        verify_json(
             &self.0.user_id,
             &DeviceKeyId::try_from(key_id.as_str())?,
             key,
