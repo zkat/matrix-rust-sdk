@@ -68,7 +68,7 @@ pub struct Signing {
 
 impl PartialEq for Signing {
     fn eq(&self, other: &Self) -> bool {
-        &self.public_key == &other.public_key
+        self.public_key == other.public_key
     }
 }
 
