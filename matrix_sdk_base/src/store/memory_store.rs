@@ -12,7 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-use std::sync::{Arc, RwLock};
+use std::{
+    collections::BTreeSet,
+    sync::{Arc, RwLock},
+};
 
 use dashmap::{DashMap, DashSet};
 use matrix_sdk_common::{
@@ -39,6 +42,7 @@ pub struct MemoryStore {
     account_data: Arc<DashMap<String, AnyBasicEvent>>,
     members: Arc<DashMap<RoomId, DashMap<UserId, MemberEvent>>>,
     profiles: Arc<DashMap<RoomId, DashMap<UserId, MemberEventContent>>>,
+    display_names: Arc<DashMap<RoomId, DashMap<String, BTreeSet<UserId>>>>,
     joined_user_ids: Arc<DashMap<RoomId, DashSet<UserId>>>,
     invited_user_ids: Arc<DashMap<RoomId, DashSet<UserId>>>,
     room_info: Arc<DashMap<RoomId, RoomInfo>>,
@@ -54,6 +58,7 @@ pub struct MemoryStore {
 }
 
 impl MemoryStore {
+    #[cfg(not(feature = "sled_state_store"))]
     pub fn new() -> Self {
         Self {
             sync_token: Arc::new(RwLock::new(None)),
@@ -61,6 +66,7 @@ impl MemoryStore {
             account_data: DashMap::new().into(),
             members: DashMap::new().into(),
             profiles: DashMap::new().into(),
+            display_names: DashMap::new().into(),
             joined_user_ids: DashMap::new().into(),
             invited_user_ids: DashMap::new().into(),
             room_info: DashMap::new().into(),
@@ -73,22 +79,22 @@ impl MemoryStore {
         }
     }
 
-    pub async fn save_filter(&self, filter_name: &str, filter_id: &str) -> Result<()> {
+    async fn save_filter(&self, filter_name: &str, filter_id: &str) -> Result<()> {
         self.filters
             .insert(filter_name.to_string(), filter_id.to_string());
 
         Ok(())
     }
 
-    pub async fn get_filter(&self, filter_name: &str) -> Result<Option<String>> {
+    async fn get_filter(&self, filter_name: &str) -> Result<Option<String>> {
         Ok(self.filters.get(filter_name).map(|f| f.to_string()))
     }
 
-    pub async fn get_sync_token(&self) -> Result<Option<String>> {
+    async fn get_sync_token(&self) -> Result<Option<String>> {
         Ok(self.sync_token.read().unwrap().clone())
     }
 
-    pub async fn save_changes(&self, changes: &StateChanges) -> Result<()> {
+    async fn save_changes(&self, changes: &StateChanges) -> Result<()> {
         let now = Instant::now();
 
         if let Some(s) = &changes.sync_token {
@@ -143,6 +149,15 @@ impl MemoryStore {
                     .entry(room.clone())
                     .or_insert_with(DashMap::new)
                     .insert(user_id.clone(), profile.clone());
+            }
+        }
+
+        for (room, map) in &changes.ambiguity_maps {
+            for (display_name, display_names) in map {
+                self.display_names
+                    .entry(room.clone())
+                    .or_insert_with(DashMap::new)
+                    .insert(display_name.clone(), display_names.clone());
             }
         }
 
@@ -213,12 +228,12 @@ impl MemoryStore {
         Ok(())
     }
 
-    pub async fn get_presence_event(&self, user_id: &UserId) -> Result<Option<PresenceEvent>> {
+    async fn get_presence_event(&self, user_id: &UserId) -> Result<Option<PresenceEvent>> {
         #[allow(clippy::map_clone)]
         Ok(self.presence.get(user_id).map(|p| p.clone()))
     }
 
-    pub async fn get_state_event(
+    async fn get_state_event(
         &self,
         room_id: &RoomId,
         event_type: EventType,
@@ -231,7 +246,7 @@ impl MemoryStore {
         }))
     }
 
-    pub async fn get_profile(
+    async fn get_profile(
         &self,
         room_id: &RoomId,
         user_id: &UserId,
@@ -243,7 +258,7 @@ impl MemoryStore {
             .and_then(|p| p.get(user_id).map(|p| p.clone())))
     }
 
-    pub async fn get_member_event(
+    async fn get_member_event(
         &self,
         room_id: &RoomId,
         state_key: &UserId,
@@ -274,6 +289,11 @@ impl MemoryStore {
     fn get_room_infos(&self) -> Vec<RoomInfo> {
         #[allow(clippy::map_clone)]
         self.room_info.iter().map(|r| r.clone()).collect()
+    }
+
+    fn get_stripped_room_infos(&self) -> Vec<StrippedRoomInfo> {
+        #[allow(clippy::map_clone)]
+        self.stripped_room_info.iter().map(|r| r.clone()).collect()
     }
 }
 
@@ -335,5 +355,22 @@ impl StateStore for MemoryStore {
 
     async fn get_room_infos(&self) -> Result<Vec<RoomInfo>> {
         Ok(self.get_room_infos())
+    }
+
+    async fn get_stripped_room_infos(&self) -> Result<Vec<StrippedRoomInfo>> {
+        Ok(self.get_stripped_room_infos())
+    }
+
+    async fn get_users_with_display_name(
+        &self,
+        room_id: &RoomId,
+        display_name: &str,
+    ) -> Result<BTreeSet<UserId>> {
+        #[allow(clippy::map_clone)]
+        Ok(self
+            .display_names
+            .get(room_id)
+            .and_then(|d| d.get(display_name).map(|d| d.clone()))
+            .unwrap_or_default())
     }
 }

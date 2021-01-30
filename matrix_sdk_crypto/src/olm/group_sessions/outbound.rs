@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-use dashmap::{DashMap, DashSet};
+use dashmap::DashMap;
 use matrix_sdk_common::{
     api::r0::to_device::DeviceIdOrAllDevices,
     events::room::{
@@ -23,6 +23,7 @@ use matrix_sdk_common::{
 };
 use std::{
     cmp::max,
+    collections::BTreeMap,
     fmt,
     sync::{
         atomic::{AtomicBool, AtomicU64, Ordering},
@@ -41,26 +42,37 @@ use matrix_sdk_common::{
     instant::Instant,
     locks::Mutex,
 };
+use serde::{Deserialize, Serialize};
 use serde_json::{json, Value};
 
-use olm_rs::outbound_group_session::OlmOutboundGroupSession;
 pub use olm_rs::{
     account::IdentityKeys,
     session::{OlmMessage, PreKeyMessage},
     utility::OlmUtility,
 };
+use olm_rs::{
+    errors::OlmGroupSessionError, outbound_group_session::OlmOutboundGroupSession, PicklingMode,
+};
 
 use crate::ToDeviceRequest;
 
-use super::GroupSessionKey;
+use super::{
+    super::{deserialize_instant, serialize_instant},
+    GroupSessionKey,
+};
 
 const ROTATION_PERIOD: Duration = Duration::from_millis(604800000);
 const ROTATION_MESSAGES: u64 = 100;
 
+pub enum ShareState {
+    NotShared,
+    Shared(u32),
+}
+
 /// Settings for an encrypted room.
 ///
 /// This determines the algorithm and rotation periods of a group session.
-#[derive(Debug, Clone)]
+#[derive(Clone, Debug, Deserialize, Serialize)]
 pub struct EncryptionSettings {
     /// The encryption algorithm that should be used in the room.
     pub algorithm: EventEncryptionAlgorithm,
@@ -113,8 +125,8 @@ pub struct OutboundGroupSession {
     shared: Arc<AtomicBool>,
     invalidated: Arc<AtomicBool>,
     settings: Arc<EncryptionSettings>,
-    pub(crate) shared_with_set: Arc<DashMap<UserId, DashSet<DeviceIdBox>>>,
-    to_share_with_set: Arc<DashMap<Uuid, Arc<ToDeviceRequest>>>,
+    pub(crate) shared_with_set: Arc<DashMap<UserId, DashMap<DeviceIdBox, u32>>>,
+    to_share_with_set: Arc<DashMap<Uuid, (Arc<ToDeviceRequest>, u32)>>,
 }
 
 impl OutboundGroupSession {
@@ -158,8 +170,14 @@ impl OutboundGroupSession {
         }
     }
 
-    pub fn add_request(&self, request_id: Uuid, request: Arc<ToDeviceRequest>) {
-        self.to_share_with_set.insert(request_id, request);
+    pub(crate) fn add_request(
+        &self,
+        request_id: Uuid,
+        request: Arc<ToDeviceRequest>,
+        message_index: u32,
+    ) {
+        self.to_share_with_set
+            .insert(request_id, (request, message_index));
     }
 
     /// This should be called if an the user wishes to rotate this session.
@@ -173,12 +191,12 @@ impl OutboundGroupSession {
     /// users/devices that received the session.
     pub fn mark_request_as_sent(&self, request_id: &Uuid) {
         if let Some((_, r)) = self.to_share_with_set.remove(request_id) {
-            let user_pairs = r.messages.iter().map(|(u, v)| {
+            let user_pairs = r.0.messages.iter().map(|(u, v)| {
                 (
                     u.clone(),
-                    v.keys().filter_map(|d| {
-                        if let DeviceIdOrAllDevices::DeviceId(d) = d {
-                            Some(d.clone())
+                    v.iter().filter_map(|d| {
+                        if let DeviceIdOrAllDevices::DeviceId(d) = d.0 {
+                            Some((d.clone(), r.1))
                         } else {
                             None
                         }
@@ -189,7 +207,7 @@ impl OutboundGroupSession {
             user_pairs.for_each(|(u, d)| {
                 self.shared_with_set
                     .entry(u)
-                    .or_insert_with(DashSet::new)
+                    .or_insert_with(DashMap::new)
                     .extend(d);
             });
 
@@ -342,28 +360,40 @@ impl OutboundGroupSession {
     }
 
     /// Has or will the session be shared with the given user/device pair.
-    pub(crate) fn is_shared_with(&self, user_id: &UserId, device_id: &DeviceId) -> bool {
-        let shared_with = self
+    pub(crate) fn is_shared_with(&self, user_id: &UserId, device_id: &DeviceId) -> ShareState {
+        // Check if we shared the session.
+        let shared_state = self
             .shared_with_set
             .get(user_id)
-            .map(|d| d.contains(device_id))
-            .unwrap_or(false);
+            .and_then(|d| d.get(device_id).map(|m| ShareState::Shared(*m.value())));
 
-        let should_be_shared_with = if self.shared() {
-            false
+        if let Some(state) = shared_state {
+            state
         } else {
+            // If we haven't shared the session, check if we're going to share
+            // the session.
             let device_id = DeviceIdOrAllDevices::DeviceId(device_id.into());
 
-            self.to_share_with_set.iter().any(|item| {
-                if let Some(e) = item.value().messages.get(user_id) {
-                    e.contains_key(&device_id)
-                } else {
-                    false
-                }
-            })
-        };
+            // Find the first request that contains the given user id and
+            // device id.
+            let shared = self.to_share_with_set.iter().find_map(|item| {
+                let request = &item.value().0;
+                let message_index = item.value().1;
 
-        shared_with || should_be_shared_with
+                if request
+                    .messages
+                    .get(user_id)
+                    .map(|e| e.contains_key(&device_id))
+                    .unwrap_or(false)
+                {
+                    Some(ShareState::Shared(message_index))
+                } else {
+                    None
+                }
+            });
+
+            shared.unwrap_or(ShareState::NotShared)
+        }
     }
 
     /// Mark that the session was shared with the given user/device pair.
@@ -371,8 +401,8 @@ impl OutboundGroupSession {
     pub fn mark_shared_with(&self, user_id: &UserId, device_id: &DeviceId) {
         self.shared_with_set
             .entry(user_id.to_owned())
-            .or_insert_with(DashSet::new)
-            .insert(device_id.to_owned());
+            .or_insert_with(DashMap::new)
+            .insert(device_id.to_owned(), 0);
     }
 
     /// Get the list of requests that need to be sent out for this session to be
@@ -380,8 +410,106 @@ impl OutboundGroupSession {
     pub(crate) fn pending_requests(&self) -> Vec<Arc<ToDeviceRequest>> {
         self.to_share_with_set
             .iter()
-            .map(|i| i.value().clone())
+            .map(|i| i.value().0.clone())
             .collect()
+    }
+
+    /// Restore a Session from a previously pickled string.
+    ///
+    /// Returns the restored group session or a `OlmGroupSessionError` if there
+    /// was an error.
+    ///
+    /// # Arguments
+    ///
+    /// * `device_id` - The device id of the device that created this session.
+    ///     Put differently, our own device id.
+    ///
+    /// * `identity_keys` - The identity keys of the device that created this
+    ///     session, our own identity keys.
+    ///
+    /// * `pickle` - The pickled version of the `OutboundGroupSession`.
+    ///
+    /// * `pickle_mode` - The mode that was used to pickle the session, either
+    /// an unencrypted mode or an encrypted using passphrase.
+    pub fn from_pickle(
+        device_id: Arc<DeviceIdBox>,
+        identity_keys: Arc<IdentityKeys>,
+        pickle: PickledOutboundGroupSession,
+        pickling_mode: PicklingMode,
+    ) -> Result<Self, OlmGroupSessionError> {
+        let inner = OlmOutboundGroupSession::unpickle(pickle.pickle.0, pickling_mode)?;
+        let session_id = inner.session_id();
+
+        Ok(Self {
+            inner: Arc::new(Mutex::new(inner)),
+            device_id,
+            account_identity_keys: identity_keys,
+            session_id: session_id.into(),
+            room_id: pickle.room_id,
+            creation_time: pickle.creation_time.into(),
+            message_count: AtomicU64::from(pickle.message_count).into(),
+            shared: AtomicBool::from(pickle.shared).into(),
+            invalidated: AtomicBool::from(pickle.invalidated).into(),
+            settings: pickle.settings,
+            shared_with_set: Arc::new(
+                pickle
+                    .shared_with_set
+                    .into_iter()
+                    .map(|(k, v)| (k, v.into_iter().collect()))
+                    .collect(),
+            ),
+            to_share_with_set: Arc::new(pickle.requests.into_iter().collect()),
+        })
+    }
+
+    /// Store the group session as a base64 encoded string and associated data
+    /// belonging to the session.
+    ///
+    /// # Arguments
+    ///
+    /// * `pickle_mode` - The mode that should be used to pickle the group session,
+    /// either an unencrypted mode or an encrypted using passphrase.
+    pub async fn pickle(&self, pickling_mode: PicklingMode) -> PickledOutboundGroupSession {
+        let pickle: OutboundGroupSessionPickle =
+            self.inner.lock().await.pickle(pickling_mode).into();
+
+        PickledOutboundGroupSession {
+            pickle,
+            room_id: self.room_id.clone(),
+            settings: self.settings.clone(),
+            creation_time: *self.creation_time,
+            message_count: self.message_count.load(Ordering::SeqCst),
+            shared: self.shared(),
+            invalidated: self.invalidated(),
+            shared_with_set: self
+                .shared_with_set
+                .iter()
+                .map(|u| {
+                    (
+                        u.key().clone(),
+                        #[allow(clippy::map_clone)]
+                        u.value()
+                            .iter()
+                            .map(|d| (d.key().clone(), *d.value()))
+                            .collect(),
+                    )
+                })
+                .collect(),
+            requests: self
+                .to_share_with_set
+                .iter()
+                .map(|r| (*r.key(), r.value().clone()))
+                .collect(),
+        }
+    }
+}
+
+#[derive(Clone, Debug, Serialize, Deserialize)]
+pub struct OutboundGroupSessionPickle(String);
+
+impl From<String> for OutboundGroupSessionPickle {
+    fn from(p: String) -> Self {
+        Self(p)
     }
 }
 
@@ -395,6 +523,36 @@ impl std::fmt::Debug for OutboundGroupSession {
             .field("message_count", &self.message_count)
             .finish()
     }
+}
+
+/// A pickled version of an `InboundGroupSession`.
+///
+/// Holds all the information that needs to be stored in a database to restore
+/// an InboundGroupSession.
+#[derive(Clone, Debug, Deserialize, Serialize)]
+pub struct PickledOutboundGroupSession {
+    /// The pickle string holding the OutboundGroupSession.
+    pub pickle: OutboundGroupSessionPickle,
+    /// The settings this session adheres to.
+    pub settings: Arc<EncryptionSettings>,
+    /// The room id this session is used for.
+    pub room_id: Arc<RoomId>,
+    /// The timestamp when this session was created.
+    #[serde(
+        deserialize_with = "deserialize_instant",
+        serialize_with = "serialize_instant"
+    )]
+    pub creation_time: Instant,
+    /// The number of messages this session has already encrypted.
+    pub message_count: u64,
+    /// Is the session shared.
+    pub shared: bool,
+    /// Has the session been invalidated.
+    pub invalidated: bool,
+    /// The set of users the session has been already shared with.
+    pub shared_with_set: BTreeMap<UserId, BTreeMap<DeviceIdBox, u32>>,
+    /// Requests that need to be sent out to share the session.
+    pub requests: BTreeMap<Uuid, (Arc<ToDeviceRequest>, u32)>,
 }
 
 #[cfg(test)]

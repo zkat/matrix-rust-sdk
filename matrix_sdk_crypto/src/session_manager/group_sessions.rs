@@ -29,7 +29,7 @@ use tracing::{debug, info};
 
 use crate::{
     error::{EventError, MegolmResult, OlmResult},
-    olm::{Account, InboundGroupSession, OutboundGroupSession, Session},
+    olm::{Account, InboundGroupSession, OutboundGroupSession, Session, ShareState},
     store::{Changes, Store},
     Device, EncryptionSettings, OlmError, ToDeviceRequest,
 };
@@ -101,7 +101,13 @@ impl GroupSessionManager {
             panic!("Session expired");
         }
 
-        Ok(session.encrypt(content).await)
+        let content = session.encrypt(content).await;
+
+        let mut changes = Changes::default();
+        changes.outbound_group_sessions.push(session);
+        self.store.save_changes(changes).await?;
+
+        Ok(content)
     }
 
     /// Create a new outbound group session.
@@ -130,8 +136,22 @@ impl GroupSessionManager {
         room_id: &RoomId,
         settings: EncryptionSettings,
     ) -> OlmResult<(OutboundGroupSession, Option<InboundGroupSession>)> {
-        #[allow(clippy::map_clone)]
-        if let Some(s) = self.outbound_group_sessions.get(room_id).map(|s| s.clone()) {
+        // Get the cached session, if there isn't one load one from the store
+        // and put it in the cache.
+        let outbound_session = if let Some(s) = self.outbound_group_sessions.get(room_id) {
+            Some(s.clone())
+        } else if let Some(s) = self.store.get_outbound_group_sessions(room_id).await? {
+            self.outbound_group_sessions
+                .insert(room_id.clone(), s.clone());
+
+            Some(s)
+        } else {
+            None
+        };
+
+        // If there is no session or the session has expired or is invalid,
+        // create a new one.
+        if let Some(s) = outbound_session {
             if s.expired() || s.invalidated() {
                 self.create_outbound_group_session(room_id, settings)
                     .await
@@ -243,7 +263,8 @@ impl GroupSessionManager {
                 {
                     #[allow(clippy::map_clone)]
                     // Devices that received this session
-                    let shared: HashSet<DeviceIdBox> = shared.iter().map(|d| d.clone()).collect();
+                    let shared: HashSet<DeviceIdBox> =
+                        shared.iter().map(|d| d.key().clone()).collect();
                     let shared: HashSet<&DeviceId> = shared.iter().map(|d| d.as_ref()).collect();
 
                     // The difference between the devices that received the
@@ -294,6 +315,7 @@ impl GroupSessionManager {
             .await?;
 
         if let Some(inbound) = inbound {
+            changes.outbound_group_sessions.push(outbound.clone());
             changes.inbound_group_sessions.push(inbound);
         }
 
@@ -303,6 +325,7 @@ impl GroupSessionManager {
             let (outbound, inbound) = self
                 .create_outbound_group_session(room_id, encryption_settings)
                 .await?;
+            changes.outbound_group_sessions.push(outbound.clone());
             changes.inbound_group_sessions.push(inbound);
 
             debug!(
@@ -319,16 +342,23 @@ impl GroupSessionManager {
         let devices: Vec<Device> = devices
             .into_iter()
             .map(|(_, d)| {
-                d.into_iter()
-                    .filter(|d| !outbound.is_shared_with(d.user_id(), d.device_id()))
+                d.into_iter().filter(|d| {
+                    matches!(
+                        outbound.is_shared_with(d.user_id(), d.device_id()),
+                        ShareState::NotShared
+                    )
+                })
             })
             .flatten()
             .collect();
 
+        let key_content = outbound.as_json().await;
+        let message_index = outbound.message_index().await;
+
         if !devices.is_empty() {
             info!(
                 "Sharing outbound session at index {} with {:?}",
-                outbound.message_index().await,
+                message_index,
                 devices.iter().fold(BTreeMap::new(), |mut acc, d| {
                     acc.entry(d.user_id())
                         .or_insert_with(BTreeSet::new)
@@ -338,15 +368,13 @@ impl GroupSessionManager {
             );
         }
 
-        let key_content = outbound.as_json().await;
-
         for device_map_chunk in devices.chunks(Self::MAX_TO_DEVICE_MESSAGES) {
             let (id, request, used_sessions) = self
                 .encrypt_session_for(key_content.clone(), device_map_chunk)
                 .await?;
 
             if !request.messages.is_empty() {
-                outbound.add_request(id, request.into());
+                outbound.add_request(id, request.into(), message_index);
                 self.outbound_sessions_being_shared
                     .insert(id, outbound.clone());
             }

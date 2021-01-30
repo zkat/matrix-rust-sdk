@@ -14,7 +14,7 @@
 
 mod store_key;
 
-use std::{convert::TryFrom, path::Path, sync::Arc, time::SystemTime};
+use std::{collections::BTreeSet, convert::TryFrom, path::Path, sync::Arc, time::SystemTime};
 
 use futures::{
     stream::{self, Stream},
@@ -37,7 +37,7 @@ use sled::{
 };
 use tracing::info;
 
-use crate::deserialized_responses::MemberEvent;
+use crate::{deserialized_responses::MemberEvent, rooms::StrippedRoomInfo};
 
 use self::store_key::{EncryptedEvent, StoreKey};
 
@@ -79,6 +79,55 @@ impl From<SerializationError> for StoreError {
     }
 }
 
+trait EncodeKey {
+    const SEPARATOR: u8 = 0xff;
+    fn encode(&self) -> Vec<u8>;
+}
+
+impl EncodeKey for &UserId {
+    fn encode(&self) -> Vec<u8> {
+        self.as_str().encode()
+    }
+}
+
+impl EncodeKey for &RoomId {
+    fn encode(&self) -> Vec<u8> {
+        self.as_str().encode()
+    }
+}
+
+impl EncodeKey for &str {
+    fn encode(&self) -> Vec<u8> {
+        [self.as_bytes(), &[Self::SEPARATOR]].concat()
+    }
+}
+
+impl EncodeKey for (&str, &str) {
+    fn encode(&self) -> Vec<u8> {
+        [
+            self.0.as_bytes(),
+            &[Self::SEPARATOR],
+            self.1.as_bytes(),
+            &[Self::SEPARATOR],
+        ]
+        .concat()
+    }
+}
+
+impl EncodeKey for (&str, &str, &str) {
+    fn encode(&self) -> Vec<u8> {
+        [
+            self.0.as_bytes(),
+            &[Self::SEPARATOR],
+            self.1.as_bytes(),
+            &[Self::SEPARATOR],
+            self.2.as_bytes(),
+            &[Self::SEPARATOR],
+        ]
+        .concat()
+    }
+}
+
 #[derive(Debug, Clone)]
 pub struct SledStore {
     pub(crate) inner: Db,
@@ -87,6 +136,7 @@ pub struct SledStore {
     account_data: Tree,
     members: Tree,
     profiles: Tree,
+    display_names: Tree,
     joined_user_ids: Tree,
     invited_user_ids: Tree,
     room_info: Tree,
@@ -105,6 +155,7 @@ impl SledStore {
 
         let members = db.open_tree("members")?;
         let profiles = db.open_tree("profiles")?;
+        let display_names = db.open_tree("display_names")?;
         let joined_user_ids = db.open_tree("joined_user_ids")?;
         let invited_user_ids = db.open_tree("invited_user_ids")?;
 
@@ -124,6 +175,7 @@ impl SledStore {
             account_data,
             members,
             profiles,
+            display_names,
             joined_user_ids,
             invited_user_ids,
             room_account_data,
@@ -147,7 +199,7 @@ impl SledStore {
         let db = Config::new().temporary(false).path(path).open()?;
 
         let store_key: Option<DatabaseType> = db
-            .get("store_key")?
+            .get("store_key".encode())?
             .map(|k| serde_json::from_slice(&k).map_err(StoreError::Json))
             .transpose()?;
 
@@ -163,7 +215,7 @@ impl SledStore {
                 key.export(passphrase)
                     .map_err::<StoreError, _>(|e| e.into())?,
             );
-            db.insert("store_key", serde_json::to_vec(&encrypted_key)?)?;
+            db.insert("store_key".encode(), serde_json::to_vec(&encrypted_key)?)?;
             key
         };
 
@@ -203,7 +255,7 @@ impl SledStore {
 
     pub async fn save_filter(&self, filter_name: &str, filter_id: &str) -> Result<()> {
         self.session
-            .insert(&format!("filter{}", filter_name), filter_id)?;
+            .insert(("filter", filter_name).encode(), filter_id)?;
 
         Ok(())
     }
@@ -211,14 +263,14 @@ impl SledStore {
     pub async fn get_filter(&self, filter_name: &str) -> Result<Option<String>> {
         Ok(self
             .session
-            .get(&format!("filter{}", filter_name))?
+            .get(("filter", filter_name).encode())?
             .map(|f| String::from_utf8_lossy(&f).to_string()))
     }
 
     pub async fn get_sync_token(&self) -> Result<Option<String>> {
         Ok(self
             .session
-            .get("sync_token")?
+            .get("sync_token".encode())?
             .map(|t| String::from_utf8_lossy(&t).to_string()))
     }
 
@@ -230,6 +282,7 @@ impl SledStore {
             &self.account_data,
             &self.members,
             &self.profiles,
+            &self.display_names,
             &self.joined_user_ids,
             &self.invited_user_ids,
             &self.room_info,
@@ -246,6 +299,7 @@ impl SledStore {
                     account_data,
                     members,
                     profiles,
+                    display_names,
                     joined,
                     invited,
                     rooms,
@@ -257,41 +311,53 @@ impl SledStore {
                     stripped_state,
                 )| {
                     if let Some(s) = &changes.sync_token {
-                        session.insert("sync_token", s.as_str())?;
+                        session.insert("sync_token".encode(), s.as_str())?;
                     }
 
                     for (room, events) in &changes.members {
+                        let profile_changes = changes.profiles.get(room);
+
                         for event in events.values() {
-                            let key = format!("{}{}", room.as_str(), event.state_key.as_str());
+                            let key = (room.as_str(), event.state_key.as_str()).encode();
 
                             match event.content.membership {
                                 MembershipState::Join => {
-                                    joined.insert(key.as_str(), event.state_key.as_str())?;
-                                    invited.remove(key.as_str())?;
+                                    joined.insert(key.as_slice(), event.state_key.as_str())?;
+                                    invited.remove(key.as_slice())?;
                                 }
                                 MembershipState::Invite => {
-                                    invited.insert(key.as_str(), event.state_key.as_str())?;
-                                    joined.remove(key.as_str())?;
+                                    invited.insert(key.as_slice(), event.state_key.as_str())?;
+                                    joined.remove(key.as_slice())?;
                                 }
                                 _ => {
-                                    joined.remove(key.as_str())?;
-                                    invited.remove(key.as_str())?;
+                                    joined.remove(key.as_slice())?;
+                                    invited.remove(key.as_slice())?;
                                 }
                             }
 
                             members.insert(
-                                format!("{}{}", room.as_str(), &event.state_key).as_str(),
+                                key.as_slice(),
                                 self.serialize_event(&event)
                                     .map_err(ConflictableTransactionError::Abort)?,
                             )?;
+
+                            if let Some(profile) =
+                                profile_changes.and_then(|p| p.get(&event.state_key))
+                            {
+                                profiles.insert(
+                                    key.as_slice(),
+                                    self.serialize_event(&profile)
+                                        .map_err(ConflictableTransactionError::Abort)?,
+                                )?;
+                            }
                         }
                     }
 
-                    for (room, users) in &changes.profiles {
-                        for (user_id, profile) in users {
-                            profiles.insert(
-                                format!("{}{}", room.as_str(), user_id.as_str()).as_str(),
-                                self.serialize_event(&profile)
+                    for (room_id, ambiguity_maps) in &changes.ambiguity_maps {
+                        for (display_name, map) in ambiguity_maps {
+                            display_names.insert(
+                                (room_id.as_str(), display_name.as_str()).encode(),
+                                self.serialize_event(&map)
                                     .map_err(ConflictableTransactionError::Abort)?,
                             )?;
                         }
@@ -299,7 +365,7 @@ impl SledStore {
 
                     for (event_type, event) in &changes.account_data {
                         account_data.insert(
-                            event_type.as_str(),
+                            event_type.as_str().encode(),
                             self.serialize_event(&event)
                                 .map_err(ConflictableTransactionError::Abort)?,
                         )?;
@@ -308,7 +374,7 @@ impl SledStore {
                     for (room, events) in &changes.room_account_data {
                         for (event_type, event) in events {
                             room_account_data.insert(
-                                format!("{}{}", room.as_str(), event_type).as_str(),
+                                (room.as_str(), event_type.as_str()).encode(),
                                 self.serialize_event(&event)
                                     .map_err(ConflictableTransactionError::Abort)?,
                             )?;
@@ -319,13 +385,12 @@ impl SledStore {
                         for events in event_types.values() {
                             for event in events.values() {
                                 state.insert(
-                                    format!(
-                                        "{}{}{}",
+                                    (
                                         room.as_str(),
                                         event.content().event_type(),
                                         event.state_key(),
                                     )
-                                    .as_bytes(),
+                                        .encode(),
                                     self.serialize_event(&event)
                                         .map_err(ConflictableTransactionError::Abort)?,
                                 )?;
@@ -335,7 +400,7 @@ impl SledStore {
 
                     for (room_id, room_info) in &changes.room_infos {
                         rooms.insert(
-                            room_id.as_bytes(),
+                            room_id.encode(),
                             self.serialize_event(room_info)
                                 .map_err(ConflictableTransactionError::Abort)?,
                         )?;
@@ -343,7 +408,7 @@ impl SledStore {
 
                     for (sender, event) in &changes.presence {
                         presence.insert(
-                            sender.as_bytes(),
+                            sender.encode(),
                             self.serialize_event(&event)
                                 .map_err(ConflictableTransactionError::Abort)?,
                         )?;
@@ -351,7 +416,7 @@ impl SledStore {
 
                     for (room_id, info) in &changes.invited_room_info {
                         striped_rooms.insert(
-                            room_id.as_str(),
+                            room_id.encode(),
                             self.serialize_event(&info)
                                 .map_err(ConflictableTransactionError::Abort)?,
                         )?;
@@ -360,7 +425,7 @@ impl SledStore {
                     for (room, events) in &changes.stripped_members {
                         for event in events.values() {
                             stripped_members.insert(
-                                format!("{}{}", room.as_str(), &event.state_key).as_str(),
+                                (room.as_str(), event.state_key.as_str()).encode(),
                                 self.serialize_event(&event)
                                     .map_err(ConflictableTransactionError::Abort)?,
                             )?;
@@ -371,13 +436,12 @@ impl SledStore {
                         for events in event_types.values() {
                             for event in events.values() {
                                 stripped_state.insert(
-                                    format!(
-                                        "{}{}{}",
+                                    (
                                         room.as_str(),
                                         event.content().event_type(),
                                         event.state_key(),
                                     )
-                                    .as_bytes(),
+                                        .encode(),
                                     self.serialize_event(&event)
                                         .map_err(ConflictableTransactionError::Abort)?,
                                 )?;
@@ -401,7 +465,7 @@ impl SledStore {
     pub async fn get_presence_event(&self, user_id: &UserId) -> Result<Option<PresenceEvent>> {
         Ok(self
             .presence
-            .get(user_id.as_bytes())?
+            .get(user_id.encode())?
             .map(|e| self.deserialize_event(&e))
             .transpose()?)
     }
@@ -414,7 +478,7 @@ impl SledStore {
     ) -> Result<Option<AnySyncStateEvent>> {
         Ok(self
             .room_state
-            .get(format!("{}{}{}", room_id.as_str(), event_type, state_key).as_bytes())?
+            .get((room_id.as_str(), event_type.to_string().as_str(), state_key).encode())?
             .map(|e| self.deserialize_event(&e))
             .transpose()?)
     }
@@ -426,7 +490,7 @@ impl SledStore {
     ) -> Result<Option<MemberEventContent>> {
         Ok(self
             .profiles
-            .get(format!("{}{}", room_id.as_str(), user_id.as_str()))?
+            .get((room_id.as_str(), user_id.as_str()).encode())?
             .map(|p| self.deserialize_event(&p))
             .transpose()?)
     }
@@ -438,7 +502,7 @@ impl SledStore {
     ) -> Result<Option<MemberEvent>> {
         Ok(self
             .members
-            .get(format!("{}{}", room_id.as_str(), state_key.as_str()))?
+            .get((room_id.as_str(), state_key.as_str()).encode())?
             .map(|v| self.deserialize_event(&v))
             .transpose()?)
     }
@@ -449,7 +513,7 @@ impl SledStore {
     ) -> impl Stream<Item = Result<UserId>> {
         stream::iter(
             self.invited_user_ids
-                .scan_prefix(room_id.as_bytes())
+                .scan_prefix(room_id.encode())
                 .map(|u| {
                     UserId::try_from(String::from_utf8_lossy(&u?.1).to_string())
                         .map_err(StoreError::Identifier)
@@ -461,14 +525,10 @@ impl SledStore {
         &self,
         room_id: &RoomId,
     ) -> impl Stream<Item = Result<UserId>> {
-        stream::iter(
-            self.joined_user_ids
-                .scan_prefix(room_id.as_bytes())
-                .map(|u| {
-                    UserId::try_from(String::from_utf8_lossy(&u?.1).to_string())
-                        .map_err(StoreError::Identifier)
-                }),
-        )
+        stream::iter(self.joined_user_ids.scan_prefix(room_id.encode()).map(|u| {
+            UserId::try_from(String::from_utf8_lossy(&u?.1).to_string())
+                .map_err(StoreError::Identifier)
+        }))
     }
 
     pub async fn get_room_infos(&self) -> impl Stream<Item = Result<RoomInfo>> {
@@ -478,6 +538,30 @@ impl SledStore {
                 .iter()
                 .map(move |r| db.deserialize_event(&r?.1).map_err(|e| e.into())),
         )
+    }
+
+    pub async fn get_stripped_room_infos(&self) -> impl Stream<Item = Result<StrippedRoomInfo>> {
+        let db = self.clone();
+        stream::iter(
+            self.stripped_room_info
+                .iter()
+                .map(move |r| db.deserialize_event(&r?.1).map_err(|e| e.into())),
+        )
+    }
+
+    pub async fn get_users_with_display_name(
+        &self,
+        room_id: &RoomId,
+        display_name: &str,
+    ) -> Result<BTreeSet<UserId>> {
+        let key = (room_id.as_str(), display_name).encode();
+
+        Ok(self
+            .display_names
+            .get(key)?
+            .map(|m| self.deserialize_event(&m))
+            .transpose()?
+            .unwrap_or_default())
     }
 }
 
@@ -538,6 +622,19 @@ impl StateStore for SledStore {
 
     async fn get_room_infos(&self) -> Result<Vec<RoomInfo>> {
         self.get_room_infos().await.try_collect().await
+    }
+
+    async fn get_stripped_room_infos(&self) -> Result<Vec<StrippedRoomInfo>> {
+        self.get_stripped_room_infos().await.try_collect().await
+    }
+
+    async fn get_users_with_display_name(
+        &self,
+        room_id: &RoomId,
+        display_name: &str,
+    ) -> Result<BTreeSet<UserId>> {
+        self.get_users_with_display_name(room_id, display_name)
+            .await
     }
 }
 

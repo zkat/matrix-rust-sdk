@@ -20,7 +20,7 @@
 //! The following crate feature flags are available:
 //!
 //! * `encryption`: Enables end-to-end encryption support in the library.
-//! * `sqlite_cryptostore`: Enables a SQLite based store for the encryption
+//! * `sled_cryptostore`: Enables a Sled based store for the encryption
 //! keys. If this is disabled and `encryption` support is enabled the keys will
 //! by default be stored only in memory and thus lost after the client is
 //! destroyed.
@@ -29,6 +29,7 @@
 //! * `markdown`: Support for sending markdown formatted messages.
 #![deny(
     missing_debug_implementations,
+    missing_docs,
     trivial_casts,
     trivial_numeric_casts,
     unused_extern_crates,
@@ -51,8 +52,11 @@ mod session;
 mod store;
 
 pub use event_emitter::EventEmitter;
-pub use rooms::{InvitedRoom, JoinedRoom, LeftRoom, Room, RoomInfo, RoomMember, RoomState};
-pub use store::{Store, StoreError};
+pub use rooms::{
+    InvitedRoom, JoinedRoom, LeftRoom, Room, RoomInfo, RoomMember, RoomState, StrippedRoom,
+    StrippedRoomInfo,
+};
+pub use store::{StateStore, Store, StoreError};
 
 pub use client::{BaseClient, BaseClientConfig, RoomStateType};
 

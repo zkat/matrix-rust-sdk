@@ -13,6 +13,27 @@ use super::{
     identifiers::{DeviceKeyAlgorithm, EventId, RoomId, UserId},
 };
 
+/// A change in ambiguity of room members that an `m.room.member` event
+/// triggers.
+#[derive(Clone, Debug, Default, Deserialize, Serialize)]
+pub struct AmbiguityChange {
+    /// Is the member that is contained in the state key of the `m.room.member`
+    /// event itself ambiguous because of the event.
+    pub member_ambiguous: bool,
+    /// Has another user been disambiguated because of this event.
+    pub disambiguated_member: Option<UserId>,
+    /// Has another user become ambiguous because of this event.
+    pub ambiguated_member: Option<UserId>,
+}
+
+/// Collection of ambiguioty changes that room member events trigger.
+#[derive(Clone, Debug, Default, Deserialize, Serialize)]
+pub struct AmbiguityChanges {
+    /// A map from room id to a map of an event id to the `AmbiguityChange` that
+    /// the event with the given id caused.
+    pub changes: BTreeMap<RoomId, BTreeMap<EventId, AmbiguityChange>>,
+}
+
 #[derive(Clone, Debug, Default, Deserialize, Serialize)]
 pub struct SyncResponse {
     /// The batch token to supply in the `since` param of the next `/sync` request.
@@ -32,6 +53,8 @@ pub struct SyncResponse {
     /// For each key algorithm, the number of unclaimed one-time keys
     /// currently held on the server for a device.
     pub device_one_time_keys_count: BTreeMap<DeviceKeyAlgorithm, u64>,
+    /// Collection of ambiguioty changes that room member events trigger.
+    pub ambiguity_changes: AmbiguityChanges,
 }
 
 impl SyncResponse {
@@ -304,4 +327,15 @@ impl Into<StrippedStateEvent<MemberEventContent>> for StrippedMemberEvent {
             state_key: self.state_key.to_string(),
         }
     }
+}
+
+/// A deserialized response for the rooms members API call.
+///
+/// [GET /_matrix/client/r0/rooms/{roomId}/members](https://matrix.org/docs/spec/client_server/r0.6.0#get-matrix-client-r0-rooms-roomid-members)
+#[derive(Clone, Debug, Default, Deserialize, Serialize)]
+pub struct MembersResponse {
+    /// The list of members events.
+    pub chunk: Vec<MemberEvent>,
+    /// Collection of ambiguioty changes that room member events trigger.
+    pub ambiguity_changes: AmbiguityChanges,
 }

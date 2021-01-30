@@ -39,12 +39,61 @@ use super::{
 };
 use crate::{
     identities::{ReadOnlyDevice, UserIdentities},
-    olm::{PickledInboundGroupSession, PrivateCrossSigningIdentity},
+    olm::{OutboundGroupSession, PickledInboundGroupSession, PrivateCrossSigningIdentity},
 };
 
 /// This needs to be 32 bytes long since AES-GCM requires it, otherwise we will
 /// panic once we try to pickle a Signing object.
 const DEFAULT_PICKLE: &str = "DEFAULT_PICKLE_PASSPHRASE_123456";
+
+trait EncodeKey {
+    const SEPARATOR: u8 = 0xff;
+    fn encode(&self) -> Vec<u8>;
+}
+
+impl EncodeKey for &UserId {
+    fn encode(&self) -> Vec<u8> {
+        self.as_str().encode()
+    }
+}
+
+impl EncodeKey for &RoomId {
+    fn encode(&self) -> Vec<u8> {
+        self.as_str().encode()
+    }
+}
+
+impl EncodeKey for &str {
+    fn encode(&self) -> Vec<u8> {
+        [self.as_bytes(), &[Self::SEPARATOR]].concat()
+    }
+}
+
+impl EncodeKey for (&str, &str) {
+    fn encode(&self) -> Vec<u8> {
+        [
+            self.0.as_bytes(),
+            &[Self::SEPARATOR],
+            self.1.as_bytes(),
+            &[Self::SEPARATOR],
+        ]
+        .concat()
+    }
+}
+
+impl EncodeKey for (&str, &str, &str) {
+    fn encode(&self) -> Vec<u8> {
+        [
+            self.0.as_bytes(),
+            &[Self::SEPARATOR],
+            self.1.as_bytes(),
+            &[Self::SEPARATOR],
+            self.2.as_bytes(),
+            &[Self::SEPARATOR],
+        ]
+        .concat()
+    }
+}
 
 /// An in-memory only store that will forget all the E2EE key once it's dropped.
 #[derive(Debug, Clone)]
@@ -62,6 +111,7 @@ pub struct SledStore {
     olm_hashes: Tree,
     sessions: Tree,
     inbound_group_sessions: Tree,
+    outbound_group_sessions: Tree,
 
     devices: Tree,
     identities: Tree,
@@ -102,6 +152,7 @@ impl SledStore {
 
         let sessions = db.open_tree("session")?;
         let inbound_group_sessions = db.open_tree("inbound_group_sessions")?;
+        let outbound_group_sessions = db.open_tree("outbound_group_sessions")?;
         let tracked_users = db.open_tree("tracked_users")?;
         let users_for_key_query = db.open_tree("users_for_key_query")?;
         let olm_hashes = db.open_tree("olm_hashes")?;
@@ -129,6 +180,7 @@ impl SledStore {
             tracked_users_cache: DashSet::new().into(),
             users_for_key_query_cache: DashSet::new().into(),
             inbound_group_sessions,
+            outbound_group_sessions,
             devices,
             tracked_users,
             users_for_key_query,
@@ -140,7 +192,7 @@ impl SledStore {
 
     fn get_or_create_pickle_key(passphrase: &str, database: &Db) -> Result<PickleKey> {
         let key = if let Some(key) = database
-            .get("pickle_key")?
+            .get("pickle_key".encode())?
             .map(|v| serde_json::from_slice(&v))
         {
             PickleKey::from_encrypted(passphrase, key?)
@@ -148,7 +200,7 @@ impl SledStore {
         } else {
             let key = PickleKey::new();
             let encrypted = key.encrypt(passphrase);
-            database.insert("pickle_key", serde_json::to_vec(&encrypted)?)?;
+            database.insert("pickle_key".encode(), serde_json::to_vec(&encrypted)?)?;
             key
         };
 
@@ -179,6 +231,34 @@ impl SledStore {
         Ok(())
     }
 
+    async fn load_outbound_group_session(
+        &self,
+        room_id: &RoomId,
+    ) -> Result<Option<OutboundGroupSession>> {
+        let account = self
+            .load_account()
+            .await?
+            .ok_or(CryptoStoreError::AccountUnset)?;
+
+        let device_id: Arc<DeviceIdBox> = account.device_id().to_owned().into();
+        let identity_keys = account.identity_keys;
+
+        self.outbound_group_sessions
+            .get(room_id.encode())?
+            .map(|p| serde_json::from_slice(&p).map_err(CryptoStoreError::Serialization))
+            .transpose()?
+            .map(|p| {
+                OutboundGroupSession::from_pickle(
+                    device_id,
+                    identity_keys,
+                    p,
+                    self.get_pickle_mode(),
+                )
+                .map_err(CryptoStoreError::OlmGroupSession)
+            })
+            .transpose()
+    }
+
     async fn save_changes(&self, changes: Changes) -> Result<()> {
         let account_pickle = if let Some(a) = changes.account {
             Some(a.pickle(self.get_pickle_mode()).await)
@@ -200,7 +280,7 @@ impl SledStore {
             let session_id = session.session_id();
 
             let pickle = session.pickle(self.get_pickle_mode()).await;
-            let key = format!("{}{}", sender_key, session_id);
+            let key = (sender_key, session_id).encode();
 
             self.session_cache.add(session).await;
             session_changes.insert(key, pickle);
@@ -212,10 +292,19 @@ impl SledStore {
             let room_id = session.room_id();
             let sender_key = session.sender_key();
             let session_id = session.session_id();
-            let key = format!("{}{}{}", room_id, sender_key, session_id);
+            let key = (room_id.as_str(), sender_key, session_id).encode();
             let pickle = session.pickle(self.get_pickle_mode()).await;
 
             inbound_session_changes.insert(key, pickle);
+        }
+
+        let mut outbound_session_changes = HashMap::new();
+
+        for session in changes.outbound_group_sessions {
+            let room_id = session.room_id();
+            let pickle = session.pickle(self.get_pickle_mode()).await;
+
+            outbound_session_changes.insert(room_id.clone(), pickle);
         }
 
         let identity_changes = changes.identities;
@@ -228,6 +317,7 @@ impl SledStore {
             &self.identities,
             &self.sessions,
             &self.inbound_group_sessions,
+            &self.outbound_group_sessions,
             &self.olm_hashes,
         )
             .transaction(
@@ -238,37 +328,38 @@ impl SledStore {
                     identities,
                     sessions,
                     inbound_sessions,
+                    outbound_sessions,
                     hashes,
                 )| {
                     if let Some(a) = &account_pickle {
                         account.insert(
-                            "account",
+                            "account".encode(),
                             serde_json::to_vec(a).map_err(ConflictableTransactionError::Abort)?,
                         )?;
                     }
 
                     if let Some(i) = &private_identity_pickle {
                         private_identity.insert(
-                            "identity",
+                            "identity".encode(),
                             serde_json::to_vec(&i).map_err(ConflictableTransactionError::Abort)?,
                         )?;
                     }
 
                     for device in device_changes.new.iter().chain(&device_changes.changed) {
-                        let key = format!("{}{}", device.user_id(), device.device_id());
+                        let key = (device.user_id().as_str(), device.device_id().as_str()).encode();
                         let device = serde_json::to_vec(&device)
                             .map_err(ConflictableTransactionError::Abort)?;
-                        devices.insert(key.as_str(), device)?;
+                        devices.insert(key, device)?;
                     }
 
                     for device in &device_changes.deleted {
-                        let key = format!("{}{}", device.user_id(), device.device_id());
-                        devices.remove(key.as_str())?;
+                        let key = (device.user_id().as_str(), device.device_id().as_str()).encode();
+                        devices.remove(key)?;
                     }
 
                     for identity in identity_changes.changed.iter().chain(&identity_changes.new) {
                         identities.insert(
-                            identity.user_id().as_str(),
+                            identity.user_id().encode(),
                             serde_json::to_vec(&identity)
                                 .map_err(ConflictableTransactionError::Abort)?,
                         )?;
@@ -276,7 +367,7 @@ impl SledStore {
 
                     for (key, session) in &session_changes {
                         sessions.insert(
-                            key.as_str(),
+                            key.as_slice(),
                             serde_json::to_vec(&session)
                                 .map_err(ConflictableTransactionError::Abort)?,
                         )?;
@@ -284,7 +375,15 @@ impl SledStore {
 
                     for (key, session) in &inbound_session_changes {
                         inbound_sessions.insert(
-                            key.as_str(),
+                            key.as_slice(),
+                            serde_json::to_vec(&session)
+                                .map_err(ConflictableTransactionError::Abort)?,
+                        )?;
+                    }
+
+                    for (key, session) in &outbound_session_changes {
+                        outbound_sessions.insert(
+                            key.encode(),
                             serde_json::to_vec(&session)
                                 .map_err(ConflictableTransactionError::Abort)?,
                         )?;
@@ -312,7 +411,7 @@ impl SledStore {
 #[async_trait]
 impl CryptoStore for SledStore {
     async fn load_account(&self) -> Result<Option<ReadOnlyAccount>> {
-        if let Some(pickle) = self.account.get("account")? {
+        if let Some(pickle) = self.account.get("account".encode())? {
             let pickle = serde_json::from_slice(&pickle)?;
 
             self.load_tracked_users().await?;
@@ -329,7 +428,7 @@ impl CryptoStore for SledStore {
     async fn save_account(&self, account: ReadOnlyAccount) -> Result<()> {
         let pickle = account.pickle(self.get_pickle_mode()).await;
         self.account
-            .insert("account", serde_json::to_vec(&pickle)?)?;
+            .insert("account".encode(), serde_json::to_vec(&pickle)?)?;
 
         Ok(())
     }
@@ -347,7 +446,7 @@ impl CryptoStore for SledStore {
         if self.session_cache.get(sender_key).is_none() {
             let sessions: Result<Vec<Session>> = self
                 .sessions
-                .scan_prefix(sender_key)
+                .scan_prefix(sender_key.encode())
                 .map(|s| serde_json::from_slice(&s?.1).map_err(CryptoStoreError::Serialization))
                 .map(|p| {
                     Session::from_pickle(
@@ -373,7 +472,7 @@ impl CryptoStore for SledStore {
         sender_key: &str,
         session_id: &str,
     ) -> Result<Option<InboundGroupSession>> {
-        let key = format!("{}{}{}", room_id, sender_key, session_id);
+        let key = (room_id.as_str(), sender_key, session_id).encode();
         let pickle = self
             .inbound_group_sessions
             .get(&key)?
@@ -437,7 +536,7 @@ impl CryptoStore for SledStore {
         user_id: &UserId,
         device_id: &DeviceId,
     ) -> Result<Option<ReadOnlyDevice>> {
-        let key = format!("{}{}", user_id, device_id);
+        let key = (user_id.as_str(), device_id.as_str()).encode();
 
         if let Some(d) = self.devices.get(key)? {
             Ok(Some(serde_json::from_slice(&d)?))
@@ -451,7 +550,7 @@ impl CryptoStore for SledStore {
         user_id: &UserId,
     ) -> Result<HashMap<DeviceIdBox, ReadOnlyDevice>> {
         self.devices
-            .scan_prefix(user_id.as_str())
+            .scan_prefix(user_id.encode())
             .map(|d| serde_json::from_slice(&d?.1).map_err(CryptoStoreError::Serialization))
             .map(|d| {
                 let d: ReadOnlyDevice = d?;
@@ -463,30 +562,30 @@ impl CryptoStore for SledStore {
     async fn get_user_identity(&self, user_id: &UserId) -> Result<Option<UserIdentities>> {
         Ok(self
             .identities
-            .get(user_id.as_str())?
+            .get(user_id.encode())?
             .map(|i| serde_json::from_slice(&i))
             .transpose()?)
     }
 
     async fn save_value(&self, key: String, value: String) -> Result<()> {
-        self.values.insert(key.as_str(), value.as_str())?;
+        self.values.insert(key.as_str().encode(), value.as_str())?;
         Ok(())
     }
 
     async fn remove_value(&self, key: &str) -> Result<()> {
-        self.values.remove(key)?;
+        self.values.remove(key.encode())?;
         Ok(())
     }
 
     async fn get_value(&self, key: &str) -> Result<Option<String>> {
         Ok(self
             .values
-            .get(key)?
+            .get(key.encode())?
             .map(|v| String::from_utf8_lossy(&v).to_string()))
     }
 
     async fn load_identity(&self) -> Result<Option<PrivateCrossSigningIdentity>> {
-        if let Some(i) = self.private_identity.get("identity")? {
+        if let Some(i) = self.private_identity.get("identity".encode())? {
             let pickle = serde_json::from_slice(&i)?;
             Ok(Some(
                 PrivateCrossSigningIdentity::from_pickle(pickle, self.get_pickle_key())
@@ -503,7 +602,579 @@ impl CryptoStore for SledStore {
             .olm_hashes
             .contains_key(serde_json::to_vec(message_hash)?)?)
     }
+
+    async fn get_outbound_group_sessions(
+        &self,
+        room_id: &RoomId,
+    ) -> Result<Option<OutboundGroupSession>> {
+        self.load_outbound_group_session(room_id).await
+    }
 }
 
 #[cfg(test)]
-mod test {}
+mod test {
+    use crate::{
+        identities::{
+            device::test::get_device,
+            user::test::{get_other_identity, get_own_identity},
+        },
+        olm::{
+            GroupSessionKey, InboundGroupSession, OlmMessageHash, PrivateCrossSigningIdentity,
+            ReadOnlyAccount, Session,
+        },
+        store::{Changes, DeviceChanges, IdentityChanges},
+    };
+    use matrix_sdk_common::{
+        api::r0::keys::SignedKey,
+        identifiers::{room_id, user_id, DeviceId, UserId},
+    };
+    use matrix_sdk_test::async_test;
+    use olm_rs::outbound_group_session::OlmOutboundGroupSession;
+    use std::collections::BTreeMap;
+    use tempfile::tempdir;
+
+    use super::{CryptoStore, SledStore};
+
+    fn alice_id() -> UserId {
+        user_id!("@alice:example.org")
+    }
+
+    fn alice_device_id() -> Box<DeviceId> {
+        "ALICEDEVICE".into()
+    }
+
+    fn bob_id() -> UserId {
+        user_id!("@bob:example.org")
+    }
+
+    fn bob_device_id() -> Box<DeviceId> {
+        "BOBDEVICE".into()
+    }
+
+    async fn get_store(passphrase: Option<&str>) -> (SledStore, tempfile::TempDir) {
+        let tmpdir = tempdir().unwrap();
+        let tmpdir_path = tmpdir.path().to_str().unwrap();
+
+        let store = SledStore::open_with_passphrase(tmpdir_path, passphrase)
+            .expect("Can't create a passphrase protected store");
+
+        (store, tmpdir)
+    }
+
+    async fn get_loaded_store() -> (ReadOnlyAccount, SledStore, tempfile::TempDir) {
+        let (store, dir) = get_store(None).await;
+        let account = get_account();
+        store
+            .save_account(account.clone())
+            .await
+            .expect("Can't save account");
+
+        (account, store, dir)
+    }
+
+    fn get_account() -> ReadOnlyAccount {
+        ReadOnlyAccount::new(&alice_id(), &alice_device_id())
+    }
+
+    async fn get_account_and_session() -> (ReadOnlyAccount, Session) {
+        let alice = ReadOnlyAccount::new(&alice_id(), &alice_device_id());
+        let bob = ReadOnlyAccount::new(&bob_id(), &bob_device_id());
+
+        bob.generate_one_time_keys_helper(1).await;
+        let one_time_key = bob
+            .one_time_keys()
+            .await
+            .curve25519()
+            .iter()
+            .next()
+            .unwrap()
+            .1
+            .to_owned();
+        let one_time_key = SignedKey {
+            key: one_time_key,
+            signatures: BTreeMap::new(),
+        };
+        let sender_key = bob.identity_keys().curve25519().to_owned();
+        let session = alice
+            .create_outbound_session_helper(&sender_key, &one_time_key)
+            .await
+            .unwrap();
+
+        (alice, session)
+    }
+
+    #[async_test]
+    async fn create_store() {
+        let tmpdir = tempdir().unwrap();
+        let tmpdir_path = tmpdir.path().to_str().unwrap();
+        let _ = SledStore::open_with_passphrase(tmpdir_path, None).expect("Can't create store");
+    }
+
+    #[async_test]
+    async fn save_account() {
+        let (store, _dir) = get_store(None).await;
+        assert!(store.load_account().await.unwrap().is_none());
+        let account = get_account();
+
+        store
+            .save_account(account)
+            .await
+            .expect("Can't save account");
+    }
+
+    #[async_test]
+    async fn load_account() {
+        let (store, _dir) = get_store(None).await;
+        let account = get_account();
+
+        store
+            .save_account(account.clone())
+            .await
+            .expect("Can't save account");
+
+        let loaded_account = store.load_account().await.expect("Can't load account");
+        let loaded_account = loaded_account.unwrap();
+
+        assert_eq!(account, loaded_account);
+    }
+
+    #[async_test]
+    async fn load_account_with_passphrase() {
+        let (store, _dir) = get_store(Some("secret_passphrase")).await;
+        let account = get_account();
+
+        store
+            .save_account(account.clone())
+            .await
+            .expect("Can't save account");
+
+        let loaded_account = store.load_account().await.expect("Can't load account");
+        let loaded_account = loaded_account.unwrap();
+
+        assert_eq!(account, loaded_account);
+    }
+
+    #[async_test]
+    async fn save_and_share_account() {
+        let (store, _dir) = get_store(None).await;
+        let account = get_account();
+
+        store
+            .save_account(account.clone())
+            .await
+            .expect("Can't save account");
+
+        account.mark_as_shared();
+        account.update_uploaded_key_count(50);
+
+        store
+            .save_account(account.clone())
+            .await
+            .expect("Can't save account");
+
+        let loaded_account = store.load_account().await.expect("Can't load account");
+        let loaded_account = loaded_account.unwrap();
+
+        assert_eq!(account, loaded_account);
+        assert_eq!(
+            account.uploaded_key_count(),
+            loaded_account.uploaded_key_count()
+        );
+    }
+
+    #[async_test]
+    async fn load_sessions() {
+        let (store, _dir) = get_store(None).await;
+        let (account, session) = get_account_and_session().await;
+        store
+            .save_account(account.clone())
+            .await
+            .expect("Can't save account");
+
+        let changes = Changes {
+            sessions: vec![session.clone()],
+            ..Default::default()
+        };
+
+        store.save_changes(changes).await.unwrap();
+
+        let sessions = store
+            .get_sessions(&session.sender_key)
+            .await
+            .expect("Can't load sessions")
+            .unwrap();
+        let loaded_session = sessions.lock().await.get(0).cloned().unwrap();
+
+        assert_eq!(&session, &loaded_session);
+    }
+
+    #[async_test]
+    async fn add_and_save_session() {
+        let (store, dir) = get_store(None).await;
+        let (account, session) = get_account_and_session().await;
+        let sender_key = session.sender_key.to_owned();
+        let session_id = session.session_id().to_owned();
+
+        store
+            .save_account(account.clone())
+            .await
+            .expect("Can't save account");
+
+        let changes = Changes {
+            sessions: vec![session.clone()],
+            ..Default::default()
+        };
+        store.save_changes(changes).await.unwrap();
+
+        let sessions = store.get_sessions(&sender_key).await.unwrap().unwrap();
+        let sessions_lock = sessions.lock().await;
+        let session = &sessions_lock[0];
+
+        assert_eq!(session_id, session.session_id());
+
+        drop(store);
+
+        let store = SledStore::open_with_passphrase(dir.path(), None).expect("Can't create store");
+
+        let loaded_account = store.load_account().await.unwrap().unwrap();
+        assert_eq!(account, loaded_account);
+
+        let sessions = store.get_sessions(&sender_key).await.unwrap().unwrap();
+        let sessions_lock = sessions.lock().await;
+        let session = &sessions_lock[0];
+
+        assert_eq!(session_id, session.session_id());
+    }
+
+    #[async_test]
+    async fn save_inbound_group_session() {
+        let (account, store, _dir) = get_loaded_store().await;
+
+        let identity_keys = account.identity_keys();
+        let outbound_session = OlmOutboundGroupSession::new();
+        let session = InboundGroupSession::new(
+            identity_keys.curve25519(),
+            identity_keys.ed25519(),
+            &room_id!("!test:localhost"),
+            GroupSessionKey(outbound_session.session_key()),
+        )
+        .expect("Can't create session");
+
+        let changes = Changes {
+            inbound_group_sessions: vec![session],
+            ..Default::default()
+        };
+
+        store
+            .save_changes(changes)
+            .await
+            .expect("Can't save group session");
+    }
+
+    #[async_test]
+    async fn load_inbound_group_session() {
+        let (account, store, dir) = get_loaded_store().await;
+
+        let identity_keys = account.identity_keys();
+        let outbound_session = OlmOutboundGroupSession::new();
+        let session = InboundGroupSession::new(
+            identity_keys.curve25519(),
+            identity_keys.ed25519(),
+            &room_id!("!test:localhost"),
+            GroupSessionKey(outbound_session.session_key()),
+        )
+        .expect("Can't create session");
+
+        let mut export = session.export().await;
+
+        export.forwarding_curve25519_key_chain = vec!["some_chain".to_owned()];
+
+        let session = InboundGroupSession::from_export(export).unwrap();
+
+        let changes = Changes {
+            inbound_group_sessions: vec![session.clone()],
+            ..Default::default()
+        };
+
+        store
+            .save_changes(changes)
+            .await
+            .expect("Can't save group session");
+
+        drop(store);
+
+        let store = SledStore::open_with_passphrase(dir.path(), None).expect("Can't create store");
+
+        store.load_account().await.unwrap();
+
+        let loaded_session = store
+            .get_inbound_group_session(&session.room_id, &session.sender_key, session.session_id())
+            .await
+            .unwrap()
+            .unwrap();
+        assert_eq!(session, loaded_session);
+        let export = loaded_session.export().await;
+        assert!(!export.forwarding_curve25519_key_chain.is_empty())
+    }
+
+    #[async_test]
+    async fn test_tracked_users() {
+        let (_account, store, dir) = get_loaded_store().await;
+        let device = get_device();
+
+        assert!(store
+            .update_tracked_user(device.user_id(), false)
+            .await
+            .unwrap());
+        assert!(!store
+            .update_tracked_user(device.user_id(), false)
+            .await
+            .unwrap());
+
+        assert!(store.is_user_tracked(device.user_id()));
+        assert!(!store.users_for_key_query().contains(device.user_id()));
+        assert!(!store
+            .update_tracked_user(device.user_id(), true)
+            .await
+            .unwrap());
+        assert!(store.users_for_key_query().contains(device.user_id()));
+        drop(store);
+
+        let store = SledStore::open_with_passphrase(dir.path(), None).expect("Can't create store");
+
+        store.load_account().await.unwrap();
+
+        assert!(store.is_user_tracked(device.user_id()));
+        assert!(store.users_for_key_query().contains(device.user_id()));
+
+        store
+            .update_tracked_user(device.user_id(), false)
+            .await
+            .unwrap();
+        assert!(!store.users_for_key_query().contains(device.user_id()));
+        drop(store);
+
+        let store = SledStore::open_with_passphrase(dir.path(), None).expect("Can't create store");
+
+        store.load_account().await.unwrap();
+
+        assert!(!store.users_for_key_query().contains(device.user_id()));
+    }
+
+    #[async_test]
+    async fn device_saving() {
+        let (_account, store, dir) = get_loaded_store().await;
+        let device = get_device();
+
+        let changes = Changes {
+            devices: DeviceChanges {
+                changed: vec![device.clone()],
+                ..Default::default()
+            },
+            ..Default::default()
+        };
+
+        store.save_changes(changes).await.unwrap();
+
+        drop(store);
+
+        let store = SledStore::open_with_passphrase(dir.path(), None).expect("Can't create store");
+
+        store.load_account().await.unwrap();
+
+        let loaded_device = store
+            .get_device(device.user_id(), device.device_id())
+            .await
+            .unwrap()
+            .unwrap();
+
+        assert_eq!(device, loaded_device);
+
+        for algorithm in loaded_device.algorithms() {
+            assert!(device.algorithms().contains(algorithm));
+        }
+        assert_eq!(device.algorithms().len(), loaded_device.algorithms().len());
+        assert_eq!(device.keys(), loaded_device.keys());
+
+        let user_devices = store.get_user_devices(device.user_id()).await.unwrap();
+        assert_eq!(&**user_devices.keys().next().unwrap(), device.device_id());
+        assert_eq!(user_devices.values().next().unwrap(), &device);
+    }
+
+    #[async_test]
+    async fn device_deleting() {
+        let (_account, store, dir) = get_loaded_store().await;
+        let device = get_device();
+
+        let changes = Changes {
+            devices: DeviceChanges {
+                changed: vec![device.clone()],
+                ..Default::default()
+            },
+            ..Default::default()
+        };
+
+        store.save_changes(changes).await.unwrap();
+
+        let changes = Changes {
+            devices: DeviceChanges {
+                deleted: vec![device.clone()],
+                ..Default::default()
+            },
+            ..Default::default()
+        };
+
+        store.save_changes(changes).await.unwrap();
+        drop(store);
+
+        let store = SledStore::open_with_passphrase(dir.path(), None).expect("Can't create store");
+
+        store.load_account().await.unwrap();
+
+        let loaded_device = store
+            .get_device(device.user_id(), device.device_id())
+            .await
+            .unwrap();
+
+        assert!(loaded_device.is_none());
+    }
+
+    #[async_test]
+    async fn user_saving() {
+        let dir = tempdir().unwrap();
+        let tmpdir_path = dir.path().to_str().unwrap();
+
+        let user_id = user_id!("@example:localhost");
+        let device_id: &DeviceId = "WSKKLTJZCL".into();
+
+        let store = SledStore::open_with_passphrase(tmpdir_path, None).expect("Can't create store");
+
+        let account = ReadOnlyAccount::new(&user_id, &device_id);
+
+        store
+            .save_account(account.clone())
+            .await
+            .expect("Can't save account");
+
+        let own_identity = get_own_identity();
+
+        let changes = Changes {
+            identities: IdentityChanges {
+                changed: vec![own_identity.clone().into()],
+                ..Default::default()
+            },
+            ..Default::default()
+        };
+
+        store
+            .save_changes(changes)
+            .await
+            .expect("Can't save identity");
+
+        drop(store);
+
+        let store = SledStore::open_with_passphrase(dir.path(), None).expect("Can't create store");
+
+        store.load_account().await.unwrap();
+
+        let loaded_user = store
+            .get_user_identity(own_identity.user_id())
+            .await
+            .unwrap()
+            .unwrap();
+
+        assert_eq!(loaded_user.master_key(), own_identity.master_key());
+        assert_eq!(
+            loaded_user.self_signing_key(),
+            own_identity.self_signing_key()
+        );
+        assert_eq!(loaded_user, own_identity.clone().into());
+
+        let other_identity = get_other_identity();
+
+        let changes = Changes {
+            identities: IdentityChanges {
+                changed: vec![other_identity.clone().into()],
+                ..Default::default()
+            },
+            ..Default::default()
+        };
+
+        store.save_changes(changes).await.unwrap();
+
+        let loaded_user = store
+            .get_user_identity(other_identity.user_id())
+            .await
+            .unwrap()
+            .unwrap();
+
+        assert_eq!(loaded_user.master_key(), other_identity.master_key());
+        assert_eq!(
+            loaded_user.self_signing_key(),
+            other_identity.self_signing_key()
+        );
+        assert_eq!(loaded_user, other_identity.into());
+
+        own_identity.mark_as_verified();
+
+        let changes = Changes {
+            identities: IdentityChanges {
+                changed: vec![own_identity.into()],
+                ..Default::default()
+            },
+            ..Default::default()
+        };
+
+        store.save_changes(changes).await.unwrap();
+        let loaded_user = store.get_user_identity(&user_id).await.unwrap().unwrap();
+        assert!(loaded_user.own().unwrap().is_verified())
+    }
+
+    #[async_test]
+    async fn private_identity_saving() {
+        let (_, store, _dir) = get_loaded_store().await;
+        assert!(store.load_identity().await.unwrap().is_none());
+        let identity = PrivateCrossSigningIdentity::new(alice_id()).await;
+
+        let changes = Changes {
+            private_identity: Some(identity.clone()),
+            ..Default::default()
+        };
+
+        store.save_changes(changes).await.unwrap();
+        let loaded_identity = store.load_identity().await.unwrap().unwrap();
+        assert_eq!(identity.user_id(), loaded_identity.user_id());
+    }
+
+    #[async_test]
+    async fn key_value_saving() {
+        let (_, store, _dir) = get_loaded_store().await;
+        let key = "test_key".to_string();
+        let value = "secret value".to_string();
+
+        store.save_value(key.clone(), value.clone()).await.unwrap();
+        let stored_value = store.get_value(&key).await.unwrap().unwrap();
+
+        assert_eq!(value, stored_value);
+
+        store.remove_value(&key).await.unwrap();
+        assert!(store.get_value(&key).await.unwrap().is_none());
+    }
+
+    #[async_test]
+    async fn olm_hash_saving() {
+        let (_, store, _dir) = get_loaded_store().await;
+
+        let hash = OlmMessageHash {
+            sender_key: "test_sender".to_owned(),
+            hash: "test_hash".to_owned(),
+        };
+
+        let mut changes = Changes::default();
+        changes.message_hashes.push(hash.clone());
+
+        assert!(!store.is_message_known(&hash).await.unwrap());
+        store.save_changes(changes).await.unwrap();
+        assert!(store.is_message_known(&hash).await.unwrap());
+    }
+}

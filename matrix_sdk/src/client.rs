@@ -40,8 +40,8 @@ use tracing::{debug, warn};
 use tracing::{error, info, instrument};
 
 use matrix_sdk_base::{
-    deserialized_responses::SyncResponse, BaseClient, BaseClientConfig, EventEmitter, InvitedRoom,
-    JoinedRoom, LeftRoom, Session, Store,
+    deserialized_responses::{MembersResponse, SyncResponse},
+    BaseClient, BaseClientConfig, EventEmitter, InvitedRoom, JoinedRoom, LeftRoom, Session, Store,
 };
 
 #[cfg(feature = "encryption")]
@@ -72,8 +72,7 @@ use matrix_sdk_common::{
         filter::{create_filter::Request as FilterUploadRequest, FilterDefinition},
         media::create_content,
         membership::{
-            ban_user, forget_room,
-            get_member_events::{self, Response as MembersResponse},
+            ban_user, forget_room, get_member_events,
             invite_user::{self, InvitationRecipient},
             join_room_by_id, join_room_by_id_or_alias, kick_user, leave_room, Invite3pid,
         },
@@ -423,6 +422,12 @@ impl Client {
     pub async fn user_id(&self) -> Option<UserId> {
         let session = self.base_client.session().read().await;
         session.as_ref().cloned().map(|s| s.user_id)
+    }
+
+    /// Get the device id that identifies the current session.
+    pub async fn device_id(&self) -> Option<DeviceIdBox> {
+        let session = self.base_client.session().read().await;
+        session.as_ref().map(|s| s.device_id.clone())
     }
 
     /// Fetches the display name of the owner of the client.
@@ -1608,9 +1613,7 @@ impl Client {
         let request = get_member_events::Request::new(room_id);
         let response = self.send(request).await?;
 
-        self.base_client.receive_members(room_id, &response).await?;
-
-        Ok(response)
+        Ok(self.base_client.receive_members(room_id, &response).await?)
     }
 
     /// Synchronize the client's state with the latest state on the server.
@@ -2273,6 +2276,8 @@ impl Client {
 
 #[cfg(test)]
 mod test {
+    use crate::ClientConfig;
+
     use super::{
         get_public_rooms, get_public_rooms_filtered, register::RegistrationKind, Client,
         Invite3pid, Session, SyncSettings, Url,
@@ -2375,38 +2380,38 @@ mod test {
         let room = client.get_joined_room(&room_id);
         assert!(room.is_some());
 
-        // test store reloads with correct room state from JsonStore
-        // let store = Box::new(JsonStore::open(path).unwrap());
-        // let config = ClientConfig::default().state_store(store);
-        // let joined_client = Client::new_with_config(homeserver, config).unwrap();
-        // joined_client.restore_login(session).await.unwrap();
+        // test store reloads with correct room state from the sled store
+        let path = tempfile::tempdir().unwrap();
+        let config = ClientConfig::default().store_path(path);
+        let joined_client = Client::new_with_config(homeserver, config).unwrap();
+        joined_client.restore_login(session).await.unwrap();
 
-        // // joined room reloaded from state store
-        // joined_client
-        //     .sync_once(SyncSettings::default())
-        //     .await
-        //     .unwrap();
-        // let room = joined_client.get_joined_room(&room_id).await;
-        // assert!(room.is_some());
+        // joined room reloaded from state store
+        joined_client
+            .sync_once(SyncSettings::default())
+            .await
+            .unwrap();
+        let room = joined_client.get_joined_room(&room_id);
+        assert!(room.is_some());
 
-        // let _m = mock(
-        //     "GET",
-        //     Matcher::Regex(r"^/_matrix/client/r0/sync\?.*$".to_string()),
-        // )
-        // .with_status(200)
-        // .with_body(test_json::LEAVE_SYNC_EVENT.to_string())
-        // .create();
+        let _m = mock(
+            "GET",
+            Matcher::Regex(r"^/_matrix/client/r0/sync\?.*$".to_string()),
+        )
+        .with_status(200)
+        .with_body(test_json::LEAVE_SYNC_EVENT.to_string())
+        .create();
 
-        // joined_client
-        //     .sync_once(SyncSettings::default())
-        //     .await
-        //     .unwrap();
+        joined_client
+            .sync_once(SyncSettings::default())
+            .await
+            .unwrap();
 
-        // let room = joined_client.get_joined_room(&room_id).await;
-        // assert!(room.is_none());
+        let room = joined_client.get_joined_room(&room_id);
+        assert!(room.is_none());
 
-        // let room = joined_client.get_left_room(&room_id).await;
-        // assert!(room.is_some());
+        let room = joined_client.get_left_room(&room_id);
+        assert!(room.is_some());
     }
 
     #[tokio::test]
