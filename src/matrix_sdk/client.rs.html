@@ -3196,7 +3196,7 @@
         <span class="ident">room</span>::{
             <span class="ident">message</span>::{
                 <span class="ident">AudioMessageEventContent</span>, <span class="ident">FileMessageEventContent</span>, <span class="ident">ImageMessageEventContent</span>,
-                <span class="ident">MessageEventContent</span>, <span class="ident">VideoMessageEventContent</span>,
+                <span class="ident">MessageEventContent</span>, <span class="ident">MessageType</span>, <span class="ident">VideoMessageEventContent</span>,
             },
             <span class="ident">EncryptedFile</span>,
         },
@@ -4338,7 +4338,7 @@
     <span class="doccomment">/// use matrix_sdk_common::uuid::Uuid;</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// let content = AnyMessageEventContent::RoomMessage(</span>
-    <span class="doccomment">///     MessageEventContent::Text(TextMessageEventContent::plain(&quot;Hello world&quot;))</span>
+    <span class="doccomment">///     MessageEventContent::text_plain(&quot;Hello world&quot;)</span>
     <span class="doccomment">/// );</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// let txn_id = Uuid::new_v4();</span>
@@ -4481,26 +4481,26 @@
         <span class="kw">let</span> <span class="ident">content</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">content_type</span>.<span class="ident">type_</span>() {
             <span class="ident">mime</span>::<span class="ident">IMAGE</span> <span class="op">=</span><span class="op">&gt;</span> {
                 <span class="comment">// TODO create a thumbnail using the image crate?.</span>
-                <span class="ident">MessageEventContent</span>::<span class="ident">Image</span>(<span class="ident">ImageMessageEventContent</span> {
+                <span class="ident">MessageType</span>::<span class="ident">Image</span>(<span class="ident">ImageMessageEventContent</span> {
                     <span class="ident">body</span>: <span class="ident">body</span>.<span class="ident">to_owned</span>(),
                     <span class="ident">info</span>: <span class="prelude-val">None</span>,
                     <span class="ident">url</span>: <span class="prelude-val">Some</span>(<span class="ident">url</span>),
                     <span class="ident">file</span>: <span class="ident">encrypted_file</span>,
                 })
             }
-            <span class="ident">mime</span>::<span class="ident">AUDIO</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">MessageEventContent</span>::<span class="ident">Audio</span>(<span class="ident">AudioMessageEventContent</span> {
+            <span class="ident">mime</span>::<span class="ident">AUDIO</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">MessageType</span>::<span class="ident">Audio</span>(<span class="ident">AudioMessageEventContent</span> {
                 <span class="ident">body</span>: <span class="ident">body</span>.<span class="ident">to_owned</span>(),
                 <span class="ident">info</span>: <span class="prelude-val">None</span>,
                 <span class="ident">url</span>: <span class="prelude-val">Some</span>(<span class="ident">url</span>),
                 <span class="ident">file</span>: <span class="ident">encrypted_file</span>,
             }),
-            <span class="ident">mime</span>::<span class="ident">VIDEO</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">MessageEventContent</span>::<span class="ident">Video</span>(<span class="ident">VideoMessageEventContent</span> {
+            <span class="ident">mime</span>::<span class="ident">VIDEO</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">MessageType</span>::<span class="ident">Video</span>(<span class="ident">VideoMessageEventContent</span> {
                 <span class="ident">body</span>: <span class="ident">body</span>.<span class="ident">to_owned</span>(),
                 <span class="ident">info</span>: <span class="prelude-val">None</span>,
                 <span class="ident">url</span>: <span class="prelude-val">Some</span>(<span class="ident">url</span>),
                 <span class="ident">file</span>: <span class="ident">encrypted_file</span>,
             }),
-            <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">MessageEventContent</span>::<span class="ident">File</span>(<span class="ident">FileMessageEventContent</span> {
+            <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">MessageType</span>::<span class="ident">File</span>(<span class="ident">FileMessageEventContent</span> {
                 <span class="ident">filename</span>: <span class="prelude-val">None</span>,
                 <span class="ident">body</span>: <span class="ident">body</span>.<span class="ident">to_owned</span>(),
                 <span class="ident">info</span>: <span class="prelude-val">None</span>,
@@ -4511,7 +4511,7 @@
 
         <span class="self">self</span>.<span class="ident">room_send</span>(
             <span class="ident">room_id</span>,
-            <span class="ident">AnyMessageEventContent</span>::<span class="ident">RoomMessage</span>(<span class="ident">content</span>),
+            <span class="ident">AnyMessageEventContent</span>::<span class="ident">RoomMessage</span>(<span class="ident">MessageEventContent</span>::<span class="ident">new</span>(<span class="ident">content</span>)),
             <span class="ident">txn_id</span>,
         )
         .<span class="kw">await</span>
