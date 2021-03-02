@@ -3100,6 +3100,14 @@
 <span id="3097">3097</span>
 <span id="3098">3098</span>
 <span id="3099">3099</span>
+<span id="3100">3100</span>
+<span id="3101">3101</span>
+<span id="3102">3102</span>
+<span id="3103">3103</span>
+<span id="3104">3104</span>
+<span id="3105">3105</span>
+<span id="3106">3106</span>
+<span id="3107">3107</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="comment">// Copyright 2020 Damir Jelić</span>
 <span class="comment">// Copyright 2020 The Matrix.org Foundation C.I.C.</span>
@@ -3144,7 +3152,8 @@
 
 <span class="kw">use</span> <span class="ident">matrix_sdk_base</span>::{
     <span class="ident">deserialized_responses</span>::{<span class="ident">MembersResponse</span>, <span class="ident">SyncResponse</span>},
-    <span class="ident">BaseClient</span>, <span class="ident">BaseClientConfig</span>, <span class="ident">EventHandler</span>, <span class="ident">InvitedRoom</span>, <span class="ident">JoinedRoom</span>, <span class="ident">LeftRoom</span>, <span class="ident">Session</span>, <span class="ident">Store</span>,
+    <span class="ident">BaseClient</span>, <span class="ident">BaseClientConfig</span>, <span class="ident">EventHandler</span>, <span class="ident">InvitedRoom</span>, <span class="ident">JoinedRoom</span>, <span class="ident">LeftRoom</span>, <span class="ident">RoomState</span>,
+    <span class="ident">Session</span>, <span class="ident">Store</span>,
 };
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;encryption&quot;</span>)]</span>
@@ -3661,6 +3670,13 @@
     <span class="doccomment">/// The methods of `EventHandler` are called when the respective `RoomEvents` occur.</span>
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">set_event_handler</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">handler</span>: <span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">EventHandler</span><span class="op">&gt;</span>) {
         <span class="self">self</span>.<span class="ident">base_client</span>.<span class="ident">set_event_handler</span>(<span class="ident">handler</span>).<span class="kw">await</span>;
+    }
+
+    <span class="doccomment">/// Get all the rooms the client knows about.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// This will return the list of joined, invited, and left rooms.</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">rooms</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">RoomState</span><span class="op">&gt;</span> {
+        <span class="self">self</span>.<span class="ident">store</span>().<span class="ident">get_rooms</span>()
     }
 
     <span class="doccomment">/// Returns the joined rooms this client knows about.</span>

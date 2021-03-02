@@ -422,6 +422,29 @@
 <span id="419">419</span>
 <span id="420">420</span>
 <span id="421">421</span>
+<span id="422">422</span>
+<span id="423">423</span>
+<span id="424">424</span>
+<span id="425">425</span>
+<span id="426">426</span>
+<span id="427">427</span>
+<span id="428">428</span>
+<span id="429">429</span>
+<span id="430">430</span>
+<span id="431">431</span>
+<span id="432">432</span>
+<span id="433">433</span>
+<span id="434">434</span>
+<span id="435">435</span>
+<span id="436">436</span>
+<span id="437">437</span>
+<span id="438">438</span>
+<span id="439">439</span>
+<span id="440">440</span>
+<span id="441">441</span>
+<span id="442">442</span>
+<span id="443">443</span>
+<span id="444">444</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="comment">// Copyright 2020 The Matrix.org Foundation C.I.C.</span>
 <span class="comment">//</span>
@@ -652,6 +675,13 @@
         <span class="kw">let</span> <span class="ident">users</span>: <span class="ident">HashSet</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">UserId</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">users</span>.<span class="ident">collect</span>();
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">devices</span>: <span class="ident">HashMap</span><span class="op">&lt;</span><span class="ident">UserId</span>, <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Device</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">HashMap</span>::<span class="ident">new</span>();
 
+        <span class="macro">debug</span><span class="macro">!</span>(
+            <span class="ident">users</span> <span class="op">=</span> <span class="question-mark">?</span><span class="ident">users</span>,
+            <span class="ident">history_visibility</span> <span class="op">=</span> <span class="question-mark">?</span><span class="ident">history_visibility</span>,
+            <span class="ident">session_id</span> <span class="op">=</span> <span class="ident">outbound</span>.<span class="ident">session_id</span>(),
+            <span class="string">&quot;Calculating group session recipients&quot;</span>
+        );
+
         <span class="kw">let</span> <span class="ident">users_shared_with</span>: <span class="ident">HashSet</span><span class="op">&lt;</span><span class="ident">UserId</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">outbound</span>
             .<span class="ident">shared_with_set</span>
             .<span class="ident">iter</span>()
@@ -726,6 +756,13 @@
                 .<span class="ident">extend</span>(<span class="ident">non_blacklisted_devices</span>);
         }
 
+        <span class="macro">debug</span><span class="macro">!</span>(
+            <span class="ident">should_rotate</span> <span class="op">=</span> <span class="ident">should_rotate</span>,
+            <span class="ident">recipients</span> <span class="op">=</span> <span class="question-mark">?</span><span class="ident">devices</span>,
+            <span class="ident">session_id</span> <span class="op">=</span> <span class="ident">outbound</span>.<span class="ident">session_id</span>(),
+            <span class="string">&quot;Done calculating group session recipients&quot;</span>
+        );
+
         <span class="prelude-val">Ok</span>((<span class="ident">should_rotate</span>, <span class="ident">devices</span>))
     }
 
@@ -737,12 +774,20 @@
     <span class="doccomment">/// used.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// `users` - The list of users that should receive the group session.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// `encryption_settings` - The settings that should be used for the group</span>
+    <span class="doccomment">/// session.</span>
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">share_group_session</span>(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         <span class="ident">room_id</span>: <span class="kw-2">&amp;</span><span class="ident">RoomId</span>,
         <span class="ident">users</span>: <span class="kw">impl</span> <span class="ident">Iterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">UserId</span><span class="op">&gt;</span>,
         <span class="ident">encryption_settings</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">EncryptionSettings</span><span class="op">&gt;</span>,
     ) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">OlmResult</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">ToDeviceRequest</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+        <span class="macro">debug</span><span class="macro">!</span>(
+            <span class="ident">room_id</span> <span class="op">=</span> <span class="ident">room_id</span>.<span class="ident">as_str</span>(),
+            <span class="string">&quot;Checking if a group session needs to be shared for room {}&quot;</span>, <span class="ident">room_id</span>
+        );
+
         <span class="kw">let</span> <span class="ident">encryption_settings</span> <span class="op">=</span> <span class="ident">encryption_settings</span>.<span class="ident">into</span>();
         <span class="kw">let</span> <span class="ident">history_visibility</span> <span class="op">=</span> <span class="ident">encryption_settings</span>.<span class="ident">history_visibility</span>.<span class="ident">clone</span>();
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">changes</span> <span class="op">=</span> <span class="ident">Changes</span>::<span class="ident">default</span>();
@@ -761,6 +806,8 @@
             .<span class="kw">await</span><span class="question-mark">?</span>;
 
         <span class="kw">let</span> <span class="ident">outbound</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">should_rotate</span> {
+            <span class="kw">let</span> <span class="ident">old_session_id</span> <span class="op">=</span> <span class="ident">outbound</span>.<span class="ident">session_id</span>();
+
             <span class="kw">let</span> (<span class="ident">outbound</span>, <span class="ident">inbound</span>) <span class="op">=</span> <span class="self">self</span>
                 .<span class="ident">create_outbound_group_session</span>(<span class="ident">room_id</span>, <span class="ident">encryption_settings</span>)
                 .<span class="kw">await</span><span class="question-mark">?</span>;
@@ -769,9 +816,10 @@
 
             <span class="macro">debug</span><span class="macro">!</span>(
                 <span class="ident">room_id</span> <span class="op">=</span> <span class="ident">room_id</span>.<span class="ident">as_str</span>(),
-                <span class="string">&quot;A user/device has left the group {} since we last sent a message, \
+                <span class="ident">old_session_id</span> <span class="op">=</span> <span class="ident">old_session_id</span>,
+                <span class="ident">session_id</span> <span class="op">=</span> <span class="ident">outbound</span>.<span class="ident">session_id</span>(),
+                <span class="string">&quot;A user/device has left the group since we last sent a message, \
                    rotating the outbound session.&quot;</span>,
-                <span class="ident">room_id</span>
             );
 
             <span class="ident">outbound</span>
@@ -806,9 +854,8 @@
             <span class="macro">info</span><span class="macro">!</span>(
                 <span class="ident">index</span> <span class="op">=</span> <span class="ident">message_index</span>,
                 <span class="ident">users</span> <span class="op">=</span> <span class="question-mark">?</span><span class="ident">users</span>,
-                <span class="string">&quot;Sharing an outbound session at index {} with {:?}&quot;</span>,
-                <span class="ident">message_index</span>,
-                <span class="ident">users</span>
+                <span class="ident">room_id</span> <span class="op">=</span> <span class="ident">room_id</span>.<span class="ident">as_str</span>(),
+                <span class="string">&quot;Sharing an outbound group session&quot;</span>,
             );
         }
 
@@ -832,9 +879,8 @@
             <span class="macro">debug</span><span class="macro">!</span>(
                 <span class="ident">room_id</span> <span class="op">=</span> <span class="ident">room_id</span>.<span class="ident">as_str</span>(),
                 <span class="ident">session_id</span> <span class="op">=</span> <span class="ident">outbound</span>.<span class="ident">session_id</span>(),
-                <span class="string">&quot;Session {} for room {} doesn&#39;t need to be shared with anyone, marking as shared&quot;</span>,
-                <span class="ident">outbound</span>.<span class="ident">session_id</span>(),
-                <span class="ident">outbound</span>.<span class="ident">room_id</span>()
+                <span class="string">&quot;The outbound group session doesn&#39;t need to be shared with \
+                    anyone, marking as shared&quot;</span>,
             );
             <span class="ident">outbound</span>.<span class="ident">mark_as_shared</span>();
         }
