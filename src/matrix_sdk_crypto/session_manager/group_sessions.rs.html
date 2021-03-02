@@ -445,6 +445,22 @@
 <span id="442">442</span>
 <span id="443">443</span>
 <span id="444">444</span>
+<span id="445">445</span>
+<span id="446">446</span>
+<span id="447">447</span>
+<span id="448">448</span>
+<span id="449">449</span>
+<span id="450">450</span>
+<span id="451">451</span>
+<span id="452">452</span>
+<span id="453">453</span>
+<span id="454">454</span>
+<span id="455">455</span>
+<span id="456">456</span>
+<span id="457">457</span>
+<span id="458">458</span>
+<span id="459">459</span>
+<span id="460">460</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="comment">// Copyright 2020 The Matrix.org Foundation C.I.C.</span>
 <span class="comment">//</span>
@@ -875,6 +891,13 @@
 
         <span class="kw">let</span> <span class="ident">requests</span> <span class="op">=</span> <span class="ident">outbound</span>.<span class="ident">pending_requests</span>();
 
+        <span class="macro">debug</span><span class="macro">!</span>(
+            <span class="ident">room_id</span> <span class="op">=</span> <span class="ident">room_id</span>.<span class="ident">as_str</span>(),
+            <span class="ident">session_id</span> <span class="op">=</span> <span class="ident">outbound</span>.<span class="ident">session_id</span>(),
+            <span class="ident">request_count</span> <span class="op">=</span> <span class="ident">requests</span>.<span class="ident">len</span>(),
+            <span class="string">&quot;Done generating to-device requests for a room key share&quot;</span>
+        );
+
         <span class="kw">if</span> <span class="ident">requests</span>.<span class="ident">is_empty</span>() {
             <span class="macro">debug</span><span class="macro">!</span>(
                 <span class="ident">room_id</span> <span class="op">=</span> <span class="ident">room_id</span>.<span class="ident">as_str</span>(),
@@ -885,7 +908,16 @@
             <span class="ident">outbound</span>.<span class="ident">mark_as_shared</span>();
         }
 
+        <span class="kw">let</span> <span class="ident">session_count</span> <span class="op">=</span> <span class="ident">changes</span>.<span class="ident">sessions</span>.<span class="ident">len</span>();
+
         <span class="self">self</span>.<span class="ident">store</span>.<span class="ident">save_changes</span>(<span class="ident">changes</span>).<span class="kw">await</span><span class="question-mark">?</span>;
+
+        <span class="macro">debug</span><span class="macro">!</span>(
+            <span class="ident">room_id</span> <span class="op">=</span> <span class="ident">room_id</span>.<span class="ident">as_str</span>(),
+            <span class="ident">session_id</span> <span class="op">=</span> <span class="ident">outbound</span>.<span class="ident">session_id</span>(),
+            <span class="ident">session_count</span> <span class="op">=</span> <span class="ident">session_count</span>,
+            <span class="string">&quot;Stored the changed sessions after encrypting an room key&quot;</span>
+        );
 
         <span class="prelude-val">Ok</span>(<span class="ident">requests</span>)
     }
