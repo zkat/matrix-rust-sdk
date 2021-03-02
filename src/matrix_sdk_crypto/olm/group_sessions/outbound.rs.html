@@ -586,6 +586,20 @@
 <span id="583">583</span>
 <span id="584">584</span>
 <span id="585">585</span>
+<span id="586">586</span>
+<span id="587">587</span>
+<span id="588">588</span>
+<span id="589">589</span>
+<span id="590">590</span>
+<span id="591">591</span>
+<span id="592">592</span>
+<span id="593">593</span>
+<span id="594">594</span>
+<span id="595">595</span>
+<span id="596">596</span>
+<span id="597">597</span>
+<span id="598">598</span>
+<span id="599">599</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="comment">// Copyright 2020 The Matrix.org Foundation C.I.C.</span>
 <span class="comment">//</span>
@@ -606,6 +620,7 @@
     <span class="ident">api</span>::<span class="ident">r0</span>::<span class="ident">to_device</span>::<span class="ident">DeviceIdOrAllDevices</span>,
     <span class="ident">events</span>::<span class="ident">room</span>::{
         <span class="ident">encrypted</span>::{<span class="ident">MegolmV1AesSha2Content</span>, <span class="ident">MegolmV1AesSha2ContentInit</span>},
+        <span class="ident">history_visibility</span>::<span class="ident">HistoryVisibility</span>,
         <span class="ident">message</span>::<span class="ident">Relation</span>,
     },
     <span class="ident">uuid</span>::<span class="ident">Uuid</span>,
@@ -669,6 +684,8 @@
     <span class="kw">pub</span> <span class="ident">rotation_period</span>: <span class="ident">Duration</span>,
     <span class="doccomment">/// How many messages should be sent before changing the session.</span>
     <span class="kw">pub</span> <span class="ident">rotation_period_msgs</span>: <span class="ident">u64</span>,
+    <span class="doccomment">/// The history visibilty of the room when the session was created.</span>
+    <span class="kw">pub</span> <span class="ident">history_visibility</span>: <span class="ident">HistoryVisibility</span>,
 }
 
 <span class="kw">impl</span> <span class="ident">Default</span> <span class="kw">for</span> <span class="ident">EncryptionSettings</span> {
@@ -677,12 +694,15 @@
             <span class="ident">algorithm</span>: <span class="ident">EventEncryptionAlgorithm</span>::<span class="ident">MegolmV1AesSha2</span>,
             <span class="ident">rotation_period</span>: <span class="ident">ROTATION_PERIOD</span>,
             <span class="ident">rotation_period_msgs</span>: <span class="ident">ROTATION_MESSAGES</span>,
+            <span class="ident">history_visibility</span>: <span class="ident">HistoryVisibility</span>::<span class="ident">Shared</span>,
         }
     }
 }
 
-<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">EncryptionEventContent</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">EncryptionSettings</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">content</span>: <span class="kw-2">&amp;</span><span class="ident">EncryptionEventContent</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+<span class="kw">impl</span> <span class="ident">EncryptionSettings</span> {
+    <span class="doccomment">/// Create new encryption settings using an `EncryptionEventContent` and a</span>
+    <span class="doccomment">/// history visiblity.</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">content</span>: <span class="ident">EncryptionEventContent</span>, <span class="ident">history_visibility</span>: <span class="ident">HistoryVisibility</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
         <span class="kw">let</span> <span class="ident">rotation_period</span>: <span class="ident">Duration</span> <span class="op">=</span> <span class="ident">content</span>
             .<span class="ident">rotation_period_ms</span>
             .<span class="ident">map_or</span>(<span class="ident">ROTATION_PERIOD</span>, <span class="op">|</span><span class="ident">r</span><span class="op">|</span> <span class="ident">Duration</span>::<span class="ident">from_millis</span>(<span class="ident">r</span>.<span class="ident">into</span>()));
@@ -691,12 +711,14 @@
             .<span class="ident">map_or</span>(<span class="ident">ROTATION_MESSAGES</span>, <span class="ident">Into</span>::<span class="ident">into</span>);
 
         <span class="self">Self</span> {
-            <span class="ident">algorithm</span>: <span class="ident">content</span>.<span class="ident">algorithm</span>.<span class="ident">clone</span>(),
+            <span class="ident">algorithm</span>: <span class="ident">content</span>.<span class="ident">algorithm</span>,
             <span class="ident">rotation_period</span>,
             <span class="ident">rotation_period_msgs</span>,
+            <span class="ident">history_visibility</span>,
         }
     }
 }
+
 <span class="doccomment">/// Outbound group session.</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// Outbound group sessions are used to exchange room messages between a group</span>
@@ -772,6 +794,11 @@
     <span class="doccomment">/// This should be called if an the user wishes to rotate this session.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">invalidate_session</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) {
         <span class="self">self</span>.<span class="ident">invalidated</span>.<span class="ident">store</span>(<span class="bool-val">true</span>, <span class="ident">Ordering</span>::<span class="ident">Relaxed</span>)
+    }
+
+    <span class="doccomment">/// Get the encryption settings of this outbound session.</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">settings</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="ident">EncryptionSettings</span> {
+        <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">settings</span>
     }
 
     <span class="doccomment">/// Mark the request with the given request id as sent.</span>
@@ -1149,7 +1176,8 @@
     <span class="kw">use</span> <span class="ident">std</span>::<span class="ident">time</span>::<span class="ident">Duration</span>;
 
     <span class="kw">use</span> <span class="ident">matrix_sdk_common</span>::{
-        <span class="ident">events</span>::<span class="ident">room</span>::<span class="ident">encryption</span>::<span class="ident">EncryptionEventContent</span>, <span class="ident">identifiers</span>::<span class="ident">EventEncryptionAlgorithm</span>,
+        <span class="ident">events</span>::<span class="ident">room</span>::{<span class="ident">encryption</span>::<span class="ident">EncryptionEventContent</span>, <span class="ident">history_visibility</span>::<span class="ident">HistoryVisibility</span>},
+        <span class="ident">identifiers</span>::<span class="ident">EventEncryptionAlgorithm</span>,
         <span class="ident">uint</span>,
     };
 
@@ -1158,7 +1186,7 @@
     <span class="attribute">#[<span class="ident">test</span>]</span>
     <span class="kw">fn</span> <span class="ident">encryption_settings_conversion</span>() {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">content</span> <span class="op">=</span> <span class="ident">EncryptionEventContent</span>::<span class="ident">new</span>(<span class="ident">EventEncryptionAlgorithm</span>::<span class="ident">MegolmV1AesSha2</span>);
-        <span class="kw">let</span> <span class="ident">settings</span> <span class="op">=</span> <span class="ident">EncryptionSettings</span>::<span class="ident">from</span>(<span class="kw-2">&amp;</span><span class="ident">content</span>);
+        <span class="kw">let</span> <span class="ident">settings</span> <span class="op">=</span> <span class="ident">EncryptionSettings</span>::<span class="ident">new</span>(<span class="ident">content</span>.<span class="ident">clone</span>(), <span class="ident">HistoryVisibility</span>::<span class="ident">Joined</span>);
 
         <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">settings</span>.<span class="ident">rotation_period</span>, <span class="ident">ROTATION_PERIOD</span>);
         <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">settings</span>.<span class="ident">rotation_period_msgs</span>, <span class="ident">ROTATION_MESSAGES</span>);
@@ -1166,7 +1194,7 @@
         <span class="ident">content</span>.<span class="ident">rotation_period_ms</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="macro">uint</span><span class="macro">!</span>(<span class="number">3600</span>));
         <span class="ident">content</span>.<span class="ident">rotation_period_msgs</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="macro">uint</span><span class="macro">!</span>(<span class="number">500</span>));
 
-        <span class="kw">let</span> <span class="ident">settings</span> <span class="op">=</span> <span class="ident">EncryptionSettings</span>::<span class="ident">from</span>(<span class="kw-2">&amp;</span><span class="ident">content</span>);
+        <span class="kw">let</span> <span class="ident">settings</span> <span class="op">=</span> <span class="ident">EncryptionSettings</span>::<span class="ident">new</span>(<span class="ident">content</span>, <span class="ident">HistoryVisibility</span>::<span class="ident">Shared</span>);
 
         <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">settings</span>.<span class="ident">rotation_period</span>, <span class="ident">Duration</span>::<span class="ident">from_millis</span>(<span class="number">3600</span>));
         <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">settings</span>.<span class="ident">rotation_period_msgs</span>, <span class="number">500</span>);

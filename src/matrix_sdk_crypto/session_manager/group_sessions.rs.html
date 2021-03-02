@@ -401,6 +401,18 @@
 <span id="398">398</span>
 <span id="399">399</span>
 <span id="400">400</span>
+<span id="401">401</span>
+<span id="402">402</span>
+<span id="403">403</span>
+<span id="404">404</span>
+<span id="405">405</span>
+<span id="406">406</span>
+<span id="407">407</span>
+<span id="408">408</span>
+<span id="409">409</span>
+<span id="410">410</span>
+<span id="411">411</span>
+<span id="412">412</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="comment">// Copyright 2020 The Matrix.org Foundation C.I.C.</span>
 <span class="comment">//</span>
@@ -424,7 +436,10 @@
 <span class="kw">use</span> <span class="ident">dashmap</span>::<span class="ident">DashMap</span>;
 <span class="kw">use</span> <span class="ident">matrix_sdk_common</span>::{
     <span class="ident">api</span>::<span class="ident">r0</span>::<span class="ident">to_device</span>::<span class="ident">DeviceIdOrAllDevices</span>,
-    <span class="ident">events</span>::{<span class="ident">room</span>::<span class="ident">encrypted</span>::<span class="ident">EncryptedEventContent</span>, <span class="ident">AnyMessageEventContent</span>, <span class="ident">EventType</span>},
+    <span class="ident">events</span>::{
+        <span class="ident">room</span>::{<span class="ident">encrypted</span>::<span class="ident">EncryptedEventContent</span>, <span class="ident">history_visibility</span>::<span class="ident">HistoryVisibility</span>},
+        <span class="ident">AnyMessageEventContent</span>, <span class="ident">EventType</span>,
+    },
     <span class="ident">identifiers</span>::{<span class="ident">DeviceId</span>, <span class="ident">DeviceIdBox</span>, <span class="ident">RoomId</span>, <span class="ident">UserId</span>},
     <span class="ident">uuid</span>::<span class="ident">Uuid</span>,
 };
@@ -622,6 +637,7 @@
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">collect_session_recipients</span>(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         <span class="ident">users</span>: <span class="kw">impl</span> <span class="ident">Iterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">UserId</span><span class="op">&gt;</span>,
+        <span class="ident">history_visibility</span>: <span class="ident">HistoryVisibility</span>,
         <span class="ident">outbound</span>: <span class="kw-2">&amp;</span><span class="ident">OutboundGroupSession</span>,
     ) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">OlmResult</span><span class="op">&lt;</span>(<span class="ident">bool</span>, <span class="ident">HashMap</span><span class="op">&lt;</span><span class="ident">UserId</span>, <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Device</span><span class="op">&gt;</span><span class="op">&gt;</span>)<span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">users</span>: <span class="ident">HashSet</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">UserId</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">users</span>.<span class="ident">collect</span>();
@@ -642,14 +658,16 @@
             .<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident">HashSet</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span><span class="op">&gt;</span>()
             .<span class="ident">is_empty</span>();
 
+        <span class="kw">let</span> <span class="ident">visiblity_changed</span> <span class="op">=</span> <span class="ident">outbound</span>.<span class="ident">settings</span>().<span class="ident">history_visibility</span> <span class="op">!</span><span class="op">=</span> <span class="ident">history_visibility</span>;
+
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">device_got_deleted_or_blacklisted</span> <span class="op">=</span> <span class="bool-val">false</span>;
 
         <span class="kw">for</span> <span class="ident">user_id</span> <span class="kw">in</span> <span class="ident">users</span> {
             <span class="kw">let</span> <span class="ident">user_devices</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">store</span>.<span class="ident">get_user_devices</span>(<span class="kw-2">&amp;</span><span class="ident">user_id</span>).<span class="kw">await</span><span class="question-mark">?</span>;
 
             <span class="comment">// If no device got deleted or blacklisted until now and no user</span>
-            <span class="comment">// left check if one got deleted or blacklisted for this user.</span>
-            <span class="kw">if</span> <span class="op">!</span><span class="ident">device_got_deleted_or_blacklisted</span> <span class="op">&amp;&amp;</span> <span class="op">!</span><span class="ident">user_left</span> {
+            <span class="comment">// left, check if one got deleted or blacklisted for this user.</span>
+            <span class="kw">if</span> <span class="op">!</span>(<span class="ident">device_got_deleted_or_blacklisted</span> <span class="op">|</span><span class="op">|</span> <span class="ident">user_left</span> <span class="op">|</span><span class="op">|</span> <span class="ident">visiblity_changed</span>) {
                 <span class="comment">// Devices that should receive this session</span>
                 <span class="kw">let</span> <span class="ident">device_ids</span>: <span class="ident">HashSet</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">DeviceId</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">user_devices</span>
                     .<span class="ident">keys</span>()
@@ -662,9 +680,7 @@
                     .<span class="ident">map</span>(<span class="op">|</span><span class="ident">d</span><span class="op">|</span> <span class="ident">d</span>.<span class="ident">as_ref</span>())
                     .<span class="ident">collect</span>();
 
-                <span class="ident">device_got_deleted_or_blacklisted</span> <span class="op">=</span> <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">shared</span>) <span class="op">=</span>
-                    <span class="ident">outbound</span>.<span class="ident">shared_with_set</span>.<span class="ident">get</span>(<span class="ident">user_id</span>)
-                {
+                <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">shared</span>) <span class="op">=</span> <span class="ident">outbound</span>.<span class="ident">shared_with_set</span>.<span class="ident">get</span>(<span class="ident">user_id</span>) {
                     <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy</span>::<span class="ident">map_clone</span>)]</span>
                     <span class="comment">// Devices that received this session</span>
                     <span class="kw">let</span> <span class="ident">shared</span>: <span class="ident">HashSet</span><span class="op">&lt;</span><span class="ident">DeviceIdBox</span><span class="op">&gt;</span> <span class="op">=</span>
@@ -674,12 +690,16 @@
                     <span class="comment">// The difference between the devices that received the</span>
                     <span class="comment">// session and devices that should receive the session are</span>
                     <span class="comment">// our deleted or newly blacklisted devices</span>
-                    <span class="op">!</span><span class="ident">shared</span>
+                    <span class="comment">//</span>
+                    <span class="comment">// If the set isn&#39;t empty, a device got blacklisted or</span>
+                    <span class="comment">// deleted, so remember it.</span>
+                    <span class="kw">if</span> <span class="op">!</span><span class="ident">shared</span>
                         .<span class="ident">difference</span>(<span class="kw-2">&amp;</span><span class="ident">device_ids</span>)
                         .<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident">HashSet</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span><span class="op">&gt;</span>()
                         .<span class="ident">is_empty</span>()
-                } <span class="kw">else</span> {
-                    <span class="bool-val">false</span>
+                    {
+                        <span class="ident">device_got_deleted_or_blacklisted</span> <span class="op">=</span> <span class="bool-val">true</span>;
+                    }
                 };
             }
 
@@ -691,8 +711,9 @@
 
         <span class="comment">// To protect the room history we need to rotate the session if a user</span>
         <span class="comment">// left or if a device got deleted/blacklisted, put differently if</span>
-        <span class="comment">// someone leaves or gets removed from the encrypted group.</span>
-        <span class="kw">let</span> <span class="ident">should_rotate</span> <span class="op">=</span> <span class="ident">user_left</span> <span class="op">|</span><span class="op">|</span> <span class="ident">device_got_deleted_or_blacklisted</span>;
+        <span class="comment">// someone leaves or gets removed from the encrypted group or if the</span>
+        <span class="comment">// history visiblity changed.</span>
+        <span class="kw">let</span> <span class="ident">should_rotate</span> <span class="op">=</span> <span class="ident">user_left</span> <span class="op">|</span><span class="op">|</span> <span class="ident">device_got_deleted_or_blacklisted</span> <span class="op">|</span><span class="op">|</span> <span class="ident">visiblity_changed</span>;
 
         <span class="prelude-val">Ok</span>((<span class="ident">should_rotate</span>, <span class="ident">devices</span>))
     }
@@ -712,6 +733,7 @@
         <span class="ident">encryption_settings</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">EncryptionSettings</span><span class="op">&gt;</span>,
     ) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">OlmResult</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">ToDeviceRequest</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">encryption_settings</span> <span class="op">=</span> <span class="ident">encryption_settings</span>.<span class="ident">into</span>();
+        <span class="kw">let</span> <span class="ident">history_visibility</span> <span class="op">=</span> <span class="ident">encryption_settings</span>.<span class="ident">history_visibility</span>.<span class="ident">clone</span>();
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">changes</span> <span class="op">=</span> <span class="ident">Changes</span>::<span class="ident">default</span>();
 
         <span class="kw">let</span> (<span class="ident">outbound</span>, <span class="ident">inbound</span>) <span class="op">=</span> <span class="self">self</span>
@@ -723,7 +745,9 @@
             <span class="ident">changes</span>.<span class="ident">inbound_group_sessions</span>.<span class="ident">push</span>(<span class="ident">inbound</span>);
         }
 
-        <span class="kw">let</span> (<span class="ident">should_rotate</span>, <span class="ident">devices</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">collect_session_recipients</span>(<span class="ident">users</span>, <span class="kw-2">&amp;</span><span class="ident">outbound</span>).<span class="kw">await</span><span class="question-mark">?</span>;
+        <span class="kw">let</span> (<span class="ident">should_rotate</span>, <span class="ident">devices</span>) <span class="op">=</span> <span class="self">self</span>
+            .<span class="ident">collect_session_recipients</span>(<span class="ident">users</span>, <span class="ident">history_visibility</span>, <span class="kw-2">&amp;</span><span class="ident">outbound</span>)
+            .<span class="kw">await</span><span class="question-mark">?</span>;
 
         <span class="kw">let</span> <span class="ident">outbound</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">should_rotate</span> {
             <span class="kw">let</span> (<span class="ident">outbound</span>, <span class="ident">inbound</span>) <span class="op">=</span> <span class="self">self</span>

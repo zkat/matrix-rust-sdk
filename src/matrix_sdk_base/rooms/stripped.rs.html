@@ -127,6 +127,25 @@
 <span id="124">124</span>
 <span id="125">125</span>
 <span id="126">126</span>
+<span id="127">127</span>
+<span id="128">128</span>
+<span id="129">129</span>
+<span id="130">130</span>
+<span id="131">131</span>
+<span id="132">132</span>
+<span id="133">133</span>
+<span id="134">134</span>
+<span id="135">135</span>
+<span id="136">136</span>
+<span id="137">137</span>
+<span id="138">138</span>
+<span id="139">139</span>
+<span id="140">140</span>
+<span id="141">141</span>
+<span id="142">142</span>
+<span id="143">143</span>
+<span id="144">144</span>
+<span id="145">145</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="comment">// Copyright 2020 The Matrix.org Foundation C.I.C.</span>
 <span class="comment">//</span>
@@ -145,7 +164,10 @@
 <span class="kw">use</span> <span class="ident">std</span>::<span class="ident">sync</span>::{<span class="ident">Arc</span>, <span class="ident">Mutex</span> <span class="kw">as</span> <span class="ident">SyncMutex</span>};
 
 <span class="kw">use</span> <span class="ident">matrix_sdk_common</span>::{
-    <span class="ident">events</span>::<span class="ident">AnyStrippedStateEvent</span>,
+    <span class="ident">events</span>::{
+        <span class="ident">room</span>::{<span class="ident">encryption</span>::<span class="ident">EncryptionEventContent</span>, <span class="ident">history_visibility</span>::<span class="ident">HistoryVisibility</span>},
+        <span class="ident">AnyStrippedStateEvent</span>,
+    },
     <span class="ident">identifiers</span>::{<span class="ident">RoomId</span>, <span class="ident">UserId</span>},
 };
 <span class="kw">use</span> <span class="ident">serde</span>::{<span class="ident">Deserialize</span>, <span class="ident">Serialize</span>};
@@ -224,6 +246,22 @@
     <span class="doccomment">/// Is the room encrypted.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_encrypted</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
         <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">lock</span>().<span class="ident">unwrap</span>().<span class="ident">base_info</span>.<span class="ident">encryption</span>.<span class="ident">is_some</span>()
+    }
+
+    <span class="doccomment">/// Get the `m.room.encryption` content that enabled end to end encryption</span>
+    <span class="doccomment">/// in the room.</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">encryption_settings</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">EncryptionEventContent</span><span class="op">&gt;</span> {
+        <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">lock</span>().<span class="ident">unwrap</span>().<span class="ident">base_info</span>.<span class="ident">encryption</span>.<span class="ident">clone</span>()
+    }
+
+    <span class="doccomment">/// Get the history visiblity policy of this room.</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">history_visibility</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">HistoryVisibility</span> {
+        <span class="self">self</span>.<span class="ident">inner</span>
+            .<span class="ident">lock</span>()
+            .<span class="ident">unwrap</span>()
+            .<span class="ident">base_info</span>
+            .<span class="ident">history_visibility</span>
+            .<span class="ident">clone</span>()
     }
 
     <span class="doccomment">/// Calculate the canonical display name of the room, taking into account</span>
