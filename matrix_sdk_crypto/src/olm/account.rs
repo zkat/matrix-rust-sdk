@@ -191,10 +191,10 @@ impl Account {
     }
 
     pub async fn update_uploaded_key_count(&self, key_count: &BTreeMap<DeviceKeyAlgorithm, UInt>) {
-        let one_time_key_count = key_count.get(&DeviceKeyAlgorithm::SignedCurve25519);
-
-        let count: u64 = one_time_key_count.map_or(0, |c| (*c).into());
-        self.inner.update_uploaded_key_count(count);
+        if let Some(count) = key_count.get(&DeviceKeyAlgorithm::SignedCurve25519) {
+            let count: u64 = (*count).into();
+            self.inner.update_uploaded_key_count(count);
+        }
     }
 
     pub async fn receive_keys_upload_response(
@@ -349,7 +349,7 @@ impl Account {
             (SessionType::New(session), plaintext)
         };
 
-        trace!("Successfully decrypted a Olm message: {}", plaintext);
+        trace!("Successfully decrypted an Olm message: {}", plaintext);
 
         let (event, signing_key) = match self.parse_decrypted_to_device_event(sender, &plaintext) {
             Ok(r) => r,
@@ -991,6 +991,8 @@ impl ReadOnlyAccount {
             return Err(());
         }
 
+        let visibility = settings.history_visibility.clone();
+
         let outbound = OutboundGroupSession::new(
             self.device_id.clone(),
             self.identity_keys.clone(),
@@ -1007,6 +1009,7 @@ impl ReadOnlyAccount {
             signing_key,
             &room_id,
             outbound.session_key().await,
+            Some(visibility),
         )
         .expect("Can't create inbound group session from a newly created outbound group session");
 
