@@ -22,6 +22,7 @@ mod group_sessions;
 mod session;
 mod signing;
 mod utility;
+mod salamander;
 
 pub(crate) use account::{Account, OlmDecryptionInfo, SessionType};
 pub use account::{AccountPickle, OlmMessageHash, PickledAccount, ReadOnlyAccount};
