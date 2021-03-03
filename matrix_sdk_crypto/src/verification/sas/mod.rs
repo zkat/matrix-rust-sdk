@@ -12,7 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-mod dalek_sas;
 mod event_enums;
 mod helpers;
 mod inner_sas;
