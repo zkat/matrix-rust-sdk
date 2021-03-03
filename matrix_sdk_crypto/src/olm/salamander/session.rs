@@ -16,7 +16,7 @@
 
 use hkdf::Hkdf;
 use hmac::{crypto_mac::MacError, Hmac, Mac, NewMac};
-use rand::{RngCore, thread_rng};
+use rand::{thread_rng, RngCore};
 use sha2::Sha256;
 
 use ed25519_dalek::{
@@ -39,7 +39,6 @@ impl RatchetKey {
 
         key
     }
-
 }
 
 pub(super) struct RootKey([u8; 32]);
@@ -50,12 +49,51 @@ impl RootKey {
     }
 }
 
-pub(super) struct ChainKey([u8; 32]);
+pub(super) struct ChainKey {
+    key: [u8; 32],
+    index: u64,
+}
 
 impl ChainKey {
     pub(super) fn new(bytes: [u8; 32]) -> Self {
-        Self(bytes)
+        Self {
+            key: bytes,
+            index: 0,
+        }
     }
+
+    fn advance(&mut self) {
+        let mut mac = Hmac::<Sha256>::new_varkey(&self.key).unwrap();
+        mac.update(b"\x01");
+
+        let output = mac.finalize().into_bytes();
+        self.key.copy_from_slice(output.as_slice());
+        self.index = self.index + 1;
+    }
+
+    fn create_message_key(&mut self) -> MessageKey {
+        let mut mac = Hmac::<Sha256>::new_varkey(&self.key).unwrap();
+        mac.update(b"\x01");
+
+        let output = mac.finalize().into_bytes();
+
+        let mut key = [0u8; 32];
+        key.copy_from_slice(output.as_slice());
+
+        let message_key = MessageKey {
+            key,
+            index: self.index,
+        };
+
+        self.advance();
+
+        message_key
+    }
+}
+
+struct MessageKey {
+    key: [u8; 32],
+    index: u64,
 }
 
 pub(super) struct SessionKeys {
@@ -86,11 +124,7 @@ pub struct Session {
 }
 
 impl Session {
-    pub(super) fn new(
-        session_keys: SessionKeys,
-        root_key: RootKey,
-        chain_key: ChainKey,
-    ) -> Self {
+    pub(super) fn new(session_keys: SessionKeys, root_key: RootKey, chain_key: ChainKey) -> Self {
         let ratchet_key = RatchetKey::new();
 
         Self {
