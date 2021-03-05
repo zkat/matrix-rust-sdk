@@ -12,20 +12,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#![allow(dead_code)]
-
 use hkdf::Hkdf;
-use hmac::{crypto_mac::MacError, Hmac, Mac, NewMac};
 use rand::thread_rng;
 use sha2::Sha256;
 
-use ed25519_dalek::{
-    ExpandedSecretKey, Keypair, PublicKey as Ed25519PublicKey, SecretKey as Ed25519SecretKey,
-    Signature,
-};
+use ed25519_dalek::{Keypair, PublicKey as Ed25519PublicKey};
 use x25519_dalek::{
-    EphemeralSecret, PublicKey as Curve25591PublicKey, SharedSecret,
-    StaticSecret as Curve25591SecretKey,
+    PublicKey as Curve25591PublicKey, SharedSecret, StaticSecret as Curve25591SecretKey,
 };
 
 use dashmap::DashMap;
@@ -38,17 +31,17 @@ struct Shared3DHSecret([u8; 96]);
 
 impl Shared3DHSecret {
     fn new(first: SharedSecret, second: SharedSecret, third: SharedSecret) -> Self {
-        let mut secret = [0u8; 96];
+        let mut secret = Self([0u8; 96]);
 
-        secret[0..32].copy_from_slice(first.as_bytes());
-        secret[32..64].copy_from_slice(second.as_bytes());
-        secret[64..96].copy_from_slice(third.as_bytes());
+        secret.0[0..32].copy_from_slice(first.as_bytes());
+        secret.0[32..64].copy_from_slice(second.as_bytes());
+        secret.0[64..96].copy_from_slice(third.as_bytes());
 
-        Self(secret)
+        secret
     }
 
     fn expand_into_sub_keys(self) -> (RootKey, ChainKey) {
-        let hkdf: Hkdf<Sha256> = Hkdf::new(None, &self.0);
+        let hkdf: Hkdf<Sha256> = Hkdf::new(Some(&[0]), &self.0);
         let mut root_key = [0u8; 32];
         let mut chain_key = [0u8; 32];
 
@@ -123,7 +116,9 @@ impl OneTimeKeys {
         self.public_keys.clear();
     }
 
-    fn generate(&self, count: usize) {}
+    fn generate(&self, _: usize) {
+        todo!()
+    }
 }
 
 pub struct Account {
@@ -218,10 +213,7 @@ impl Account {
 mod test {
     use super::{Account, Curve25591PublicKey};
     use crate::utilities::{decode, encode};
-    use olm_rs::{
-        account::OlmAccount,
-        session::{OlmMessage, PreKeyMessage},
-    };
+    use olm_rs::{account::OlmAccount, session::OlmMessage};
 
     #[test]
     fn test_encryption() {
@@ -249,19 +241,33 @@ mod test {
         let one_time_key = Curve25591PublicKey::from(one_time_key);
         let identity_key = Curve25591PublicKey::from(identity_key);
 
-        let mut session = alice.tripple_diffie_hellman(&identity_key, one_time_key);
+        let mut alice_session = alice.tripple_diffie_hellman(&identity_key, one_time_key);
 
         let message = "It's a secret to everybody";
 
-        let olm_message = session.encrypt(message.as_bytes());
+        let olm_message = alice_session.encrypt(message.as_bytes());
         let olm_message = encode(olm_message);
         let olm_message = OlmMessage::from_type_and_ciphertext(0, olm_message).unwrap();
         bob.mark_keys_as_published();
 
-        if let OlmMessage::PreKey(m) = olm_message {
+        if let OlmMessage::PreKey(m) = olm_message.clone() {
             let session = bob
                 .create_inbound_session_from(alice.curve25519_key_encoded(), m)
                 .expect("Can't create an Olm session");
+            let plaintext = session
+                .decrypt(olm_message)
+                .expect("Can't decrypt ciphertext");
+            assert_eq!(message, plaintext);
+
+            let second_text = "Here's another secret to everybody";
+            let olm_message = alice_session.encrypt(&second_text.as_bytes());
+            let olm_message = encode(olm_message);
+            let olm_message = OlmMessage::from_type_and_ciphertext(0, olm_message).unwrap();
+
+            let plaintext = session
+                .decrypt(olm_message)
+                .expect("Can't decrypt second ciphertext");
+            assert_eq!(second_text, plaintext);
         } else {
             unreachable!();
         }

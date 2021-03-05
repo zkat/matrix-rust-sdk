@@ -12,30 +12,16 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#![allow(dead_code)]
-
 use hkdf::Hkdf;
-use hmac::{crypto_mac::MacError, Hmac, Mac, NewMac};
-use rand::{thread_rng, RngCore};
+use hmac::{Hmac, Mac, NewMac};
+use rand::thread_rng;
 use sha2::Sha256;
+use zeroize::Zeroize;
 
-use aes::cipher::generic_array::GenericArray;
-use aes::cipher::{BlockCipher, NewBlockCipher};
 use aes::Aes256;
-use block_modes::block_padding::Pkcs7;
-use block_modes::{BlockMode, Cbc};
+use block_modes::{block_padding::Pkcs7, BlockMode, Cbc};
 
-use ed25519_dalek::{
-    ExpandedSecretKey, PublicKey as Ed25519PublicKey, SecretKey as Ed25519SecretKey, Signature,
-};
-use x25519_dalek::{
-    EphemeralSecret, PublicKey as Curve25591PublicKey, SharedSecret,
-    StaticSecret as Curve25591SecretKey,
-};
-
-use dashmap::DashMap;
-
-use crate::utilities::{decode, encode};
+use x25519_dalek::{PublicKey as Curve25591PublicKey, StaticSecret as Curve25591SecretKey};
 
 use super::messages::{OlmMessage, PrekeyMessage};
 
@@ -43,6 +29,28 @@ type Aes256Cbc = Cbc<Aes256, Pkcs7>;
 
 struct RatchetKey(Curve25591SecretKey);
 pub(super) struct RatchetPublicKey(Curve25591PublicKey);
+
+struct Aes256Key([u8; 32]);
+struct Aes256IV([u8; 16]);
+struct HmacSha256Key([u8; 32]);
+
+impl Aes256Key {
+    fn to_bytes(self) -> [u8; 32] {
+        self.0
+    }
+}
+
+impl HmacSha256Key {
+    fn to_bytes(self) -> [u8; 32] {
+        self.0
+    }
+}
+
+impl Aes256IV {
+    fn to_bytes(self) -> [u8; 16] {
+        self.0
+    }
+}
 
 impl RatchetKey {
     fn new() -> Self {
@@ -52,8 +60,8 @@ impl RatchetKey {
 }
 
 impl RatchetPublicKey {
-    pub fn base64_encode(&self) -> String {
-        encode(self.0.as_bytes())
+    pub fn as_bytes(&self) -> &[u8] {
+        self.0.as_bytes()
     }
 }
 
@@ -70,7 +78,7 @@ impl RootKey {
         Self(bytes)
     }
 
-    fn advance(&mut self) {
+    fn advance(&mut self) -> ChainKey {
         todo!()
     }
 }
@@ -81,6 +89,9 @@ pub(super) struct ChainKey {
 }
 
 impl ChainKey {
+    const MESSAGE_KEY_SEED: &'static [u8; 1] = b"\x01";
+    const ADVANCEMENT_SEED: &'static [u8; 1] = b"\x02";
+
     pub(super) fn new(bytes: [u8; 32]) -> Self {
         Self {
             key: bytes,
@@ -90,16 +101,16 @@ impl ChainKey {
 
     fn advance(&mut self) {
         let mut mac = Hmac::<Sha256>::new_varkey(&self.key).unwrap();
-        mac.update(b"\x02");
+        mac.update(Self::ADVANCEMENT_SEED);
 
         let output = mac.finalize().into_bytes();
         self.key.copy_from_slice(output.as_slice());
-        self.index = self.index + 1;
+        self.index += 1;
     }
 
-    fn create_message_key(&mut self) -> MessageKey {
+    fn create_message_key(&mut self, ratchet_key: RatchetPublicKey) -> MessageKey {
         let mut mac = Hmac::<Sha256>::new_varkey(&self.key).unwrap();
-        mac.update(b"\x01");
+        mac.update(Self::MESSAGE_KEY_SEED);
 
         let output = mac.finalize().into_bytes();
 
@@ -108,6 +119,7 @@ impl ChainKey {
 
         let message_key = MessageKey {
             key,
+            ratchet_key,
             index: self.index,
         };
 
@@ -119,32 +131,68 @@ impl ChainKey {
 
 struct MessageKey {
     key: [u8; 32],
+    ratchet_key: RatchetPublicKey,
     index: u64,
 }
 
 impl MessageKey {
-    fn encrypt(self, plaintext: &[u8]) -> (Vec<u8>, [u8; 32]) {
-        let hkdf: Hkdf<Sha256> = Hkdf::new(None, &self.key);
+    fn construct_message(&self, ciphertext: Vec<u8>) -> OlmMessage {
+        OlmMessage::from_parts(&self.ratchet_key, self.index, &ciphertext)
+    }
 
-        // TODO zeroize this.
-        let mut aes_key = [0u8; 32];
-        let mut hmac_key = [0u8; 32];
-        let mut iv = [0u8; 16];
+    fn expand_keys(&self) -> (Aes256Key, HmacSha256Key, Aes256IV) {
+        #[derive(Clone, Zeroize)]
+        struct ExpandedKeys([u8; 80]);
 
-        // TODO zeroize this.
-        let mut expanded_keys = [0u8; 80];
+        impl Drop for ExpandedKeys {
+            fn drop(&mut self) {
+                self.0.zeroize();
+            }
+        }
 
-        hkdf.expand(b"OLM_KEYS", &mut expanded_keys).unwrap();
+        impl ExpandedKeys {
+            const HMAC_INFO: &'static [u8] = b"OLM_KEYS";
 
-        aes_key.copy_from_slice(&expanded_keys[0..32]);
-        hmac_key.copy_from_slice(&expanded_keys[32..64]);
-        iv.copy_from_slice(&expanded_keys[64..80]);
+            fn new(message_key: &MessageKey) -> Self {
+                let mut expanded_keys = [0u8; 80];
+                let hkdf: Hkdf<Sha256> = Hkdf::new(Some(&[0]), &message_key.key);
+                hkdf.expand(Self::HMAC_INFO, &mut expanded_keys).unwrap();
 
-        let cipher = Aes256Cbc::new_var(&aes_key, &iv).unwrap();
+                Self(expanded_keys)
+            }
+
+            fn split(self) -> (Aes256Key, HmacSha256Key, Aes256IV) {
+                let mut aes_key = Aes256Key([0u8; 32]);
+                let mut hmac_key = HmacSha256Key([0u8; 32]);
+                let mut iv = Aes256IV([0u8; 16]);
+
+                aes_key.0.copy_from_slice(&self.0[0..32]);
+                hmac_key.0.copy_from_slice(&self.0[32..64]);
+                iv.0.copy_from_slice(&self.0[64..80]);
+
+                (aes_key, hmac_key, iv)
+            }
+        }
+
+        let expanded_keys = ExpandedKeys::new(&self);
+        expanded_keys.split()
+    }
+
+    fn encrypt(self, plaintext: &[u8]) -> OlmMessage {
+        let (aes_key, hmac_key, iv) = self.expand_keys();
+
+        let cipher = Aes256Cbc::new_var(&aes_key.to_bytes(), &iv.to_bytes()).unwrap();
 
         let ciphertext = cipher.encrypt_vec(&plaintext);
+        let mut message = self.construct_message(ciphertext);
 
-        (ciphertext, hmac_key)
+        let mut hmac = Hmac::<Sha256>::new_varkey(&hmac_key.to_bytes()).unwrap();
+        hmac.update(message.as_payload_bytes());
+
+        let mac = hmac.finalize().into_bytes();
+        message.append_mac(&mac);
+
+        message
     }
 }
 
@@ -189,34 +237,20 @@ impl Session {
         }
     }
 
-    fn construct_message(&self, ciphertext: Vec<u8>) -> OlmMessage {
+    fn create_message_key(&mut self) -> MessageKey {
         let ratchet_key = RatchetPublicKey::from(&self.ratchet_key);
-        let chain_index = self.chain_key.index;
-
-        OlmMessage::from_parts(ratchet_key, chain_index, &ciphertext)
+        self.chain_key.create_message_key(ratchet_key)
     }
 
     pub fn encrypt(&mut self, plaintext: &[u8]) -> Vec<u8> {
-        let message_key = self.chain_key.create_message_key();
-        let (ciphertext, hmac_key) = message_key.encrypt(plaintext);
-
-        let message = self.construct_message(ciphertext);
-
-        println!("HELLO");
-        // let hmac_key = GenericArray::from_slice(&hmac_key);
-        let mut hmac = Hmac::<Sha256>::new_varkey(&hmac_key).unwrap();
-        println!("HELLO");
-        hmac.update(message.as_bytes());
-
-        let mac = hmac.finalize().into_bytes();
-
-        let message = [message.as_bytes(), &mac.as_slice()[0..8]].concat();
+        let message_key = self.create_message_key();
+        let message = message_key.encrypt(plaintext);
 
         PrekeyMessage::from_parts_untyped(
             self.session_keys.one_time_key.as_bytes(),
             self.session_keys.ephemeral_key.as_bytes(),
             self.session_keys.identity_key.as_bytes(),
-            message.as_slice(),
+            message.as_bytes(),
         )
         .inner
     }

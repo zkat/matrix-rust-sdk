@@ -13,7 +13,6 @@
 // limitations under the License.
 
 use super::session::RatchetPublicKey;
-use crate::utilities::{decode, encode};
 
 trait Encode {
     fn encode(self) -> Vec<u8>;
@@ -79,7 +78,17 @@ impl OlmMessage {
         self.inner.as_ref()
     }
 
-    fn from_parts_untyped(ratchet_key: &str, index: u64, ciphertext: &str) -> Self {
+    pub fn as_payload_bytes(&self) -> &[u8] {
+        let end = self.inner.len();
+        &self.inner[..end - 8]
+    }
+
+    pub fn append_mac(&mut self, mac: &[u8]) {
+        let end = self.inner.len();
+        self.inner[end - 8..].copy_from_slice(&mac[0..8]);
+    }
+
+    fn from_parts_untyped(ratchet_key: &[u8], index: u64, ciphertext: &[u8]) -> Self {
         let index = index.encode();
         let ratchet_len = ratchet_key.len().encode();
         let ciphertext_len = ratchet_key.len().encode();
@@ -88,23 +97,25 @@ impl OlmMessage {
             Self::VERSION.as_ref(),
             Self::RATCHET_TAG,
             &ratchet_len,
-            ratchet_key.as_bytes(),
+            ratchet_key,
             Self::INDEX_TAG.as_ref(),
             &index,
             Self::CIPHER_TAG.as_ref(),
             &ciphertext_len,
-            ciphertext.as_bytes(),
+            ciphertext,
+            &[0u8; 8],
         ]
         .concat();
 
         Self { inner: message }
     }
 
-    pub(super) fn from_parts(ratchet_key: RatchetPublicKey, index: u64, ciphertext: &[u8]) -> Self {
-        let ratchet_key = ratchet_key.base64_encode();
-        let ciphertext = encode(ciphertext);
-
-        Self::from_parts_untyped(&ratchet_key, index, &ciphertext)
+    pub(super) fn from_parts(
+        ratchet_key: &RatchetPublicKey,
+        index: u64,
+        ciphertext: &[u8],
+    ) -> Self {
+        Self::from_parts_untyped(ratchet_key.as_bytes(), index, ciphertext)
     }
 }
 
@@ -131,11 +142,6 @@ impl PrekeyMessage {
         identity_key: &[u8],
         message: &[u8],
     ) -> Self {
-        let one_time_key = encode(one_time_key);
-        let base_key = encode(base_key);
-        let identity_key = encode(identity_key);
-        let message = encode(message);
-
         let one_time_key_len = one_time_key.len().encode();
         let base_key_len = base_key.len().encode();
         let identity_key_len = identity_key.len().encode();
@@ -145,16 +151,16 @@ impl PrekeyMessage {
             Self::VERSION.as_ref(),
             Self::ONE_TIME_KEY_TAG,
             one_time_key_len.as_slice(),
-            one_time_key.as_bytes(),
+            one_time_key,
             Self::BASE_KEY_TAG,
             base_key_len.as_slice(),
-            base_key.as_bytes(),
+            base_key,
             Self::IDENTITY_KEY_TAG,
             identity_key_len.as_slice(),
-            identity_key.as_bytes(),
+            identity_key,
             Self::MESSAGE_TAG,
             message_len.as_slice(),
-            message.as_bytes(),
+            message,
         ]
         .concat();
 
@@ -170,8 +176,8 @@ mod test {
     fn encode() {
         let message = b"\x03\n\nratchetkey\x10\x01\"\nciphertext";
 
-        let ratchet_key = "ratchetkey";
-        let ciphertext = "ciphertext";
+        let ratchet_key = b"ratchetkey";
+        let ciphertext = b"ciphertext";
 
         let encoded = OlmMessage::from_parts_untyped(ratchet_key, 1, ciphertext);
 
