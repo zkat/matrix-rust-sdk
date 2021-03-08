@@ -601,6 +601,29 @@
 <span id="598">598</span>
 <span id="599">599</span>
 <span id="600">600</span>
+<span id="601">601</span>
+<span id="602">602</span>
+<span id="603">603</span>
+<span id="604">604</span>
+<span id="605">605</span>
+<span id="606">606</span>
+<span id="607">607</span>
+<span id="608">608</span>
+<span id="609">609</span>
+<span id="610">610</span>
+<span id="611">611</span>
+<span id="612">612</span>
+<span id="613">613</span>
+<span id="614">614</span>
+<span id="615">615</span>
+<span id="616">616</span>
+<span id="617">617</span>
+<span id="618">618</span>
+<span id="619">619</span>
+<span id="620">620</span>
+<span id="621">621</span>
+<span id="622">622</span>
+<span id="623">623</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="comment">// Copyright 2020 The Matrix.org Foundation C.I.C.</span>
 <span class="comment">//</span>
@@ -636,7 +659,7 @@
     },
     <span class="ident">time</span>::<span class="ident">Duration</span>,
 };
-<span class="kw">use</span> <span class="ident">tracing</span>::<span class="ident">debug</span>;
+<span class="kw">use</span> <span class="ident">tracing</span>::{<span class="ident">debug</span>, <span class="ident">error</span>, <span class="ident">trace</span>};
 
 <span class="kw">use</span> <span class="ident">matrix_sdk_common</span>::{
     <span class="ident">events</span>::{
@@ -808,6 +831,11 @@
     <span class="doccomment">/// users/devices that received the session.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">mark_request_as_sent</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">request_id</span>: <span class="kw-2">&amp;</span><span class="ident">Uuid</span>) {
         <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>((<span class="kw">_</span>, <span class="ident">r</span>)) <span class="op">=</span> <span class="self">self</span>.<span class="ident">to_share_with_set</span>.<span class="ident">remove</span>(<span class="ident">request_id</span>) {
+            <span class="macro">trace</span><span class="macro">!</span>(
+                <span class="ident">request_id</span> <span class="op">=</span> <span class="ident">request_id</span>.<span class="ident">to_string</span>().<span class="ident">as_str</span>(),
+                <span class="string">&quot;Marking to-device request carrying a room key as sent&quot;</span>
+            );
+
             <span class="kw">let</span> <span class="ident">user_pairs</span> <span class="op">=</span> <span class="ident">r</span>.<span class="number">0</span>.<span class="ident">messages</span>.<span class="ident">iter</span>().<span class="ident">map</span>(<span class="op">|</span>(<span class="ident">u</span>, <span class="ident">v</span>)<span class="op">|</span> {
                 (
                     <span class="ident">u</span>.<span class="ident">clone</span>(),
@@ -837,6 +865,19 @@
                 );
                 <span class="self">self</span>.<span class="ident">mark_as_shared</span>();
             }
+        } <span class="kw">else</span> {
+            <span class="kw">let</span> <span class="ident">request_ids</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span> <span class="op">=</span> <span class="self">self</span>
+                .<span class="ident">to_share_with_set</span>
+                .<span class="ident">iter</span>()
+                .<span class="ident">map</span>(<span class="op">|</span><span class="ident">e</span><span class="op">|</span> <span class="ident">e</span>.<span class="ident">key</span>().<span class="ident">to_string</span>())
+                .<span class="ident">collect</span>();
+
+            <span class="macro">error</span><span class="macro">!</span>(
+                <span class="ident">all_request_ids</span> <span class="op">=</span> <span class="question-mark">?</span><span class="ident">request_ids</span>,
+                <span class="ident">request_id</span> <span class="op">=</span> <span class="ident">request_id</span>.<span class="ident">to_string</span>().<span class="ident">as_str</span>(),
+                <span class="string">&quot;Marking to-device request carrying a room key as sent but no \
+                    request found with the given id&quot;</span>
+            );
         }
     }
 
@@ -1030,6 +1071,11 @@
             .<span class="ident">iter</span>()
             .<span class="ident">map</span>(<span class="op">|</span><span class="ident">i</span><span class="op">|</span> <span class="ident">i</span>.<span class="ident">value</span>().<span class="number">0</span>.<span class="ident">clone</span>())
             .<span class="ident">collect</span>()
+    }
+
+    <span class="doccomment">/// Get the list of request ids this session is waiting for to be sent out.</span>
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">pending_request_ids</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Uuid</span><span class="op">&gt;</span> {
+        <span class="self">self</span>.<span class="ident">to_share_with_set</span>.<span class="ident">iter</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">e</span><span class="op">|</span> <span class="kw-2">*</span><span class="ident">e</span>.<span class="ident">key</span>()).<span class="ident">collect</span>()
     }
 
     <span class="doccomment">/// Restore a Session from a previously pickled string.</span>
