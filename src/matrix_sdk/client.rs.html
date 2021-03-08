@@ -3108,6 +3108,11 @@
 <span id="3105">3105</span>
 <span id="3106">3106</span>
 <span id="3107">3107</span>
+<span id="3108">3108</span>
+<span id="3109">3109</span>
+<span id="3110">3110</span>
+<span id="3111">3111</span>
+<span id="3112">3112</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="comment">// Copyright 2020 Damir Jelić</span>
 <span class="comment">// Copyright 2020 The Matrix.org Foundation C.I.C.</span>
@@ -3152,8 +3157,7 @@
 
 <span class="kw">use</span> <span class="ident">matrix_sdk_base</span>::{
     <span class="ident">deserialized_responses</span>::{<span class="ident">MembersResponse</span>, <span class="ident">SyncResponse</span>},
-    <span class="ident">BaseClient</span>, <span class="ident">BaseClientConfig</span>, <span class="ident">EventHandler</span>, <span class="ident">InvitedRoom</span>, <span class="ident">JoinedRoom</span>, <span class="ident">LeftRoom</span>, <span class="ident">RoomState</span>,
-    <span class="ident">Session</span>, <span class="ident">Store</span>,
+    <span class="ident">BaseClient</span>, <span class="ident">BaseClientConfig</span>, <span class="ident">EventHandler</span>, <span class="ident">Room</span>, <span class="ident">RoomType</span>, <span class="ident">Session</span>, <span class="ident">Store</span>,
 };
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;encryption&quot;</span>)]</span>
@@ -3675,34 +3679,34 @@
     <span class="doccomment">/// Get all the rooms the client knows about.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// This will return the list of joined, invited, and left rooms.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">rooms</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">RoomState</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">rooms</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Room</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">store</span>().<span class="ident">get_rooms</span>()
     }
 
     <span class="doccomment">/// Returns the joined rooms this client knows about.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">joined_rooms</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">JoinedRoom</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">joined_rooms</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Room</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">store</span>()
             .<span class="ident">get_rooms</span>()
             .<span class="ident">into_iter</span>()
-            .<span class="ident">filter_map</span>(<span class="op">|</span><span class="ident">r</span><span class="op">|</span> <span class="ident">r</span>.<span class="ident">joined</span>())
+            .<span class="ident">filter</span>(<span class="op">|</span><span class="ident">room</span><span class="op">|</span> <span class="ident">room</span>.<span class="ident">room_type</span>() <span class="op">=</span><span class="op">=</span> <span class="ident">RoomType</span>::<span class="ident">Joined</span>)
             .<span class="ident">collect</span>()
     }
 
     <span class="doccomment">/// Returns the invited rooms this client knows about.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">invited_rooms</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">InvitedRoom</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">invited_rooms</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Room</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">store</span>()
             .<span class="ident">get_rooms</span>()
             .<span class="ident">into_iter</span>()
-            .<span class="ident">filter_map</span>(<span class="op">|</span><span class="ident">r</span><span class="op">|</span> <span class="ident">r</span>.<span class="ident">invited</span>())
+            .<span class="ident">filter</span>(<span class="op">|</span><span class="ident">room</span><span class="op">|</span> <span class="ident">room</span>.<span class="ident">room_type</span>() <span class="op">=</span><span class="op">=</span> <span class="ident">RoomType</span>::<span class="ident">Invited</span>)
             .<span class="ident">collect</span>()
     }
 
     <span class="doccomment">/// Returns the left rooms this client knows about.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">left_rooms</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">LeftRoom</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">left_rooms</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Room</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">store</span>()
             .<span class="ident">get_rooms</span>()
             .<span class="ident">into_iter</span>()
-            .<span class="ident">filter_map</span>(<span class="op">|</span><span class="ident">r</span><span class="op">|</span> <span class="ident">r</span>.<span class="ident">left</span>())
+            .<span class="ident">filter</span>(<span class="op">|</span><span class="ident">room</span><span class="op">|</span> <span class="ident">room</span>.<span class="ident">room_type</span>() <span class="op">=</span><span class="op">=</span> <span class="ident">RoomType</span>::<span class="ident">Left</span>)
             .<span class="ident">collect</span>()
     }
 
@@ -3711,8 +3715,10 @@
     <span class="doccomment">/// # Arguments</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// `room_id` - The unique id of the room that should be fetched.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_joined_room</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">room_id</span>: <span class="kw-2">&amp;</span><span class="ident">RoomId</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">JoinedRoom</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">store</span>().<span class="ident">get_joined_room</span>(<span class="ident">room_id</span>)
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_joined_room</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">room_id</span>: <span class="kw-2">&amp;</span><span class="ident">RoomId</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Room</span><span class="op">&gt;</span> {
+        <span class="self">self</span>.<span class="ident">store</span>()
+            .<span class="ident">get_room</span>(<span class="ident">room_id</span>)
+            .<span class="ident">filter</span>(<span class="op">|</span><span class="ident">room</span><span class="op">|</span> <span class="ident">room</span>.<span class="ident">room_type</span>() <span class="op">=</span><span class="op">=</span> <span class="ident">RoomType</span>::<span class="ident">Joined</span>)
     }
 
     <span class="doccomment">/// Get an invited room with the given room id.</span>
@@ -3720,8 +3726,10 @@
     <span class="doccomment">/// # Arguments</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// `room_id` - The unique id of the room that should be fetched.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_invited_room</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">room_id</span>: <span class="kw-2">&amp;</span><span class="ident">RoomId</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">InvitedRoom</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">store</span>().<span class="ident">get_invited_room</span>(<span class="ident">room_id</span>)
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_invited_room</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">room_id</span>: <span class="kw-2">&amp;</span><span class="ident">RoomId</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Room</span><span class="op">&gt;</span> {
+        <span class="self">self</span>.<span class="ident">store</span>()
+            .<span class="ident">get_room</span>(<span class="ident">room_id</span>)
+            .<span class="ident">filter</span>(<span class="op">|</span><span class="ident">room</span><span class="op">|</span> <span class="ident">room</span>.<span class="ident">room_type</span>() <span class="op">=</span><span class="op">=</span> <span class="ident">RoomType</span>::<span class="ident">Invited</span>)
     }
 
     <span class="doccomment">/// Get a left room with the given room id.</span>
@@ -3729,8 +3737,10 @@
     <span class="doccomment">/// # Arguments</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// `room_id` - The unique id of the room that should be fetched.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_left_room</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">room_id</span>: <span class="kw-2">&amp;</span><span class="ident">RoomId</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">LeftRoom</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">store</span>().<span class="ident">get_left_room</span>(<span class="ident">room_id</span>)
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_left_room</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">room_id</span>: <span class="kw-2">&amp;</span><span class="ident">RoomId</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Room</span><span class="op">&gt;</span> {
+        <span class="self">self</span>.<span class="ident">store</span>()
+            .<span class="ident">get_room</span>(<span class="ident">room_id</span>)
+            .<span class="ident">filter</span>(<span class="op">|</span><span class="ident">room</span><span class="op">|</span> <span class="ident">room</span>.<span class="ident">room_type</span>() <span class="op">=</span><span class="op">=</span> <span class="ident">RoomType</span>::<span class="ident">Left</span>)
     }
 
     <span class="doccomment">/// Login to the server.</span>

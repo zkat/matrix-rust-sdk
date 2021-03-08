@@ -413,7 +413,7 @@
 
 <span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">deserialized_responses</span>::{<span class="ident">MemberEvent</span>, <span class="ident">StrippedMemberEvent</span>};
 
-<span class="kw">use</span> <span class="kw">super</span>::{<span class="prelude-ty">Result</span>, <span class="ident">RoomInfo</span>, <span class="ident">StateChanges</span>, <span class="ident">StateStore</span>, <span class="ident">StrippedRoomInfo</span>};
+<span class="kw">use</span> <span class="kw">super</span>::{<span class="prelude-ty">Result</span>, <span class="ident">RoomInfo</span>, <span class="ident">StateChanges</span>, <span class="ident">StateStore</span>};
 
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">MemoryStore</span> {
@@ -429,7 +429,7 @@
     <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy</span>::<span class="ident">type_complexity</span>)]</span>
     <span class="ident">room_state</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">DashMap</span><span class="op">&lt;</span><span class="ident">RoomId</span>, <span class="ident">DashMap</span><span class="op">&lt;</span><span class="ident">String</span>, <span class="ident">DashMap</span><span class="op">&lt;</span><span class="ident">String</span>, <span class="ident">AnySyncStateEvent</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span>,
     <span class="ident">room_account_data</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">DashMap</span><span class="op">&lt;</span><span class="ident">RoomId</span>, <span class="ident">DashMap</span><span class="op">&lt;</span><span class="ident">String</span>, <span class="ident">AnyBasicEvent</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-    <span class="ident">stripped_room_info</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">DashMap</span><span class="op">&lt;</span><span class="ident">RoomId</span>, <span class="ident">StrippedRoomInfo</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+    <span class="ident">stripped_room_info</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">DashMap</span><span class="op">&lt;</span><span class="ident">RoomId</span>, <span class="ident">RoomInfo</span><span class="op">&gt;</span><span class="op">&gt;</span>,
     <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy</span>::<span class="ident">type_complexity</span>)]</span>
     <span class="ident">stripped_room_state</span>:
         <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">DashMap</span><span class="op">&lt;</span><span class="ident">RoomId</span>, <span class="ident">DashMap</span><span class="op">&lt;</span><span class="ident">String</span>, <span class="ident">DashMap</span><span class="op">&lt;</span><span class="ident">String</span>, <span class="ident">AnyStrippedStateEvent</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span>,
@@ -671,7 +671,7 @@
         <span class="self">self</span>.<span class="ident">room_info</span>.<span class="ident">iter</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">r</span><span class="op">|</span> <span class="ident">r</span>.<span class="ident">clone</span>()).<span class="ident">collect</span>()
     }
 
-    <span class="kw">fn</span> <span class="ident">get_stripped_room_infos</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">StrippedRoomInfo</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">get_stripped_room_infos</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">RoomInfo</span><span class="op">&gt;</span> {
         <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy</span>::<span class="ident">map_clone</span>)]</span>
         <span class="self">self</span>.<span class="ident">stripped_room_info</span>.<span class="ident">iter</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">r</span><span class="op">|</span> <span class="ident">r</span>.<span class="ident">clone</span>()).<span class="ident">collect</span>()
     }
@@ -737,7 +737,7 @@
         <span class="prelude-val">Ok</span>(<span class="self">self</span>.<span class="ident">get_room_infos</span>())
     }
 
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">get_stripped_room_infos</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">StrippedRoomInfo</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">get_stripped_room_infos</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">RoomInfo</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="prelude-val">Ok</span>(<span class="self">self</span>.<span class="ident">get_stripped_room_infos</span>())
     }
 
