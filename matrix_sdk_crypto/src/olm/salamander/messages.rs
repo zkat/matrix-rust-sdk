@@ -91,7 +91,7 @@ impl OlmMessage {
     fn from_parts_untyped(ratchet_key: &[u8], index: u64, ciphertext: &[u8]) -> Self {
         let index = index.encode();
         let ratchet_len = ratchet_key.len().encode();
-        let ciphertext_len = ratchet_key.len().encode();
+        let ciphertext_len = ciphertext.len().encode();
 
         let message = [
             Self::VERSION.as_ref(),
@@ -175,12 +175,16 @@ mod test {
     #[test]
     fn encode() {
         let message = b"\x03\n\nratchetkey\x10\x01\"\nciphertext";
+        let message_mac = b"\x03\n\nratchetkey\x10\x01\"\nciphertextMACHEREE";
 
         let ratchet_key = b"ratchetkey";
         let ciphertext = b"ciphertext";
 
-        let encoded = OlmMessage::from_parts_untyped(ratchet_key, 1, ciphertext);
+        let mut encoded = OlmMessage::from_parts_untyped(ratchet_key, 1, ciphertext);
 
-        assert_eq!(encoded.as_bytes(), message.as_ref());
+        assert_eq!(encoded.as_payload_bytes(), message.as_ref());
+        encoded.append_mac(b"MACHEREE");
+        assert_eq!(encoded.as_payload_bytes(), message.as_ref());
+        assert_eq!(encoded.as_bytes(), message_mac.as_ref());
     }
 }

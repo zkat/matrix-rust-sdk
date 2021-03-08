@@ -260,7 +260,7 @@ mod test {
             assert_eq!(message, plaintext);
 
             let second_text = "Here's another secret to everybody";
-            let olm_message = alice_session.encrypt(&second_text.as_bytes());
+            let olm_message = alice_session.encrypt(second_text.as_bytes());
             let olm_message = encode(olm_message);
             let olm_message = OlmMessage::from_type_and_ciphertext(0, olm_message).unwrap();
 
