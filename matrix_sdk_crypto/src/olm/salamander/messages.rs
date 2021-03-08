@@ -63,7 +63,7 @@ impl Encode for u64 {
 }
 
 #[derive(Clone, Debug)]
-pub(super) struct OlmMessage {
+pub struct OlmMessage {
     inner: Vec<u8>,
 }
 
@@ -86,6 +86,10 @@ impl OlmMessage {
     pub fn append_mac(&mut self, mac: &[u8]) {
         let end = self.inner.len();
         self.inner[end - 8..].copy_from_slice(&mac[0..8]);
+    }
+
+    pub(super) fn decode(self) -> Result<(RatchetPublicKey, u64, Vec<u8>), ()> {
+        todo!();
     }
 
     fn from_parts_untyped(ratchet_key: &[u8], index: u64, ciphertext: &[u8]) -> Self {

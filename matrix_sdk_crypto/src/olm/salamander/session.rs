@@ -71,15 +71,47 @@ impl From<&RatchetKey> for RatchetPublicKey {
     }
 }
 
+struct Ratchet {
+    root_key: RootKey,
+    ratchet_key: RatchetKey,
+}
+
+impl Ratchet {
+    fn advance(&mut self, other_ratchet_key: RatchetPublicKey) -> ChainKey {
+        let (root_key, chain_key) = self.root_key.advance(&self.ratchet_key, other_ratchet_key);
+        self.root_key = root_key;
+
+        chain_key
+    }
+}
+
 pub(super) struct RootKey([u8; 32]);
 
 impl RootKey {
+    const ADVANCEMENT_SEED: &'static [u8; 11] = b"OLM_RATCHET";
+
     pub(super) fn new(bytes: [u8; 32]) -> Self {
         Self(bytes)
     }
 
-    fn advance(&mut self) -> ChainKey {
-        todo!()
+    fn advance(
+        &self,
+        old_ratchet_key: &RatchetKey,
+        other_ratchet_key: RatchetPublicKey,
+    ) -> (RootKey, ChainKey) {
+        let shared_secret = old_ratchet_key.0.diffie_hellman(&other_ratchet_key.0);
+        let hkdf: Hkdf<Sha256> = Hkdf::new(Some(self.0.as_ref()), shared_secret.as_bytes());
+        let mut output = [0u8; 64];
+
+        hkdf.expand(Self::ADVANCEMENT_SEED, &mut output).expect("Can't expand");
+
+        let mut chain_key = ChainKey::new([0u8; 32]);
+        let mut root_key = RootKey([0u8; 32]);
+
+        root_key.0.copy_from_slice(&output[..32]);
+        chain_key.key.copy_from_slice(&output[32..]);
+
+        (root_key, chain_key)
     }
 }
 
@@ -218,28 +250,32 @@ impl SessionKeys {
 
 pub struct Session {
     session_keys: SessionKeys,
-    ratchet_key: RatchetKey,
-    root_key: RootKey,
+    ratchet: Ratchet,
     chain_key: ChainKey,
     established: bool,
 }
 
 impl Session {
     pub(super) fn new(session_keys: SessionKeys, root_key: RootKey, chain_key: ChainKey) -> Self {
-        let ratchet_key = RatchetKey::new();
+        let ratchet = Ratchet {
+            root_key,
+            ratchet_key: RatchetKey::new(),
+        };
 
         Self {
-            ratchet_key,
+            ratchet,
             session_keys,
-            root_key,
             chain_key,
             established: false,
         }
     }
 
+    fn ratchet_key(&self) -> RatchetPublicKey {
+        RatchetPublicKey::from(&self.ratchet.ratchet_key)
+    }
+
     fn create_message_key(&mut self) -> MessageKey {
-        let ratchet_key = RatchetPublicKey::from(&self.ratchet_key);
-        self.chain_key.create_message_key(ratchet_key)
+        self.chain_key.create_message_key(self.ratchet_key())
     }
 
     pub fn encrypt(&mut self, plaintext: &[u8]) -> Vec<u8> {
@@ -253,5 +289,11 @@ impl Session {
             message.as_bytes(),
         )
         .inner
+    }
+
+    pub fn decrypt(&mut self, message: OlmMessage) {
+        let (ratchet_key, _, _) = message.decode().unwrap();
+
+        let _ = self.ratchet.advance(ratchet_key);
     }
 }
