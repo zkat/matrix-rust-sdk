@@ -13,6 +13,7 @@
 // limitations under the License.
 
 use super::session::RatchetPublicKey;
+use prost::Message;
 
 trait Encode {
     fn encode(self) -> Vec<u8>;
@@ -62,13 +63,13 @@ impl Encode for u64 {
     }
 }
 
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, PartialEq)]
 pub struct OlmMessage {
     inner: Vec<u8>,
 }
 
 impl OlmMessage {
-    const VERSION: &'static [u8; 1] = b"\x03";
+    const VERSION: u8 = 3;
 
     const RATCHET_TAG: &'static [u8; 1] = b"\x0A";
     const INDEX_TAG: &'static [u8; 1] = b"\x10";
@@ -83,30 +84,51 @@ impl OlmMessage {
         &self.inner[..end - 8]
     }
 
+    pub fn to_vec(self) -> Vec<u8> {
+        self.inner
+    }
+
     pub fn append_mac(&mut self, mac: &[u8]) {
         let end = self.inner.len();
         self.inner[end - 8..].copy_from_slice(&mac[0..8]);
     }
 
     pub(super) fn decode(self) -> Result<(RatchetPublicKey, u64, Vec<u8>), ()> {
-        todo!();
+        let version = *self.inner.get(0).unwrap();
+
+        if version != Self::VERSION {
+            panic!("Unsupported version");
+        }
+
+        let inner = InnerMessage::decode(&self.inner[1..self.inner.len() - 8]).unwrap();
+
+        let mut key = [0u8; 32];
+        key.copy_from_slice(&inner.ratchet_key);
+
+        let key = RatchetPublicKey::from(key);
+        let chain_index = inner.chain_index;
+        let ciphertext = inner.ciphertext;
+
+        Ok((key, chain_index, ciphertext))
     }
 
-    fn from_parts_untyped(ratchet_key: &[u8], index: u64, ciphertext: &[u8]) -> Self {
+    fn from_parts_untyped(ratchet_key: Vec<u8>, index: u64, ciphertext: Vec<u8>) -> Self {
+        // Prost optimizes away the chain index if it's 0, libolm can't decode
+        // this, so encode our messages the pedestrian way instead.
         let index = index.encode();
         let ratchet_len = ratchet_key.len().encode();
         let ciphertext_len = ciphertext.len().encode();
 
         let message = [
-            Self::VERSION.as_ref(),
-            Self::RATCHET_TAG,
+            &[Self::VERSION].as_ref(),
+            Self::RATCHET_TAG.as_ref(),
             &ratchet_len,
-            ratchet_key,
+            &ratchet_key,
             Self::INDEX_TAG.as_ref(),
             &index,
             Self::CIPHER_TAG.as_ref(),
             &ciphertext_len,
-            ciphertext,
+            &ciphertext,
             &[0u8; 8],
         ]
         .concat();
@@ -115,11 +137,11 @@ impl OlmMessage {
     }
 
     pub(super) fn from_parts(
-        ratchet_key: &RatchetPublicKey,
+        ratchet_key: RatchetPublicKey,
         index: u64,
-        ciphertext: &[u8],
+        ciphertext: Vec<u8>,
     ) -> Self {
-        Self::from_parts_untyped(ratchet_key.as_bytes(), index, ciphertext)
+        Self::from_parts_untyped(ratchet_key.to_vec(), index, ciphertext)
     }
 }
 
@@ -129,7 +151,7 @@ pub(super) struct PrekeyMessage {
 }
 
 impl PrekeyMessage {
-    const VERSION: &'static [u8; 1] = b"\x03";
+    const VERSION: u8 = 3;
 
     const ONE_TIME_KEY_TAG: &'static [u8; 1] = b"\x0A";
     const BASE_KEY_TAG: &'static [u8; 1] = b"\x12";
@@ -141,10 +163,10 @@ impl PrekeyMessage {
     }
 
     pub(super) fn from_parts_untyped(
-        one_time_key: &[u8],
-        base_key: &[u8],
-        identity_key: &[u8],
-        message: &[u8],
+        one_time_key: Vec<u8>,
+        base_key: Vec<u8>,
+        identity_key: Vec<u8>,
+        message: Vec<u8>,
     ) -> Self {
         let one_time_key_len = one_time_key.len().encode();
         let base_key_len = base_key.len().encode();
@@ -152,24 +174,67 @@ impl PrekeyMessage {
         let message_len = message.len().encode();
 
         let message = [
-            Self::VERSION.as_ref(),
+            [Self::VERSION].as_ref(),
             Self::ONE_TIME_KEY_TAG,
             one_time_key_len.as_slice(),
-            one_time_key,
+            &one_time_key,
             Self::BASE_KEY_TAG,
             base_key_len.as_slice(),
-            base_key,
+            &base_key,
             Self::IDENTITY_KEY_TAG,
             identity_key_len.as_slice(),
-            identity_key,
+            &identity_key,
             Self::MESSAGE_TAG,
             message_len.as_slice(),
-            message,
+            &message,
         ]
         .concat();
 
         Self { inner: message }
     }
+
+    pub(super) fn from_parts_untyped_prost(
+        one_time_key: Vec<u8>,
+        base_key: Vec<u8>,
+        identity_key: Vec<u8>,
+        message: Vec<u8>,
+    ) -> Self {
+        let message = InnerPreKeyMessage {
+            one_time_key,
+            base_key,
+            identity_key,
+            message,
+        };
+
+        let mut output: Vec<u8> = vec![0u8; message.encoded_len() + 1];
+        output[0] = Self::VERSION;
+
+        message.encode(&mut output[1..].as_mut()).unwrap();
+
+        Self { inner: output }
+    }
+}
+
+#[derive(Clone, Message, PartialEq)]
+struct InnerMessage {
+    #[prost(bytes, tag = "1")]
+    pub ratchet_key: Vec<u8>,
+    #[prost(uint64, tag = "2")]
+    pub chain_index: u64,
+    #[prost(bytes, tag = "4")]
+    pub ciphertext: Vec<u8>,
+}
+
+#[derive(Clone, Message)]
+struct InnerPreKeyMessage {
+    #[prost(bytes, tag = "1")]
+    pub one_time_key: Vec<u8>,
+    #[prost(bytes, tag = "2")]
+    pub base_key: Vec<u8>,
+    #[prost(bytes, tag = "3")]
+    pub identity_key: Vec<u8>,
+    #[prost(bytes, tag = "4")]
+    pub message: Vec<u8>,
 }
 
 #[cfg(test)]
@@ -184,7 +249,8 @@ mod test {
         let ratchet_key = b"ratchetkey";
         let ciphertext = b"ciphertext";
 
-        let mut encoded = OlmMessage::from_parts_untyped(ratchet_key, 1, ciphertext);
+        let mut encoded =
+            OlmMessage::from_parts_untyped(ratchet_key.to_vec(), 1, ciphertext.to_vec());
 
         assert_eq!(encoded.as_payload_bytes(), message.as_ref());
         encoded.append_mac(b"MACHEREE");

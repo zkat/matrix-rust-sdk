@@ -63,6 +63,16 @@ impl RatchetPublicKey {
     pub fn as_bytes(&self) -> &[u8] {
         self.0.as_bytes()
     }
+
+    pub fn to_vec(self) -> Vec<u8> {
+        self.0.to_bytes().to_vec()
+    }
+}
+
+impl From<[u8; 32]> for RatchetPublicKey {
+    fn from(bytes: [u8; 32]) -> Self {
+        RatchetPublicKey(Curve25591PublicKey::from(bytes))
+    }
 }
 
 impl From<&RatchetKey> for RatchetPublicKey {
@@ -103,7 +113,8 @@ impl RootKey {
         let hkdf: Hkdf<Sha256> = Hkdf::new(Some(self.0.as_ref()), shared_secret.as_bytes());
         let mut output = [0u8; 64];
 
-        hkdf.expand(Self::ADVANCEMENT_SEED, &mut output).expect("Can't expand");
+        hkdf.expand(Self::ADVANCEMENT_SEED, &mut output)
+            .expect("Can't expand");
 
         let mut chain_key = ChainKey::new([0u8; 32]);
         let mut root_key = RootKey([0u8; 32]);
@@ -168,8 +179,8 @@ struct MessageKey {
 }
 
 impl MessageKey {
-    fn construct_message(&self, ciphertext: Vec<u8>) -> OlmMessage {
-        OlmMessage::from_parts(&self.ratchet_key, self.index, &ciphertext)
+    fn construct_message(self, ciphertext: Vec<u8>) -> OlmMessage {
+        OlmMessage::from_parts(self.ratchet_key, self.index, ciphertext)
     }
 
     fn expand_keys(&self) -> (Aes256Key, HmacSha256Key, Aes256IV) {
@@ -282,11 +293,11 @@ impl Session {
         let message_key = self.create_message_key();
         let message = message_key.encrypt(plaintext);
 
-        PrekeyMessage::from_parts_untyped(
-            self.session_keys.one_time_key.as_bytes(),
-            self.session_keys.ephemeral_key.as_bytes(),
-            self.session_keys.identity_key.as_bytes(),
-            message.as_bytes(),
+        PrekeyMessage::from_parts_untyped_prost(
+            self.session_keys.one_time_key.as_bytes().to_vec(),
+            self.session_keys.ephemeral_key.as_bytes().to_vec(),
+            self.session_keys.identity_key.as_bytes().to_vec(),
+            message.to_vec(),
         )
         .inner
     }
