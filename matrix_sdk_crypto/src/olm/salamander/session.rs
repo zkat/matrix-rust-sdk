@@ -28,6 +28,8 @@ use super::messages::{OlmMessage, PrekeyMessage};
 type Aes256Cbc = Cbc<Aes256, Pkcs7>;
 
 struct RatchetKey(Curve25591SecretKey);
+
+#[derive(Debug)]
 pub(super) struct RatchetPublicKey(Curve25591PublicKey);
 
 struct Aes256Key([u8; 32]);
@@ -221,6 +223,14 @@ impl MessageKey {
         expanded_keys.split()
     }
 
+    fn decrypt(self, ciphertext: Vec<u8>) -> Vec<u8> {
+        let (aes_key, hmac_key, iv) = self.expand_keys();
+        let cipher = Aes256Cbc::new_var(&aes_key.to_bytes(), &iv.to_bytes()).unwrap();
+        let plaintext = cipher.decrypt_vec(&ciphertext).unwrap();
+
+        plaintext
+    }
+
     fn encrypt(self, plaintext: &[u8]) -> OlmMessage {
         let (aes_key, hmac_key, iv) = self.expand_keys();
 
@@ -302,9 +312,17 @@ impl Session {
         .inner
     }
 
-    pub fn decrypt(&mut self, message: OlmMessage) {
-        let (ratchet_key, _, _) = message.decode().unwrap();
+    pub fn decrypt(&mut self, message: Vec<u8>) -> Vec<u8> {
+        let message = OlmMessage::from(message);
+        let (ratchet_key, index, ciphertext) = message.decode().unwrap();
 
-        let _ = self.ratchet.advance(ratchet_key);
+        println!("{:?} {:?}", ratchet_key, index);
+
+        let mut chain_key = self.ratchet.advance(ratchet_key);
+        let ratchet_key = RatchetKey::new();
+
+        let message_key = chain_key.create_message_key(RatchetPublicKey::from(&ratchet_key));
+
+        message_key.decrypt(ciphertext)
     }
 }

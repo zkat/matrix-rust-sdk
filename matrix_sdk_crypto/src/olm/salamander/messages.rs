@@ -68,6 +68,12 @@ pub struct OlmMessage {
     inner: Vec<u8>,
 }
 
+impl From<Vec<u8>> for OlmMessage {
+    fn from(bytes: Vec<u8>) -> Self {
+        Self { inner: bytes }
+    }
+}
+
 impl OlmMessage {
     const VERSION: u8 = 3;
 
