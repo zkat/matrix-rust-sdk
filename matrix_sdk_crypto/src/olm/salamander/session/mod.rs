@@ -12,20 +12,54 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+mod chain_key;
 mod message_key;
 mod messages;
 
 use hkdf::Hkdf;
-use hmac::{Hmac, Mac, NewMac};
 use rand::thread_rng;
 use sha2::Sha256;
 
-use x25519_dalek::{PublicKey as Curve25591PublicKey, StaticSecret as Curve25591SecretKey};
+use x25519_dalek::{
+    PublicKey as Curve25591PublicKey, SharedSecret, StaticSecret as Curve25591SecretKey,
+};
 
-use super::account::Shared3DHSecret;
-
+use chain_key::ChainKey;
 use message_key::MessageKey;
 use messages::{OlmMessage, PrekeyMessage};
+
+pub(super) struct Shared3DHSecret([u8; 96]);
+
+impl Shared3DHSecret {
+    pub fn new(first: SharedSecret, second: SharedSecret, third: SharedSecret) -> Self {
+        let mut secret = Self([0u8; 96]);
+
+        secret.0[0..32].copy_from_slice(first.as_bytes());
+        secret.0[32..64].copy_from_slice(second.as_bytes());
+        secret.0[64..96].copy_from_slice(third.as_bytes());
+
+        secret
+    }
+
+    fn expand_into_sub_keys(self) -> (RootKey, ChainKey) {
+        let hkdf: Hkdf<Sha256> = Hkdf::new(Some(&[0]), &self.0);
+        let mut root_key = [0u8; 32];
+        let mut chain_key = [0u8; 32];
+
+        // TODO zeroize this.
+        let mut expanded_keys = [0u8; 64];
+
+        hkdf.expand(b"OLM_ROOT", &mut expanded_keys).unwrap();
+
+        root_key.copy_from_slice(&expanded_keys[0..32]);
+        chain_key.copy_from_slice(&expanded_keys[32..64]);
+
+        let root_key = RootKey::new(root_key);
+        let chain_key = ChainKey::new(chain_key);
+
+        (root_key, chain_key)
+    }
+}
 
 struct RatchetKey(Curve25591SecretKey);
 
@@ -100,51 +134,9 @@ impl RootKey {
         let mut root_key = RootKey([0u8; 32]);
 
         root_key.0.copy_from_slice(&output[..32]);
-        chain_key.key.copy_from_slice(&output[32..]);
+        chain_key.fill(&output[32..]);
 
         (root_key, chain_key)
-    }
-}
-
-pub(super) struct ChainKey {
-    key: [u8; 32],
-    index: u64,
-}
-
-impl ChainKey {
-    const MESSAGE_KEY_SEED: &'static [u8; 1] = b"\x01";
-    const ADVANCEMENT_SEED: &'static [u8; 1] = b"\x02";
-
-    pub(super) fn new(bytes: [u8; 32]) -> Self {
-        Self {
-            key: bytes,
-            index: 0,
-        }
-    }
-
-    fn advance(&mut self) {
-        let mut mac = Hmac::<Sha256>::new_varkey(&self.key).unwrap();
-        mac.update(Self::ADVANCEMENT_SEED);
-
-        let output = mac.finalize().into_bytes();
-        self.key.copy_from_slice(output.as_slice());
-        self.index += 1;
-    }
-
-    fn create_message_key(&mut self, ratchet_key: RatchetPublicKey) -> MessageKey {
-        let mut mac = Hmac::<Sha256>::new_varkey(&self.key).unwrap();
-        mac.update(Self::MESSAGE_KEY_SEED);
-
-        let output = mac.finalize().into_bytes();
-
-        let mut key = [0u8; 32];
-        key.copy_from_slice(output.as_slice());
-
-        let message_key = MessageKey::new(key, ratchet_key, self.index);
-
-        self.advance();
-
-        message_key
     }
 }
 
