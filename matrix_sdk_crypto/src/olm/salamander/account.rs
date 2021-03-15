@@ -27,7 +27,7 @@ use crate::utilities::encode;
 
 use super::session::{ChainKey, RootKey, Session, SessionKeys};
 
-struct Shared3DHSecret([u8; 96]);
+pub(super) struct Shared3DHSecret([u8; 96]);
 
 impl Shared3DHSecret {
     fn new(first: SharedSecret, second: SharedSecret, third: SharedSecret) -> Self {
@@ -40,7 +40,7 @@ impl Shared3DHSecret {
         secret
     }
 
-    fn expand_into_sub_keys(self) -> (RootKey, ChainKey) {
+    pub fn expand_into_sub_keys(self) -> (RootKey, ChainKey) {
         let hkdf: Hkdf<Sha256> = Hkdf::new(Some(&[0]), &self.0);
         let mut root_key = [0u8; 32];
         let mut chain_key = [0u8; 32];
@@ -184,9 +184,7 @@ impl Account {
         let session_keys =
             SessionKeys::new(self.curve25519_key().clone(), ephemeral_key, one_time_key);
 
-        let (root_key, chain_key) = shared_secret.expand_into_sub_keys();
-
-        Session::new(session_keys, root_key, chain_key)
+        Session::new(session_keys, shared_secret)
     }
 
     /// Get a reference to the account's public curve25519 key

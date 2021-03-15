@@ -23,7 +23,7 @@ use block_modes::{block_padding::Pkcs7, BlockMode, Cbc};
 
 use x25519_dalek::{PublicKey as Curve25591PublicKey, StaticSecret as Curve25591SecretKey};
 
-use super::messages::{OlmMessage, PrekeyMessage};
+use super::{account::Shared3DHSecret, messages::{OlmMessage, PrekeyMessage}};
 
 type Aes256Cbc = Cbc<Aes256, Pkcs7>;
 
@@ -277,7 +277,9 @@ pub struct Session {
 }
 
 impl Session {
-    pub(super) fn new(session_keys: SessionKeys, root_key: RootKey, chain_key: ChainKey) -> Self {
+    pub(super) fn new(session_keys: SessionKeys, shared_secret: Shared3DHSecret) -> Self {
+        let (root_key, chain_key) = shared_secret.expand_into_sub_keys();
+
         let ratchet = Ratchet {
             root_key,
             ratchet_key: RatchetKey::new(),
