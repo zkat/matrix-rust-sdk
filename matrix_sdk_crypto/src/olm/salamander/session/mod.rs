@@ -15,18 +15,19 @@
 mod chain_key;
 mod message_key;
 mod messages;
+mod ratchet;
+mod root_key;
 
 use hkdf::Hkdf;
-use rand::thread_rng;
 use sha2::Sha256;
 
-use x25519_dalek::{
-    PublicKey as Curve25591PublicKey, SharedSecret, StaticSecret as Curve25591SecretKey,
-};
+use x25519_dalek::{PublicKey as Curve25591PublicKey, SharedSecret};
 
 use chain_key::ChainKey;
 use message_key::MessageKey;
 use messages::{OlmMessage, PrekeyMessage};
+use ratchet::{Ratchet, RatchetKey, RatchetPublicKey};
+use root_key::RootKey;
 
 pub(super) struct Shared3DHSecret([u8; 96]);
 
@@ -56,85 +57,6 @@ impl Shared3DHSecret {
 
         let root_key = RootKey::new(root_key);
         let chain_key = ChainKey::new(chain_key);
-
-        (root_key, chain_key)
-    }
-}
-
-struct RatchetKey(Curve25591SecretKey);
-
-#[derive(Debug)]
-pub(super) struct RatchetPublicKey(Curve25591PublicKey);
-
-impl RatchetKey {
-    fn new() -> Self {
-        let rng = thread_rng();
-        Self(Curve25591SecretKey::new(rng))
-    }
-}
-
-impl RatchetPublicKey {
-    pub fn as_bytes(&self) -> &[u8] {
-        self.0.as_bytes()
-    }
-
-    pub fn to_vec(self) -> Vec<u8> {
-        self.0.to_bytes().to_vec()
-    }
-}
-
-impl From<[u8; 32]> for RatchetPublicKey {
-    fn from(bytes: [u8; 32]) -> Self {
-        RatchetPublicKey(Curve25591PublicKey::from(bytes))
-    }
-}
-
-impl From<&RatchetKey> for RatchetPublicKey {
-    fn from(r: &RatchetKey) -> Self {
-        RatchetPublicKey(Curve25591PublicKey::from(&r.0))
-    }
-}
-
-struct Ratchet {
-    root_key: RootKey,
-    ratchet_key: RatchetKey,
-}
-
-impl Ratchet {
-    fn advance(&mut self, other_ratchet_key: RatchetPublicKey) -> ChainKey {
-        let (root_key, chain_key) = self.root_key.advance(&self.ratchet_key, other_ratchet_key);
-        self.root_key = root_key;
-
-        chain_key
-    }
-}
-
-pub(super) struct RootKey([u8; 32]);
-
-impl RootKey {
-    const ADVANCEMENT_SEED: &'static [u8; 11] = b"OLM_RATCHET";
-
-    pub(super) fn new(bytes: [u8; 32]) -> Self {
-        Self(bytes)
-    }
-
-    fn advance(
-        &self,
-        old_ratchet_key: &RatchetKey,
-        other_ratchet_key: RatchetPublicKey,
-    ) -> (RootKey, ChainKey) {
-        let shared_secret = old_ratchet_key.0.diffie_hellman(&other_ratchet_key.0);
-        let hkdf: Hkdf<Sha256> = Hkdf::new(Some(self.0.as_ref()), shared_secret.as_bytes());
-        let mut output = [0u8; 64];
-
-        hkdf.expand(Self::ADVANCEMENT_SEED, &mut output)
-            .expect("Can't expand");
-
-        let mut chain_key = ChainKey::new([0u8; 32]);
-        let mut root_key = RootKey([0u8; 32]);
-
-        root_key.0.copy_from_slice(&output[..32]);
-        chain_key.fill(&output[32..]);
 
         (root_key, chain_key)
     }
@@ -171,10 +93,7 @@ impl Session {
     pub(super) fn new(session_keys: SessionKeys, shared_secret: Shared3DHSecret) -> Self {
         let (root_key, chain_key) = shared_secret.expand_into_sub_keys();
 
-        let ratchet = Ratchet {
-            root_key,
-            ratchet_key: RatchetKey::new(),
-        };
+        let ratchet = Ratchet::new(root_key);
 
         Self {
             ratchet,
@@ -185,7 +104,7 @@ impl Session {
     }
 
     fn ratchet_key(&self) -> RatchetPublicKey {
-        RatchetPublicKey::from(&self.ratchet.ratchet_key)
+        RatchetPublicKey::from(self.ratchet.ratchet_key())
     }
 
     fn create_message_key(&mut self) -> MessageKey {
