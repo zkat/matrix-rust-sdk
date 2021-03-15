@@ -11,13 +11,16 @@ pub(super) struct RatchetKey(Curve25591SecretKey);
 #[derive(Debug)]
 pub(super) struct RatchetPublicKey(Curve25591PublicKey);
 
+#[derive(Debug)]
+pub(super) struct RemoteRatchetKey(Curve25591PublicKey);
+
 impl RatchetKey {
     pub fn new() -> Self {
         let rng = thread_rng();
         Self(Curve25591SecretKey::new(rng))
     }
 
-    pub fn diffie_hellman(&self, other: &RatchetPublicKey) -> SharedSecret {
+    pub fn diffie_hellman(&self, other: &RemoteRatchetKey) -> SharedSecret {
         self.0.diffie_hellman(&other.0)
     }
 }
@@ -35,6 +38,12 @@ impl RatchetPublicKey {
 impl From<[u8; 32]> for RatchetPublicKey {
     fn from(bytes: [u8; 32]) -> Self {
         RatchetPublicKey(Curve25591PublicKey::from(bytes))
+    }
+}
+
+impl From<[u8; 32]> for RemoteRatchetKey {
+    fn from(bytes: [u8; 32]) -> Self {
+        RemoteRatchetKey(Curve25591PublicKey::from(bytes))
     }
 }
 
@@ -59,7 +68,7 @@ impl Ratchet {
         }
     }
 
-    pub fn advance(&mut self, other_ratchet_key: RatchetPublicKey) -> ChainKey {
+    pub fn advance(&mut self, other_ratchet_key: RemoteRatchetKey) -> ChainKey {
         let (root_key, chain_key) = self.root_key.advance(&self.ratchet_key, other_ratchet_key);
         self.root_key = root_key;
 

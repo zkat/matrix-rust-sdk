@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-use super::RatchetPublicKey;
+use super::ratchet::{RatchetPublicKey, RemoteRatchetKey};
 use prost::Message;
 
 trait Encode {
@@ -99,7 +99,7 @@ impl OlmMessage {
         self.inner[end - 8..].copy_from_slice(&mac[0..8]);
     }
 
-    pub(super) fn decode(self) -> Result<(RatchetPublicKey, u64, Vec<u8>), ()> {
+    pub(super) fn decode(self) -> Result<(RemoteRatchetKey, u64, Vec<u8>), ()> {
         let version = *self.inner.get(0).unwrap();
 
         if version != Self::VERSION {
@@ -111,7 +111,7 @@ impl OlmMessage {
         let mut key = [0u8; 32];
         key.copy_from_slice(&inner.ratchet_key);
 
-        let key = RatchetPublicKey::from(key);
+        let key = RemoteRatchetKey::from(key);
         let chain_index = inner.chain_index;
         let ciphertext = inner.ciphertext;
 

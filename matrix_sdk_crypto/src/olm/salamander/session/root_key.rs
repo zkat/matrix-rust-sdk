@@ -3,7 +3,7 @@ use sha2::Sha256;
 
 use super::{
     chain_key::ChainKey,
-    ratchet::{RatchetKey, RatchetPublicKey},
+    ratchet::{RatchetKey, RemoteRatchetKey},
 };
 
 pub(super) struct RootKey([u8; 32]);
@@ -18,7 +18,7 @@ impl RootKey {
     pub fn advance(
         &self,
         old_ratchet_key: &RatchetKey,
-        other_ratchet_key: RatchetPublicKey,
+        other_ratchet_key: RemoteRatchetKey,
     ) -> (RootKey, ChainKey) {
         let shared_secret = old_ratchet_key.diffie_hellman(&other_ratchet_key);
         let hkdf: Hkdf<Sha256> = Hkdf::new(Some(self.0.as_ref()), shared_secret.as_bytes());
