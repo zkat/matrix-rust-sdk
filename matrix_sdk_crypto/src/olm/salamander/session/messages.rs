@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-use super::session::RatchetPublicKey;
+use super::RatchetPublicKey;
 use prost::Message;
 
 trait Encode {
