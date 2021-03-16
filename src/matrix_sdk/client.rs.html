@@ -2848,7 +2848,6 @@
 <span id="2845">2845</span>
 <span id="2846">2846</span>
 <span id="2847">2847</span>
-<span id="2848">2848</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="comment">// Copyright 2020 Damir Jelić</span>
 <span class="comment">// Copyright 2020 The Matrix.org Foundation C.I.C.</span>
@@ -2940,15 +2939,14 @@
 };
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;encryption&quot;</span>)]</span>
-<span class="kw">use</span> <span class="ident">matrix_sdk_common</span>::{
-    <span class="ident">api</span>::<span class="ident">r0</span>::{
-        <span class="ident">keys</span>::{<span class="ident">get_keys</span>, <span class="ident">upload_keys</span>, <span class="ident">upload_signing_keys</span>::<span class="ident">Request</span> <span class="kw">as</span> <span class="ident">UploadSigningKeysRequest</span>},
-        <span class="ident">to_device</span>::<span class="ident">send_event_to_device</span>::{
-            <span class="ident">Request</span> <span class="kw">as</span> <span class="ident">RumaToDeviceRequest</span>, <span class="ident">Response</span> <span class="kw">as</span> <span class="ident">ToDeviceResponse</span>,
-        },
+<span class="kw">use</span> <span class="ident">matrix_sdk_common</span>::<span class="ident">api</span>::<span class="ident">r0</span>::{
+    <span class="ident">keys</span>::{<span class="ident">get_keys</span>, <span class="ident">upload_keys</span>, <span class="ident">upload_signing_keys</span>::<span class="ident">Request</span> <span class="kw">as</span> <span class="ident">UploadSigningKeysRequest</span>},
+    <span class="ident">to_device</span>::<span class="ident">send_event_to_device</span>::{
+        <span class="ident">Request</span> <span class="kw">as</span> <span class="ident">RumaToDeviceRequest</span>, <span class="ident">Response</span> <span class="kw">as</span> <span class="ident">ToDeviceResponse</span>,
     },
-    <span class="ident">locks</span>::<span class="ident">Mutex</span>,
 };
+
+<span class="kw">use</span> <span class="ident">matrix_sdk_common</span>::<span class="ident">locks</span>::<span class="ident">Mutex</span>;
 
 <span class="kw">use</span> <span class="kw">crate</span>::{
     <span class="ident">error</span>::<span class="ident">HttpError</span>,
@@ -2986,10 +2984,12 @@
     <span class="doccomment">/// Locks making sure we only have one group session sharing request in</span>
     <span class="doccomment">/// flight per room.</span>
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;encryption&quot;</span>)]</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">group_session_locks</span>: <span class="ident">DashMap</span><span class="op">&lt;</span><span class="ident">RoomId</span>, <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">Mutex</span><span class="op">&lt;</span>()<span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">group_session_locks</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">DashMap</span><span class="op">&lt;</span><span class="ident">RoomId</span>, <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">Mutex</span><span class="op">&lt;</span>()<span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span>,
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;encryption&quot;</span>)]</span>
     <span class="doccomment">/// Lock making sure we&#39;re only doing one key claim request at a time.</span>
     <span class="ident">key_claim_lock</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">Mutex</span><span class="op">&lt;</span>()<span class="op">&gt;</span><span class="op">&gt;</span>,
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">members_request_locks</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">DashMap</span><span class="op">&lt;</span><span class="ident">RoomId</span>, <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">Mutex</span><span class="op">&lt;</span>()<span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">typing_notice_times</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">DashMap</span><span class="op">&lt;</span><span class="ident">RoomId</span>, <span class="ident">Instant</span><span class="op">&gt;</span><span class="op">&gt;</span>,
 }
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">tarpaulin_include</span>))]</span>
@@ -3242,9 +3242,11 @@
             <span class="ident">http_client</span>,
             <span class="ident">base_client</span>,
             <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;encryption&quot;</span>)]</span>
-            <span class="ident">group_session_locks</span>: <span class="ident">DashMap</span>::<span class="ident">new</span>(),
+            <span class="ident">group_session_locks</span>: <span class="ident">Arc</span>::<span class="ident">new</span>(<span class="ident">DashMap</span>::<span class="ident">new</span>()),
             <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;encryption&quot;</span>)]</span>
             <span class="ident">key_claim_lock</span>: <span class="ident">Arc</span>::<span class="ident">new</span>(<span class="ident">Mutex</span>::<span class="ident">new</span>(())),
+            <span class="ident">members_request_locks</span>: <span class="ident">Arc</span>::<span class="ident">new</span>(<span class="ident">DashMap</span>::<span class="ident">new</span>()),
+            <span class="ident">typing_notice_times</span>: <span class="ident">Arc</span>::<span class="ident">new</span>(<span class="ident">DashMap</span>::<span class="ident">new</span>()),
         })
     }
 
@@ -4520,7 +4522,6 @@
     <span class="doccomment">/// # use std::{path::PathBuf, time::Duration};</span>
     <span class="doccomment">/// # use matrix_sdk::{</span>
     <span class="doccomment">/// #     Client, SyncSettings,</span>
-    <span class="doccomment">/// #     api::r0::typing::create_typing_event::Typing,</span>
     <span class="doccomment">/// #     identifiers::room_id,</span>
     <span class="doccomment">/// # };</span>
     <span class="doccomment">/// # use futures::executor::block_on;</span>
@@ -4598,7 +4599,6 @@
     <span class="doccomment">/// # use std::{path::PathBuf, time::Duration};</span>
     <span class="doccomment">/// # use matrix_sdk::{</span>
     <span class="doccomment">/// #     Client, SyncSettings,</span>
-    <span class="doccomment">/// #     api::r0::typing::create_typing_event::Typing,</span>
     <span class="doccomment">/// #     identifiers::room_id,</span>
     <span class="doccomment">/// # };</span>
     <span class="doccomment">/// # use futures::executor::block_on;</span>
@@ -4653,7 +4653,7 @@
         <span class="ident">api</span>::<span class="ident">r0</span>::{
             <span class="ident">account</span>::<span class="ident">register</span>::<span class="ident">Request</span> <span class="kw">as</span> <span class="ident">RegistrationRequest</span>,
             <span class="ident">directory</span>::<span class="ident">get_public_rooms_filtered</span>::<span class="ident">Request</span> <span class="kw">as</span> <span class="ident">PublicRoomsFilterRequest</span>,
-            <span class="ident">membership</span>::<span class="ident">Invite3pid</span>, <span class="ident">typing</span>::<span class="ident">create_typing_event</span>::<span class="ident">Typing</span>, <span class="ident">uiaa</span>::<span class="ident">AuthData</span>,
+            <span class="ident">membership</span>::<span class="ident">Invite3pid</span>, <span class="ident">uiaa</span>::<span class="ident">AuthData</span>,
         },
         <span class="ident">assign</span>,
         <span class="ident">directory</span>::<span class="ident">Filter</span>,
@@ -5302,9 +5302,7 @@
             .<span class="ident">get_joined_room</span>(<span class="kw-2">&amp;</span><span class="macro">room_id</span><span class="macro">!</span>(<span class="string">&quot;!SVkFJHzfwvuaIEawgC:localhost&quot;</span>))
             .<span class="ident">unwrap</span>();
 
-        <span class="ident">room</span>.<span class="ident">typing_notice</span>(<span class="ident">Typing</span>::<span class="ident">Yes</span>(<span class="ident">std</span>::<span class="ident">time</span>::<span class="ident">Duration</span>::<span class="ident">from_secs</span>(<span class="number">1</span>)))
-            .<span class="kw">await</span>
-            .<span class="ident">unwrap</span>();
+        <span class="ident">room</span>.<span class="ident">typing_notice</span>(<span class="bool-val">true</span>).<span class="kw">await</span>.<span class="ident">unwrap</span>();
     }
 
     <span class="attribute">#[<span class="ident">tokio</span>::<span class="ident">test</span>]</span>
