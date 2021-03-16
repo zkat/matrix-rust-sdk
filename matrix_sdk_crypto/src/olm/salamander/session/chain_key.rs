@@ -3,8 +3,8 @@ use sha2::Sha256;
 
 use super::{message_key::RemoteMessageKey, ratchet::RatchetPublicKey, MessageKey};
 
-const MESSAGE_KEY_SEED: &'static [u8; 1] = b"\x01";
-const ADVANCEMENT_SEED: &'static [u8; 1] = b"\x02";
+const MESSAGE_KEY_SEED: &[u8; 1] = b"\x01";
+const ADVANCEMENT_SEED: &[u8; 1] = b"\x02";
 
 fn expand_chain_key(key: &[u8; 32]) -> [u8; 32] {
     let mut mac = Hmac::<Sha256>::new_varkey(key).expect("Can't create HmacSha256 from the key");

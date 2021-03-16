@@ -124,11 +124,11 @@ impl Session {
                 self.session_keys.one_time_key.as_bytes().to_vec(),
                 self.session_keys.ephemeral_key.as_bytes().to_vec(),
                 self.session_keys.identity_key.as_bytes().to_vec(),
-                message.to_vec(),
+                message.into_vec(),
             )
             .inner
         } else {
-            message.to_vec()
+            message.into_vec()
         }
     }
 
@@ -160,9 +160,7 @@ impl Session {
             plaintext
         } else if let Some(ref mut remote_chain_key) = self.receiving_chain_key {
             let message_key = remote_chain_key.create_message_key();
-            let plaintext = message_key.decrypt(ciphertext);
-
-            plaintext
+            message_key.decrypt(ciphertext)
         } else {
             todo!()
         }

@@ -15,19 +15,19 @@ struct Aes256IV([u8; 16]);
 struct HmacSha256Key([u8; 32]);
 
 impl Aes256Key {
-    fn to_bytes(self) -> [u8; 32] {
+    fn into_bytes(self) -> [u8; 32] {
         self.0
     }
 }
 
 impl HmacSha256Key {
-    fn to_bytes(self) -> [u8; 32] {
+    fn into_bytes(self) -> [u8; 32] {
         self.0
     }
 }
 
 impl Aes256IV {
-    fn to_bytes(self) -> [u8; 16] {
+    fn into_bytes(self) -> [u8; 16] {
         self.0
     }
 }
@@ -90,10 +90,8 @@ impl RemoteMessageKey {
     pub fn decrypt(self, ciphertext: Vec<u8>) -> Vec<u8> {
         let (aes_key, _hmac_key, iv) = self.expand_keys();
         // TODO check the MAC
-        let cipher = Aes256Cbc::new_var(&aes_key.to_bytes(), &iv.to_bytes()).unwrap();
-        let plaintext = cipher.decrypt_vec(&ciphertext).unwrap();
-
-        plaintext
+        let cipher = Aes256Cbc::new_var(&aes_key.into_bytes(), &iv.into_bytes()).unwrap();
+        cipher.decrypt_vec(&ciphertext).unwrap()
     }
 }
 
@@ -118,12 +116,12 @@ impl MessageKey {
     pub fn encrypt(self, plaintext: &[u8]) -> OlmMessage {
         let (aes_key, hmac_key, iv) = self.expand_keys();
 
-        let cipher = Aes256Cbc::new_var(&aes_key.to_bytes(), &iv.to_bytes()).unwrap();
+        let cipher = Aes256Cbc::new_var(&aes_key.into_bytes(), &iv.into_bytes()).unwrap();
 
         let ciphertext = cipher.encrypt_vec(&plaintext);
         let mut message = self.construct_message(ciphertext);
 
-        let mut hmac = Hmac::<Sha256>::new_varkey(&hmac_key.to_bytes()).unwrap();
+        let mut hmac = Hmac::<Sha256>::new_varkey(&hmac_key.into_bytes()).unwrap();
         hmac.update(message.as_payload_bytes());
 
         let mac = hmac.finalize().into_bytes();

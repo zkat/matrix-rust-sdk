@@ -6,7 +6,7 @@ use super::{
     ratchet::{RatchetKey, RemoteRatchetKey},
 };
 
-const ADVANCEMENT_SEED: &'static [u8; 11] = b"OLM_RATCHET";
+const ADVANCEMENT_SEED: &[u8; 11] = b"OLM_RATCHET";
 
 pub(super) struct RootKey([u8; 32]);
 pub(super) struct RemoteRootKey {

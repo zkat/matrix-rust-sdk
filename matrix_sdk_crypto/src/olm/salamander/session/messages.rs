@@ -90,7 +90,7 @@ impl OlmMessage {
         &self.inner[..end - 8]
     }
 
-    pub fn to_vec(self) -> Vec<u8> {
+    pub fn into_vec(self) -> Vec<u8> {
         self.inner
     }
 
@@ -103,7 +103,7 @@ impl OlmMessage {
         let version = *self.inner.get(0).unwrap();
 
         if version != Self::VERSION {
-            panic!("Unsupported version");
+            return Err(());
         }
 
         let inner = InnerMessage::decode(&self.inner[1..self.inner.len() - 8]).unwrap();

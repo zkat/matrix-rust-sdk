@@ -33,7 +33,7 @@ impl RatchetPublicKey {
         self.0.as_bytes()
     }
 
-    pub fn to_vec(self) -> Vec<u8> {
+    pub fn to_vec(&self) -> Vec<u8> {
         self.0.to_bytes().to_vec()
     }
 }

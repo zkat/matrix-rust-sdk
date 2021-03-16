@@ -144,8 +144,7 @@ impl Account {
         let (shared_secret, ephemeral_key) =
             self.calculate_shared_secret(identity_key, &one_time_key);
 
-        let session_keys =
-            SessionKeys::new(self.curve25519_key().clone(), ephemeral_key, one_time_key);
+        let session_keys = SessionKeys::new(*self.curve25519_key(), ephemeral_key, one_time_key);
 
         Session::new(session_keys, shared_secret)
     }
