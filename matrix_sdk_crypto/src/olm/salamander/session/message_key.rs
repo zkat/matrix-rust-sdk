@@ -38,6 +38,67 @@ pub(super) struct MessageKey {
     index: u64,
 }
 
+pub(super) struct RemoteMessageKey {
+    key: [u8; 32],
+    index: u64,
+}
+
+#[derive(Clone, Zeroize)]
+struct ExpandedKeys([u8; 80]);
+
+impl Drop for ExpandedKeys {
+    fn drop(&mut self) {
+        self.0.zeroize();
+    }
+}
+
+impl ExpandedKeys {
+    const HMAC_INFO: &'static [u8] = b"OLM_KEYS";
+
+    fn new(message_key: &[u8; 32]) -> Self {
+        let mut expanded_keys = [0u8; 80];
+        let hkdf: Hkdf<Sha256> = Hkdf::new(Some(&[0]), message_key);
+        hkdf.expand(Self::HMAC_INFO, &mut expanded_keys).expect("Can't expand message key");
+
+        Self(expanded_keys)
+    }
+
+    fn split(self) -> (Aes256Key, HmacSha256Key, Aes256IV) {
+        let mut aes_key = Aes256Key([0u8; 32]);
+        let mut hmac_key = HmacSha256Key([0u8; 32]);
+        let mut iv = Aes256IV([0u8; 16]);
+
+        aes_key.0.copy_from_slice(&self.0[0..32]);
+        hmac_key.0.copy_from_slice(&self.0[32..64]);
+        iv.0.copy_from_slice(&self.0[64..80]);
+
+        (aes_key, hmac_key, iv)
+    }
+}
+
+impl RemoteMessageKey {
+    pub fn new(key: [u8; 32], index: u64) -> Self {
+        Self {
+            key,
+            index,
+        }
+    }
+
+    fn expand_keys(&self) -> (Aes256Key, HmacSha256Key, Aes256IV) {
+        let expanded_keys = ExpandedKeys::new(&self.key);
+        expanded_keys.split()
+    }
+
+    pub fn decrypt(self, ciphertext: Vec<u8>) -> Vec<u8> {
+        let (aes_key, _hmac_key, iv) = self.expand_keys();
+        // TODO check the MAC
+        let cipher = Aes256Cbc::new_var(&aes_key.to_bytes(), &iv.to_bytes()).unwrap();
+        let plaintext = cipher.decrypt_vec(&ciphertext).unwrap();
+
+        plaintext
+    }
+}
+
 impl MessageKey {
     pub fn new(key: [u8; 32], ratchet_key: RatchetPublicKey, index: u64) -> Self {
         Self {
@@ -52,49 +113,8 @@ impl MessageKey {
     }
 
     fn expand_keys(&self) -> (Aes256Key, HmacSha256Key, Aes256IV) {
-        #[derive(Clone, Zeroize)]
-        struct ExpandedKeys([u8; 80]);
-
-        impl Drop for ExpandedKeys {
-            fn drop(&mut self) {
-                self.0.zeroize();
-            }
-        }
-
-        impl ExpandedKeys {
-            const HMAC_INFO: &'static [u8] = b"OLM_KEYS";
-
-            fn new(message_key: &MessageKey) -> Self {
-                let mut expanded_keys = [0u8; 80];
-                let hkdf: Hkdf<Sha256> = Hkdf::new(Some(&[0]), &message_key.key);
-                hkdf.expand(Self::HMAC_INFO, &mut expanded_keys).unwrap();
-
-                Self(expanded_keys)
-            }
-
-            fn split(self) -> (Aes256Key, HmacSha256Key, Aes256IV) {
-                let mut aes_key = Aes256Key([0u8; 32]);
-                let mut hmac_key = HmacSha256Key([0u8; 32]);
-                let mut iv = Aes256IV([0u8; 16]);
-
-                aes_key.0.copy_from_slice(&self.0[0..32]);
-                hmac_key.0.copy_from_slice(&self.0[32..64]);
-                iv.0.copy_from_slice(&self.0[64..80]);
-
-                (aes_key, hmac_key, iv)
-            }
-        }
-
-        let expanded_keys = ExpandedKeys::new(&self);
+        let expanded_keys = ExpandedKeys::new(&self.key);
         expanded_keys.split()
-    }
-
-    pub fn decrypt(self, ciphertext: Vec<u8>) -> Vec<u8> {
-        let (aes_key, _hmac_key, iv) = self.expand_keys();
-        let cipher = Aes256Cbc::new_var(&aes_key.to_bytes(), &iv.to_bytes()).unwrap();
-        let plaintext = cipher.decrypt_vec(&ciphertext).unwrap();
-
-        plaintext
     }
 
     pub fn encrypt(self, plaintext: &[u8]) -> OlmMessage {

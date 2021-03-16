@@ -4,14 +4,17 @@ use x25519_dalek::{
     PublicKey as Curve25591PublicKey, SharedSecret, StaticSecret as Curve25591SecretKey,
 };
 
-use super::{chain_key::ChainKey, root_key::RootKey};
+use super::{
+    chain_key::{ChainKey, RemoteChainKey},
+    root_key::RootKey,
+};
 
 pub(super) struct RatchetKey(Curve25591SecretKey);
 
 #[derive(Debug)]
 pub(super) struct RatchetPublicKey(Curve25591PublicKey);
 
-#[derive(Debug)]
+#[derive(Clone, Debug, Hash, PartialEq)]
 pub(super) struct RemoteRatchetKey(Curve25591PublicKey);
 
 impl RatchetKey {
@@ -68,14 +71,30 @@ impl Ratchet {
         }
     }
 
-    pub fn advance(&mut self, other_ratchet_key: RemoteRatchetKey) -> ChainKey {
-        let (root_key, chain_key) = self.root_key.advance(&self.ratchet_key, other_ratchet_key);
-        self.root_key = root_key;
+    pub fn advance(
+        &self,
+        remote_key: RemoteRatchetKey,
+    ) -> (Ratchet, ChainKey, RemoteRatchet, RemoteChainKey) {
+        let (remote_root_key, remote_chain_key) =
+            self.root_key.advance(&self.ratchet_key, &remote_key);
 
-        chain_key
+        let remote_ratchet = RemoteRatchet(remote_key);
+        let (root_key, chain_key) = remote_root_key.advance();
+        let new_ratchet = Ratchet::new(root_key);
+
+        (new_ratchet, chain_key, remote_ratchet, remote_chain_key)
     }
 
     pub fn ratchet_key(&self) -> &RatchetKey {
         &self.ratchet_key
+    }
+}
+
+#[derive(Clone, Debug, Hash)]
+pub(super) struct RemoteRatchet(RemoteRatchetKey);
+
+impl RemoteRatchet {
+    pub fn belongs_to(&self, remote_key: &RemoteRatchetKey) -> bool {
+        &self.0 == remote_key
     }
 }

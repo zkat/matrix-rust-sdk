@@ -23,10 +23,10 @@ use sha2::Sha256;
 
 use x25519_dalek::{PublicKey as Curve25591PublicKey, SharedSecret};
 
-use chain_key::ChainKey;
+use chain_key::{ChainKey, RemoteChainKey};
 use message_key::MessageKey;
 use messages::{OlmMessage, PrekeyMessage};
-use ratchet::{Ratchet, RatchetKey, RatchetPublicKey};
+use ratchet::{Ratchet, RatchetPublicKey, RemoteRatchet};
 use root_key::RootKey;
 
 pub(super) struct Shared3DHSecret([u8; 96]);
@@ -84,8 +84,10 @@ impl SessionKeys {
 
 pub struct Session {
     session_keys: SessionKeys,
-    ratchet: Ratchet,
+    sending_ratchet: Ratchet,
     chain_key: ChainKey,
+    receiving_ratchet: Option<RemoteRatchet>,
+    receiving_chain_key: Option<RemoteChainKey>,
     established: bool,
 }
 
@@ -96,15 +98,17 @@ impl Session {
         let ratchet = Ratchet::new(root_key);
 
         Self {
-            ratchet,
             session_keys,
+            sending_ratchet: ratchet,
             chain_key,
+            receiving_ratchet: None,
+            receiving_chain_key: None,
             established: false,
         }
     }
 
     fn ratchet_key(&self) -> RatchetPublicKey {
-        RatchetPublicKey::from(self.ratchet.ratchet_key())
+        RatchetPublicKey::from(self.sending_ratchet.ratchet_key())
     }
 
     fn create_message_key(&mut self) -> MessageKey {
@@ -126,15 +130,29 @@ impl Session {
 
     pub fn decrypt(&mut self, message: Vec<u8>) -> Vec<u8> {
         let message = OlmMessage::from(message);
-        let (ratchet_key, index, ciphertext) = message.decode().unwrap();
+        let (ratchet_key, _index, ciphertext) = message.decode().unwrap();
 
-        println!("{:?} {:?}", ratchet_key, index);
+        // TODO try to use existing message keys.
 
-        let mut chain_key = self.ratchet.advance(ratchet_key);
-        let ratchet_key = RatchetKey::new();
+        if !self
+            .receiving_ratchet
+            .as_ref()
+            .map_or(false, |r| r.belongs_to(&ratchet_key))
+        {}
 
-        let message_key = chain_key.create_message_key(RatchetPublicKey::from(&ratchet_key));
+        let (sending_ratchet, chain_key, receiving_ratchet, mut receiving_chain_key) =
+            self.sending_ratchet.advance(ratchet_key);
 
-        message_key.decrypt(ciphertext)
+        let message_key = receiving_chain_key.create_message_key();
+
+        // TODO don't update the state if the message doesn't decrypt
+        let plaintext = message_key.decrypt(ciphertext);
+
+        self.sending_ratchet = sending_ratchet;
+        self.chain_key = chain_key;
+        self.receiving_ratchet = Some(receiving_ratchet);
+        self.receiving_chain_key = Some(receiving_chain_key);
+
+        plaintext
     }
 }
