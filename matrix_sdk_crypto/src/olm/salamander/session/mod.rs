@@ -119,13 +119,17 @@ impl Session {
         let message_key = self.create_message_key();
         let message = message_key.encrypt(plaintext);
 
-        PrekeyMessage::from_parts_untyped_prost(
-            self.session_keys.one_time_key.as_bytes().to_vec(),
-            self.session_keys.ephemeral_key.as_bytes().to_vec(),
-            self.session_keys.identity_key.as_bytes().to_vec(),
-            message.to_vec(),
-        )
-        .inner
+        if !self.established {
+            PrekeyMessage::from_parts_untyped_prost(
+                self.session_keys.one_time_key.as_bytes().to_vec(),
+                self.session_keys.ephemeral_key.as_bytes().to_vec(),
+                self.session_keys.identity_key.as_bytes().to_vec(),
+                message.to_vec(),
+            )
+            .inner
+        } else {
+            message.to_vec()
+        }
     }
 
     pub fn decrypt(&mut self, message: Vec<u8>) -> Vec<u8> {
@@ -151,6 +155,7 @@ impl Session {
             self.chain_key = chain_key;
             self.receiving_ratchet = Some(receiving_ratchet);
             self.receiving_chain_key = Some(receiving_chain_key);
+            self.established = true;
 
             plaintext
         } else if let Some(ref mut remote_chain_key) = self.receiving_chain_key {
