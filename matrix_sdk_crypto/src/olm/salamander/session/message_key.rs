@@ -58,7 +58,8 @@ impl ExpandedKeys {
     fn new(message_key: &[u8; 32]) -> Self {
         let mut expanded_keys = [0u8; 80];
         let hkdf: Hkdf<Sha256> = Hkdf::new(Some(&[0]), message_key);
-        hkdf.expand(Self::HMAC_INFO, &mut expanded_keys).expect("Can't expand message key");
+        hkdf.expand(Self::HMAC_INFO, &mut expanded_keys)
+            .expect("Can't expand message key");
 
         Self(expanded_keys)
     }
@@ -78,10 +79,7 @@ impl ExpandedKeys {
 
 impl RemoteMessageKey {
     pub fn new(key: [u8; 32], index: u64) -> Self {
-        Self {
-            key,
-            index,
-        }
+        Self { key, index }
     }
 
     fn expand_keys(&self) -> (Aes256Key, HmacSha256Key, Aes256IV) {

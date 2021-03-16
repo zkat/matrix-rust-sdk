@@ -138,21 +138,28 @@ impl Session {
             .receiving_ratchet
             .as_ref()
             .map_or(false, |r| r.belongs_to(&ratchet_key))
-        {}
+        {
+            let (sending_ratchet, chain_key, receiving_ratchet, mut receiving_chain_key) =
+                self.sending_ratchet.advance(ratchet_key);
 
-        let (sending_ratchet, chain_key, receiving_ratchet, mut receiving_chain_key) =
-            self.sending_ratchet.advance(ratchet_key);
+            let message_key = receiving_chain_key.create_message_key();
 
-        let message_key = receiving_chain_key.create_message_key();
+            // TODO don't update the state if the message doesn't decrypt
+            let plaintext = message_key.decrypt(ciphertext);
 
-        // TODO don't update the state if the message doesn't decrypt
-        let plaintext = message_key.decrypt(ciphertext);
+            self.sending_ratchet = sending_ratchet;
+            self.chain_key = chain_key;
+            self.receiving_ratchet = Some(receiving_ratchet);
+            self.receiving_chain_key = Some(receiving_chain_key);
 
-        self.sending_ratchet = sending_ratchet;
-        self.chain_key = chain_key;
-        self.receiving_ratchet = Some(receiving_ratchet);
-        self.receiving_chain_key = Some(receiving_chain_key);
+            plaintext
+        } else if let Some(ref mut remote_chain_key) = self.receiving_chain_key {
+            let message_key = remote_chain_key.create_message_key();
+            let plaintext = message_key.decrypt(ciphertext);
 
-        plaintext
+            plaintext
+        } else {
+            todo!()
+        }
     }
 }

@@ -230,12 +230,18 @@ mod test {
                 .expect("Can't decrypt second ciphertext");
             assert_eq!(second_text, plaintext);
 
-            let reply_plain = "Yes, take this it's dangerous out there";
+            let reply_plain = "Yes, take this, it's dangerous out there";
             let (_, reply) = session.encrypt(reply_plain).to_tuple();
             let reply = decode(reply).unwrap();
             let plaintext = String::from_utf8(alice_session.decrypt(reply)).unwrap();
 
             assert_eq!(&plaintext, reply_plain);
+
+            let another_reply = "Last one";
+            let (_, reply) = session.encrypt(another_reply).to_tuple();
+            let reply = decode(reply).unwrap();
+            let plaintext = String::from_utf8(alice_session.decrypt(reply)).unwrap();
+            assert_eq!(&plaintext, another_reply);
         } else {
             unreachable!();
         }
