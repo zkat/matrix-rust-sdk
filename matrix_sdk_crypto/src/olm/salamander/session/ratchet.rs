@@ -71,6 +71,13 @@ impl Ratchet {
         }
     }
 
+    pub fn new_with_ratchet_key(root_key: RootKey, ratchet_key: RatchetKey) -> Self {
+        Self {
+            root_key,
+            ratchet_key,
+        }
+    }
+
     pub fn advance(
         &self,
         remote_key: RemoteRatchetKey,
@@ -79,8 +86,8 @@ impl Ratchet {
             self.root_key.advance(&self.ratchet_key, &remote_key);
 
         let remote_ratchet = RemoteRatchet(remote_key);
-        let (root_key, chain_key) = remote_root_key.advance();
-        let new_ratchet = Ratchet::new(root_key);
+        let (root_key, chain_key, ratchet_key) = remote_root_key.advance();
+        let new_ratchet = Ratchet::new_with_ratchet_key(root_key, ratchet_key);
 
         (new_ratchet, chain_key, remote_ratchet, remote_chain_key)
     }

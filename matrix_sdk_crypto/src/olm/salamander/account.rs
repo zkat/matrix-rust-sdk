@@ -241,6 +241,16 @@ mod test {
             let reply = decode(reply).unwrap();
             let plaintext = String::from_utf8(alice_session.decrypt(reply)).unwrap();
             assert_eq!(&plaintext, another_reply);
+
+            let last_text = "Nope, I'll have the last word";
+            let olm_message = alice_session.encrypt(last_text.as_bytes());
+            let olm_message = encode(olm_message);
+            let olm_message = OlmMessage::from_type_and_ciphertext(1, olm_message).unwrap();
+
+            let plaintext = session
+                .decrypt(olm_message)
+                .expect("Can't decrypt second ciphertext");
+            assert_eq!(last_text, plaintext);
         } else {
             unreachable!();
         }
