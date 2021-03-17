@@ -57,7 +57,7 @@
 <span id="54">54</span>
 <span id="55">55</span>
 </pre><div class="example-wrap"><pre class="rust ">
-<span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">room</span>::<span class="ident">Common</span>, <span class="ident">Client</span>, <span class="prelude-ty">Result</span>, <span class="ident">Room</span>, <span class="ident">RoomType</span>};
+<span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">room</span>::<span class="ident">Common</span>, <span class="ident">BaseRoom</span>, <span class="ident">Client</span>, <span class="prelude-ty">Result</span>, <span class="ident">RoomType</span>};
 <span class="kw">use</span> <span class="ident">std</span>::<span class="ident">ops</span>::<span class="ident">Deref</span>;
 
 <span class="kw">use</span> <span class="ident">matrix_sdk_common</span>::<span class="ident">api</span>::<span class="ident">r0</span>::<span class="ident">membership</span>::<span class="ident">forget_room</span>;
@@ -68,7 +68,7 @@
 <span class="doccomment">/// Operations may fail once the underlaying `Room` changes `RoomType`.</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Left</span> {
-    <span class="ident">inner</span>: <span class="ident">Common</span>,
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">inner</span>: <span class="ident">Common</span>,
 }
 
 <span class="kw">impl</span> <span class="ident">Left</span> {
@@ -78,7 +78,7 @@
     <span class="doccomment">/// * `client` - The client used to make requests.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// * `room` - The underlaying room.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">client</span>: <span class="ident">Client</span>, <span class="ident">room</span>: <span class="ident">Room</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">client</span>: <span class="ident">Client</span>, <span class="ident">room</span>: <span class="ident">BaseRoom</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
         <span class="comment">// TODO: Make this private</span>
         <span class="kw">if</span> <span class="ident">room</span>.<span class="ident">room_type</span>() <span class="op">=</span><span class="op">=</span> <span class="ident">RoomType</span>::<span class="ident">Left</span> {
             <span class="prelude-val">Some</span>(<span class="self">Self</span> {
