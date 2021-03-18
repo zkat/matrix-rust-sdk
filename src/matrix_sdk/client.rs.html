@@ -2848,6 +2848,21 @@
 <span id="2845">2845</span>
 <span id="2846">2846</span>
 <span id="2847">2847</span>
+<span id="2848">2848</span>
+<span id="2849">2849</span>
+<span id="2850">2850</span>
+<span id="2851">2851</span>
+<span id="2852">2852</span>
+<span id="2853">2853</span>
+<span id="2854">2854</span>
+<span id="2855">2855</span>
+<span id="2856">2856</span>
+<span id="2857">2857</span>
+<span id="2858">2858</span>
+<span id="2859">2859</span>
+<span id="2860">2860</span>
+<span id="2861">2861</span>
+<span id="2862">2862</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="comment">// Copyright 2020 Damir Jelić</span>
 <span class="comment">// Copyright 2020 The Matrix.org Foundation C.I.C.</span>
@@ -2891,8 +2906,7 @@
 <span class="kw">use</span> <span class="ident">tracing</span>::{<span class="ident">error</span>, <span class="ident">info</span>, <span class="ident">instrument</span>};
 
 <span class="kw">use</span> <span class="ident">matrix_sdk_base</span>::{
-    <span class="ident">deserialized_responses</span>::<span class="ident">SyncResponse</span>, <span class="ident">BaseClient</span>, <span class="ident">BaseClientConfig</span>, <span class="ident">EventHandler</span>, <span class="ident">Session</span>,
-    <span class="ident">Store</span>,
+    <span class="ident">deserialized_responses</span>::<span class="ident">SyncResponse</span>, <span class="ident">BaseClient</span>, <span class="ident">BaseClientConfig</span>, <span class="ident">Session</span>, <span class="ident">Store</span>,
 };
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;encryption&quot;</span>)]</span>
@@ -2933,6 +2947,7 @@
     <span class="ident">assign</span>,
     <span class="ident">identifiers</span>::{<span class="ident">DeviceIdBox</span>, <span class="ident">EventId</span>, <span class="ident">RoomId</span>, <span class="ident">RoomIdOrAliasId</span>, <span class="ident">ServerName</span>, <span class="ident">UserId</span>},
     <span class="ident">instant</span>::{<span class="ident">Duration</span>, <span class="ident">Instant</span>},
+    <span class="ident">locks</span>::<span class="ident">RwLock</span>,
     <span class="ident">presence</span>::<span class="ident">PresenceState</span>,
     <span class="ident">uuid</span>::<span class="ident">Uuid</span>,
     <span class="ident">FromHttpResponseError</span>, <span class="ident">UInt</span>,
@@ -2957,9 +2972,11 @@
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;encryption&quot;</span>)]</span>
 <span class="kw">use</span> <span class="kw">crate</span>::{
     <span class="ident">device</span>::{<span class="ident">Device</span>, <span class="ident">UserDevices</span>},
+    <span class="ident">event_handler</span>::<span class="ident">Handler</span>,
     <span class="ident">identifiers</span>::<span class="ident">DeviceId</span>,
     <span class="ident">sas</span>::<span class="ident">Sas</span>,
     <span class="ident">verification_request</span>::<span class="ident">VerificationRequest</span>,
+    <span class="ident">EventHandler</span>,
 };
 
 <span class="kw">const</span> <span class="ident">DEFAULT_SYNC_TIMEOUT</span>: <span class="ident">Duration</span> <span class="op">=</span> <span class="ident">Duration</span>::<span class="ident">from_secs</span>(<span class="number">30</span>);
@@ -2990,6 +3007,9 @@
     <span class="ident">key_claim_lock</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">Mutex</span><span class="op">&lt;</span>()<span class="op">&gt;</span><span class="op">&gt;</span>,
     <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">members_request_locks</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">DashMap</span><span class="op">&lt;</span><span class="ident">RoomId</span>, <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">Mutex</span><span class="op">&lt;</span>()<span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span>,
     <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">typing_notice_times</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">DashMap</span><span class="op">&lt;</span><span class="ident">RoomId</span>, <span class="ident">Instant</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// Any implementor of EventHandler will act as the callbacks for various</span>
+    <span class="doccomment">/// events.</span>
+    <span class="ident">event_handler</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">RwLock</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Handler</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span>,
 }
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">tarpaulin_include</span>))]</span>
@@ -3247,6 +3267,7 @@
             <span class="ident">key_claim_lock</span>: <span class="ident">Arc</span>::<span class="ident">new</span>(<span class="ident">Mutex</span>::<span class="ident">new</span>(())),
             <span class="ident">members_request_locks</span>: <span class="ident">Arc</span>::<span class="ident">new</span>(<span class="ident">DashMap</span>::<span class="ident">new</span>()),
             <span class="ident">typing_notice_times</span>: <span class="ident">Arc</span>::<span class="ident">new</span>(<span class="ident">DashMap</span>::<span class="ident">new</span>()),
+            <span class="ident">event_handler</span>: <span class="ident">Arc</span>::<span class="ident">new</span>(<span class="ident">RwLock</span>::<span class="ident">new</span>(<span class="prelude-val">None</span>)),
         })
     }
 
@@ -3392,7 +3413,11 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// The methods of `EventHandler` are called when the respective `RoomEvents` occur.</span>
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">set_event_handler</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">handler</span>: <span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">EventHandler</span><span class="op">&gt;</span>) {
-        <span class="self">self</span>.<span class="ident">base_client</span>.<span class="ident">set_event_handler</span>(<span class="ident">handler</span>).<span class="kw">await</span>;
+        <span class="kw">let</span> <span class="ident">handler</span> <span class="op">=</span> <span class="ident">Handler</span> {
+            <span class="ident">inner</span>: <span class="ident">handler</span>,
+            <span class="ident">client</span>: <span class="self">self</span>.<span class="ident">clone</span>(),
+        };
+        <span class="kw-2">*</span><span class="self">self</span>.<span class="ident">event_handler</span>.<span class="ident">write</span>().<span class="kw">await</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">handler</span>);
     }
 
     <span class="doccomment">/// Get all the rooms the client knows about.</span>
@@ -4031,8 +4056,13 @@
             <span class="op">+</span> <span class="ident">SYNC_REQUEST_TIMEOUT</span>;
 
         <span class="kw">let</span> <span class="ident">response</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">send</span>(<span class="ident">request</span>, <span class="prelude-val">Some</span>(<span class="ident">timeout</span>)).<span class="kw">await</span><span class="question-mark">?</span>;
+        <span class="kw">let</span> <span class="ident">sync_response</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">base_client</span>.<span class="ident">receive_sync_response</span>(<span class="ident">response</span>).<span class="kw">await</span><span class="question-mark">?</span>;
 
-        <span class="prelude-val">Ok</span>(<span class="self">self</span>.<span class="ident">base_client</span>.<span class="ident">receive_sync_response</span>(<span class="ident">response</span>).<span class="kw">await</span><span class="question-mark">?</span>)
+        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">handler</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">event_handler</span>.<span class="ident">read</span>().<span class="kw">await</span>.<span class="ident">as_ref</span>() {
+            <span class="ident">handler</span>.<span class="ident">handle_sync</span>(<span class="kw-2">&amp;</span><span class="ident">sync_response</span>).<span class="kw">await</span>;
+        }
+
+        <span class="prelude-val">Ok</span>(<span class="ident">sync_response</span>)
     }
 
     <span class="doccomment">/// Repeatedly call sync to synchronize the client state with the server.</span>
