@@ -1,4 +1,5 @@
 // Copyright 2021 Damir Jelić
+// Copyright 2021 The Matrix.org Foundation C.I.C.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -25,11 +26,11 @@ use x25519_dalek::{PublicKey as Curve25591PublicKey, SharedSecret};
 
 use chain_key::{ChainKey, RemoteChainKey};
 use message_key::MessageKey;
-pub(super) use messages::{PrekeyMessage, OlmMessage};
+pub(super) use messages::{DecodedMessage, OlmMessage, PrekeyMessage};
 use ratchet::{Ratchet, RatchetPublicKey, RemoteRatchet};
 use root_key::RootKey;
 
-use self::{ratchet::{RatchetKey, RemoteRatchetKey}, root_key::RemoteRootKey};
+use self::{ratchet::RemoteRatchetKey, root_key::RemoteRootKey};
 
 pub(super) struct Shared3DHSecret([u8; 96]);
 
@@ -44,7 +45,7 @@ impl Shared3DHSecret {
         secret
     }
 
-    fn expand(self) -> ([u8;32], [u8; 32]) {
+    fn expand(self) -> ([u8; 32], [u8; 32]) {
         let hkdf: Hkdf<Sha256> = Hkdf::new(Some(&[0]), &self.0);
         let mut root_key = [0u8; 32];
         let mut chain_key = [0u8; 32];
@@ -121,7 +122,10 @@ impl Session {
         }
     }
 
-    pub(super) fn new_remote(shared_secret: Shared3DHSecret, remote_ratchet_key: RemoteRatchetKey) -> Self {
+    pub(super) fn new_remote(
+        shared_secret: Shared3DHSecret,
+        remote_ratchet_key: RemoteRatchetKey,
+    ) -> Self {
         let (root_key, remote_chain_key) = shared_secret.expand_into_remote_sub_keys();
 
         let (root_key, chain_key, ratchet_key) = root_key.advance(&remote_ratchet_key);
@@ -172,22 +176,22 @@ impl Session {
 
     pub fn decrypt(&mut self, message: Vec<u8>) -> Vec<u8> {
         let message = OlmMessage::from(message);
-        let (ratchet_key, _index, ciphertext) = message.decode().unwrap();
+        let decoded = message.decode().unwrap();
 
         // TODO try to use existing message keys.
 
         if !self
             .receiving_ratchet
             .as_ref()
-            .map_or(false, |r| r.belongs_to(&ratchet_key))
+            .map_or(false, |r| r.belongs_to(&decoded.ratchet_key))
         {
             let (sending_ratchet, chain_key, receiving_ratchet, mut receiving_chain_key) =
-                self.sending_ratchet.advance(ratchet_key);
+                self.sending_ratchet.advance(decoded.ratchet_key.clone());
 
             let message_key = receiving_chain_key.create_message_key();
 
             // TODO don't update the state if the message doesn't decrypt
-            let plaintext = message_key.decrypt(ciphertext);
+            let plaintext = message_key.decrypt(&message, &decoded);
 
             self.sending_ratchet = sending_ratchet;
             self.chain_key = chain_key;
@@ -198,7 +202,7 @@ impl Session {
             plaintext
         } else if let Some(ref mut remote_chain_key) = self.receiving_chain_key {
             let message_key = remote_chain_key.create_message_key();
-            message_key.decrypt(ciphertext)
+            message_key.decrypt(&message, &decoded)
         } else {
             todo!()
         }

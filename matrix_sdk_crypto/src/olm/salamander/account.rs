@@ -190,9 +190,9 @@ impl Account {
         let shared_secret = Shared3DHSecret::new(first_secret, second_secret, third_secret);
 
         let message = OlmMessage::from(m);
-        let (ratchet_key, _, _) = message.decode().unwrap();
+        let decoded = message.decode().unwrap();
 
-        Session::new_remote(shared_secret, ratchet_key)
+        Session::new_remote(shared_secret, decoded.ratchet_key)
     }
 
     /// Get a reference to the account's public curve25519 key
@@ -324,7 +324,6 @@ mod test {
             .unwrap();
 
         let text = "It's a secret to everybody";
-
         let (_, message) = alice_session.encrypt(text).to_tuple();
         let message = decode(message).unwrap();
 
@@ -333,5 +332,21 @@ mod test {
         let decrypted = session.decrypt_prekey(message);
 
         assert_eq!(text, String::from_utf8(decrypted).unwrap());
+
+        let text = "Another secret";
+        let (_, message) = alice_session.encrypt(text).to_tuple();
+        let message = decode(message).unwrap();
+
+        let decrypted = session.decrypt_prekey(message);
+
+        assert_eq!(text, String::from_utf8(decrypted).unwrap());
+
+        let text = "My first reply";
+
+        let message = session.encrypt(text.as_bytes());
+        let message = OlmMessage::from_type_and_ciphertext(1, encode(message)).unwrap();
+        let decrypted = alice_session.decrypt(message).unwrap();
+
+        assert_eq!(text, decrypted);
     }
 }
