@@ -12,8 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-use super::ratchet::{RatchetPublicKey, RemoteRatchetKey};
 use prost::Message;
+use x25519_dalek::PublicKey as Curve25591PublicKey;
+
+use super::ratchet::{RatchetPublicKey, RemoteRatchetKey};
 
 trait Encode {
     fn encode(self) -> Vec<u8>;
@@ -99,7 +101,7 @@ impl OlmMessage {
         self.inner[end - 8..].copy_from_slice(&mac[0..8]);
     }
 
-    pub(super) fn decode(self) -> Result<(RemoteRatchetKey, u64, Vec<u8>), ()> {
+    pub fn decode(self) -> Result<(RemoteRatchetKey, u64, Vec<u8>), ()> {
         let version = *self.inner.get(0).unwrap();
 
         if version != Self::VERSION {
@@ -152,7 +154,7 @@ impl OlmMessage {
 }
 
 #[derive(Clone, Debug)]
-pub(super) struct PrekeyMessage {
+pub(crate) struct PrekeyMessage {
     pub(super) inner: Vec<u8>,
 }
 
@@ -199,6 +201,40 @@ impl PrekeyMessage {
         Self { inner: message }
     }
 
+    pub fn decode(
+        self,
+    ) -> Result<
+        (
+            Curve25591PublicKey,
+            Curve25591PublicKey,
+            Curve25591PublicKey,
+            Vec<u8>,
+        ),
+        (),
+    > {
+        let version = *self.inner.get(0).unwrap();
+
+        if version != Self::VERSION {
+            return Err(());
+        }
+
+        let inner = InnerPreKeyMessage::decode(&self.inner[1..self.inner.len()]).unwrap();
+
+        let mut one_time_key = [0u8; 32];
+        let mut base_key = [0u8; 32];
+        let mut identity_key = [0u8; 32];
+
+        one_time_key.copy_from_slice(&inner.one_time_key);
+        base_key.copy_from_slice(&inner.base_key);
+        identity_key.copy_from_slice(&inner.identity_key);
+
+        let one_time_key = Curve25591PublicKey::from(one_time_key);
+        let base_key = Curve25591PublicKey::from(base_key);
+        let identity_key = Curve25591PublicKey::from(identity_key);
+
+        Ok((one_time_key, base_key, identity_key, inner.message))
+    }
+
     pub(super) fn from_parts_untyped_prost(
         one_time_key: Vec<u8>,
         base_key: Vec<u8>,
@@ -218,6 +254,14 @@ impl PrekeyMessage {
         message.encode(&mut output[1..].as_mut()).unwrap();
 
         Self { inner: output }
+    }
+}
+
+impl From<Vec<u8>> for PrekeyMessage {
+    fn from(bytes: Vec<u8>) -> Self {
+        Self {
+            inner: bytes,
+        }
     }
 }
 

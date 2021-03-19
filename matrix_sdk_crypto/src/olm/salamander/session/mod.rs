@@ -25,9 +25,11 @@ use x25519_dalek::{PublicKey as Curve25591PublicKey, SharedSecret};
 
 use chain_key::{ChainKey, RemoteChainKey};
 use message_key::MessageKey;
-use messages::{OlmMessage, PrekeyMessage};
+pub(super) use messages::{PrekeyMessage, OlmMessage};
 use ratchet::{Ratchet, RatchetPublicKey, RemoteRatchet};
 use root_key::RootKey;
+
+use self::{ratchet::{RatchetKey, RemoteRatchetKey}, root_key::RemoteRootKey};
 
 pub(super) struct Shared3DHSecret([u8; 96]);
 
@@ -42,7 +44,7 @@ impl Shared3DHSecret {
         secret
     }
 
-    fn expand_into_sub_keys(self) -> (RootKey, ChainKey) {
+    fn expand(self) -> ([u8;32], [u8; 32]) {
         let hkdf: Hkdf<Sha256> = Hkdf::new(Some(&[0]), &self.0);
         let mut root_key = [0u8; 32];
         let mut chain_key = [0u8; 32];
@@ -54,6 +56,20 @@ impl Shared3DHSecret {
 
         root_key.copy_from_slice(&expanded_keys[0..32]);
         chain_key.copy_from_slice(&expanded_keys[32..64]);
+
+        (root_key, chain_key)
+    }
+
+    fn expand_into_remote_sub_keys(self) -> (RemoteRootKey, RemoteChainKey) {
+        let (root_key, chain_key) = self.expand();
+        let root_key = RemoteRootKey::new(root_key);
+        let chain_key = RemoteChainKey::new(chain_key);
+
+        (root_key, chain_key)
+    }
+
+    fn expand_into_sub_keys(self) -> (RootKey, ChainKey) {
+        let (root_key, chain_key) = self.expand();
 
         let root_key = RootKey::new(root_key);
         let chain_key = ChainKey::new(chain_key);
@@ -83,27 +99,42 @@ impl SessionKeys {
 }
 
 pub struct Session {
-    session_keys: SessionKeys,
+    session_keys: Option<SessionKeys>,
     sending_ratchet: Ratchet,
     chain_key: ChainKey,
     receiving_ratchet: Option<RemoteRatchet>,
     receiving_chain_key: Option<RemoteChainKey>,
-    established: bool,
 }
 
 impl Session {
-    pub(super) fn new(session_keys: SessionKeys, shared_secret: Shared3DHSecret) -> Self {
+    pub(super) fn new(shared_secret: Shared3DHSecret, session_keys: SessionKeys) -> Self {
         let (root_key, chain_key) = shared_secret.expand_into_sub_keys();
 
-        let ratchet = Ratchet::new(root_key);
+        let local_ratchet = Ratchet::new(root_key);
 
         Self {
-            session_keys,
-            sending_ratchet: ratchet,
+            session_keys: Some(session_keys),
+            sending_ratchet: local_ratchet,
             chain_key,
             receiving_ratchet: None,
             receiving_chain_key: None,
-            established: false,
+        }
+    }
+
+    pub(super) fn new_remote(shared_secret: Shared3DHSecret, remote_ratchet_key: RemoteRatchetKey) -> Self {
+        let (root_key, remote_chain_key) = shared_secret.expand_into_remote_sub_keys();
+
+        let (root_key, chain_key, ratchet_key) = root_key.advance(&remote_ratchet_key);
+        let local_ratchet = Ratchet::new_with_ratchet_key(root_key, ratchet_key);
+
+        let remote_ratchet = RemoteRatchet::new(remote_ratchet_key);
+
+        Self {
+            session_keys: None,
+            sending_ratchet: local_ratchet,
+            chain_key,
+            receiving_ratchet: Some(remote_ratchet),
+            receiving_chain_key: Some(remote_chain_key),
         }
     }
 
@@ -119,17 +150,24 @@ impl Session {
         let message_key = self.create_message_key();
         let message = message_key.encrypt(plaintext);
 
-        if !self.established {
+        if let Some(session_keys) = &self.session_keys {
             PrekeyMessage::from_parts_untyped_prost(
-                self.session_keys.one_time_key.as_bytes().to_vec(),
-                self.session_keys.ephemeral_key.as_bytes().to_vec(),
-                self.session_keys.identity_key.as_bytes().to_vec(),
+                session_keys.one_time_key.as_bytes().to_vec(),
+                session_keys.ephemeral_key.as_bytes().to_vec(),
+                session_keys.identity_key.as_bytes().to_vec(),
                 message.into_vec(),
             )
             .inner
         } else {
             message.into_vec()
         }
+    }
+
+    pub fn decrypt_prekey(&mut self, message: Vec<u8>) -> Vec<u8> {
+        let message = PrekeyMessage::from(message);
+        let (_, _, _, message) = message.decode().unwrap();
+
+        self.decrypt(message)
     }
 
     pub fn decrypt(&mut self, message: Vec<u8>) -> Vec<u8> {
@@ -155,7 +193,7 @@ impl Session {
             self.chain_key = chain_key;
             self.receiving_ratchet = Some(receiving_ratchet);
             self.receiving_chain_key = Some(receiving_chain_key);
-            self.established = true;
+            self.session_keys = None;
 
             plaintext
         } else if let Some(ref mut remote_chain_key) = self.receiving_chain_key {

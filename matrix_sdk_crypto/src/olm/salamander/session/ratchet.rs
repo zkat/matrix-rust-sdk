@@ -15,7 +15,7 @@ pub(super) struct RatchetKey(Curve25591SecretKey);
 pub(super) struct RatchetPublicKey(Curve25591PublicKey);
 
 #[derive(Clone, Debug, Hash, PartialEq)]
-pub(super) struct RemoteRatchetKey(Curve25591PublicKey);
+pub struct RemoteRatchetKey(Curve25591PublicKey);
 
 impl RatchetKey {
     pub fn new() -> Self {
@@ -85,8 +85,8 @@ impl Ratchet {
         let (remote_root_key, remote_chain_key) =
             self.root_key.advance(&self.ratchet_key, &remote_key);
 
+        let (root_key, chain_key, ratchet_key) = remote_root_key.advance(&remote_key);
         let remote_ratchet = RemoteRatchet(remote_key);
-        let (root_key, chain_key, ratchet_key) = remote_root_key.advance();
         let new_ratchet = Ratchet::new_with_ratchet_key(root_key, ratchet_key);
 
         (new_ratchet, chain_key, remote_ratchet, remote_chain_key)
@@ -101,6 +101,10 @@ impl Ratchet {
 pub(super) struct RemoteRatchet(RemoteRatchetKey);
 
 impl RemoteRatchet {
+    pub fn new(remote_ratchet_key: RemoteRatchetKey) -> Self {
+        Self(remote_ratchet_key)
+    }
+
     pub fn belongs_to(&self, remote_key: &RemoteRatchetKey) -> bool {
         &self.0 == remote_key
     }

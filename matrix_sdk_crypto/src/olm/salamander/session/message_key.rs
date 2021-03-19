@@ -39,8 +39,8 @@ pub(super) struct MessageKey {
 }
 
 pub(super) struct RemoteMessageKey {
-    key: [u8; 32],
-    index: u64,
+    pub key: [u8; 32],
+    pub index: u64,
 }
 
 #[derive(Clone, Zeroize)]

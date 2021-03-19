@@ -23,6 +23,7 @@ pub(super) struct ChainKey {
     index: u64,
 }
 
+#[derive(Debug)]
 pub(super) struct RemoteChainKey {
     key: [u8; 32],
     index: u64,
