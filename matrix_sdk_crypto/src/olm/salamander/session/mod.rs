@@ -17,66 +17,18 @@ mod message_key;
 mod messages;
 mod ratchet;
 mod root_key;
+mod shared_secret;
 
-use hkdf::Hkdf;
-use sha2::Sha256;
-
-use x25519_dalek::{PublicKey as Curve25591PublicKey, SharedSecret};
+use x25519_dalek::PublicKey as Curve25591PublicKey;
 
 use chain_key::{ChainKey, RemoteChainKey};
 use message_key::MessageKey;
-pub(super) use messages::{PrekeyMessage, OlmMessage};
+pub(super) use messages::{OlmMessage, PrekeyMessage};
 use ratchet::{Ratchet, RatchetPublicKey, RemoteRatchet};
-use root_key::RootKey;
 
-use self::{ratchet::{RatchetKey, RemoteRatchetKey}, root_key::RemoteRootKey};
+pub(super) use shared_secret::Shared3DHSecret;
 
-pub(super) struct Shared3DHSecret([u8; 96]);
-
-impl Shared3DHSecret {
-    pub fn new(first: SharedSecret, second: SharedSecret, third: SharedSecret) -> Self {
-        let mut secret = Self([0u8; 96]);
-
-        secret.0[0..32].copy_from_slice(first.as_bytes());
-        secret.0[32..64].copy_from_slice(second.as_bytes());
-        secret.0[64..96].copy_from_slice(third.as_bytes());
-
-        secret
-    }
-
-    fn expand(self) -> ([u8;32], [u8; 32]) {
-        let hkdf: Hkdf<Sha256> = Hkdf::new(Some(&[0]), &self.0);
-        let mut root_key = [0u8; 32];
-        let mut chain_key = [0u8; 32];
-
-        // TODO zeroize this.
-        let mut expanded_keys = [0u8; 64];
-
-        hkdf.expand(b"OLM_ROOT", &mut expanded_keys).unwrap();
-
-        root_key.copy_from_slice(&expanded_keys[0..32]);
-        chain_key.copy_from_slice(&expanded_keys[32..64]);
-
-        (root_key, chain_key)
-    }
-
-    fn expand_into_remote_sub_keys(self) -> (RemoteRootKey, RemoteChainKey) {
-        let (root_key, chain_key) = self.expand();
-        let root_key = RemoteRootKey::new(root_key);
-        let chain_key = RemoteChainKey::new(chain_key);
-
-        (root_key, chain_key)
-    }
-
-    fn expand_into_sub_keys(self) -> (RootKey, ChainKey) {
-        let (root_key, chain_key) = self.expand();
-
-        let root_key = RootKey::new(root_key);
-        let chain_key = ChainKey::new(chain_key);
-
-        (root_key, chain_key)
-    }
-}
+use self::ratchet::RemoteRatchetKey;
 
 pub(super) struct SessionKeys {
     identity_key: Curve25591PublicKey,
@@ -121,7 +73,10 @@ impl Session {
         }
     }
 
-    pub(super) fn new_remote(shared_secret: Shared3DHSecret, remote_ratchet_key: RemoteRatchetKey) -> Self {
+    pub(super) fn new_remote(
+        shared_secret: Shared3DHSecret,
+        remote_ratchet_key: RemoteRatchetKey,
+    ) -> Self {
         let (root_key, remote_chain_key) = shared_secret.expand_into_remote_sub_keys();
 
         let (root_key, chain_key, ratchet_key) = root_key.advance(&remote_ratchet_key);

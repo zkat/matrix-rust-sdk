@@ -259,9 +259,7 @@ impl PrekeyMessage {
 
 impl From<Vec<u8>> for PrekeyMessage {
     fn from(bytes: Vec<u8>) -> Self {
-        Self {
-            inner: bytes,
-        }
+        Self { inner: bytes }
     }
 }
 
