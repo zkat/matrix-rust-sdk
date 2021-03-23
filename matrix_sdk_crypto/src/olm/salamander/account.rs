@@ -143,24 +143,6 @@ impl Account {
         &self.signing_key.inner.public
     }
 
-    fn calculate_shared_secret(
-        &self,
-        base_key: &Curve25591SecretKey,
-        identity_key: &Curve25591PublicKey,
-        one_time_key: &Curve25591PublicKey,
-    ) -> Shared3DHSecret {
-        let first_secret = self
-            .diffie_helman_key
-            .secret_key
-            .diffie_hellman(one_time_key);
-        let second_secret = base_key.diffie_hellman(identity_key);
-        let third_secret = base_key.diffie_hellman(one_time_key);
-
-        let shared_secret = Shared3DHSecret::new(first_secret, second_secret, third_secret);
-
-        shared_secret
-    }
-
     pub fn tripple_diffie_hellman(
         &self,
         identity_key: &Curve25591PublicKey,
@@ -171,7 +153,12 @@ impl Account {
         let base_key = Curve25591SecretKey::new(rng);
         let public_base_key = Curve25591PublicKey::from(&base_key);
 
-        let shared_secret = self.calculate_shared_secret(&base_key, identity_key, &one_time_key);
+        let shared_secret = Shared3DHSecret::new(
+            &self.diffie_helman_key.secret_key,
+            &base_key,
+            &identity_key,
+            &one_time_key,
+        );
 
         let session_keys = SessionKeys::new(*self.curve25519_key(), public_base_key, one_time_key);
 
@@ -180,18 +167,19 @@ impl Account {
 
     pub fn session(&self, message: Vec<u8>) -> Session {
         let message = PrekeyMessage::from(message);
-        let (public_one_time_key, base_key, identity_key, m) = message.decode().unwrap();
+        let (public_one_time_key, remote_one_time_key, remote_identity_key, m) = message.decode().unwrap();
 
         let one_time_key = self
             .one_time_keys
             .get_secret_key(public_one_time_key)
             .unwrap();
 
-        let first_secret = one_time_key.diffie_hellman(&identity_key);
-        let second_secret = self.diffie_helman_key.secret_key.diffie_hellman(&base_key);
-        let third_secret = one_time_key.diffie_hellman(&base_key);
-
-        let shared_secret = RemoteShared3DHSecret::new(first_secret, second_secret, third_secret);
+        let shared_secret = RemoteShared3DHSecret::new(
+            &self.diffie_helman_key.secret_key,
+            &one_time_key,
+            &remote_identity_key,
+            &remote_one_time_key,
+        );
 
         let message = OlmMessage::from(m);
         let (ratchet_key, _, _) = message.decode().unwrap();
