@@ -495,9 +495,6 @@
 <span id="492">492</span>
 <span id="493">493</span>
 <span id="494">494</span>
-<span id="495">495</span>
-<span id="496">496</span>
-<span id="497">497</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="comment">// Copyright 2020 The Matrix.org Foundation C.I.C.</span>
 <span class="comment">//</span>
@@ -696,9 +693,9 @@
         <span class="comment">// Add the list of devices that the user wishes to establish sessions</span>
         <span class="comment">// right now.</span>
         <span class="kw">for</span> <span class="ident">user_id</span> <span class="kw">in</span> <span class="ident">users</span> {
-            <span class="kw">let</span> <span class="ident">user_devices</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">store</span>.<span class="ident">get_user_devices</span>(<span class="ident">user_id</span>).<span class="kw">await</span><span class="question-mark">?</span>;
+            <span class="kw">let</span> <span class="ident">user_devices</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">store</span>.<span class="ident">get_readonly_devices</span>(<span class="ident">user_id</span>).<span class="kw">await</span><span class="question-mark">?</span>;
 
-            <span class="kw">for</span> <span class="ident">device</span> <span class="kw">in</span> <span class="ident">user_devices</span>.<span class="ident">devices</span>() {
+            <span class="kw">for</span> (<span class="ident">device_id</span>, <span class="ident">device</span>) <span class="kw">in</span> <span class="ident">user_devices</span>.<span class="ident">into_iter</span>() {
                 <span class="kw">let</span> <span class="ident">sender_key</span> <span class="op">=</span> <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">k</span>) <span class="op">=</span> <span class="ident">device</span>.<span class="ident">get_key</span>(<span class="ident">DeviceKeyAlgorithm</span>::<span class="ident">Curve25519</span>) {
                     <span class="ident">k</span>
                 } <span class="kw">else</span> {
@@ -717,10 +714,7 @@
                     <span class="ident">missing</span>
                         .<span class="ident">entry</span>(<span class="ident">user_id</span>.<span class="ident">to_owned</span>())
                         .<span class="ident">or_insert_with</span>(<span class="ident">BTreeMap</span>::<span class="ident">new</span>)
-                        .<span class="ident">insert</span>(
-                            <span class="ident">device</span>.<span class="ident">device_id</span>().<span class="ident">into</span>(),
-                            <span class="ident">DeviceKeyAlgorithm</span>::<span class="ident">SignedCurve25519</span>,
-                        );
+                        .<span class="ident">insert</span>(<span class="ident">device_id</span>, <span class="ident">DeviceKeyAlgorithm</span>::<span class="ident">SignedCurve25519</span>);
                 }
             }
         }

@@ -321,6 +321,14 @@
 <span id="318">318</span>
 <span id="319">319</span>
 <span id="320">320</span>
+<span id="321">321</span>
+<span id="322">322</span>
+<span id="323">323</span>
+<span id="324">324</span>
+<span id="325">325</span>
+<span id="326">326</span>
+<span id="327">327</span>
+<span id="328">328</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="comment">// Copyright 2020 The Matrix.org Foundation C.I.C.</span>
 <span class="comment">//</span>
@@ -386,6 +394,14 @@
     <span class="doccomment">/// Gets the transaction ID as a string.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">txn_id_string</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">String</span> {
         <span class="self">self</span>.<span class="ident">txn_id</span>.<span class="ident">to_string</span>()
+    }
+
+    <span class="doccomment">/// Get the number of unique messages this request contains.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// *Note*: A single message may be sent to multiple devices, so this may or</span>
+    <span class="doccomment">/// may not be the number of devices that will receive the messages as well.</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">message_count</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">usize</span> {
+        <span class="self">self</span>.<span class="ident">messages</span>.<span class="ident">values</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">d</span><span class="op">|</span> <span class="ident">d</span>.<span class="ident">len</span>()).<span class="ident">sum</span>()
     }
 }
 

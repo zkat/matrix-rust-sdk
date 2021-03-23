@@ -444,6 +444,15 @@
 <span id="441">441</span>
 <span id="442">442</span>
 <span id="443">443</span>
+<span id="444">444</span>
+<span id="445">445</span>
+<span id="446">446</span>
+<span id="447">447</span>
+<span id="448">448</span>
+<span id="449">449</span>
+<span id="450">450</span>
+<span id="451">451</span>
+<span id="452">452</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="comment">// Copyright 2020 The Matrix.org Foundation C.I.C.</span>
 <span class="comment">//</span>
@@ -571,6 +580,15 @@
     <span class="kw">pub</span> <span class="ident">new</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">ReadOnlyDevice</span><span class="op">&gt;</span>,
     <span class="kw">pub</span> <span class="ident">changed</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">ReadOnlyDevice</span><span class="op">&gt;</span>,
     <span class="kw">pub</span> <span class="ident">deleted</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">ReadOnlyDevice</span><span class="op">&gt;</span>,
+}
+
+<span class="kw">impl</span> <span class="ident">DeviceChanges</span> {
+    <span class="doccomment">/// Merge the given `DeviceChanges` into this instance of `DeviceChanges`.</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">extend</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">other</span>: <span class="ident">DeviceChanges</span>) {
+        <span class="self">self</span>.<span class="ident">new</span>.<span class="ident">extend</span>(<span class="ident">other</span>.<span class="ident">new</span>);
+        <span class="self">self</span>.<span class="ident">changed</span>.<span class="ident">extend</span>(<span class="ident">other</span>.<span class="ident">changed</span>);
+        <span class="self">self</span>.<span class="ident">deleted</span>.<span class="ident">extend</span>(<span class="ident">other</span>.<span class="ident">deleted</span>);
+    }
 }
 
 <span class="kw">impl</span> <span class="ident">Store</span> {
