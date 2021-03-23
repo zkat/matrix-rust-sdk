@@ -26,7 +26,7 @@ use message_key::MessageKey;
 pub(super) use messages::{OlmMessage, PrekeyMessage};
 use ratchet::{Ratchet, RatchetPublicKey, RemoteRatchet};
 
-pub(super) use shared_secret::Shared3DHSecret;
+pub(super) use shared_secret::{RemoteShared3DHSecret, Shared3DHSecret};
 
 use self::ratchet::RemoteRatchetKey;
 
@@ -60,7 +60,7 @@ pub struct Session {
 
 impl Session {
     pub(super) fn new(shared_secret: Shared3DHSecret, session_keys: SessionKeys) -> Self {
-        let (root_key, chain_key) = shared_secret.expand_into_sub_keys();
+        let (root_key, chain_key) = shared_secret.expand();
 
         let local_ratchet = Ratchet::new(root_key);
 
@@ -74,10 +74,10 @@ impl Session {
     }
 
     pub(super) fn new_remote(
-        shared_secret: Shared3DHSecret,
+        shared_secret: RemoteShared3DHSecret,
         remote_ratchet_key: RemoteRatchetKey,
     ) -> Self {
-        let (root_key, remote_chain_key) = shared_secret.expand_into_remote_sub_keys();
+        let (root_key, remote_chain_key) = shared_secret.expand();
 
         let (root_key, chain_key, ratchet_key) = root_key.advance(&remote_ratchet_key);
         let local_ratchet = Ratchet::new_with_ratchet_key(root_key, ratchet_key);

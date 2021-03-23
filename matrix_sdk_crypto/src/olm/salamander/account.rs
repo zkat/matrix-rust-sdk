@@ -23,7 +23,9 @@ use dashmap::DashMap;
 
 use crate::utilities::encode;
 
-use super::session::{OlmMessage, PrekeyMessage, Session, SessionKeys, Shared3DHSecret};
+use super::session::{
+    OlmMessage, PrekeyMessage, RemoteShared3DHSecret, Session, SessionKeys, Shared3DHSecret,
+};
 
 struct Ed25519Keypair {
     inner: Keypair,
@@ -94,7 +96,7 @@ impl OneTimeKeys {
             .and_then(|(_, key_id)| self.private_keys.remove(&key_id).map(|(_, v)| v))
     }
 
-    fn generate(&self, count: usize) {
+    fn generate(&mut self, count: usize) {
         let mut rng = thread_rng();
 
         for _ in 0..count {
@@ -105,6 +107,8 @@ impl OneTimeKeys {
             self.private_keys.insert(key_id.clone(), secret_key);
             self.public_keys.insert(key_id.clone(), public_key.clone());
             self.reverse_public_keys.insert(public_key, key_id);
+
+            self.key_id += 1;
         }
     }
 }
@@ -187,7 +191,7 @@ impl Account {
         let second_secret = self.diffie_helman_key.secret_key.diffie_hellman(&base_key);
         let third_secret = one_time_key.diffie_hellman(&base_key);
 
-        let shared_secret = Shared3DHSecret::new(first_secret, second_secret, third_secret);
+        let shared_secret = RemoteShared3DHSecret::new(first_secret, second_secret, third_secret);
 
         let message = OlmMessage::from(m);
         let (ratchet_key, _, _) = message.decode().unwrap();
@@ -206,7 +210,7 @@ impl Account {
         &self.diffie_helman_key.encoded_public_key
     }
 
-    pub fn generate_one_time_keys(&self, count: usize) {
+    pub fn generate_one_time_keys(&mut self, count: usize) {
         self.one_time_keys.generate(count);
     }
 
@@ -313,7 +317,7 @@ mod test {
     #[test]
     fn test_inbound_session_creation() {
         let alice = OlmAccount::new();
-        let bob = Account::new();
+        let mut bob = Account::new();
 
         bob.generate_one_time_keys(1);
 
