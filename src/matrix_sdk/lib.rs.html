@@ -105,6 +105,10 @@
 <span id="102">102</span>
 <span id="103">103</span>
 <span id="104">104</span>
+<span id="105">105</span>
+<span id="106">106</span>
+<span id="107">107</span>
+<span id="108">108</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="comment">// Copyright 2020 Damir Jelić</span>
 <span class="comment">// Copyright 2020 The Matrix.org Foundation C.I.C.</span>
@@ -153,6 +157,7 @@
 <span class="doccomment">//! of Synapse in compliance with the Matrix API specification.</span>
 <span class="doccomment">//! * `markdown`: Support for sending markdown formatted messages.</span>
 <span class="doccomment">//! * `socks`: Enables SOCKS support in reqwest, the default HTTP client.</span>
+<span class="doccomment">//! * `sso_login`: Enables SSO login with a local http server.</span>
 
 <span class="attribute">#![<span class="ident">deny</span>(
     <span class="ident">missing_debug_implementations</span>,
@@ -171,6 +176,9 @@
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;native-tls&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;rustls-tls&quot;</span>,))]</span>
 <span class="macro">compile_error</span><span class="macro">!</span>(<span class="string">&quot;only one of &#39;native-tls&#39; or &#39;rustls-tls&#39; features can be enabled&quot;</span>);
+
+<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;sso_login&quot;</span>, <span class="ident">target_arch</span> <span class="op">=</span> <span class="string">&quot;wasm32&quot;</span>))]</span>
+<span class="macro">compile_error</span><span class="macro">!</span>(<span class="string">&quot;&#39;sso_login&#39; cannot be enabled on &#39;wasm32&#39; arch&quot;</span>);
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;encryption&quot;</span>)]</span>
 <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;docs&quot;</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">encryption</span>)))]</span>
