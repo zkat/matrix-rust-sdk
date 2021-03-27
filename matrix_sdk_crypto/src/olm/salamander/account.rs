@@ -167,7 +167,8 @@ impl Account {
 
     pub fn session(&self, message: Vec<u8>) -> Session {
         let message = PrekeyMessage::from(message);
-        let (public_one_time_key, remote_one_time_key, remote_identity_key, m) = message.decode().unwrap();
+        let (public_one_time_key, remote_one_time_key, remote_identity_key, m) =
+            message.decode().unwrap();
 
         let one_time_key = self
             .one_time_keys

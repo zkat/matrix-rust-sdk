@@ -88,9 +88,9 @@ impl Shared3DHSecret {
 #[cfg(test)]
 mod test {
     use rand::thread_rng;
-    use x25519_dalek::{StaticSecret, PublicKey};
+    use x25519_dalek::{PublicKey, StaticSecret};
 
-    use super::{Shared3DHSecret, RemoteShared3DHSecret};
+    use super::{RemoteShared3DHSecret, Shared3DHSecret};
 
     #[test]
     fn tripple_diffie_hellman() {

@@ -50,12 +50,59 @@ impl SessionKeys {
     }
 }
 
+struct DoubleRatchet {
+    dh_ratchet: Ratchet,
+    hkdf_ratchet: ChainKey,
+}
+
+impl DoubleRatchet {
+    fn advance(&self, ratchet_key: RemoteRatchetKey) -> (Self, RemoteDoubleRatchet) {
+        let (ratchet, chain, remote_ratchet, remote_chain) = self.dh_ratchet.advance(ratchet_key);
+
+        let ratchet = Self {
+            dh_ratchet: ratchet,
+            hkdf_ratchet: chain,
+        };
+
+        let remote_ratchet = RemoteDoubleRatchet {
+            dh_ratchet: remote_ratchet,
+            hkdf_ratchet: remote_chain,
+        };
+
+        (ratchet, remote_ratchet)
+    }
+
+    fn ratchet_key(&self) -> RatchetPublicKey {
+        RatchetPublicKey::from(self.dh_ratchet.ratchet_key())
+    }
+
+    fn encrypt(&mut self, plaintext: &[u8]) -> OlmMessage {
+        let message_key = self.hkdf_ratchet.create_message_key(self.ratchet_key());
+
+        message_key.encrypt(plaintext)
+    }
+}
+
+struct RemoteDoubleRatchet {
+    dh_ratchet: RemoteRatchet,
+    hkdf_ratchet: RemoteChainKey,
+}
+
+impl RemoteDoubleRatchet {
+    fn decrypt(&mut self, message: Vec<u8>) -> Vec<u8> {
+        let message_key = self.hkdf_ratchet.create_message_key();
+        message_key.decrypt(message)
+    }
+
+    fn belongs_to(&self, ratchet_key: &RemoteRatchetKey) -> bool {
+        self.dh_ratchet.belongs_to(ratchet_key)
+    }
+}
+
 pub struct Session {
     session_keys: Option<SessionKeys>,
-    sending_ratchet: Ratchet,
-    chain_key: ChainKey,
-    receiving_ratchet: Option<RemoteRatchet>,
-    receiving_chain_key: Option<RemoteChainKey>,
+    sending_ratchet: DoubleRatchet,
+    receiving_ratchet: Option<RemoteDoubleRatchet>,
 }
 
 impl Session {
@@ -64,12 +111,15 @@ impl Session {
 
         let local_ratchet = Ratchet::new(root_key);
 
+        let local_ratchet = DoubleRatchet {
+            dh_ratchet: local_ratchet,
+            hkdf_ratchet: chain_key,
+        };
+
         Self {
             session_keys: Some(session_keys),
             sending_ratchet: local_ratchet,
-            chain_key,
             receiving_ratchet: None,
-            receiving_chain_key: None,
         }
     }
 
@@ -84,26 +134,25 @@ impl Session {
 
         let remote_ratchet = RemoteRatchet::new(remote_ratchet_key);
 
+        let local_ratchet = DoubleRatchet {
+            dh_ratchet: local_ratchet,
+            hkdf_ratchet: chain_key,
+        };
+
+        let remote_ratchet = RemoteDoubleRatchet {
+            dh_ratchet: remote_ratchet,
+            hkdf_ratchet: remote_chain_key,
+        };
+
         Self {
             session_keys: None,
             sending_ratchet: local_ratchet,
-            chain_key,
             receiving_ratchet: Some(remote_ratchet),
-            receiving_chain_key: Some(remote_chain_key),
         }
     }
 
-    fn ratchet_key(&self) -> RatchetPublicKey {
-        RatchetPublicKey::from(self.sending_ratchet.ratchet_key())
-    }
-
-    fn create_message_key(&mut self) -> MessageKey {
-        self.chain_key.create_message_key(self.ratchet_key())
-    }
-
     pub fn encrypt(&mut self, plaintext: &[u8]) -> Vec<u8> {
-        let message_key = self.create_message_key();
-        let message = message_key.encrypt(plaintext);
+        let message = self.sending_ratchet.encrypt(plaintext);
 
         if let Some(session_keys) = &self.session_keys {
             PrekeyMessage::from_parts_untyped_prost(
@@ -136,24 +185,18 @@ impl Session {
             .as_ref()
             .map_or(false, |r| r.belongs_to(&ratchet_key))
         {
-            let (sending_ratchet, chain_key, receiving_ratchet, mut receiving_chain_key) =
-                self.sending_ratchet.advance(ratchet_key);
-
-            let message_key = receiving_chain_key.create_message_key();
+            let (sending_ratchet, mut remote_ratchet) = self.sending_ratchet.advance(ratchet_key);
 
             // TODO don't update the state if the message doesn't decrypt
-            let plaintext = message_key.decrypt(ciphertext);
+            let plaintext = remote_ratchet.decrypt(ciphertext);
 
             self.sending_ratchet = sending_ratchet;
-            self.chain_key = chain_key;
-            self.receiving_ratchet = Some(receiving_ratchet);
-            self.receiving_chain_key = Some(receiving_chain_key);
+            self.receiving_ratchet = Some(remote_ratchet);
             self.session_keys = None;
 
             plaintext
-        } else if let Some(ref mut remote_chain_key) = self.receiving_chain_key {
-            let message_key = remote_chain_key.create_message_key();
-            message_key.decrypt(ciphertext)
+        } else if let Some(ref mut remote_ratchet) = self.receiving_ratchet {
+            remote_ratchet.decrypt(ciphertext)
         } else {
             todo!()
         }
