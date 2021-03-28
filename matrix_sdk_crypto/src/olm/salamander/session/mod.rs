@@ -25,6 +25,7 @@ use chain_key::{ChainKey, RemoteChainKey};
 use message_key::MessageKey;
 pub(super) use messages::{OlmMessage, PrekeyMessage};
 use ratchet::{Ratchet, RatchetPublicKey, RemoteRatchet};
+use root_key::RemoteRootKey;
 
 pub(super) use shared_secret::{RemoteShared3DHSecret, Shared3DHSecret};
 
@@ -50,18 +51,57 @@ impl SessionKeys {
     }
 }
 
+enum LocalDoubleRatchet {
+    Inactive(InactiveDoubleRatchet),
+    Active(DoubleRatchet),
+}
+
+impl LocalDoubleRatchet {
+    fn advance(
+        &self,
+        ratchet_key: RemoteRatchetKey,
+    ) -> (InactiveDoubleRatchet, RemoteDoubleRatchet) {
+        if let LocalDoubleRatchet::Active(ratchet) = self {
+            ratchet.advance(ratchet_key)
+        } else {
+            // TODO turn this into an error
+            panic!("Can't advance an inactive ratchet");
+        }
+    }
+}
+
+struct InactiveDoubleRatchet {
+    root_key: RemoteRootKey,
+    ratchet_key: RemoteRatchetKey,
+}
+
+impl InactiveDoubleRatchet {
+    fn activate(&self) -> DoubleRatchet {
+        let (root_key, chain_key, ratchet_key) = self.root_key.advance(&self.ratchet_key);
+        let dh_ratchet = Ratchet::new_with_ratchet_key(root_key, ratchet_key);
+
+        DoubleRatchet {
+            dh_ratchet,
+            hkdf_ratchet: chain_key,
+        }
+    }
+}
+
 struct DoubleRatchet {
     dh_ratchet: Ratchet,
     hkdf_ratchet: ChainKey,
 }
 
 impl DoubleRatchet {
-    fn advance(&self, ratchet_key: RemoteRatchetKey) -> (Self, RemoteDoubleRatchet) {
-        let (ratchet, chain, remote_ratchet, remote_chain) = self.dh_ratchet.advance(ratchet_key);
+    fn advance(
+        &self,
+        ratchet_key: RemoteRatchetKey,
+    ) -> (InactiveDoubleRatchet, RemoteDoubleRatchet) {
+        let (root_key, remote_ratchet, remote_chain) = self.dh_ratchet.advance(ratchet_key.clone());
 
-        let ratchet = Self {
-            dh_ratchet: ratchet,
-            hkdf_ratchet: chain,
+        let ratchet = InactiveDoubleRatchet {
+            root_key,
+            ratchet_key,
         };
 
         let remote_ratchet = RemoteDoubleRatchet {
@@ -101,7 +141,7 @@ impl RemoteDoubleRatchet {
 
 pub struct Session {
     session_keys: Option<SessionKeys>,
-    sending_ratchet: DoubleRatchet,
+    sending_ratchet: LocalDoubleRatchet,
     receiving_ratchet: Option<RemoteDoubleRatchet>,
 }
 
@@ -118,7 +158,7 @@ impl Session {
 
         Self {
             session_keys: Some(session_keys),
-            sending_ratchet: local_ratchet,
+            sending_ratchet: LocalDoubleRatchet::Active(local_ratchet),
             receiving_ratchet: None,
         }
     }
@@ -129,15 +169,13 @@ impl Session {
     ) -> Self {
         let (root_key, remote_chain_key) = shared_secret.expand();
 
-        let (root_key, chain_key, ratchet_key) = root_key.advance(&remote_ratchet_key);
-        let local_ratchet = Ratchet::new_with_ratchet_key(root_key, ratchet_key);
+        let local_ratchet = InactiveDoubleRatchet {
+            root_key,
+            ratchet_key: remote_ratchet_key.clone(),
+        };
 
         let remote_ratchet = RemoteRatchet::new(remote_ratchet_key);
-
-        let local_ratchet = DoubleRatchet {
-            dh_ratchet: local_ratchet,
-            hkdf_ratchet: chain_key,
-        };
+        let local_ratchet = LocalDoubleRatchet::Inactive(local_ratchet);
 
         let remote_ratchet = RemoteDoubleRatchet {
             dh_ratchet: remote_ratchet,
@@ -152,7 +190,15 @@ impl Session {
     }
 
     pub fn encrypt(&mut self, plaintext: &[u8]) -> Vec<u8> {
-        let message = self.sending_ratchet.encrypt(plaintext);
+        let message = match &mut self.sending_ratchet {
+            LocalDoubleRatchet::Inactive(ratchet) => {
+                let mut ratchet = ratchet.activate();
+                let message = ratchet.encrypt(plaintext);
+                self.sending_ratchet = LocalDoubleRatchet::Active(ratchet);
+                message
+            }
+            LocalDoubleRatchet::Active(ratchet) => ratchet.encrypt(plaintext),
+        };
 
         if let Some(session_keys) = &self.session_keys {
             PrekeyMessage::from_parts_untyped_prost(
@@ -190,7 +236,7 @@ impl Session {
             // TODO don't update the state if the message doesn't decrypt
             let plaintext = remote_ratchet.decrypt(ciphertext);
 
-            self.sending_ratchet = sending_ratchet;
+            self.sending_ratchet = LocalDoubleRatchet::Inactive(sending_ratchet);
             self.receiving_ratchet = Some(remote_ratchet);
             self.session_keys = None;
 

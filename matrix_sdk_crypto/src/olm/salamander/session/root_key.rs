@@ -31,7 +31,10 @@ impl RemoteRootKey {
         Self(bytes)
     }
 
-    pub fn advance(self, remote_ratchet_key: &RemoteRatchetKey) -> (RootKey, ChainKey, RatchetKey) {
+    pub fn advance(
+        &self,
+        remote_ratchet_key: &RemoteRatchetKey,
+    ) -> (RootKey, ChainKey, RatchetKey) {
         let ratchet_key = RatchetKey::new();
         let output = diffie_hellman(&self.0, &ratchet_key, &remote_ratchet_key);
 
