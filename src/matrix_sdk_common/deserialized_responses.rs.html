@@ -627,16 +627,16 @@
     }
 }
 
-<span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">SyncStateEvent</span><span class="op">&lt;</span><span class="ident">MemberEventContent</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">MemberEvent</span> {
-    <span class="kw">fn</span> <span class="ident">into</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">SyncStateEvent</span><span class="op">&lt;</span><span class="ident">MemberEventContent</span><span class="op">&gt;</span> {
+<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">MemberEvent</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">SyncStateEvent</span><span class="op">&lt;</span><span class="ident">MemberEventContent</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">other</span>: <span class="ident">MemberEvent</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">SyncStateEvent</span><span class="op">&lt;</span><span class="ident">MemberEventContent</span><span class="op">&gt;</span> {
         <span class="ident">SyncStateEvent</span> {
-            <span class="ident">content</span>: <span class="self">self</span>.<span class="ident">content</span>,
-            <span class="ident">event_id</span>: <span class="self">self</span>.<span class="ident">event_id</span>,
-            <span class="ident">sender</span>: <span class="self">self</span>.<span class="ident">sender</span>,
-            <span class="ident">origin_server_ts</span>: <span class="self">self</span>.<span class="ident">origin_server_ts</span>,
-            <span class="ident">state_key</span>: <span class="self">self</span>.<span class="ident">state_key</span>.<span class="ident">to_string</span>(),
-            <span class="ident">prev_content</span>: <span class="self">self</span>.<span class="ident">prev_content</span>,
-            <span class="ident">unsigned</span>: <span class="self">self</span>.<span class="ident">unsigned</span>,
+            <span class="ident">content</span>: <span class="ident">other</span>.<span class="ident">content</span>,
+            <span class="ident">event_id</span>: <span class="ident">other</span>.<span class="ident">event_id</span>,
+            <span class="ident">sender</span>: <span class="ident">other</span>.<span class="ident">sender</span>,
+            <span class="ident">origin_server_ts</span>: <span class="ident">other</span>.<span class="ident">origin_server_ts</span>,
+            <span class="ident">state_key</span>: <span class="ident">other</span>.<span class="ident">state_key</span>.<span class="ident">to_string</span>(),
+            <span class="ident">prev_content</span>: <span class="ident">other</span>.<span class="ident">prev_content</span>,
+            <span class="ident">unsigned</span>: <span class="ident">other</span>.<span class="ident">unsigned</span>,
         }
     }
 }
@@ -664,12 +664,12 @@
     }
 }
 
-<span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">StrippedStateEvent</span><span class="op">&lt;</span><span class="ident">MemberEventContent</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">StrippedMemberEvent</span> {
-    <span class="kw">fn</span> <span class="ident">into</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">StrippedStateEvent</span><span class="op">&lt;</span><span class="ident">MemberEventContent</span><span class="op">&gt;</span> {
-        <span class="ident">StrippedStateEvent</span> {
-            <span class="ident">content</span>: <span class="self">self</span>.<span class="ident">content</span>,
-            <span class="ident">sender</span>: <span class="self">self</span>.<span class="ident">sender</span>,
-            <span class="ident">state_key</span>: <span class="self">self</span>.<span class="ident">state_key</span>.<span class="ident">to_string</span>(),
+<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">StrippedMemberEvent</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">StrippedStateEvent</span><span class="op">&lt;</span><span class="ident">MemberEventContent</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">other</span>: <span class="ident">StrippedMemberEvent</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+        <span class="self">Self</span> {
+            <span class="ident">content</span>: <span class="ident">other</span>.<span class="ident">content</span>,
+            <span class="ident">sender</span>: <span class="ident">other</span>.<span class="ident">sender</span>,
+            <span class="ident">state_key</span>: <span class="ident">other</span>.<span class="ident">state_key</span>.<span class="ident">to_string</span>(),
         }
     }
 }
