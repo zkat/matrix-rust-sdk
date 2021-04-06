@@ -2145,11 +2145,11 @@
     ) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">StoreResult</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">account</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">store</span>.<span class="ident">load_account</span>().<span class="kw">await</span><span class="question-mark">?</span> {
             <span class="prelude-val">Some</span>(<span class="ident">a</span>) <span class="op">=</span><span class="op">&gt;</span> {
-                <span class="macro">debug</span><span class="macro">!</span>(<span class="string">&quot;Restored account&quot;</span>);
+                <span class="macro">debug!</span>(<span class="string">&quot;Restored account&quot;</span>);
                 <span class="ident">a</span>
             }
             <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> {
-                <span class="macro">debug</span><span class="macro">!</span>(<span class="string">&quot;Creating a new account&quot;</span>);
+                <span class="macro">debug!</span>(<span class="string">&quot;Creating a new account&quot;</span>);
                 <span class="kw">let</span> <span class="ident">account</span> <span class="op">=</span> <span class="ident">ReadOnlyAccount</span>::<span class="ident">new</span>(<span class="kw-2">&amp;</span><span class="ident">user_id</span>, <span class="kw-2">&amp;</span><span class="ident">device_id</span>);
                 <span class="ident">store</span>.<span class="ident">save_account</span>(<span class="ident">account</span>.<span class="ident">clone</span>()).<span class="kw">await</span><span class="question-mark">?</span>;
                 <span class="ident">account</span>
@@ -2158,11 +2158,11 @@
 
         <span class="kw">let</span> <span class="ident">identity</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">store</span>.<span class="ident">load_identity</span>().<span class="kw">await</span><span class="question-mark">?</span> {
             <span class="prelude-val">Some</span>(<span class="ident">i</span>) <span class="op">=</span><span class="op">&gt;</span> {
-                <span class="macro">debug</span><span class="macro">!</span>(<span class="string">&quot;Restored the cross signing identity&quot;</span>);
+                <span class="macro">debug!</span>(<span class="string">&quot;Restored the cross signing identity&quot;</span>);
                 <span class="ident">i</span>
             }
             <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> {
-                <span class="macro">debug</span><span class="macro">!</span>(<span class="string">&quot;Creating an empty cross signing identity stub&quot;</span>);
+                <span class="macro">debug!</span>(<span class="string">&quot;Creating an empty cross signing identity stub&quot;</span>);
                 <span class="ident">PrivateCrossSigningIdentity</span>::<span class="ident">empty</span>(<span class="ident">user_id</span>.<span class="ident">clone</span>())
             }
         };
@@ -2315,7 +2315,7 @@
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">identity</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">user_identity</span>.<span class="ident">lock</span>().<span class="kw">await</span>;
 
         <span class="kw">if</span> <span class="ident">identity</span>.<span class="ident">is_empty</span>().<span class="kw">await</span> <span class="op">|</span><span class="op">|</span> <span class="ident">reset</span> {
-            <span class="macro">info</span><span class="macro">!</span>(<span class="string">&quot;Creating new cross signing identity&quot;</span>);
+            <span class="macro">info!</span>(<span class="string">&quot;Creating new cross signing identity&quot;</span>);
             <span class="kw">let</span> (<span class="ident">id</span>, <span class="ident">request</span>, <span class="ident">signature_request</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">account</span>.<span class="ident">bootstrap_cross_signing</span>().<span class="kw">await</span>;
 
             <span class="kw-2">*</span><span class="ident">identity</span> <span class="op">=</span> <span class="ident">id</span>;
@@ -2326,7 +2326,7 @@
 
             <span class="kw">let</span> <span class="ident">changes</span> <span class="op">=</span> <span class="ident">Changes</span> {
                 <span class="ident">identities</span>: <span class="ident">IdentityChanges</span> {
-                    <span class="ident">new</span>: <span class="macro">vec</span><span class="macro">!</span>[<span class="ident">public</span>.<span class="ident">into</span>()],
+                    <span class="ident">new</span>: <span class="macro">vec!</span>[<span class="ident">public</span>.<span class="ident">into</span>()],
                     ..<span class="ident">Default</span>::<span class="ident">default</span>()
                 },
                 <span class="ident">private_identity</span>: <span class="prelude-val">Some</span>(<span class="ident">identity</span>.<span class="ident">clone</span>()),
@@ -2337,7 +2337,7 @@
 
             <span class="prelude-val">Ok</span>((<span class="ident">request</span>, <span class="ident">signature_request</span>))
         } <span class="kw">else</span> {
-            <span class="macro">info</span><span class="macro">!</span>(<span class="string">&quot;Trying to upload the existing cross signing identity&quot;</span>);
+            <span class="macro">info!</span>(<span class="string">&quot;Trying to upload the existing cross signing identity&quot;</span>);
             <span class="kw">let</span> <span class="ident">request</span> <span class="op">=</span> <span class="ident">identity</span>.<span class="ident">as_upload_request</span>().<span class="kw">await</span>;
             <span class="comment">// TODO remove this expect.</span>
             <span class="kw">let</span> <span class="ident">signature_request</span> <span class="op">=</span> <span class="ident">identity</span>
@@ -2471,7 +2471,7 @@
     <span class="doccomment">/// [`OlmMachine`]: struct.OlmMachine.html</span>
     <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">keys_for_upload</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">upload_keys</span>::<span class="ident">Request</span><span class="op">&gt;</span> {
         <span class="kw">let</span> (<span class="ident">device_keys</span>, <span class="ident">one_time_keys</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">account</span>.<span class="ident">keys_for_upload</span>().<span class="kw">await</span><span class="question-mark">?</span>;
-        <span class="prelude-val">Some</span>(<span class="macro">assign</span><span class="macro">!</span>(<span class="ident">upload_keys</span>::<span class="ident">Request</span>::<span class="ident">new</span>(), { <span class="ident">device_keys</span>, <span class="ident">one_time_keys</span> }))
+        <span class="prelude-val">Some</span>(<span class="macro">assign!</span>(<span class="ident">upload_keys</span>::<span class="ident">Request</span>::<span class="ident">new</span>(), { <span class="ident">device_keys</span>, <span class="ident">one_time_keys</span> }))
     }
 
     <span class="doccomment">/// Decrypt a to-device event.</span>
@@ -2523,7 +2523,7 @@
                     <span class="prelude-val">None</span>,
                 )<span class="question-mark">?</span>;
 
-                <span class="macro">info</span><span class="macro">!</span>(
+                <span class="macro">info!</span>(
                     <span class="string">&quot;Received a new room key from {} for room {} with session id {}&quot;</span>,
                     <span class="ident">event</span>.<span class="ident">sender</span>,
                     <span class="ident">event</span>.<span class="ident">content</span>.<span class="ident">room_id</span>,
@@ -2533,7 +2533,7 @@
                 <span class="prelude-val">Ok</span>((<span class="prelude-val">Some</span>(<span class="ident">event</span>), <span class="prelude-val">Some</span>(<span class="ident">session</span>)))
             }
             <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> {
-                <span class="macro">warn</span><span class="macro">!</span>(
+                <span class="macro">warn!</span>(
                     <span class="string">&quot;Received room key with unsupported key algorithm {}&quot;</span>,
                     <span class="ident">event</span>.<span class="ident">content</span>.<span class="ident">algorithm</span>
                 );
@@ -2633,7 +2633,7 @@
         <span class="kw">let</span> <span class="ident">event</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">decrypted</span>.<span class="ident">event</span>.<span class="ident">deserialize</span>() {
             <span class="prelude-val">Ok</span>(<span class="ident">e</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">e</span>,
             <span class="prelude-val">Err</span>(<span class="ident">e</span>) <span class="op">=</span><span class="op">&gt;</span> {
-                <span class="macro">warn</span><span class="macro">!</span>(
+                <span class="macro">warn!</span>(
                     <span class="string">&quot;Decrypted to-device event failed to be parsed correctly {:?}&quot;</span>,
                     <span class="ident">e</span>
                 );
@@ -2650,7 +2650,7 @@
                 .<span class="ident">receive_forwarded_room_key</span>(<span class="kw-2">&amp;</span><span class="ident">decrypted</span>.<span class="ident">sender_key</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">e</span>)
                 .<span class="kw">await</span><span class="question-mark">?</span>),
             <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> {
-                <span class="macro">warn</span><span class="macro">!</span>(<span class="string">&quot;Received an unexpected encrypted to-device event&quot;</span>);
+                <span class="macro">warn!</span>(<span class="string">&quot;Received an unexpected encrypted to-device event&quot;</span>);
                 <span class="prelude-val">Ok</span>((<span class="prelude-val">Some</span>(<span class="ident">event</span>), <span class="prelude-val">None</span>))
             }
         }
@@ -2658,7 +2658,7 @@
 
     <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">handle_verification_event</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">event</span>: <span class="kw-2">&amp;</span><span class="ident">AnyToDeviceEvent</span>) {
         <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Err</span>(<span class="ident">e</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">verification_machine</span>.<span class="ident">receive_event</span>(<span class="kw-2">&amp;</span><span class="ident">event</span>).<span class="kw">await</span> {
-            <span class="macro">error</span><span class="macro">!</span>(<span class="string">&quot;Error handling a verification event: {:?}&quot;</span>, <span class="ident">e</span>);
+            <span class="macro">error!</span>(<span class="string">&quot;Error handling a verification event: {:?}&quot;</span>, <span class="ident">e</span>);
         }
     }
 
@@ -2735,7 +2735,7 @@
 
         <span class="kw">for</span> <span class="ident">user_id</span> <span class="kw">in</span> <span class="kw-2">&amp;</span><span class="ident">changed_devices</span>.<span class="ident">changed</span> {
             <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Err</span>(<span class="ident">e</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">identity_manager</span>.<span class="ident">mark_user_as_changed</span>(<span class="kw-2">&amp;</span><span class="ident">user_id</span>).<span class="kw">await</span> {
-                <span class="macro">error</span><span class="macro">!</span>(<span class="string">&quot;Error marking a tracked user as changed {:?}&quot;</span>, <span class="ident">e</span>);
+                <span class="macro">error!</span>(<span class="string">&quot;Error marking a tracked user as changed {:?}&quot;</span>, <span class="ident">e</span>);
             }
         }
 
@@ -2746,7 +2746,7 @@
                 <span class="prelude-val">Ok</span>(<span class="ident">e</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">e</span>,
                 <span class="prelude-val">Err</span>(<span class="ident">e</span>) <span class="op">=</span><span class="op">&gt;</span> {
                     <span class="comment">// Skip invalid events.</span>
-                    <span class="macro">warn</span><span class="macro">!</span>(
+                    <span class="macro">warn!</span>(
                         <span class="string">&quot;Received an invalid to-device event {:?} {:?}&quot;</span>,
                         <span class="ident">e</span>, <span class="ident">event_result</span>
                     );
@@ -2754,14 +2754,14 @@
                 }
             };
 
-            <span class="macro">info</span><span class="macro">!</span>(<span class="string">&quot;Received a to-device event {:?}&quot;</span>, <span class="ident">event</span>);
+            <span class="macro">info!</span>(<span class="string">&quot;Received a to-device event {:?}&quot;</span>, <span class="ident">event</span>);
 
             <span class="kw">match</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">event</span> {
                 <span class="ident">AnyToDeviceEvent</span>::<span class="ident">RoomEncrypted</span>(<span class="ident">e</span>) <span class="op">=</span><span class="op">&gt;</span> {
                     <span class="kw">let</span> <span class="ident">decrypted</span> <span class="op">=</span> <span class="kw">match</span> <span class="self">self</span>.<span class="ident">decrypt_to_device_event</span>(<span class="ident">e</span>).<span class="kw">await</span> {
                         <span class="prelude-val">Ok</span>(<span class="ident">e</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">e</span>,
                         <span class="prelude-val">Err</span>(<span class="ident">err</span>) <span class="op">=</span><span class="op">&gt;</span> {
-                            <span class="macro">warn</span><span class="macro">!</span>(
+                            <span class="macro">warn!</span>(
                                 <span class="string">&quot;Failed to decrypt to-device event from {} {}&quot;</span>,
                                 <span class="ident">e</span>.<span class="ident">sender</span>, <span class="ident">err</span>
                             );
@@ -2772,7 +2772,7 @@
                                     .<span class="ident">mark_device_as_wedged</span>(<span class="kw-2">&amp;</span><span class="ident">sender</span>, <span class="kw-2">&amp;</span><span class="ident">curve_key</span>)
                                     .<span class="kw">await</span>
                                 {
-                                    <span class="macro">error</span><span class="macro">!</span>(
+                                    <span class="macro">error!</span>(
                                         <span class="string">&quot;Couldn&#39;t mark device from {} to be unwedged {:?}&quot;</span>,
                                         <span class="ident">sender</span>, <span class="ident">e</span>
                                     );
@@ -2868,7 +2868,7 @@
         <span class="comment">// TODO check if this is from a verified device.</span>
         <span class="kw">let</span> (<span class="ident">decrypted_event</span>, <span class="kw">_</span>) <span class="op">=</span> <span class="ident">session</span>.<span class="ident">decrypt</span>(<span class="ident">event</span>).<span class="kw">await</span><span class="question-mark">?</span>;
 
-        <span class="macro">trace</span><span class="macro">!</span>(
+        <span class="macro">trace!</span>(
             <span class="string">&quot;Successfully decrypted a Megolm event {:?}&quot;</span>,
             <span class="ident">decrypted_event</span>
         );
@@ -3041,7 +3041,7 @@
 
         <span class="self">self</span>.<span class="ident">store</span>.<span class="ident">save_changes</span>(<span class="ident">changes</span>).<span class="kw">await</span><span class="question-mark">?</span>;
 
-        <span class="macro">info</span><span class="macro">!</span>(
+        <span class="macro">info!</span>(
             <span class="string">&quot;Successfully imported {} inbound group sessions&quot;</span>,
             <span class="ident">num_sessions</span>
         );
@@ -3144,7 +3144,7 @@
     <span class="kw">use</span> <span class="ident">matrix_sdk_common</span>::<span class="ident">uint</span>;
 
     <span class="kw">fn</span> <span class="ident">alice_id</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident">UserId</span> {
-        <span class="macro">user_id</span><span class="macro">!</span>(<span class="string">&quot;@alice:example.org&quot;</span>)
+        <span class="macro">user_id!</span>(<span class="string">&quot;@alice:example.org&quot;</span>)
     }
 
     <span class="kw">fn</span> <span class="ident">alice_device_id</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Box</span><span class="op">&lt;</span><span class="ident">DeviceId</span><span class="op">&gt;</span> {
@@ -3264,7 +3264,7 @@
             .<span class="ident">unwrap</span>();
 
         <span class="kw">let</span> (<span class="ident">session</span>, <span class="ident">content</span>) <span class="op">=</span> <span class="ident">bob_device</span>
-            .<span class="ident">encrypt</span>(<span class="ident">EventType</span>::<span class="ident">Dummy</span>, <span class="macro">json</span><span class="macro">!</span>({}))
+            .<span class="ident">encrypt</span>(<span class="ident">EventType</span>::<span class="ident">Dummy</span>, <span class="macro">json!</span>({}))
             .<span class="kw">await</span>
             .<span class="ident">unwrap</span>();
         <span class="ident">alice</span>.<span class="ident">store</span>.<span class="ident">save_sessions</span>(<span class="kw-2">&amp;</span>[<span class="ident">session</span>]).<span class="kw">await</span>.<span class="ident">unwrap</span>();
@@ -3286,7 +3286,7 @@
     <span class="attribute">#[<span class="ident">tokio</span>::<span class="ident">test</span>]</span>
     <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">create_olm_machine</span>() {
         <span class="kw">let</span> <span class="ident">machine</span> <span class="op">=</span> <span class="ident">OlmMachine</span>::<span class="ident">new</span>(<span class="kw-2">&amp;</span><span class="ident">user_id</span>(), <span class="kw-2">&amp;</span><span class="ident">alice_device_id</span>());
-        <span class="macro">assert</span><span class="macro">!</span>(<span class="ident">machine</span>.<span class="ident">should_upload_keys</span>().<span class="kw">await</span>);
+        <span class="macro">assert!</span>(<span class="ident">machine</span>.<span class="ident">should_upload_keys</span>().<span class="kw">await</span>);
     }
 
     <span class="attribute">#[<span class="ident">tokio</span>::<span class="ident">test</span>]</span>
@@ -3299,30 +3299,30 @@
             .<span class="ident">remove</span>(<span class="kw-2">&amp;</span><span class="ident">DeviceKeyAlgorithm</span>::<span class="ident">SignedCurve25519</span>)
             .<span class="ident">unwrap</span>();
 
-        <span class="macro">assert</span><span class="macro">!</span>(<span class="ident">machine</span>.<span class="ident">should_upload_keys</span>().<span class="kw">await</span>);
+        <span class="macro">assert!</span>(<span class="ident">machine</span>.<span class="ident">should_upload_keys</span>().<span class="kw">await</span>);
         <span class="ident">machine</span>
             .<span class="ident">receive_keys_upload_response</span>(<span class="kw-2">&amp;</span><span class="ident">response</span>)
             .<span class="kw">await</span>
             .<span class="ident">unwrap</span>();
-        <span class="macro">assert</span><span class="macro">!</span>(<span class="ident">machine</span>.<span class="ident">should_upload_keys</span>().<span class="kw">await</span>);
+        <span class="macro">assert!</span>(<span class="ident">machine</span>.<span class="ident">should_upload_keys</span>().<span class="kw">await</span>);
 
         <span class="ident">response</span>
             .<span class="ident">one_time_key_counts</span>
-            .<span class="ident">insert</span>(<span class="ident">DeviceKeyAlgorithm</span>::<span class="ident">SignedCurve25519</span>, <span class="macro">uint</span><span class="macro">!</span>(<span class="number">10</span>));
+            .<span class="ident">insert</span>(<span class="ident">DeviceKeyAlgorithm</span>::<span class="ident">SignedCurve25519</span>, <span class="macro">uint!</span>(<span class="number">10</span>));
         <span class="ident">machine</span>
             .<span class="ident">receive_keys_upload_response</span>(<span class="kw-2">&amp;</span><span class="ident">response</span>)
             .<span class="kw">await</span>
             .<span class="ident">unwrap</span>();
-        <span class="macro">assert</span><span class="macro">!</span>(<span class="ident">machine</span>.<span class="ident">should_upload_keys</span>().<span class="kw">await</span>);
+        <span class="macro">assert!</span>(<span class="ident">machine</span>.<span class="ident">should_upload_keys</span>().<span class="kw">await</span>);
 
         <span class="ident">response</span>
             .<span class="ident">one_time_key_counts</span>
-            .<span class="ident">insert</span>(<span class="ident">DeviceKeyAlgorithm</span>::<span class="ident">SignedCurve25519</span>, <span class="macro">uint</span><span class="macro">!</span>(<span class="number">50</span>));
+            .<span class="ident">insert</span>(<span class="ident">DeviceKeyAlgorithm</span>::<span class="ident">SignedCurve25519</span>, <span class="macro">uint!</span>(<span class="number">50</span>));
         <span class="ident">machine</span>
             .<span class="ident">receive_keys_upload_response</span>(<span class="kw-2">&amp;</span><span class="ident">response</span>)
             .<span class="kw">await</span>
             .<span class="ident">unwrap</span>();
-        <span class="macro">assert</span><span class="macro">!</span>(<span class="op">!</span><span class="ident">machine</span>.<span class="ident">should_upload_keys</span>().<span class="kw">await</span>);
+        <span class="macro">assert!</span>(<span class="op">!</span><span class="ident">machine</span>.<span class="ident">should_upload_keys</span>().<span class="kw">await</span>);
     }
 
     <span class="attribute">#[<span class="ident">tokio</span>::<span class="ident">test</span>]</span>
@@ -3331,23 +3331,23 @@
 
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">response</span> <span class="op">=</span> <span class="ident">keys_upload_response</span>();
 
-        <span class="macro">assert</span><span class="macro">!</span>(<span class="ident">machine</span>.<span class="ident">should_upload_keys</span>().<span class="kw">await</span>);
+        <span class="macro">assert!</span>(<span class="ident">machine</span>.<span class="ident">should_upload_keys</span>().<span class="kw">await</span>);
 
         <span class="ident">machine</span>
             .<span class="ident">receive_keys_upload_response</span>(<span class="kw-2">&amp;</span><span class="ident">response</span>)
             .<span class="kw">await</span>
             .<span class="ident">unwrap</span>();
-        <span class="macro">assert</span><span class="macro">!</span>(<span class="ident">machine</span>.<span class="ident">should_upload_keys</span>().<span class="kw">await</span>);
-        <span class="macro">assert</span><span class="macro">!</span>(<span class="ident">machine</span>.<span class="ident">account</span>.<span class="ident">generate_one_time_keys</span>().<span class="kw">await</span>.<span class="ident">is_ok</span>());
+        <span class="macro">assert!</span>(<span class="ident">machine</span>.<span class="ident">should_upload_keys</span>().<span class="kw">await</span>);
+        <span class="macro">assert!</span>(<span class="ident">machine</span>.<span class="ident">account</span>.<span class="ident">generate_one_time_keys</span>().<span class="kw">await</span>.<span class="ident">is_ok</span>());
 
         <span class="ident">response</span>
             .<span class="ident">one_time_key_counts</span>
-            .<span class="ident">insert</span>(<span class="ident">DeviceKeyAlgorithm</span>::<span class="ident">SignedCurve25519</span>, <span class="macro">uint</span><span class="macro">!</span>(<span class="number">50</span>));
+            .<span class="ident">insert</span>(<span class="ident">DeviceKeyAlgorithm</span>::<span class="ident">SignedCurve25519</span>, <span class="macro">uint!</span>(<span class="number">50</span>));
         <span class="ident">machine</span>
             .<span class="ident">receive_keys_upload_response</span>(<span class="kw-2">&amp;</span><span class="ident">response</span>)
             .<span class="kw">await</span>
             .<span class="ident">unwrap</span>();
-        <span class="macro">assert</span><span class="macro">!</span>(<span class="ident">machine</span>.<span class="ident">account</span>.<span class="ident">generate_one_time_keys</span>().<span class="kw">await</span>.<span class="ident">is_err</span>());
+        <span class="macro">assert!</span>(<span class="ident">machine</span>.<span class="ident">account</span>.<span class="ident">generate_one_time_keys</span>().<span class="kw">await</span>.<span class="ident">is_err</span>());
     }
 
     <span class="attribute">#[<span class="ident">tokio</span>::<span class="ident">test</span>]</span>
@@ -3363,28 +3363,28 @@
             <span class="kw-2">&amp;</span><span class="ident">machine</span>.<span class="ident">user_id</span>,
             <span class="kw-2">&amp;</span><span class="ident">DeviceKeyId</span>::<span class="ident">from_parts</span>(<span class="ident">DeviceKeyAlgorithm</span>::<span class="ident">Ed25519</span>, <span class="ident">machine</span>.<span class="ident">device_id</span>()),
             <span class="ident">ed25519_key</span>,
-            <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="macro">json</span><span class="macro">!</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">device_keys</span>),
+            <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="macro">json!</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">device_keys</span>),
         );
-        <span class="macro">assert</span><span class="macro">!</span>(<span class="ident">ret</span>.<span class="ident">is_ok</span>());
+        <span class="macro">assert!</span>(<span class="ident">ret</span>.<span class="ident">is_ok</span>());
     }
 
     <span class="attribute">#[<span class="ident">tokio</span>::<span class="ident">test</span>]</span>
     <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">tests_session_invalidation</span>() {
         <span class="kw">let</span> <span class="ident">machine</span> <span class="op">=</span> <span class="ident">OlmMachine</span>::<span class="ident">new</span>(<span class="kw-2">&amp;</span><span class="ident">user_id</span>(), <span class="kw-2">&amp;</span><span class="ident">alice_device_id</span>());
-        <span class="kw">let</span> <span class="ident">room_id</span> <span class="op">=</span> <span class="macro">room_id</span><span class="macro">!</span>(<span class="string">&quot;!test:example.org&quot;</span>);
+        <span class="kw">let</span> <span class="ident">room_id</span> <span class="op">=</span> <span class="macro">room_id!</span>(<span class="string">&quot;!test:example.org&quot;</span>);
 
         <span class="ident">machine</span>
             .<span class="ident">create_outbound_group_session_with_defaults</span>(<span class="kw-2">&amp;</span><span class="ident">room_id</span>)
             .<span class="kw">await</span>
             .<span class="ident">unwrap</span>();
-        <span class="macro">assert</span><span class="macro">!</span>(<span class="ident">machine</span>
+        <span class="macro">assert!</span>(<span class="ident">machine</span>
             .<span class="ident">group_session_manager</span>
             .<span class="ident">get_outbound_group_session</span>(<span class="kw-2">&amp;</span><span class="ident">room_id</span>)
             .<span class="ident">is_some</span>());
 
         <span class="ident">machine</span>.<span class="ident">invalidate_group_session</span>(<span class="kw-2">&amp;</span><span class="ident">room_id</span>);
 
-        <span class="macro">assert</span><span class="macro">!</span>(<span class="ident">machine</span>
+        <span class="macro">assert!</span>(<span class="ident">machine</span>
             .<span class="ident">group_session_manager</span>
             .<span class="ident">get_outbound_group_session</span>(<span class="kw-2">&amp;</span><span class="ident">room_id</span>)
             .<span class="ident">unwrap</span>()
@@ -3402,9 +3402,9 @@
             <span class="kw-2">&amp;</span><span class="ident">machine</span>.<span class="ident">user_id</span>,
             <span class="kw-2">&amp;</span><span class="ident">DeviceKeyId</span>::<span class="ident">from_parts</span>(<span class="ident">DeviceKeyAlgorithm</span>::<span class="ident">Ed25519</span>, <span class="ident">machine</span>.<span class="ident">device_id</span>()),
             <span class="string">&quot;fake_key&quot;</span>,
-            <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="macro">json</span><span class="macro">!</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">device_keys</span>),
+            <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="macro">json!</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">device_keys</span>),
         );
-        <span class="macro">assert</span><span class="macro">!</span>(<span class="ident">ret</span>.<span class="ident">is_err</span>());
+        <span class="macro">assert!</span>(<span class="ident">ret</span>.<span class="ident">is_err</span>());
     }
 
     <span class="attribute">#[<span class="ident">tokio</span>::<span class="ident">test</span>]</span>
@@ -3423,9 +3423,9 @@
             <span class="kw-2">&amp;</span><span class="ident">machine</span>.<span class="ident">user_id</span>,
             <span class="kw-2">&amp;</span><span class="ident">DeviceKeyId</span>::<span class="ident">from_parts</span>(<span class="ident">DeviceKeyAlgorithm</span>::<span class="ident">Ed25519</span>, <span class="ident">machine</span>.<span class="ident">device_id</span>()),
             <span class="ident">ed25519_key</span>,
-            <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="macro">json</span><span class="macro">!</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">one_time_key</span>),
+            <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="macro">json!</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">one_time_key</span>),
         );
-        <span class="macro">assert</span><span class="macro">!</span>(<span class="ident">ret</span>.<span class="ident">is_ok</span>());
+        <span class="macro">assert!</span>(<span class="ident">ret</span>.<span class="ident">is_ok</span>());
     }
 
     <span class="attribute">#[<span class="ident">tokio</span>::<span class="ident">test</span>]</span>
@@ -3446,18 +3446,18 @@
             <span class="kw-2">&amp;</span><span class="ident">machine</span>.<span class="ident">user_id</span>,
             <span class="kw-2">&amp;</span><span class="ident">DeviceKeyId</span>::<span class="ident">from_parts</span>(<span class="ident">DeviceKeyAlgorithm</span>::<span class="ident">Ed25519</span>, <span class="ident">machine</span>.<span class="ident">device_id</span>()),
             <span class="ident">ed25519_key</span>,
-            <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="macro">json</span><span class="macro">!</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">request</span>.<span class="ident">one_time_keys</span>.<span class="ident">as_mut</span>().<span class="ident">unwrap</span>().<span class="ident">values_mut</span>().<span class="ident">next</span>()),
+            <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="macro">json!</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">request</span>.<span class="ident">one_time_keys</span>.<span class="ident">as_mut</span>().<span class="ident">unwrap</span>().<span class="ident">values_mut</span>().<span class="ident">next</span>()),
         );
-        <span class="macro">assert</span><span class="macro">!</span>(<span class="ident">ret</span>.<span class="ident">is_ok</span>());
+        <span class="macro">assert!</span>(<span class="ident">ret</span>.<span class="ident">is_ok</span>());
 
         <span class="kw">let</span> <span class="ident">utility</span> <span class="op">=</span> <span class="ident">Utility</span>::<span class="ident">new</span>();
         <span class="kw">let</span> <span class="ident">ret</span> <span class="op">=</span> <span class="ident">utility</span>.<span class="ident">verify_json</span>(
             <span class="kw-2">&amp;</span><span class="ident">machine</span>.<span class="ident">user_id</span>,
             <span class="kw-2">&amp;</span><span class="ident">DeviceKeyId</span>::<span class="ident">from_parts</span>(<span class="ident">DeviceKeyAlgorithm</span>::<span class="ident">Ed25519</span>, <span class="ident">machine</span>.<span class="ident">device_id</span>()),
             <span class="ident">ed25519_key</span>,
-            <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="macro">json</span><span class="macro">!</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">request</span>.<span class="ident">device_keys</span>.<span class="ident">unwrap</span>()),
+            <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="macro">json!</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">request</span>.<span class="ident">device_keys</span>.<span class="ident">unwrap</span>()),
         );
-        <span class="macro">assert</span><span class="macro">!</span>(<span class="ident">ret</span>.<span class="ident">is_ok</span>());
+        <span class="macro">assert!</span>(<span class="ident">ret</span>.<span class="ident">is_ok</span>());
 
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">response</span> <span class="op">=</span> <span class="ident">keys_upload_response</span>();
         <span class="ident">response</span>.<span class="ident">one_time_key_counts</span>.<span class="ident">insert</span>(
@@ -3473,18 +3473,18 @@
             .<span class="ident">unwrap</span>();
 
         <span class="kw">let</span> <span class="ident">ret</span> <span class="op">=</span> <span class="ident">machine</span>.<span class="ident">keys_for_upload</span>().<span class="kw">await</span>;
-        <span class="macro">assert</span><span class="macro">!</span>(<span class="ident">ret</span>.<span class="ident">is_none</span>());
+        <span class="macro">assert!</span>(<span class="ident">ret</span>.<span class="ident">is_none</span>());
     }
 
     <span class="attribute">#[<span class="ident">tokio</span>::<span class="ident">test</span>]</span>
     <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">test_keys_query</span>() {
         <span class="kw">let</span> (<span class="ident">machine</span>, <span class="kw">_</span>) <span class="op">=</span> <span class="ident">get_prepared_machine</span>().<span class="kw">await</span>;
         <span class="kw">let</span> <span class="ident">response</span> <span class="op">=</span> <span class="ident">keys_query_response</span>();
-        <span class="kw">let</span> <span class="ident">alice_id</span> <span class="op">=</span> <span class="macro">user_id</span><span class="macro">!</span>(<span class="string">&quot;@alice:example.org&quot;</span>);
+        <span class="kw">let</span> <span class="ident">alice_id</span> <span class="op">=</span> <span class="macro">user_id!</span>(<span class="string">&quot;@alice:example.org&quot;</span>);
         <span class="kw">let</span> <span class="ident">alice_device_id</span>: <span class="kw-2">&amp;</span><span class="ident">DeviceId</span> <span class="op">=</span> <span class="string">&quot;JLAFKJWSCS&quot;</span>.<span class="ident">into</span>();
 
         <span class="kw">let</span> <span class="ident">alice_devices</span> <span class="op">=</span> <span class="ident">machine</span>.<span class="ident">store</span>.<span class="ident">get_user_devices</span>(<span class="kw-2">&amp;</span><span class="ident">alice_id</span>).<span class="kw">await</span>.<span class="ident">unwrap</span>();
-        <span class="macro">assert</span><span class="macro">!</span>(<span class="ident">alice_devices</span>.<span class="ident">devices</span>().<span class="ident">peekable</span>().<span class="ident">peek</span>().<span class="ident">is_none</span>());
+        <span class="macro">assert!</span>(<span class="ident">alice_devices</span>.<span class="ident">devices</span>().<span class="ident">peekable</span>().<span class="ident">peek</span>().<span class="ident">is_none</span>());
 
         <span class="ident">machine</span>
             .<span class="ident">receive_keys_query_response</span>(<span class="kw-2">&amp;</span><span class="ident">response</span>)
@@ -3497,8 +3497,8 @@
             .<span class="kw">await</span>
             .<span class="ident">unwrap</span>()
             .<span class="ident">unwrap</span>();
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">device</span>.<span class="ident">user_id</span>(), <span class="kw-2">&amp;</span><span class="ident">alice_id</span>);
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">device</span>.<span class="ident">device_id</span>(), <span class="ident">alice_device_id</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">device</span>.<span class="ident">user_id</span>(), <span class="kw-2">&amp;</span><span class="ident">alice_id</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">device</span>.<span class="ident">device_id</span>(), <span class="ident">alice_device_id</span>);
     }
 
     <span class="attribute">#[<span class="ident">tokio</span>::<span class="ident">test</span>]</span>
@@ -3514,9 +3514,9 @@
             .<span class="ident">unwrap</span>()
             .<span class="ident">unwrap</span>();
 
-        <span class="macro">assert</span><span class="macro">!</span>(<span class="ident">missing_sessions</span>.<span class="ident">one_time_keys</span>.<span class="ident">contains_key</span>(<span class="kw-2">&amp;</span><span class="ident">alice</span>));
+        <span class="macro">assert!</span>(<span class="ident">missing_sessions</span>.<span class="ident">one_time_keys</span>.<span class="ident">contains_key</span>(<span class="kw-2">&amp;</span><span class="ident">alice</span>));
         <span class="kw">let</span> <span class="ident">user_sessions</span> <span class="op">=</span> <span class="ident">missing_sessions</span>.<span class="ident">one_time_keys</span>.<span class="ident">get</span>(<span class="kw-2">&amp;</span><span class="ident">alice</span>).<span class="ident">unwrap</span>();
-        <span class="macro">assert</span><span class="macro">!</span>(<span class="ident">user_sessions</span>.<span class="ident">contains_key</span>(<span class="kw-2">&amp;</span><span class="ident">alice_device</span>));
+        <span class="macro">assert!</span>(<span class="ident">user_sessions</span>.<span class="ident">contains_key</span>(<span class="kw-2">&amp;</span><span class="ident">alice_device</span>));
     }
 
     <span class="attribute">#[<span class="ident">tokio</span>::<span class="ident">test</span>]</span>
@@ -3547,7 +3547,7 @@
             .<span class="ident">unwrap</span>()
             .<span class="ident">unwrap</span>();
 
-        <span class="macro">assert</span><span class="macro">!</span>(<span class="op">!</span><span class="ident">session</span>.<span class="ident">lock</span>().<span class="kw">await</span>.<span class="ident">is_empty</span>())
+        <span class="macro">assert!</span>(<span class="op">!</span><span class="ident">session</span>.<span class="ident">lock</span>().<span class="kw">await</span>.<span class="ident">is_empty</span>())
     }
 
     <span class="attribute">#[<span class="ident">tokio</span>::<span class="ident">test</span>]</span>
@@ -3563,7 +3563,7 @@
         <span class="kw">let</span> <span class="ident">event</span> <span class="op">=</span> <span class="ident">ToDeviceEvent</span> {
             <span class="ident">sender</span>: <span class="ident">alice</span>.<span class="ident">user_id</span>().<span class="ident">clone</span>(),
             <span class="ident">content</span>: <span class="ident">bob_device</span>
-                .<span class="ident">encrypt</span>(<span class="ident">EventType</span>::<span class="ident">Dummy</span>, <span class="macro">json</span><span class="macro">!</span>({}))
+                .<span class="ident">encrypt</span>(<span class="ident">EventType</span>::<span class="ident">Dummy</span>, <span class="macro">json!</span>({}))
                 .<span class="kw">await</span>
                 .<span class="ident">unwrap</span>()
                 .<span class="number">1</span>,
@@ -3578,9 +3578,9 @@
             .<span class="ident">unwrap</span>();
 
         <span class="kw">if</span> <span class="kw">let</span> <span class="ident">AnyToDeviceEvent</span>::<span class="ident">Dummy</span>(<span class="ident">e</span>) <span class="op">=</span> <span class="ident">event</span> {
-            <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="kw-2">&amp;</span><span class="ident">e</span>.<span class="ident">sender</span>, <span class="ident">alice</span>.<span class="ident">user_id</span>());
+            <span class="macro">assert_eq!</span>(<span class="kw-2">&amp;</span><span class="ident">e</span>.<span class="ident">sender</span>, <span class="ident">alice</span>.<span class="ident">user_id</span>());
         } <span class="kw">else</span> {
-            <span class="macro">panic</span><span class="macro">!</span>(<span class="string">&quot;Wrong event type found {:?}&quot;</span>, <span class="ident">event</span>);
+            <span class="macro">panic!</span>(<span class="string">&quot;Wrong event type found {:?}&quot;</span>, <span class="ident">event</span>);
         }
     }
 
@@ -3588,7 +3588,7 @@
     <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">test_room_key_sharing</span>() {
         <span class="kw">let</span> (<span class="ident">alice</span>, <span class="ident">bob</span>) <span class="op">=</span> <span class="ident">get_machine_pair_with_session</span>().<span class="kw">await</span>;
 
-        <span class="kw">let</span> <span class="ident">room_id</span> <span class="op">=</span> <span class="macro">room_id</span><span class="macro">!</span>(<span class="string">&quot;!test:example.org&quot;</span>);
+        <span class="kw">let</span> <span class="ident">room_id</span> <span class="op">=</span> <span class="macro">room_id!</span>(<span class="string">&quot;!test:example.org&quot;</span>);
 
         <span class="kw">let</span> <span class="ident">to_device_requests</span> <span class="op">=</span> <span class="ident">alice</span>
             .<span class="ident">share_group_session</span>(
@@ -3622,10 +3622,10 @@
         <span class="kw">let</span> <span class="ident">event</span> <span class="op">=</span> <span class="ident">decrypted</span>.<span class="ident">deserialized_event</span>.<span class="ident">unwrap</span>();
 
         <span class="kw">if</span> <span class="kw">let</span> <span class="ident">AnyToDeviceEvent</span>::<span class="ident">RoomKey</span>(<span class="ident">event</span>) <span class="op">=</span> <span class="ident">event</span> {
-            <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="kw-2">&amp;</span><span class="ident">event</span>.<span class="ident">sender</span>, <span class="ident">alice</span>.<span class="ident">user_id</span>());
-            <span class="macro">assert</span><span class="macro">!</span>(<span class="ident">event</span>.<span class="ident">content</span>.<span class="ident">session_key</span>.<span class="ident">is_empty</span>());
+            <span class="macro">assert_eq!</span>(<span class="kw-2">&amp;</span><span class="ident">event</span>.<span class="ident">sender</span>, <span class="ident">alice</span>.<span class="ident">user_id</span>());
+            <span class="macro">assert!</span>(<span class="ident">event</span>.<span class="ident">content</span>.<span class="ident">session_key</span>.<span class="ident">is_empty</span>());
         } <span class="kw">else</span> {
-            <span class="macro">panic</span><span class="macro">!</span>(<span class="string">&quot;expected RoomKeyEvent found {:?}&quot;</span>, <span class="ident">event</span>);
+            <span class="macro">panic!</span>(<span class="string">&quot;expected RoomKeyEvent found {:?}&quot;</span>, <span class="ident">event</span>);
         }
 
         <span class="kw">let</span> <span class="ident">session</span> <span class="op">=</span> <span class="ident">bob</span>
@@ -3637,13 +3637,13 @@
             )
             .<span class="kw">await</span>;
 
-        <span class="macro">assert</span><span class="macro">!</span>(<span class="ident">session</span>.<span class="ident">unwrap</span>().<span class="ident">is_some</span>());
+        <span class="macro">assert!</span>(<span class="ident">session</span>.<span class="ident">unwrap</span>().<span class="ident">is_some</span>());
     }
 
     <span class="attribute">#[<span class="ident">tokio</span>::<span class="ident">test</span>]</span>
     <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">test_megolm_encryption</span>() {
         <span class="kw">let</span> (<span class="ident">alice</span>, <span class="ident">bob</span>) <span class="op">=</span> <span class="ident">get_machine_pair_with_setup_sessions</span>().<span class="kw">await</span>;
-        <span class="kw">let</span> <span class="ident">room_id</span> <span class="op">=</span> <span class="macro">room_id</span><span class="macro">!</span>(<span class="string">&quot;!test:example.org&quot;</span>);
+        <span class="kw">let</span> <span class="ident">room_id</span> <span class="op">=</span> <span class="macro">room_id!</span>(<span class="string">&quot;!test:example.org&quot;</span>);
 
         <span class="kw">let</span> <span class="ident">to_device_requests</span> <span class="op">=</span> <span class="ident">alice</span>
             .<span class="ident">share_group_session</span>(
@@ -3682,7 +3682,7 @@
             .<span class="ident">unwrap</span>();
 
         <span class="kw">let</span> <span class="ident">event</span> <span class="op">=</span> <span class="ident">SyncMessageEvent</span> {
-            <span class="ident">event_id</span>: <span class="macro">event_id</span><span class="macro">!</span>(<span class="string">&quot;$xxxxx:example.org&quot;</span>),
+            <span class="ident">event_id</span>: <span class="macro">event_id!</span>(<span class="string">&quot;$xxxxx:example.org&quot;</span>),
             <span class="ident">origin_server_ts</span>: <span class="ident">SystemTime</span>::<span class="ident">now</span>(),
             <span class="ident">sender</span>: <span class="ident">alice</span>.<span class="ident">user_id</span>().<span class="ident">clone</span>(),
             <span class="ident">content</span>: <span class="ident">encrypted_content</span>,
@@ -3702,14 +3702,14 @@
                 <span class="ident">content</span>,
                 ..
             })) <span class="op">=</span><span class="op">&gt;</span> {
-                <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="kw-2">&amp;</span><span class="ident">sender</span>, <span class="ident">alice</span>.<span class="ident">user_id</span>());
+                <span class="macro">assert_eq!</span>(<span class="kw-2">&amp;</span><span class="ident">sender</span>, <span class="ident">alice</span>.<span class="ident">user_id</span>());
                 <span class="kw">if</span> <span class="kw">let</span> <span class="ident">MessageType</span>::<span class="ident">Text</span>(<span class="ident">c</span>) <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">content</span>.<span class="ident">msgtype</span> {
-                    <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="kw-2">&amp;</span><span class="ident">c</span>.<span class="ident">body</span>, <span class="ident">plaintext</span>);
+                    <span class="macro">assert_eq!</span>(<span class="kw-2">&amp;</span><span class="ident">c</span>.<span class="ident">body</span>, <span class="ident">plaintext</span>);
                 } <span class="kw">else</span> {
-                    <span class="macro">panic</span><span class="macro">!</span>(<span class="string">&quot;Decrypted event has a missmatched content&quot;</span>);
+                    <span class="macro">panic!</span>(<span class="string">&quot;Decrypted event has a missmatched content&quot;</span>);
                 }
             }
-            <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">panic</span><span class="macro">!</span>(<span class="string">&quot;Decrypted room event has the wrong type&quot;</span>),
+            <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">panic!</span>(<span class="string">&quot;Decrypted room event has the wrong type&quot;</span>),
         }
     }
 
@@ -3749,9 +3749,9 @@
         .<span class="kw">await</span>
         .<span class="ident">unwrap</span>();
 
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="kw-2">&amp;</span><span class="ident">user_id</span>, <span class="ident">machine</span>.<span class="ident">user_id</span>());
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="ident">device_id</span>, <span class="ident">machine</span>.<span class="ident">device_id</span>());
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">ed25519_key</span>, <span class="ident">machine</span>.<span class="ident">identity_keys</span>().<span class="ident">ed25519</span>());
+        <span class="macro">assert_eq!</span>(<span class="kw-2">&amp;</span><span class="ident">user_id</span>, <span class="ident">machine</span>.<span class="ident">user_id</span>());
+        <span class="macro">assert_eq!</span>(<span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="ident">device_id</span>, <span class="ident">machine</span>.<span class="ident">device_id</span>());
+        <span class="macro">assert_eq!</span>(<span class="ident">ed25519_key</span>, <span class="ident">machine</span>.<span class="ident">identity_keys</span>().<span class="ident">ed25519</span>());
     }
 
     <span class="attribute">#[<span class="ident">tokio</span>::<span class="ident">test</span>]</span>
@@ -3764,7 +3764,7 @@
             .<span class="ident">unwrap</span>()
             .<span class="ident">unwrap</span>();
 
-        <span class="macro">assert</span><span class="macro">!</span>(<span class="op">!</span><span class="ident">bob_device</span>.<span class="ident">is_trusted</span>());
+        <span class="macro">assert!</span>(<span class="op">!</span><span class="ident">bob_device</span>.<span class="ident">is_trusted</span>());
 
         <span class="kw">let</span> (<span class="ident">alice_sas</span>, <span class="ident">request</span>) <span class="op">=</span> <span class="ident">bob_device</span>.<span class="ident">start_verification</span>().<span class="kw">await</span>.<span class="ident">unwrap</span>();
 
@@ -3773,8 +3773,8 @@
 
         <span class="kw">let</span> <span class="ident">bob_sas</span> <span class="op">=</span> <span class="ident">bob</span>.<span class="ident">get_verification</span>(<span class="ident">alice_sas</span>.<span class="ident">flow_id</span>().<span class="ident">as_str</span>()).<span class="ident">unwrap</span>();
 
-        <span class="macro">assert</span><span class="macro">!</span>(<span class="ident">alice_sas</span>.<span class="ident">emoji</span>().<span class="ident">is_none</span>());
-        <span class="macro">assert</span><span class="macro">!</span>(<span class="ident">bob_sas</span>.<span class="ident">emoji</span>().<span class="ident">is_none</span>());
+        <span class="macro">assert!</span>(<span class="ident">alice_sas</span>.<span class="ident">emoji</span>().<span class="ident">is_none</span>());
+        <span class="macro">assert!</span>(<span class="ident">bob_sas</span>.<span class="ident">emoji</span>().<span class="ident">is_none</span>());
 
         <span class="kw">let</span> <span class="ident">event</span> <span class="op">=</span> <span class="ident">bob_sas</span>
             .<span class="ident">accept</span>()
@@ -3797,11 +3797,11 @@
             .<span class="ident">unwrap</span>();
         <span class="ident">alice</span>.<span class="ident">handle_verification_event</span>(<span class="kw-2">&amp;</span><span class="ident">event</span>).<span class="kw">await</span>;
 
-        <span class="macro">assert</span><span class="macro">!</span>(<span class="ident">alice_sas</span>.<span class="ident">emoji</span>().<span class="ident">is_some</span>());
-        <span class="macro">assert</span><span class="macro">!</span>(<span class="ident">bob_sas</span>.<span class="ident">emoji</span>().<span class="ident">is_some</span>());
+        <span class="macro">assert!</span>(<span class="ident">alice_sas</span>.<span class="ident">emoji</span>().<span class="ident">is_some</span>());
+        <span class="macro">assert!</span>(<span class="ident">bob_sas</span>.<span class="ident">emoji</span>().<span class="ident">is_some</span>());
 
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">alice_sas</span>.<span class="ident">emoji</span>(), <span class="ident">bob_sas</span>.<span class="ident">emoji</span>());
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">alice_sas</span>.<span class="ident">decimals</span>(), <span class="ident">bob_sas</span>.<span class="ident">decimals</span>());
+        <span class="macro">assert_eq!</span>(<span class="ident">alice_sas</span>.<span class="ident">emoji</span>(), <span class="ident">bob_sas</span>.<span class="ident">emoji</span>());
+        <span class="macro">assert_eq!</span>(<span class="ident">alice_sas</span>.<span class="ident">decimals</span>(), <span class="ident">bob_sas</span>.<span class="ident">decimals</span>());
 
         <span class="kw">let</span> <span class="ident">event</span> <span class="op">=</span> <span class="ident">bob_sas</span>
             .<span class="ident">confirm</span>()
@@ -3812,8 +3812,8 @@
             .<span class="ident">unwrap</span>();
         <span class="ident">alice</span>.<span class="ident">handle_verification_event</span>(<span class="kw-2">&amp;</span><span class="ident">event</span>).<span class="kw">await</span>;
 
-        <span class="macro">assert</span><span class="macro">!</span>(<span class="op">!</span><span class="ident">alice_sas</span>.<span class="ident">is_done</span>());
-        <span class="macro">assert</span><span class="macro">!</span>(<span class="op">!</span><span class="ident">bob_sas</span>.<span class="ident">is_done</span>());
+        <span class="macro">assert!</span>(<span class="op">!</span><span class="ident">alice_sas</span>.<span class="ident">is_done</span>());
+        <span class="macro">assert!</span>(<span class="op">!</span><span class="ident">bob_sas</span>.<span class="ident">is_done</span>());
 
         <span class="kw">let</span> <span class="ident">event</span> <span class="op">=</span> <span class="ident">alice_sas</span>
             .<span class="ident">confirm</span>()
@@ -3823,8 +3823,8 @@
             .<span class="ident">map</span>(<span class="op">|</span><span class="ident">r</span><span class="op">|</span> <span class="ident">request_to_event</span>(<span class="ident">alice</span>.<span class="ident">user_id</span>(), <span class="kw-2">&amp;</span><span class="ident">r</span>))
             .<span class="ident">unwrap</span>();
 
-        <span class="macro">assert</span><span class="macro">!</span>(<span class="ident">alice_sas</span>.<span class="ident">is_done</span>());
-        <span class="macro">assert</span><span class="macro">!</span>(<span class="ident">bob_device</span>.<span class="ident">is_trusted</span>());
+        <span class="macro">assert!</span>(<span class="ident">alice_sas</span>.<span class="ident">is_done</span>());
+        <span class="macro">assert!</span>(<span class="ident">bob_device</span>.<span class="ident">is_trusted</span>());
 
         <span class="kw">let</span> <span class="ident">alice_device</span> <span class="op">=</span> <span class="ident">bob</span>
             .<span class="ident">get_device</span>(<span class="ident">alice</span>.<span class="ident">user_id</span>(), <span class="ident">alice</span>.<span class="ident">device_id</span>())
@@ -3832,10 +3832,10 @@
             .<span class="ident">unwrap</span>()
             .<span class="ident">unwrap</span>();
 
-        <span class="macro">assert</span><span class="macro">!</span>(<span class="op">!</span><span class="ident">alice_device</span>.<span class="ident">is_trusted</span>());
+        <span class="macro">assert!</span>(<span class="op">!</span><span class="ident">alice_device</span>.<span class="ident">is_trusted</span>());
         <span class="ident">bob</span>.<span class="ident">handle_verification_event</span>(<span class="kw-2">&amp;</span><span class="ident">event</span>).<span class="kw">await</span>;
-        <span class="macro">assert</span><span class="macro">!</span>(<span class="ident">bob_sas</span>.<span class="ident">is_done</span>());
-        <span class="macro">assert</span><span class="macro">!</span>(<span class="ident">alice_device</span>.<span class="ident">is_trusted</span>());
+        <span class="macro">assert!</span>(<span class="ident">bob_sas</span>.<span class="ident">is_done</span>());
+        <span class="macro">assert!</span>(<span class="ident">alice_device</span>.<span class="ident">is_trusted</span>());
     }
 }
 </pre></div>

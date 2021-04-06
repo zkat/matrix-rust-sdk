@@ -1218,12 +1218,12 @@
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         <span class="ident">event</span>: <span class="kw-2">&amp;</span><span class="ident">ToDeviceEvent</span><span class="op">&lt;</span><span class="ident">EncryptedEventContent</span><span class="op">&gt;</span>,
     ) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">OlmResult</span><span class="op">&lt;</span><span class="ident">OlmDecryptionInfo</span><span class="op">&gt;</span> {
-        <span class="macro">debug</span><span class="macro">!</span>(<span class="string">&quot;Decrypting to-device event&quot;</span>);
+        <span class="macro">debug!</span>(<span class="string">&quot;Decrypting to-device event&quot;</span>);
 
         <span class="kw">let</span> <span class="ident">content</span> <span class="op">=</span> <span class="kw">if</span> <span class="kw">let</span> <span class="ident">EncryptedEventContent</span>::<span class="ident">OlmV1Curve25519AesSha2</span>(<span class="ident">c</span>) <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">event</span>.<span class="ident">content</span> {
             <span class="ident">c</span>
         } <span class="kw">else</span> {
-            <span class="macro">warn</span><span class="macro">!</span>(<span class="string">&quot;Error, unsupported encryption algorithm&quot;</span>);
+            <span class="macro">warn!</span>(<span class="string">&quot;Error, unsupported encryption algorithm&quot;</span>);
             <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">EventError</span>::<span class="ident">UnsupportedAlgorithm</span>.<span class="ident">into</span>());
         };
 
@@ -1269,7 +1269,7 @@
                 <span class="prelude-val">Err</span>(<span class="ident">e</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">e</span>),
             };
 
-            <span class="macro">debug</span><span class="macro">!</span>(<span class="string">&quot;Decrypted a to-device event {:?}&quot;</span>, <span class="ident">event</span>);
+            <span class="macro">debug!</span>(<span class="string">&quot;Decrypted a to-device event {:?}&quot;</span>, <span class="ident">event</span>);
 
             <span class="prelude-val">Ok</span>(<span class="ident">OlmDecryptionInfo</span> {
                 <span class="ident">session</span>,
@@ -1281,7 +1281,7 @@
                 <span class="ident">inbound_group_session</span>: <span class="prelude-val">None</span>,
             })
         } <span class="kw">else</span> {
-            <span class="macro">warn</span><span class="macro">!</span>(<span class="string">&quot;Olm event doesn&#39;t contain a ciphertext for our key&quot;</span>);
+            <span class="macro">warn!</span>(<span class="string">&quot;Olm event doesn&#39;t contain a ciphertext for our key&quot;</span>);
             <span class="prelude-val">Err</span>(<span class="ident">EventError</span>::<span class="ident">MissingCiphertext</span>.<span class="ident">into</span>())
         }
     }
@@ -1298,7 +1298,7 @@
         <span class="ident">response</span>: <span class="kw-2">&amp;</span><span class="ident">upload_keys</span>::<span class="ident">Response</span>,
     ) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">OlmResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="kw">if</span> <span class="op">!</span><span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">shared</span>() {
-            <span class="macro">debug</span><span class="macro">!</span>(<span class="string">&quot;Marking account as shared&quot;</span>);
+            <span class="macro">debug!</span>(<span class="string">&quot;Marking account as shared&quot;</span>);
         }
         <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">mark_as_shared</span>();
 
@@ -1307,7 +1307,7 @@
             .<span class="ident">get</span>(<span class="kw-2">&amp;</span><span class="ident">DeviceKeyAlgorithm</span>::<span class="ident">SignedCurve25519</span>);
 
         <span class="kw">let</span> <span class="ident">count</span>: <span class="ident">u64</span> <span class="op">=</span> <span class="ident">one_time_key_count</span>.<span class="ident">map_or</span>(<span class="number">0</span>, <span class="op">|</span><span class="ident">c</span><span class="op">|</span> (<span class="kw-2">*</span><span class="ident">c</span>).<span class="ident">into</span>());
-        <span class="macro">debug</span><span class="macro">!</span>(
+        <span class="macro">debug!</span>(
             <span class="string">&quot;Updated uploaded one-time key count {} -&gt; {}, marking keys as published&quot;</span>,
             <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">uploaded_key_count</span>(),
             <span class="ident">count</span>
@@ -1364,7 +1364,7 @@
                     <span class="comment">// Decryption failed with a matching session, the session is</span>
                     <span class="comment">// likely wedged and needs to be rotated.</span>
                     <span class="kw">if</span> <span class="ident">matches</span> {
-                        <span class="macro">warn</span><span class="macro">!</span>(
+                        <span class="macro">warn!</span>(
                             <span class="string">&quot;Found a matching Olm session yet decryption failed
                               for sender {} and sender_key {} {:?}&quot;</span>,
                             <span class="ident">sender</span>, <span class="ident">sender_key</span>, <span class="ident">e</span>
@@ -1403,7 +1403,7 @@
                 <span class="comment">// A new session can only be created using a pre-key message,</span>
                 <span class="comment">// return with an error if it isn&#39;t one.</span>
                 <span class="ident">OlmMessage</span>::<span class="ident">Message</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> {
-                    <span class="macro">warn</span><span class="macro">!</span>(
+                    <span class="macro">warn!</span>(
                         <span class="string">&quot;Failed to decrypt a non-pre-key message with all \
                           available sessions {} {}&quot;</span>,
                         <span class="ident">sender</span>, <span class="ident">sender_key</span>
@@ -1423,7 +1423,7 @@
                     {
                         <span class="prelude-val">Ok</span>(<span class="ident">s</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">s</span>,
                         <span class="prelude-val">Err</span>(<span class="ident">e</span>) <span class="op">=</span><span class="op">&gt;</span> {
-                            <span class="macro">warn</span><span class="macro">!</span>(
+                            <span class="macro">warn!</span>(
                                 <span class="string">&quot;Failed to create a new Olm session for {} {}
                                       from a prekey message: {}&quot;</span>,
                                 <span class="ident">sender</span>, <span class="ident">sender_key</span>, <span class="ident">e</span>
@@ -1445,7 +1445,7 @@
             (<span class="ident">SessionType</span>::<span class="ident">New</span>(<span class="ident">session</span>), <span class="ident">plaintext</span>)
         };
 
-        <span class="macro">trace</span><span class="macro">!</span>(<span class="string">&quot;Successfully decrypted an Olm message: {}&quot;</span>, <span class="ident">plaintext</span>);
+        <span class="macro">trace!</span>(<span class="string">&quot;Successfully decrypted an Olm message: {}&quot;</span>, <span class="ident">plaintext</span>);
 
         <span class="kw">let</span> (<span class="ident">event</span>, <span class="ident">signing_key</span>) <span class="op">=</span> <span class="kw">match</span> <span class="self">self</span>.<span class="ident">parse_decrypted_to_device_event</span>(<span class="ident">sender</span>, <span class="kw-2">&amp;</span><span class="ident">plaintext</span>) {
             <span class="prelude-val">Ok</span>(<span class="ident">r</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">r</span>,
@@ -1457,7 +1457,7 @@
                     <span class="ident">SessionType</span>::<span class="ident">New</span>(<span class="ident">s</span>) <span class="op">=</span><span class="op">&gt;</span> {
                         <span class="kw">let</span> <span class="ident">changes</span> <span class="op">=</span> <span class="ident">Changes</span> {
                             <span class="ident">account</span>: <span class="prelude-val">Some</span>(<span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">clone</span>()),
-                            <span class="ident">sessions</span>: <span class="macro">vec</span><span class="macro">!</span>[<span class="ident">s</span>],
+                            <span class="ident">sessions</span>: <span class="macro">vec!</span>[<span class="ident">s</span>],
                             ..<span class="ident">Default</span>::<span class="ident">default</span>()
                         };
                         <span class="self">self</span>.<span class="ident">store</span>.<span class="ident">save_changes</span>(<span class="ident">changes</span>).<span class="kw">await</span><span class="question-mark">?</span>;
@@ -1827,7 +1827,7 @@
 
         <span class="comment">// Create a copy of the device keys containing only fields that will</span>
         <span class="comment">// get signed.</span>
-        <span class="kw">let</span> <span class="ident">json_device_keys</span> <span class="op">=</span> <span class="macro">json</span><span class="macro">!</span>({
+        <span class="kw">let</span> <span class="ident">json_device_keys</span> <span class="op">=</span> <span class="macro">json!</span>({
             <span class="string">&quot;user_id&quot;</span>: <span class="ident">device_keys</span>.<span class="ident">user_id</span>,
             <span class="string">&quot;device_id&quot;</span>: <span class="ident">device_keys</span>.<span class="ident">device_id</span>,
             <span class="string">&quot;algorithms&quot;</span>: <span class="ident">device_keys</span>.<span class="ident">algorithms</span>,
@@ -1880,7 +1880,7 @@
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">one_time_key_map</span> <span class="op">=</span> <span class="ident">BTreeMap</span>::<span class="ident">new</span>();
 
         <span class="kw">for</span> (<span class="ident">key_id</span>, <span class="ident">key</span>) <span class="kw">in</span> <span class="ident">one_time_keys</span>.<span class="ident">curve25519</span>().<span class="ident">iter</span>() {
-            <span class="kw">let</span> <span class="ident">key_json</span> <span class="op">=</span> <span class="macro">json</span><span class="macro">!</span>({
+            <span class="kw">let</span> <span class="ident">key_json</span> <span class="op">=</span> <span class="macro">json!</span>({
                 <span class="string">&quot;key&quot;</span>: <span class="ident">key</span>,
             });
 
@@ -2136,13 +2136,13 @@
         <span class="ident">other</span>.<span class="ident">mark_keys_as_published</span>().<span class="kw">await</span>;
 
         <span class="kw">let</span> <span class="ident">message</span> <span class="op">=</span> <span class="ident">our_session</span>
-            .<span class="ident">encrypt</span>(<span class="kw-2">&amp;</span><span class="ident">device</span>, <span class="ident">EventType</span>::<span class="ident">Dummy</span>, <span class="macro">json</span><span class="macro">!</span>({}))
+            .<span class="ident">encrypt</span>(<span class="kw-2">&amp;</span><span class="ident">device</span>, <span class="ident">EventType</span>::<span class="ident">Dummy</span>, <span class="macro">json!</span>({}))
             .<span class="kw">await</span>
             .<span class="ident">unwrap</span>();
         <span class="kw">let</span> <span class="ident">content</span> <span class="op">=</span> <span class="kw">if</span> <span class="kw">let</span> <span class="ident">EncryptedEventContent</span>::<span class="ident">OlmV1Curve25519AesSha2</span>(<span class="ident">c</span>) <span class="op">=</span> <span class="ident">message</span> {
             <span class="ident">c</span>
         } <span class="kw">else</span> {
-            <span class="macro">panic</span><span class="macro">!</span>(<span class="string">&quot;Invalid encrypted event algorithm&quot;</span>);
+            <span class="macro">panic!</span>(<span class="string">&quot;Invalid encrypted event algorithm&quot;</span>);
         };
 
         <span class="kw">let</span> <span class="ident">own_ciphertext</span> <span class="op">=</span> <span class="ident">content</span>
@@ -2157,7 +2157,7 @@
         <span class="kw">let</span> <span class="ident">prekey</span> <span class="op">=</span> <span class="kw">if</span> <span class="kw">let</span> <span class="ident">OlmMessage</span>::<span class="ident">PreKey</span>(<span class="ident">m</span>) <span class="op">=</span> <span class="ident">message</span>.<span class="ident">clone</span>() {
             <span class="ident">m</span>
         } <span class="kw">else</span> {
-            <span class="macro">panic</span><span class="macro">!</span>(<span class="string">&quot;Wrong Olm message type&quot;</span>);
+            <span class="macro">panic!</span>(<span class="string">&quot;Wrong Olm message type&quot;</span>);
         };
 
         <span class="kw">let</span> <span class="ident">our_device</span> <span class="op">=</span> <span class="ident">ReadOnlyDevice</span>::<span class="ident">from_account</span>(<span class="self">self</span>).<span class="kw">await</span>;

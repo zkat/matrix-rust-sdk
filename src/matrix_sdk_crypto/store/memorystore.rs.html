@@ -630,10 +630,10 @@
         <span class="kw">let</span> (<span class="ident">account</span>, <span class="ident">session</span>) <span class="op">=</span> <span class="ident">get_account_and_session</span>().<span class="kw">await</span>;
         <span class="kw">let</span> <span class="ident">store</span> <span class="op">=</span> <span class="ident">MemoryStore</span>::<span class="ident">new</span>();
 
-        <span class="macro">assert</span><span class="macro">!</span>(<span class="ident">store</span>.<span class="ident">load_account</span>().<span class="kw">await</span>.<span class="ident">unwrap</span>().<span class="ident">is_none</span>());
+        <span class="macro">assert!</span>(<span class="ident">store</span>.<span class="ident">load_account</span>().<span class="kw">await</span>.<span class="ident">unwrap</span>().<span class="ident">is_none</span>());
         <span class="ident">store</span>.<span class="ident">save_account</span>(<span class="ident">account</span>).<span class="kw">await</span>.<span class="ident">unwrap</span>();
 
-        <span class="ident">store</span>.<span class="ident">save_sessions</span>(<span class="macro">vec</span><span class="macro">!</span>[<span class="ident">session</span>.<span class="ident">clone</span>()]).<span class="kw">await</span>;
+        <span class="ident">store</span>.<span class="ident">save_sessions</span>(<span class="macro">vec!</span>[<span class="ident">session</span>.<span class="ident">clone</span>()]).<span class="kw">await</span>;
 
         <span class="kw">let</span> <span class="ident">sessions</span> <span class="op">=</span> <span class="ident">store</span>
             .<span class="ident">get_sessions</span>(<span class="kw-2">&amp;</span><span class="ident">session</span>.<span class="ident">sender_key</span>)
@@ -644,13 +644,13 @@
 
         <span class="kw">let</span> <span class="ident">loaded_session</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">sessions</span>[<span class="number">0</span>];
 
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="kw-2">&amp;</span><span class="ident">session</span>, <span class="ident">loaded_session</span>);
+        <span class="macro">assert_eq!</span>(<span class="kw-2">&amp;</span><span class="ident">session</span>, <span class="ident">loaded_session</span>);
     }
 
     <span class="attribute">#[<span class="ident">tokio</span>::<span class="ident">test</span>]</span>
     <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">test_group_session_store</span>() {
         <span class="kw">let</span> (<span class="ident">account</span>, <span class="kw">_</span>) <span class="op">=</span> <span class="ident">get_account_and_session</span>().<span class="kw">await</span>;
-        <span class="kw">let</span> <span class="ident">room_id</span> <span class="op">=</span> <span class="macro">room_id</span><span class="macro">!</span>(<span class="string">&quot;!test:localhost&quot;</span>);
+        <span class="kw">let</span> <span class="ident">room_id</span> <span class="op">=</span> <span class="macro">room_id!</span>(<span class="string">&quot;!test:localhost&quot;</span>);
 
         <span class="kw">let</span> (<span class="ident">outbound</span>, <span class="kw">_</span>) <span class="op">=</span> <span class="ident">account</span>
             .<span class="ident">create_group_session_pair_with_defaults</span>(<span class="kw-2">&amp;</span><span class="ident">room_id</span>)
@@ -667,7 +667,7 @@
 
         <span class="kw">let</span> <span class="ident">store</span> <span class="op">=</span> <span class="ident">MemoryStore</span>::<span class="ident">new</span>();
         <span class="kw">let</span> <span class="kw">_</span> <span class="op">=</span> <span class="ident">store</span>
-            .<span class="ident">save_inbound_group_sessions</span>(<span class="macro">vec</span><span class="macro">!</span>[<span class="ident">inbound</span>.<span class="ident">clone</span>()])
+            .<span class="ident">save_inbound_group_sessions</span>(<span class="macro">vec!</span>[<span class="ident">inbound</span>.<span class="ident">clone</span>()])
             .<span class="kw">await</span>;
 
         <span class="kw">let</span> <span class="ident">loaded_session</span> <span class="op">=</span> <span class="ident">store</span>
@@ -675,7 +675,7 @@
             .<span class="kw">await</span>
             .<span class="ident">unwrap</span>()
             .<span class="ident">unwrap</span>();
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">inbound</span>, <span class="ident">loaded_session</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">inbound</span>, <span class="ident">loaded_session</span>);
     }
 
     <span class="attribute">#[<span class="ident">tokio</span>::<span class="ident">test</span>]</span>
@@ -683,7 +683,7 @@
         <span class="kw">let</span> <span class="ident">device</span> <span class="op">=</span> <span class="ident">get_device</span>();
         <span class="kw">let</span> <span class="ident">store</span> <span class="op">=</span> <span class="ident">MemoryStore</span>::<span class="ident">new</span>();
 
-        <span class="ident">store</span>.<span class="ident">save_devices</span>(<span class="macro">vec</span><span class="macro">!</span>[<span class="ident">device</span>.<span class="ident">clone</span>()]).<span class="kw">await</span>;
+        <span class="ident">store</span>.<span class="ident">save_devices</span>(<span class="macro">vec!</span>[<span class="ident">device</span>.<span class="ident">clone</span>()]).<span class="kw">await</span>;
 
         <span class="kw">let</span> <span class="ident">loaded_device</span> <span class="op">=</span> <span class="ident">store</span>
             .<span class="ident">get_device</span>(<span class="ident">device</span>.<span class="ident">user_id</span>(), <span class="ident">device</span>.<span class="ident">device_id</span>())
@@ -691,19 +691,19 @@
             .<span class="ident">unwrap</span>()
             .<span class="ident">unwrap</span>();
 
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">device</span>, <span class="ident">loaded_device</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">device</span>, <span class="ident">loaded_device</span>);
 
         <span class="kw">let</span> <span class="ident">user_devices</span> <span class="op">=</span> <span class="ident">store</span>.<span class="ident">get_user_devices</span>(<span class="ident">device</span>.<span class="ident">user_id</span>()).<span class="kw">await</span>.<span class="ident">unwrap</span>();
 
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="kw-2">*</span><span class="ident">user_devices</span>.<span class="ident">keys</span>().<span class="ident">next</span>().<span class="ident">unwrap</span>(), <span class="ident">device</span>.<span class="ident">device_id</span>());
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">user_devices</span>.<span class="ident">values</span>().<span class="ident">next</span>().<span class="ident">unwrap</span>(), <span class="kw-2">&amp;</span><span class="ident">device</span>);
+        <span class="macro">assert_eq!</span>(<span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="kw-2">*</span><span class="ident">user_devices</span>.<span class="ident">keys</span>().<span class="ident">next</span>().<span class="ident">unwrap</span>(), <span class="ident">device</span>.<span class="ident">device_id</span>());
+        <span class="macro">assert_eq!</span>(<span class="ident">user_devices</span>.<span class="ident">values</span>().<span class="ident">next</span>().<span class="ident">unwrap</span>(), <span class="kw-2">&amp;</span><span class="ident">device</span>);
 
         <span class="kw">let</span> <span class="ident">loaded_device</span> <span class="op">=</span> <span class="ident">user_devices</span>.<span class="ident">get</span>(<span class="ident">device</span>.<span class="ident">device_id</span>()).<span class="ident">unwrap</span>();
 
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="kw-2">&amp;</span><span class="ident">device</span>, <span class="ident">loaded_device</span>);
+        <span class="macro">assert_eq!</span>(<span class="kw-2">&amp;</span><span class="ident">device</span>, <span class="ident">loaded_device</span>);
 
-        <span class="ident">store</span>.<span class="ident">delete_devices</span>(<span class="macro">vec</span><span class="macro">!</span>[<span class="ident">device</span>.<span class="ident">clone</span>()]).<span class="kw">await</span>;
-        <span class="macro">assert</span><span class="macro">!</span>(<span class="ident">store</span>
+        <span class="ident">store</span>.<span class="ident">delete_devices</span>(<span class="macro">vec!</span>[<span class="ident">device</span>.<span class="ident">clone</span>()]).<span class="kw">await</span>;
+        <span class="macro">assert!</span>(<span class="ident">store</span>
             .<span class="ident">get_device</span>(<span class="ident">device</span>.<span class="ident">user_id</span>(), <span class="ident">device</span>.<span class="ident">device_id</span>())
             .<span class="kw">await</span>
             .<span class="ident">unwrap</span>()
@@ -715,16 +715,16 @@
         <span class="kw">let</span> <span class="ident">device</span> <span class="op">=</span> <span class="ident">get_device</span>();
         <span class="kw">let</span> <span class="ident">store</span> <span class="op">=</span> <span class="ident">MemoryStore</span>::<span class="ident">new</span>();
 
-        <span class="macro">assert</span><span class="macro">!</span>(<span class="ident">store</span>
+        <span class="macro">assert!</span>(<span class="ident">store</span>
             .<span class="ident">update_tracked_user</span>(<span class="ident">device</span>.<span class="ident">user_id</span>(), <span class="bool-val">false</span>)
             .<span class="kw">await</span>
             .<span class="ident">unwrap</span>());
-        <span class="macro">assert</span><span class="macro">!</span>(<span class="op">!</span><span class="ident">store</span>
+        <span class="macro">assert!</span>(<span class="op">!</span><span class="ident">store</span>
             .<span class="ident">update_tracked_user</span>(<span class="ident">device</span>.<span class="ident">user_id</span>(), <span class="bool-val">false</span>)
             .<span class="kw">await</span>
             .<span class="ident">unwrap</span>());
 
-        <span class="macro">assert</span><span class="macro">!</span>(<span class="ident">store</span>.<span class="ident">is_user_tracked</span>(<span class="ident">device</span>.<span class="ident">user_id</span>()));
+        <span class="macro">assert!</span>(<span class="ident">store</span>.<span class="ident">is_user_tracked</span>(<span class="ident">device</span>.<span class="ident">user_id</span>()));
     }
 
     <span class="attribute">#[<span class="ident">tokio</span>::<span class="ident">test</span>]</span>
@@ -739,9 +739,9 @@
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">changes</span> <span class="op">=</span> <span class="ident">Changes</span>::<span class="ident">default</span>();
         <span class="ident">changes</span>.<span class="ident">message_hashes</span>.<span class="ident">push</span>(<span class="ident">hash</span>.<span class="ident">clone</span>());
 
-        <span class="macro">assert</span><span class="macro">!</span>(<span class="op">!</span><span class="ident">store</span>.<span class="ident">is_message_known</span>(<span class="kw-2">&amp;</span><span class="ident">hash</span>).<span class="kw">await</span>.<span class="ident">unwrap</span>());
+        <span class="macro">assert!</span>(<span class="op">!</span><span class="ident">store</span>.<span class="ident">is_message_known</span>(<span class="kw-2">&amp;</span><span class="ident">hash</span>).<span class="kw">await</span>.<span class="ident">unwrap</span>());
         <span class="ident">store</span>.<span class="ident">save_changes</span>(<span class="ident">changes</span>).<span class="kw">await</span>.<span class="ident">unwrap</span>();
-        <span class="macro">assert</span><span class="macro">!</span>(<span class="ident">store</span>.<span class="ident">is_message_known</span>(<span class="kw-2">&amp;</span><span class="ident">hash</span>).<span class="kw">await</span>.<span class="ident">unwrap</span>());
+        <span class="macro">assert!</span>(<span class="ident">store</span>.<span class="ident">is_message_known</span>(<span class="kw-2">&amp;</span><span class="ident">hash</span>).<span class="kw">await</span>.<span class="ident">unwrap</span>());
     }
 }
 </pre></div>

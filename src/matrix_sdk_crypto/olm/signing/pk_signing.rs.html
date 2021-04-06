@@ -583,7 +583,7 @@
     }
 
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">sign_subkey</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">subkey</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">CrossSigningKey</span>) {
-        <span class="kw">let</span> <span class="ident">subkey_wihtout_signatures</span> <span class="op">=</span> <span class="macro">json</span><span class="macro">!</span>({
+        <span class="kw">let</span> <span class="ident">subkey_wihtout_signatures</span> <span class="op">=</span> <span class="macro">json!</span>({
             <span class="string">&quot;user_id&quot;</span>: <span class="ident">subkey</span>.<span class="ident">user_id</span>.<span class="ident">clone</span>(),
             <span class="string">&quot;keys&quot;</span>: <span class="ident">subkey</span>.<span class="ident">keys</span>.<span class="ident">clone</span>(),
             <span class="string">&quot;usage&quot;</span>: <span class="ident">subkey</span>.<span class="ident">usage</span>.<span class="ident">clone</span>(),
@@ -669,7 +669,7 @@
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">sign_device</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">device_keys</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">DeviceKeys</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">SignatureError</span><span class="op">&gt;</span> {
         <span class="comment">// Create a copy of the device keys containing only fields that will</span>
         <span class="comment">// get signed.</span>
-        <span class="kw">let</span> <span class="ident">json_device</span> <span class="op">=</span> <span class="macro">json</span><span class="macro">!</span>({
+        <span class="kw">let</span> <span class="ident">json_device</span> <span class="op">=</span> <span class="macro">json!</span>({
             <span class="string">&quot;user_id&quot;</span>: <span class="ident">device_keys</span>.<span class="ident">user_id</span>,
             <span class="string">&quot;device_id&quot;</span>: <span class="ident">device_keys</span>.<span class="ident">device_id</span>,
             <span class="string">&quot;algorithms&quot;</span>: <span class="ident">device_keys</span>.<span class="ident">algorithms</span>,
@@ -769,7 +769,7 @@
         <span class="kw">let</span> <span class="ident">key</span> <span class="op">=</span> <span class="ident">GenericArray</span>::<span class="ident">from_slice</span>(<span class="ident">pickle_key</span>);
         <span class="kw">let</span> <span class="ident">cipher</span> <span class="op">=</span> <span class="ident">Aes256Gcm</span>::<span class="ident">new</span>(<span class="ident">key</span>);
 
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">nonce</span> <span class="op">=</span> <span class="macro">vec</span><span class="macro">!</span>[<span class="number">0u8</span>; <span class="ident">NONCE_SIZE</span>];
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">nonce</span> <span class="op">=</span> <span class="macro">vec!</span>[<span class="number">0u8</span>; <span class="ident">NONCE_SIZE</span>];
         <span class="ident">getrandom</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">nonce</span>).<span class="ident">expect</span>(<span class="string">&quot;Can&#39;t generate nonce to pickle the signing object&quot;</span>);
         <span class="kw">let</span> <span class="ident">nonce</span> <span class="op">=</span> <span class="ident">GenericArray</span>::<span class="ident">from_slice</span>(<span class="ident">nonce</span>.<span class="ident">as_slice</span>());
 
@@ -806,7 +806,7 @@
 
         <span class="ident">CrossSigningKey</span> {
             <span class="ident">user_id</span>,
-            <span class="ident">usage</span>: <span class="macro">vec</span><span class="macro">!</span>[<span class="ident">usage</span>],
+            <span class="ident">usage</span>: <span class="macro">vec!</span>[<span class="ident">usage</span>],
             <span class="ident">keys</span>,
             <span class="ident">signatures</span>: <span class="ident">BTreeMap</span>::<span class="ident">new</span>(),
         }

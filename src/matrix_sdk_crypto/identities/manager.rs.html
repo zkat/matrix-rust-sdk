@@ -807,7 +807,7 @@
 
         <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="kw-2">mut</span> <span class="ident">device</span>) <span class="op">=</span> <span class="ident">old_device</span> {
             <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Err</span>(<span class="ident">e</span>) <span class="op">=</span> <span class="ident">device</span>.<span class="ident">update_device</span>(<span class="kw-2">&amp;</span><span class="ident">device_keys</span>) {
-                <span class="macro">warn</span><span class="macro">!</span>(
+                <span class="macro">warn!</span>(
                     <span class="string">&quot;Failed to update the device keys for {} {}: {:?}&quot;</span>,
                     <span class="ident">device</span>.<span class="ident">user_id</span>(),
                     <span class="ident">device</span>.<span class="ident">device_id</span>(),
@@ -820,11 +820,11 @@
         } <span class="kw">else</span> {
             <span class="kw">match</span> <span class="ident">ReadOnlyDevice</span>::<span class="ident">try_from</span>(<span class="kw-2">&amp;</span><span class="ident">device_keys</span>) {
                 <span class="prelude-val">Ok</span>(<span class="ident">d</span>) <span class="op">=</span><span class="op">&gt;</span> {
-                    <span class="macro">trace</span><span class="macro">!</span>(<span class="string">&quot;Adding a new device to the device store {:?}&quot;</span>, <span class="ident">d</span>);
+                    <span class="macro">trace!</span>(<span class="string">&quot;Adding a new device to the device store {:?}&quot;</span>, <span class="ident">d</span>);
                     <span class="prelude-val">Ok</span>(<span class="ident">DeviceChange</span>::<span class="ident">New</span>(<span class="ident">d</span>))
                 }
                 <span class="prelude-val">Err</span>(<span class="ident">e</span>) <span class="op">=</span><span class="op">&gt;</span> {
-                    <span class="macro">warn</span><span class="macro">!</span>(
+                    <span class="macro">warn!</span>(
                         <span class="string">&quot;Failed to create a new device for {} {}: {:?}&quot;</span>,
                         <span class="ident">device_keys</span>.<span class="ident">user_id</span>, <span class="ident">device_keys</span>.<span class="ident">device_id</span>, <span class="ident">e</span>
                     );
@@ -852,7 +852,7 @@
                 <span class="kw">if</span> <span class="ident">user_id</span> <span class="op">=</span><span class="op">=</span> <span class="kw-2">*</span><span class="ident">own_user_id</span> <span class="op">&amp;&amp;</span> <span class="ident">device_id</span> <span class="op">=</span><span class="op">=</span> <span class="kw-2">*</span><span class="ident">own_device_id</span> {
                     <span class="prelude-val">None</span>
                 } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">user_id</span> <span class="op">!</span><span class="op">=</span> <span class="ident">device_keys</span>.<span class="ident">user_id</span> <span class="op">|</span><span class="op">|</span> <span class="ident">device_id</span> <span class="op">!</span><span class="op">=</span> <span class="ident">device_keys</span>.<span class="ident">device_id</span> {
-                    <span class="macro">warn</span><span class="macro">!</span>(
+                    <span class="macro">warn!</span>(
                         <span class="string">&quot;Mismatch in device keys payload of device {}|{} from user {}|{}&quot;</span>,
                         <span class="ident">device_id</span>, <span class="ident">device_keys</span>.<span class="ident">device_id</span>, <span class="ident">user_id</span>, <span class="ident">device_keys</span>.<span class="ident">user_id</span>
                     );
@@ -951,7 +951,7 @@
             <span class="kw">let</span> <span class="ident">self_signing</span> <span class="op">=</span> <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">s</span>) <span class="op">=</span> <span class="ident">response</span>.<span class="ident">self_signing_keys</span>.<span class="ident">get</span>(<span class="ident">user_id</span>) {
                 <span class="ident">SelfSigningPubkey</span>::<span class="ident">from</span>(<span class="ident">s</span>)
             } <span class="kw">else</span> {
-                <span class="macro">warn</span><span class="macro">!</span>(
+                <span class="macro">warn!</span>(
                     <span class="string">&quot;User identity for user {} didn&#39;t contain a self signing pubkey&quot;</span>,
                     <span class="ident">user_id</span>
                 );
@@ -965,7 +965,7 @@
                         {
                             <span class="ident">UserSigningPubkey</span>::<span class="ident">from</span>(<span class="ident">s</span>)
                         } <span class="kw">else</span> {
-                            <span class="macro">warn</span><span class="macro">!</span>(
+                            <span class="macro">warn!</span>(
                                 <span class="string">&quot;User identity for our own user {} didn&#39;t \
                                   contain a user signing pubkey&quot;</span>,
                                 <span class="ident">user_id</span>
@@ -989,7 +989,7 @@
                         <span class="op">|</span><span class="op">|</span> <span class="ident">self_signing</span>.<span class="ident">user_id</span>() <span class="op">!</span><span class="op">=</span> <span class="ident">user_id</span>
                         <span class="op">|</span><span class="op">|</span> <span class="ident">user_signing</span>.<span class="ident">user_id</span>() <span class="op">!</span><span class="op">=</span> <span class="ident">user_id</span>
                     {
-                        <span class="macro">warn</span><span class="macro">!</span>(
+                        <span class="macro">warn!</span>(
                             <span class="string">&quot;User id mismatch in one of the cross signing keys for user {}&quot;</span>,
                             <span class="ident">user_id</span>
                         );
@@ -999,7 +999,7 @@
                     <span class="ident">OwnUserIdentity</span>::<span class="ident">new</span>(<span class="ident">master_key</span>, <span class="ident">self_signing</span>, <span class="ident">user_signing</span>)
                         .<span class="ident">map</span>(<span class="op">|</span><span class="ident">i</span><span class="op">|</span> (<span class="ident">UserIdentities</span>::<span class="ident">Own</span>(<span class="ident">i</span>), <span class="bool-val">true</span>))
                 } <span class="kw">else</span> {
-                    <span class="macro">warn</span><span class="macro">!</span>(
+                    <span class="macro">warn!</span>(
                         <span class="string">&quot;User identity for our own user {} didn&#39;t contain a \
                         user signing pubkey&quot;</span>,
                         <span class="ident">user_id</span>
@@ -1007,7 +1007,7 @@
                     <span class="kw">continue</span>;
                 }
             } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">master_key</span>.<span class="ident">user_id</span>() <span class="op">!</span><span class="op">=</span> <span class="ident">user_id</span> <span class="op">|</span><span class="op">|</span> <span class="ident">self_signing</span>.<span class="ident">user_id</span>() <span class="op">!</span><span class="op">=</span> <span class="ident">user_id</span> {
-                <span class="macro">warn</span><span class="macro">!</span>(
+                <span class="macro">warn!</span>(
                     <span class="string">&quot;User id mismatch in one of the cross signing keys for user {}&quot;</span>,
                     <span class="ident">user_id</span>
                 );
@@ -1019,7 +1019,7 @@
 
             <span class="kw">match</span> <span class="ident">result</span> {
                 <span class="prelude-val">Ok</span>((<span class="ident">i</span>, <span class="ident">new</span>)) <span class="op">=</span><span class="op">&gt;</span> {
-                    <span class="macro">trace</span><span class="macro">!</span>(
+                    <span class="macro">trace!</span>(
                         <span class="string">&quot;Updated or created new user identity for {}: {:?}&quot;</span>,
                         <span class="ident">user_id</span>,
                         <span class="ident">i</span>
@@ -1031,7 +1031,7 @@
                     }
                 }
                 <span class="prelude-val">Err</span>(<span class="ident">e</span>) <span class="op">=</span><span class="op">&gt;</span> {
-                    <span class="macro">warn</span><span class="macro">!</span>(
+                    <span class="macro">warn!</span>(
                         <span class="string">&quot;Couldn&#39;t update or create new user identity for {}: {:?}&quot;</span>,
                         <span class="ident">user_id</span>, <span class="ident">e</span>
                     );
@@ -1105,7 +1105,7 @@
             }
 
             <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Err</span>(<span class="ident">e</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">store</span>.<span class="ident">update_tracked_user</span>(<span class="ident">user</span>, <span class="bool-val">true</span>).<span class="kw">await</span> {
-                <span class="macro">warn</span><span class="macro">!</span>(<span class="string">&quot;Error storing users for tracking {}&quot;</span>, <span class="ident">e</span>);
+                <span class="macro">warn!</span>(<span class="string">&quot;Error storing users for tracking {}&quot;</span>, <span class="ident">e</span>);
             }
         }
     }
@@ -1134,11 +1134,11 @@
     };
 
     <span class="kw">fn</span> <span class="ident">user_id</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident">UserId</span> {
-        <span class="macro">user_id</span><span class="macro">!</span>(<span class="string">&quot;@example:localhost&quot;</span>)
+        <span class="macro">user_id!</span>(<span class="string">&quot;@example:localhost&quot;</span>)
     }
 
     <span class="kw">fn</span> <span class="ident">other_user_id</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident">UserId</span> {
-        <span class="macro">user_id</span><span class="macro">!</span>(<span class="string">&quot;@example2:localhost&quot;</span>)
+        <span class="macro">user_id!</span>(<span class="string">&quot;@example2:localhost&quot;</span>)
     }
 
     <span class="kw">fn</span> <span class="ident">device_id</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident">DeviceIdBox</span> {
@@ -1161,7 +1161,7 @@
     }
 
     <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">other_key_query</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident">KeyQueryResponse</span> {
-        <span class="kw">let</span> <span class="ident">data</span> <span class="op">=</span> <span class="ident">response_from_file</span>(<span class="kw-2">&amp;</span><span class="macro">json</span><span class="macro">!</span>({
+        <span class="kw">let</span> <span class="ident">data</span> <span class="op">=</span> <span class="ident">response_from_file</span>(<span class="kw-2">&amp;</span><span class="macro">json!</span>({
             <span class="string">&quot;device_keys&quot;</span>: {
                 <span class="string">&quot;@example2:localhost&quot;</span>: {
                     <span class="string">&quot;SKISMLNIMH&quot;</span>: {
@@ -1219,7 +1219,7 @@
     }
 
     <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">own_key_query</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident">KeyQueryResponse</span> {
-        <span class="kw">let</span> <span class="ident">data</span> <span class="op">=</span> <span class="ident">response_from_file</span>(<span class="kw-2">&amp;</span><span class="macro">json</span><span class="macro">!</span>({
+        <span class="kw">let</span> <span class="ident">data</span> <span class="op">=</span> <span class="ident">response_from_file</span>(<span class="kw-2">&amp;</span><span class="macro">json!</span>({
           <span class="string">&quot;device_keys&quot;</span>: {
             <span class="string">&quot;@example:localhost&quot;</span>: {
               <span class="string">&quot;WSKKLTJZCL&quot;</span>: {
@@ -1321,7 +1321,7 @@
     <span class="attribute">#[<span class="ident">async_test</span>]</span>
     <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">test_manager_creation</span>() {
         <span class="kw">let</span> <span class="ident">manager</span> <span class="op">=</span> <span class="ident">manager</span>();
-        <span class="macro">assert</span><span class="macro">!</span>(<span class="ident">manager</span>.<span class="ident">users_for_key_query</span>().<span class="kw">await</span>.<span class="ident">is_empty</span>())
+        <span class="macro">assert!</span>(<span class="ident">manager</span>.<span class="ident">users_for_key_query</span>().<span class="kw">await</span>.<span class="ident">is_empty</span>())
     }
 
     <span class="attribute">#[<span class="ident">async_test</span>]</span>
@@ -1329,7 +1329,7 @@
         <span class="kw">let</span> <span class="ident">manager</span> <span class="op">=</span> <span class="ident">manager</span>();
         <span class="kw">let</span> <span class="ident">other_user</span> <span class="op">=</span> <span class="ident">other_user_id</span>();
         <span class="kw">let</span> <span class="ident">devices</span> <span class="op">=</span> <span class="ident">manager</span>.<span class="ident">store</span>.<span class="ident">get_user_devices</span>(<span class="kw-2">&amp;</span><span class="ident">other_user</span>).<span class="kw">await</span>.<span class="ident">unwrap</span>();
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">devices</span>.<span class="ident">devices</span>().<span class="ident">count</span>(), <span class="number">0</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">devices</span>.<span class="ident">devices</span>().<span class="ident">count</span>(), <span class="number">0</span>);
 
         <span class="ident">manager</span>
             .<span class="ident">receive_keys_query_response</span>(<span class="kw-2">&amp;</span><span class="ident">other_key_query</span>())
@@ -1337,7 +1337,7 @@
             .<span class="ident">unwrap</span>();
 
         <span class="kw">let</span> <span class="ident">devices</span> <span class="op">=</span> <span class="ident">manager</span>.<span class="ident">store</span>.<span class="ident">get_user_devices</span>(<span class="kw-2">&amp;</span><span class="ident">other_user</span>).<span class="kw">await</span>.<span class="ident">unwrap</span>();
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">devices</span>.<span class="ident">devices</span>().<span class="ident">count</span>(), <span class="number">1</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">devices</span>.<span class="ident">devices</span>().<span class="ident">count</span>(), <span class="number">1</span>);
 
         <span class="kw">let</span> <span class="ident">device</span> <span class="op">=</span> <span class="ident">manager</span>
             .<span class="ident">store</span>
@@ -1353,7 +1353,7 @@
             .<span class="ident">unwrap</span>();
         <span class="kw">let</span> <span class="ident">identity</span> <span class="op">=</span> <span class="ident">identity</span>.<span class="ident">other</span>().<span class="ident">unwrap</span>();
 
-        <span class="macro">assert</span><span class="macro">!</span>(<span class="ident">identity</span>.<span class="ident">is_device_signed</span>(<span class="kw-2">&amp;</span><span class="ident">device</span>).<span class="ident">is_ok</span>())
+        <span class="macro">assert!</span>(<span class="ident">identity</span>.<span class="ident">is_device_signed</span>(<span class="kw-2">&amp;</span><span class="ident">device</span>).<span class="ident">is_ok</span>())
     }
 
     <span class="attribute">#[<span class="ident">async_test</span>]</span>
@@ -1361,7 +1361,7 @@
         <span class="kw">let</span> <span class="ident">manager</span> <span class="op">=</span> <span class="ident">manager</span>();
         <span class="kw">let</span> <span class="ident">other_user</span> <span class="op">=</span> <span class="ident">other_user_id</span>();
         <span class="kw">let</span> <span class="ident">devices</span> <span class="op">=</span> <span class="ident">manager</span>.<span class="ident">store</span>.<span class="ident">get_user_devices</span>(<span class="kw-2">&amp;</span><span class="ident">other_user</span>).<span class="kw">await</span>.<span class="ident">unwrap</span>();
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">devices</span>.<span class="ident">devices</span>().<span class="ident">count</span>(), <span class="number">0</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">devices</span>.<span class="ident">devices</span>().<span class="ident">count</span>(), <span class="number">0</span>);
 
         <span class="ident">manager</span>
             .<span class="ident">receive_keys_query_response</span>(<span class="kw-2">&amp;</span><span class="ident">other_key_query</span>())
@@ -1369,7 +1369,7 @@
             .<span class="ident">unwrap</span>();
 
         <span class="kw">let</span> <span class="ident">devices</span> <span class="op">=</span> <span class="ident">manager</span>.<span class="ident">store</span>.<span class="ident">get_user_devices</span>(<span class="kw-2">&amp;</span><span class="ident">other_user</span>).<span class="kw">await</span>.<span class="ident">unwrap</span>();
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">devices</span>.<span class="ident">devices</span>().<span class="ident">count</span>(), <span class="number">1</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">devices</span>.<span class="ident">devices</span>().<span class="ident">count</span>(), <span class="number">1</span>);
 
         <span class="kw">let</span> <span class="ident">device</span> <span class="op">=</span> <span class="ident">manager</span>
             .<span class="ident">store</span>
@@ -1385,7 +1385,7 @@
             .<span class="ident">unwrap</span>();
         <span class="kw">let</span> <span class="ident">identity</span> <span class="op">=</span> <span class="ident">identity</span>.<span class="ident">other</span>().<span class="ident">unwrap</span>();
 
-        <span class="macro">assert</span><span class="macro">!</span>(<span class="ident">identity</span>.<span class="ident">is_device_signed</span>(<span class="kw-2">&amp;</span><span class="ident">device</span>).<span class="ident">is_ok</span>())
+        <span class="macro">assert!</span>(<span class="ident">identity</span>.<span class="ident">is_device_signed</span>(<span class="kw-2">&amp;</span><span class="ident">device</span>).<span class="ident">is_ok</span>())
     }
 }
 </pre></div>

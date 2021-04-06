@@ -829,7 +829,7 @@
         <span class="kw">if</span> <span class="kw">let</span> <span class="ident">OutgoingVerificationRequest</span>::<span class="ident">ToDevice</span>(<span class="ident">r</span>) <span class="op">=</span> <span class="ident">request</span> {
             <span class="prelude-val">Ok</span>((<span class="ident">sas</span>, <span class="ident">r</span>))
         } <span class="kw">else</span> {
-            <span class="macro">panic</span><span class="macro">!</span>(<span class="string">&quot;Invalid verification request type&quot;</span>);
+            <span class="macro">panic!</span>(<span class="string">&quot;Invalid verification request type&quot;</span>);
         }
     }
 
@@ -861,7 +861,7 @@
 
         <span class="kw">let</span> <span class="ident">changes</span> <span class="op">=</span> <span class="ident">Changes</span> {
             <span class="ident">devices</span>: <span class="ident">DeviceChanges</span> {
-                <span class="ident">changed</span>: <span class="macro">vec</span><span class="macro">!</span>[<span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">clone</span>()],
+                <span class="ident">changed</span>: <span class="macro">vec!</span>[<span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">clone</span>()],
                 ..<span class="ident">Default</span>::<span class="ident">default</span>()
             },
             ..<span class="ident">Default</span>::<span class="ident">default</span>()
@@ -904,7 +904,7 @@
             <span class="ident">c</span>
         } <span class="kw">else</span> {
             <span class="comment">// TODO remove this panic.</span>
-            <span class="macro">panic</span><span class="macro">!</span>(
+            <span class="macro">panic!</span>(
                 <span class="string">&quot;Can&#39;t share session {} with device {} {}, key export can&#39;t \
                  be converted to a forwarded room key content&quot;</span>,
                 <span class="ident">session</span>.<span class="ident">session_id</span>(),
@@ -1122,7 +1122,7 @@
         <span class="kw">let</span> <span class="ident">sender_key</span> <span class="op">=</span> <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">k</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">get_key</span>(<span class="ident">DeviceKeyAlgorithm</span>::<span class="ident">Curve25519</span>) {
             <span class="ident">k</span>
         } <span class="kw">else</span> {
-            <span class="macro">warn</span><span class="macro">!</span>(
+            <span class="macro">warn!</span>(
                 <span class="string">&quot;Trying to encrypt a Megolm session for user {} on device {}, \
                 but the device doesn&#39;t have a curve25519 key&quot;</span>,
                 <span class="self">self</span>.<span class="ident">user_id</span>(),
@@ -1141,7 +1141,7 @@
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">session</span> <span class="op">=</span> <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">s</span>) <span class="op">=</span> <span class="ident">session</span> {
             <span class="ident">s</span>
         } <span class="kw">else</span> {
-            <span class="macro">warn</span><span class="macro">!</span>(
+            <span class="macro">warn!</span>(
                 <span class="string">&quot;Trying to encrypt a Megolm session for user {} on device {}, \
                 but no Olm session is found&quot;</span>,
                 <span class="self">self</span>.<span class="ident">user_id</span>(),
@@ -1195,7 +1195,7 @@
     }
 
     <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">as_signature_message</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Value</span> {
-        <span class="macro">json</span><span class="macro">!</span>({
+        <span class="macro">json!</span>({
             <span class="string">&quot;user_id&quot;</span>: <span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="self">self</span>.<span class="ident">user_id</span>,
             <span class="string">&quot;device_id&quot;</span>: <span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="self">self</span>.<span class="ident">device_id</span>,
             <span class="string">&quot;keys&quot;</span>: <span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="self">self</span>.<span class="ident">keys</span>,
@@ -1216,7 +1216,7 @@
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         <span class="ident">one_time_key</span>: <span class="kw-2">&amp;</span><span class="ident">SignedKey</span>,
     ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">SignatureError</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">is_signed_by_device</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="macro">json</span><span class="macro">!</span>(<span class="kw-2">&amp;</span><span class="ident">one_time_key</span>))
+        <span class="self">self</span>.<span class="ident">is_signed_by_device</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="macro">json!</span>(<span class="kw-2">&amp;</span><span class="ident">one_time_key</span>))
     }
 
     <span class="doccomment">/// Mark the device as deleted.</span>
@@ -1274,8 +1274,8 @@
     };
 
     <span class="kw">fn</span> <span class="ident">device_keys</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident">DeviceKeys</span> {
-        <span class="kw">let</span> <span class="ident">device_keys</span> <span class="op">=</span> <span class="macro">json</span><span class="macro">!</span>({
-          <span class="string">&quot;algorithms&quot;</span>: <span class="macro">vec</span><span class="macro">!</span>[
+        <span class="kw">let</span> <span class="ident">device_keys</span> <span class="op">=</span> <span class="macro">json!</span>({
+          <span class="string">&quot;algorithms&quot;</span>: <span class="macro">vec!</span>[
               <span class="string">&quot;m.olm.v1.curve25519-aes-sha2&quot;</span>,
               <span class="string">&quot;m.megolm.v1.aes-sha2&quot;</span>
           ],
@@ -1305,24 +1305,24 @@
 
     <span class="attribute">#[<span class="ident">test</span>]</span>
     <span class="kw">fn</span> <span class="ident">create_a_device</span>() {
-        <span class="kw">let</span> <span class="ident">user_id</span> <span class="op">=</span> <span class="macro">user_id</span><span class="macro">!</span>(<span class="string">&quot;@example:localhost&quot;</span>);
+        <span class="kw">let</span> <span class="ident">user_id</span> <span class="op">=</span> <span class="macro">user_id!</span>(<span class="string">&quot;@example:localhost&quot;</span>);
         <span class="kw">let</span> <span class="ident">device_id</span> <span class="op">=</span> <span class="string">&quot;BNYQQWUMXO&quot;</span>;
 
         <span class="kw">let</span> <span class="ident">device</span> <span class="op">=</span> <span class="ident">get_device</span>();
 
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="kw-2">&amp;</span><span class="ident">user_id</span>, <span class="ident">device</span>.<span class="ident">user_id</span>());
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">device_id</span>, <span class="ident">device</span>.<span class="ident">device_id</span>());
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">device</span>.<span class="ident">algorithms</span>.<span class="ident">len</span>(), <span class="number">2</span>);
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">LocalTrust</span>::<span class="ident">Unset</span>, <span class="ident">device</span>.<span class="ident">local_trust_state</span>());
-        <span class="macro">assert_eq</span><span class="macro">!</span>(
+        <span class="macro">assert_eq!</span>(<span class="kw-2">&amp;</span><span class="ident">user_id</span>, <span class="ident">device</span>.<span class="ident">user_id</span>());
+        <span class="macro">assert_eq!</span>(<span class="ident">device_id</span>, <span class="ident">device</span>.<span class="ident">device_id</span>());
+        <span class="macro">assert_eq!</span>(<span class="ident">device</span>.<span class="ident">algorithms</span>.<span class="ident">len</span>(), <span class="number">2</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">LocalTrust</span>::<span class="ident">Unset</span>, <span class="ident">device</span>.<span class="ident">local_trust_state</span>());
+        <span class="macro">assert_eq!</span>(
             <span class="string">&quot;Alice&#39;s mobile phone&quot;</span>,
             <span class="ident">device</span>.<span class="ident">display_name</span>().<span class="ident">as_ref</span>().<span class="ident">unwrap</span>()
         );
-        <span class="macro">assert_eq</span><span class="macro">!</span>(
+        <span class="macro">assert_eq!</span>(
             <span class="ident">device</span>.<span class="ident">get_key</span>(<span class="ident">DeviceKeyAlgorithm</span>::<span class="ident">Curve25519</span>).<span class="ident">unwrap</span>(),
             <span class="string">&quot;xfgbLIC5WAl1OIkpOzoxpCe8FsRDT6nch7NQsOb15nc&quot;</span>
         );
-        <span class="macro">assert_eq</span><span class="macro">!</span>(
+        <span class="macro">assert_eq!</span>(
             <span class="ident">device</span>.<span class="ident">get_key</span>(<span class="ident">DeviceKeyAlgorithm</span>::<span class="ident">Ed25519</span>).<span class="ident">unwrap</span>(),
             <span class="string">&quot;2/5LWJMow5zhJqakV88SIc7q/1pa8fmkfgAzx72w9G4&quot;</span>
         );
@@ -1332,7 +1332,7 @@
     <span class="kw">fn</span> <span class="ident">update_a_device</span>() {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">device</span> <span class="op">=</span> <span class="ident">get_device</span>();
 
-        <span class="macro">assert_eq</span><span class="macro">!</span>(
+        <span class="macro">assert_eq!</span>(
             <span class="string">&quot;Alice&#39;s mobile phone&quot;</span>,
             <span class="ident">device</span>.<span class="ident">display_name</span>().<span class="ident">as_ref</span>().<span class="ident">unwrap</span>()
         );
@@ -1343,19 +1343,19 @@
         <span class="ident">device_keys</span>.<span class="ident">unsigned</span>.<span class="ident">device_display_name</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">display_name</span>.<span class="ident">clone</span>());
         <span class="ident">device</span>.<span class="ident">update_device</span>(<span class="kw-2">&amp;</span><span class="ident">device_keys</span>).<span class="ident">unwrap</span>();
 
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="kw-2">&amp;</span><span class="ident">display_name</span>, <span class="ident">device</span>.<span class="ident">display_name</span>().<span class="ident">as_ref</span>().<span class="ident">unwrap</span>());
+        <span class="macro">assert_eq!</span>(<span class="kw-2">&amp;</span><span class="ident">display_name</span>, <span class="ident">device</span>.<span class="ident">display_name</span>().<span class="ident">as_ref</span>().<span class="ident">unwrap</span>());
     }
 
     <span class="attribute">#[<span class="ident">test</span>]</span>
     <span class="kw">fn</span> <span class="ident">delete_a_device</span>() {
         <span class="kw">let</span> <span class="ident">device</span> <span class="op">=</span> <span class="ident">get_device</span>();
-        <span class="macro">assert</span><span class="macro">!</span>(<span class="op">!</span><span class="ident">device</span>.<span class="ident">deleted</span>());
+        <span class="macro">assert!</span>(<span class="op">!</span><span class="ident">device</span>.<span class="ident">deleted</span>());
 
         <span class="kw">let</span> <span class="ident">device_clone</span> <span class="op">=</span> <span class="ident">device</span>.<span class="ident">clone</span>();
 
         <span class="ident">device</span>.<span class="ident">mark_as_deleted</span>();
-        <span class="macro">assert</span><span class="macro">!</span>(<span class="ident">device</span>.<span class="ident">deleted</span>());
-        <span class="macro">assert</span><span class="macro">!</span>(<span class="ident">device_clone</span>.<span class="ident">deleted</span>());
+        <span class="macro">assert!</span>(<span class="ident">device</span>.<span class="ident">deleted</span>());
+        <span class="macro">assert!</span>(<span class="ident">device_clone</span>.<span class="ident">deleted</span>());
     }
 }
 </pre></div>

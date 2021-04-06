@@ -1599,9 +1599,9 @@
         <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;sled_state_store&quot;</span>)]</span>
         <span class="kw">let</span> <span class="ident">stores</span> <span class="op">=</span> <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">path</span>) <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">config</span>.<span class="ident">store_path</span> {
             <span class="kw">if</span> <span class="ident">config</span>.<span class="ident">passphrase</span>.<span class="ident">is_some</span>() {
-                <span class="macro">info</span><span class="macro">!</span>(<span class="string">&quot;Opening an encrypted store in path {}&quot;</span>, <span class="ident">path</span>.<span class="ident">display</span>());
+                <span class="macro">info!</span>(<span class="string">&quot;Opening an encrypted store in path {}&quot;</span>, <span class="ident">path</span>.<span class="ident">display</span>());
             } <span class="kw">else</span> {
-                <span class="macro">info</span><span class="macro">!</span>(<span class="string">&quot;Opening store in path {}&quot;</span>, <span class="ident">path</span>.<span class="ident">display</span>());
+                <span class="macro">info!</span>(<span class="string">&quot;Opening store in path {}&quot;</span>, <span class="ident">path</span>.<span class="ident">display</span>());
             }
             <span class="ident">Store</span>::<span class="ident">open_default</span>(<span class="ident">path</span>, <span class="ident">config</span>.<span class="ident">passphrase</span>.<span class="ident">as_deref</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">p</span><span class="op">|</span> <span class="ident">p</span>.<span class="ident">as_str</span>()))<span class="question-mark">?</span>
         } <span class="kw">else</span> {
@@ -1810,7 +1810,7 @@
                                     <span class="kw">match</span> <span class="ident">decrypted</span>.<span class="ident">deserialize</span>() {
                                         <span class="prelude-val">Ok</span>(<span class="ident">decrypted</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">e</span> <span class="op">=</span> <span class="ident">decrypted</span>,
                                         <span class="prelude-val">Err</span>(<span class="ident">e</span>) <span class="op">=</span><span class="op">&gt;</span> {
-                                            <span class="macro">warn</span><span class="macro">!</span>(<span class="string">&quot;Error deserializing a decrypted event {:?} &quot;</span>, <span class="ident">e</span>)
+                                            <span class="macro">warn!</span>(<span class="string">&quot;Error deserializing a decrypted event {:?} &quot;</span>, <span class="ident">e</span>)
                                         }
                                     }
                                 }
@@ -1826,7 +1826,7 @@
                     <span class="ident">timeline</span>.<span class="ident">events</span>.<span class="ident">push</span>(<span class="ident">e</span>);
                 }
                 <span class="prelude-val">Err</span>(<span class="ident">e</span>) <span class="op">=</span><span class="op">&gt;</span> {
-                    <span class="macro">warn</span><span class="macro">!</span>(<span class="string">&quot;Error deserializing event {:?}&quot;</span>, <span class="ident">e</span>);
+                    <span class="macro">warn!</span>(<span class="string">&quot;Error deserializing event {:?}&quot;</span>, <span class="ident">e</span>);
                 }
             }
         }
@@ -1856,7 +1856,7 @@
                                 <span class="prelude-val">Ok</span>(<span class="ident">m</span>) <span class="op">=</span><span class="op">&gt;</span> {
                                     <span class="ident">members</span>.<span class="ident">insert</span>(<span class="ident">m</span>.<span class="ident">state_key</span>.<span class="ident">clone</span>(), <span class="ident">m</span>);
                                 }
-                                <span class="prelude-val">Err</span>(<span class="ident">e</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="macro">warn</span><span class="macro">!</span>(
+                                <span class="prelude-val">Err</span>(<span class="ident">e</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="macro">warn!</span>(
                                     <span class="string">&quot;Stripped member event in room {} has an invalid state key {:?}&quot;</span>,
                                     <span class="ident">room_info</span>.<span class="ident">room_id</span>, <span class="ident">e</span>
                                 ),
@@ -1870,7 +1870,7 @@
                         }
                     }
                     <span class="prelude-val">Err</span>(<span class="ident">err</span>) <span class="op">=</span><span class="op">&gt;</span> {
-                        <span class="macro">warn</span><span class="macro">!</span>(
+                        <span class="macro">warn!</span>(
                             <span class="string">&quot;Couldn&#39;t deserialize stripped state event for room {}: {:?}&quot;</span>,
                             <span class="ident">room_info</span>.<span class="ident">room_id</span>, <span class="ident">err</span>
                         );
@@ -1902,7 +1902,7 @@
                 .<span class="ident">filter_map</span>(<span class="op">|</span><span class="ident">e</span><span class="op">|</span> <span class="kw">match</span> <span class="ident">hoist_and_deserialize_state_event</span>(<span class="kw-2">&amp;</span><span class="ident">e</span>) {
                     <span class="prelude-val">Ok</span>(<span class="ident">e</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="ident">e</span>),
                     <span class="prelude-val">Err</span>(<span class="ident">err</span>) <span class="op">=</span><span class="op">&gt;</span> {
-                        <span class="macro">warn</span><span class="macro">!</span>(
+                        <span class="macro">warn!</span>(
                             <span class="string">&quot;Couldn&#39;t deserialize state event for room {}: {:?} {:#?}&quot;</span>,
                             <span class="ident">room_id</span>, <span class="ident">err</span>, <span class="ident">e</span>
                         );
@@ -1935,7 +1935,7 @@
 
                         <span class="ident">members</span>.<span class="ident">insert</span>(<span class="ident">m</span>.<span class="ident">state_key</span>.<span class="ident">clone</span>(), <span class="ident">m</span>);
                     }
-                    <span class="prelude-val">Err</span>(<span class="ident">e</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="macro">warn</span><span class="macro">!</span>(
+                    <span class="prelude-val">Err</span>(<span class="ident">e</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="macro">warn!</span>(
                         <span class="string">&quot;Member event in room {} has an invalid state key {:?}&quot;</span>,
                         <span class="ident">room_info</span>.<span class="ident">room_id</span>, <span class="ident">e</span>
                     ),
@@ -2224,7 +2224,7 @@
         <span class="kw-2">*</span><span class="self">self</span>.<span class="ident">sync_token</span>.<span class="ident">write</span>().<span class="kw">await</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">response</span>.<span class="ident">next_batch</span>.<span class="ident">clone</span>());
         <span class="self">self</span>.<span class="ident">apply_changes</span>(<span class="kw-2">&amp;</span><span class="ident">changes</span>).<span class="kw">await</span>;
 
-        <span class="macro">info</span><span class="macro">!</span>(<span class="string">&quot;Processed a sync response in {:?}&quot;</span>, <span class="ident">now</span>.<span class="ident">elapsed</span>());
+        <span class="macro">info!</span>(<span class="string">&quot;Processed a sync response in {:?}&quot;</span>, <span class="ident">now</span>.<span class="ident">elapsed</span>());
 
         <span class="kw">let</span> <span class="ident">response</span> <span class="op">=</span> <span class="ident">SyncResponse</span> {
             <span class="ident">next_batch</span>: <span class="ident">response</span>.<span class="ident">next_batch</span>,
@@ -2404,7 +2404,7 @@
 
         <span class="kw">match</span> <span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="ident">olm</span> {
             <span class="prelude-val">Some</span>(<span class="ident">o</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">o</span>.<span class="ident">outgoing_requests</span>().<span class="kw">await</span>,
-            <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">vec</span><span class="macro">!</span>[],
+            <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">vec!</span>[],
         }
     }
 
@@ -2478,7 +2478,7 @@
 
                 <span class="prelude-val">Ok</span>(<span class="ident">o</span>.<span class="ident">share_group_session</span>(<span class="ident">room_id</span>, <span class="ident">members</span>, <span class="ident">settings</span>).<span class="kw">await</span><span class="question-mark">?</span>)
             }
-            <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">panic</span><span class="macro">!</span>(<span class="string">&quot;Olm machine wasn&#39;t started&quot;</span>),
+            <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">panic!</span>(<span class="string">&quot;Olm machine wasn&#39;t started&quot;</span>),
         }
     }
 
@@ -2503,7 +2503,7 @@
 
         <span class="kw">match</span> <span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="ident">olm</span> {
             <span class="prelude-val">Some</span>(<span class="ident">o</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">o</span>.<span class="ident">encrypt</span>(<span class="ident">room_id</span>, <span class="ident">content</span>.<span class="ident">into</span>()).<span class="kw">await</span><span class="question-mark">?</span>),
-            <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">panic</span><span class="macro">!</span>(<span class="string">&quot;Olm machine wasn&#39;t started&quot;</span>),
+            <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">panic!</span>(<span class="string">&quot;Olm machine wasn&#39;t started&quot;</span>),
         }
     }
 
@@ -2639,7 +2639,7 @@
             <span class="prelude-val">Ok</span>(<span class="ident">olm</span>.<span class="ident">get_user_devices</span>(<span class="ident">user_id</span>).<span class="kw">await</span><span class="question-mark">?</span>)
         } <span class="kw">else</span> {
             <span class="comment">// TODO remove this panic.</span>
-            <span class="macro">panic</span><span class="macro">!</span>(<span class="string">&quot;The client hasn&#39;t been logged in&quot;</span>)
+            <span class="macro">panic!</span>(<span class="string">&quot;The client hasn&#39;t been logged in&quot;</span>)
         }
     }
 

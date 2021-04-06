@@ -323,19 +323,19 @@
             ..<span class="ident">Default</span>::<span class="ident">default</span>()
         };
 
-        <span class="kw">let</span> <span class="ident">account</span> <span class="op">=</span> <span class="ident">ReadOnlyAccount</span>::<span class="ident">new</span>(<span class="kw-2">&amp;</span><span class="macro">user_id</span><span class="macro">!</span>(<span class="string">&quot;@alice:example.org&quot;</span>), <span class="string">&quot;DEVICEID&quot;</span>.<span class="ident">into</span>());
+        <span class="kw">let</span> <span class="ident">account</span> <span class="op">=</span> <span class="ident">ReadOnlyAccount</span>::<span class="ident">new</span>(<span class="kw-2">&amp;</span><span class="macro">user_id!</span>(<span class="string">&quot;@alice:example.org&quot;</span>), <span class="string">&quot;DEVICEID&quot;</span>.<span class="ident">into</span>());
         <span class="kw">let</span> (<span class="ident">session</span>, <span class="kw">_</span>) <span class="op">=</span> <span class="ident">account</span>
-            .<span class="ident">create_group_session_pair</span>(<span class="kw-2">&amp;</span><span class="macro">room_id</span><span class="macro">!</span>(<span class="string">&quot;!test_room:example.org&quot;</span>), <span class="ident">settings</span>)
+            .<span class="ident">create_group_session_pair</span>(<span class="kw-2">&amp;</span><span class="macro">room_id!</span>(<span class="string">&quot;!test_room:example.org&quot;</span>), <span class="ident">settings</span>)
             .<span class="kw">await</span>
             .<span class="ident">unwrap</span>();
 
-        <span class="macro">assert</span><span class="macro">!</span>(<span class="op">!</span><span class="ident">session</span>.<span class="ident">expired</span>());
+        <span class="macro">assert!</span>(<span class="op">!</span><span class="ident">session</span>.<span class="ident">expired</span>());
         <span class="kw">let</span> <span class="kw">_</span> <span class="op">=</span> <span class="ident">session</span>
             .<span class="ident">encrypt</span>(<span class="ident">AnyMessageEventContent</span>::<span class="ident">RoomMessage</span>(
                 <span class="ident">MessageEventContent</span>::<span class="ident">text_plain</span>(<span class="string">&quot;Test message&quot;</span>),
             ))
             .<span class="kw">await</span>;
-        <span class="macro">assert</span><span class="macro">!</span>(<span class="ident">session</span>.<span class="ident">expired</span>());
+        <span class="macro">assert!</span>(<span class="ident">session</span>.<span class="ident">expired</span>());
 
         <span class="kw">let</span> <span class="ident">settings</span> <span class="op">=</span> <span class="ident">EncryptionSettings</span> {
             <span class="ident">rotation_period</span>: <span class="ident">Duration</span>::<span class="ident">from_millis</span>(<span class="number">100</span>),
@@ -343,13 +343,13 @@
         };
 
         <span class="kw">let</span> (<span class="kw-2">mut</span> <span class="ident">session</span>, <span class="kw">_</span>) <span class="op">=</span> <span class="ident">account</span>
-            .<span class="ident">create_group_session_pair</span>(<span class="kw-2">&amp;</span><span class="macro">room_id</span><span class="macro">!</span>(<span class="string">&quot;!test_room:example.org&quot;</span>), <span class="ident">settings</span>)
+            .<span class="ident">create_group_session_pair</span>(<span class="kw-2">&amp;</span><span class="macro">room_id!</span>(<span class="string">&quot;!test_room:example.org&quot;</span>), <span class="ident">settings</span>)
             .<span class="kw">await</span>
             .<span class="ident">unwrap</span>();
 
-        <span class="macro">assert</span><span class="macro">!</span>(<span class="op">!</span><span class="ident">session</span>.<span class="ident">expired</span>());
+        <span class="macro">assert!</span>(<span class="op">!</span><span class="ident">session</span>.<span class="ident">expired</span>());
         <span class="ident">session</span>.<span class="ident">creation_time</span> <span class="op">=</span> <span class="ident">Arc</span>::<span class="ident">new</span>(<span class="ident">Instant</span>::<span class="ident">now</span>() <span class="op">-</span> <span class="ident">Duration</span>::<span class="ident">from_secs</span>(<span class="number">60</span> <span class="op">*</span> <span class="number">60</span>));
-        <span class="macro">assert</span><span class="macro">!</span>(<span class="ident">session</span>.<span class="ident">expired</span>());
+        <span class="macro">assert!</span>(<span class="ident">session</span>.<span class="ident">expired</span>());
     }
 }
 </pre></div>

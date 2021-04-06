@@ -1042,7 +1042,7 @@
     <span class="kw">use</span> <span class="ident">matrix_sdk_test</span>::<span class="ident">async_test</span>;
 
     <span class="kw">fn</span> <span class="ident">user_id</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident">UserId</span> {
-        <span class="macro">user_id</span><span class="macro">!</span>(<span class="string">&quot;@example:localhost&quot;</span>)
+        <span class="macro">user_id!</span>(<span class="string">&quot;@example:localhost&quot;</span>)
     }
 
     <span class="kw">fn</span> <span class="ident">pickle_key</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> [<span class="ident">u8</span>] {
@@ -1052,7 +1052,7 @@
     <span class="attribute">#[<span class="ident">test</span>]</span>
     <span class="kw">fn</span> <span class="ident">signing_creation</span>() {
         <span class="kw">let</span> <span class="ident">signing</span> <span class="op">=</span> <span class="ident">Signing</span>::<span class="ident">new</span>();
-        <span class="macro">assert</span><span class="macro">!</span>(<span class="op">!</span><span class="ident">signing</span>.<span class="ident">public_key</span>().<span class="ident">as_str</span>().<span class="ident">is_empty</span>());
+        <span class="macro">assert!</span>(<span class="op">!</span><span class="ident">signing</span>.<span class="ident">public_key</span>().<span class="ident">as_str</span>().<span class="ident">is_empty</span>());
     }
 
     <span class="attribute">#[<span class="ident">async_test</span>]</span>
@@ -1062,7 +1062,7 @@
         <span class="kw">let</span> <span class="ident">message</span> <span class="op">=</span> <span class="string">&quot;Hello world&quot;</span>;
 
         <span class="kw">let</span> <span class="ident">signature</span> <span class="op">=</span> <span class="ident">signing</span>.<span class="ident">sign</span>(<span class="ident">message</span>).<span class="kw">await</span>;
-        <span class="macro">assert</span><span class="macro">!</span>(<span class="ident">signing</span>.<span class="ident">verify</span>(<span class="ident">message</span>, <span class="kw-2">&amp;</span><span class="ident">signature</span>).<span class="kw">await</span>.<span class="ident">is_ok</span>());
+        <span class="macro">assert!</span>(<span class="ident">signing</span>.<span class="ident">verify</span>(<span class="ident">message</span>, <span class="kw-2">&amp;</span><span class="ident">signature</span>).<span class="kw">await</span>.<span class="ident">is_ok</span>());
     }
 
     <span class="attribute">#[<span class="ident">async_test</span>]</span>
@@ -1072,7 +1072,7 @@
 
         <span class="kw">let</span> <span class="ident">unpickled</span> <span class="op">=</span> <span class="ident">Signing</span>::<span class="ident">from_pickle</span>(<span class="ident">pickled</span>, <span class="ident">pickle_key</span>()).<span class="ident">unwrap</span>();
 
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">signing</span>.<span class="ident">public_key</span>(), <span class="ident">unpickled</span>.<span class="ident">public_key</span>());
+        <span class="macro">assert_eq!</span>(<span class="ident">signing</span>.<span class="ident">public_key</span>(), <span class="ident">unpickled</span>.<span class="ident">public_key</span>());
     }
 
     <span class="attribute">#[<span class="ident">async_test</span>]</span>
@@ -1082,7 +1082,7 @@
         <span class="kw">let</span> <span class="ident">master_key</span> <span class="op">=</span> <span class="ident">identity</span>.<span class="ident">master_key</span>.<span class="ident">lock</span>().<span class="kw">await</span>;
         <span class="kw">let</span> <span class="ident">master_key</span> <span class="op">=</span> <span class="ident">master_key</span>.<span class="ident">as_ref</span>().<span class="ident">unwrap</span>();
 
-        <span class="macro">assert</span><span class="macro">!</span>(<span class="ident">master_key</span>
+        <span class="macro">assert!</span>(<span class="ident">master_key</span>
             .<span class="ident">public_key</span>
             .<span class="ident">verify_subkey</span>(
                 <span class="kw-2">&amp;</span><span class="ident">identity</span>
@@ -1095,7 +1095,7 @@
             )
             .<span class="ident">is_ok</span>());
 
-        <span class="macro">assert</span><span class="macro">!</span>(<span class="ident">master_key</span>
+        <span class="macro">assert!</span>(<span class="ident">master_key</span>
             .<span class="ident">public_key</span>
             .<span class="ident">verify_subkey</span>(
                 <span class="kw-2">&amp;</span><span class="ident">identity</span>
@@ -1119,16 +1119,16 @@
             .<span class="kw">await</span>
             .<span class="ident">unwrap</span>();
 
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">identity</span>.<span class="ident">user_id</span>, <span class="ident">unpickled</span>.<span class="ident">user_id</span>);
-        <span class="macro">assert_eq</span><span class="macro">!</span>(
+        <span class="macro">assert_eq!</span>(<span class="ident">identity</span>.<span class="ident">user_id</span>, <span class="ident">unpickled</span>.<span class="ident">user_id</span>);
+        <span class="macro">assert_eq!</span>(
             <span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="ident">identity</span>.<span class="ident">master_key</span>.<span class="ident">lock</span>().<span class="kw">await</span>,
             <span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="ident">unpickled</span>.<span class="ident">master_key</span>.<span class="ident">lock</span>().<span class="kw">await</span>
         );
-        <span class="macro">assert_eq</span><span class="macro">!</span>(
+        <span class="macro">assert_eq!</span>(
             <span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="ident">identity</span>.<span class="ident">user_signing_key</span>.<span class="ident">lock</span>().<span class="kw">await</span>,
             <span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="ident">unpickled</span>.<span class="ident">user_signing_key</span>.<span class="ident">lock</span>().<span class="kw">await</span>
         );
-        <span class="macro">assert_eq</span><span class="macro">!</span>(
+        <span class="macro">assert_eq!</span>(
             <span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="ident">identity</span>.<span class="ident">self_signing_key</span>.<span class="ident">lock</span>().<span class="kw">await</span>,
             <span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="ident">unpickled</span>.<span class="ident">self_signing_key</span>.<span class="ident">lock</span>().<span class="kw">await</span>
         );
@@ -1141,7 +1141,7 @@
         <span class="kw">let</span> <span class="ident">master</span> <span class="op">=</span> <span class="ident">identity</span>.<span class="ident">master_key</span>.<span class="ident">lock</span>().<span class="kw">await</span>;
         <span class="kw">let</span> <span class="ident">master</span> <span class="op">=</span> <span class="ident">master</span>.<span class="ident">as_ref</span>().<span class="ident">unwrap</span>();
 
-        <span class="macro">assert</span><span class="macro">!</span>(<span class="op">!</span><span class="ident">master</span>.<span class="ident">public_key</span>.<span class="ident">signatures</span>().<span class="ident">is_empty</span>());
+        <span class="macro">assert!</span>(<span class="op">!</span><span class="ident">master</span>.<span class="ident">public_key</span>.<span class="ident">signatures</span>().<span class="ident">is_empty</span>());
     }
 
     <span class="attribute">#[<span class="ident">async_test</span>]</span>
@@ -1166,7 +1166,7 @@
         <span class="kw">let</span> <span class="ident">account</span> <span class="op">=</span> <span class="ident">ReadOnlyAccount</span>::<span class="ident">new</span>(<span class="kw-2">&amp;</span><span class="ident">user_id</span>(), <span class="string">&quot;DEVICEID&quot;</span>.<span class="ident">into</span>());
         <span class="kw">let</span> (<span class="ident">identity</span>, <span class="kw">_</span>, <span class="kw">_</span>) <span class="op">=</span> <span class="ident">PrivateCrossSigningIdentity</span>::<span class="ident">new_with_account</span>(<span class="kw-2">&amp;</span><span class="ident">account</span>).<span class="kw">await</span>;
 
-        <span class="kw">let</span> <span class="ident">bob_account</span> <span class="op">=</span> <span class="ident">ReadOnlyAccount</span>::<span class="ident">new</span>(<span class="kw-2">&amp;</span><span class="macro">user_id</span><span class="macro">!</span>(<span class="string">&quot;@bob:localhost&quot;</span>), <span class="string">&quot;DEVICEID&quot;</span>.<span class="ident">into</span>());
+        <span class="kw">let</span> <span class="ident">bob_account</span> <span class="op">=</span> <span class="ident">ReadOnlyAccount</span>::<span class="ident">new</span>(<span class="kw-2">&amp;</span><span class="macro">user_id!</span>(<span class="string">&quot;@bob:localhost&quot;</span>), <span class="string">&quot;DEVICEID&quot;</span>.<span class="ident">into</span>());
         <span class="kw">let</span> (<span class="ident">bob_private</span>, <span class="kw">_</span>, <span class="kw">_</span>) <span class="op">=</span> <span class="ident">PrivateCrossSigningIdentity</span>::<span class="ident">new_with_account</span>(<span class="kw-2">&amp;</span><span class="ident">bob_account</span>).<span class="kw">await</span>;
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">bob_public</span> <span class="op">=</span> <span class="ident">UserIdentity</span>::<span class="ident">from_private</span>(<span class="kw-2">&amp;</span><span class="ident">bob_private</span>).<span class="kw">await</span>;
 

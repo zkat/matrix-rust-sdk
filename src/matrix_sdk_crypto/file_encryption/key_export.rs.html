@@ -502,7 +502,7 @@
 
     <span class="ident">aes</span>.<span class="ident">apply_keystream</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">plaintext</span>);
 
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">payload</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span> <span class="op">=</span> <span class="macro">vec</span><span class="macro">!</span>[];
+    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">payload</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span> <span class="op">=</span> <span class="macro">vec!</span>[];
 
     <span class="ident">payload</span>.<span class="ident">extend</span>(<span class="kw-2">&amp;</span><span class="ident">VERSION</span>.<span class="ident">to_be_bytes</span>());
     <span class="ident">payload</span>.<span class="ident">extend</span>(<span class="kw-2">&amp;</span><span class="ident">salt</span>);
@@ -575,7 +575,7 @@
 
     <span class="kw">const</span> <span class="ident">PASSPHRASE</span>: <span class="kw-2">&amp;</span><span class="ident">str</span> <span class="op">=</span> <span class="string">&quot;1234&quot;</span>;
 
-    <span class="kw">const</span> <span class="ident">TEST_EXPORT</span>: <span class="kw-2">&amp;</span><span class="ident">str</span> <span class="op">=</span> <span class="macro">indoc</span><span class="macro">!</span> {<span class="string">&quot;
+    <span class="kw">const</span> <span class="ident">TEST_EXPORT</span>: <span class="kw-2">&amp;</span><span class="ident">str</span> <span class="op">=</span> <span class="macro">indoc!</span> {<span class="string">&quot;
         -----BEGIN MEGOLM SESSION DATA-----
         Af7mGhlzQ+eGvHu93u0YXd3D/+vYMs3E7gQqOhuCtkvGAAAAASH7pEdWvFyAP1JUisAcpEo
         Xke2Q7Kr9hVl/SCc6jXBNeJCZcrUbUV4D/tRQIl3E9L4fOk928YI1J+3z96qiH0uE7hpsCI
@@ -602,10 +602,10 @@
     <span class="attribute">#[<span class="ident">test</span>]</span>
     <span class="kw">fn</span> <span class="ident">test_decode</span>() {
         <span class="kw">let</span> <span class="ident">export</span> <span class="op">=</span> <span class="ident">export_wihtout_headers</span>();
-        <span class="macro">assert</span><span class="macro">!</span>(<span class="ident">decode</span>(<span class="ident">export</span>).<span class="ident">is_ok</span>());
+        <span class="macro">assert!</span>(<span class="ident">decode</span>(<span class="ident">export</span>).<span class="ident">is_ok</span>());
     }
 
-    <span class="macro">proptest</span><span class="macro">!</span> {
+    <span class="macro">proptest!</span> {
         <span class="attribute">#[<span class="ident">test</span>]</span>
         <span class="kw">fn</span> <span class="ident">proptest_encrypt_cycle</span>(<span class="ident">plaintext</span> <span class="kw">in</span> <span class="ident">prop</span>::<span class="ident">string</span>::<span class="ident">string_regex</span>(<span class="string">&quot;.*&quot;</span>).<span class="ident">unwrap</span>()) {
             <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">plaintext_bytes</span> <span class="op">=</span> <span class="ident">plaintext</span>.<span class="ident">clone</span>().<span class="ident">into_bytes</span>();
@@ -613,7 +613,7 @@
             <span class="kw">let</span> <span class="ident">ciphertext</span> <span class="op">=</span> <span class="ident">encrypt_helper</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">plaintext_bytes</span>, <span class="string">&quot;test&quot;</span>, <span class="number">1</span>);
             <span class="kw">let</span> <span class="ident">decrypted</span> <span class="op">=</span> <span class="ident">decrypt_helper</span>(<span class="kw-2">&amp;</span><span class="ident">ciphertext</span>, <span class="string">&quot;test&quot;</span>).<span class="ident">unwrap</span>();
 
-            <span class="macro">prop_assert</span><span class="macro">!</span>(<span class="ident">plaintext</span> <span class="op">=</span><span class="op">=</span> <span class="ident">decrypted</span>);
+            <span class="macro">prop_assert!</span>(<span class="ident">plaintext</span> <span class="op">=</span><span class="op">=</span> <span class="ident">decrypted</span>);
         }
     }
 
@@ -625,13 +625,13 @@
         <span class="kw">let</span> <span class="ident">encrypted</span> <span class="op">=</span> <span class="ident">encrypt_helper</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">bytes</span>, <span class="ident">PASSPHRASE</span>, <span class="number">10</span>);
         <span class="kw">let</span> <span class="ident">decrypted</span> <span class="op">=</span> <span class="ident">decrypt_helper</span>(<span class="kw-2">&amp;</span><span class="ident">encrypted</span>, <span class="ident">PASSPHRASE</span>).<span class="ident">unwrap</span>();
 
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">data</span>, <span class="ident">decrypted</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">data</span>, <span class="ident">decrypted</span>);
     }
 
     <span class="attribute">#[<span class="ident">async_test</span>]</span>
     <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">test_session_encrypt</span>() {
         <span class="kw">let</span> (<span class="ident">machine</span>, <span class="kw">_</span>) <span class="op">=</span> <span class="ident">get_prepared_machine</span>().<span class="kw">await</span>;
-        <span class="kw">let</span> <span class="ident">room_id</span> <span class="op">=</span> <span class="macro">room_id</span><span class="macro">!</span>(<span class="string">&quot;!test:localhost&quot;</span>);
+        <span class="kw">let</span> <span class="ident">room_id</span> <span class="op">=</span> <span class="macro">room_id!</span>(<span class="string">&quot;!test:localhost&quot;</span>);
 
         <span class="ident">machine</span>
             .<span class="ident">create_outbound_group_session_with_defaults</span>(<span class="kw-2">&amp;</span><span class="ident">room_id</span>)
@@ -642,20 +642,20 @@
             .<span class="kw">await</span>
             .<span class="ident">unwrap</span>();
 
-        <span class="macro">assert</span><span class="macro">!</span>(<span class="op">!</span><span class="ident">export</span>.<span class="ident">is_empty</span>());
+        <span class="macro">assert!</span>(<span class="op">!</span><span class="ident">export</span>.<span class="ident">is_empty</span>());
 
         <span class="kw">let</span> <span class="ident">encrypted</span> <span class="op">=</span> <span class="ident">encrypt_key_export</span>(<span class="kw-2">&amp;</span><span class="ident">export</span>, <span class="string">&quot;1234&quot;</span>, <span class="number">1</span>).<span class="ident">unwrap</span>();
         <span class="kw">let</span> <span class="ident">decrypted</span> <span class="op">=</span> <span class="ident">decrypt_key_export</span>(<span class="ident">Cursor</span>::<span class="ident">new</span>(<span class="ident">encrypted</span>), <span class="string">&quot;1234&quot;</span>).<span class="ident">unwrap</span>();
 
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">export</span>, <span class="ident">decrypted</span>);
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">machine</span>.<span class="ident">import_keys</span>(<span class="ident">decrypted</span>).<span class="kw">await</span>.<span class="ident">unwrap</span>(), (<span class="number">0</span>, <span class="number">1</span>));
+        <span class="macro">assert_eq!</span>(<span class="ident">export</span>, <span class="ident">decrypted</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">machine</span>.<span class="ident">import_keys</span>(<span class="ident">decrypted</span>).<span class="kw">await</span>.<span class="ident">unwrap</span>(), (<span class="number">0</span>, <span class="number">1</span>));
     }
 
     <span class="attribute">#[<span class="ident">test</span>]</span>
     <span class="kw">fn</span> <span class="ident">test_real_decrypt</span>() {
         <span class="kw">let</span> <span class="ident">reader</span> <span class="op">=</span> <span class="ident">Cursor</span>::<span class="ident">new</span>(<span class="ident">TEST_EXPORT</span>);
         <span class="kw">let</span> <span class="ident">imported</span> <span class="op">=</span> <span class="ident">decrypt_key_export</span>(<span class="ident">reader</span>, <span class="ident">PASSPHRASE</span>).<span class="ident">expect</span>(<span class="string">&quot;Can&#39;t decrypt key export&quot;</span>);
-        <span class="macro">assert</span><span class="macro">!</span>(<span class="op">!</span><span class="ident">imported</span>.<span class="ident">is_empty</span>())
+        <span class="macro">assert!</span>(<span class="op">!</span><span class="ident">imported</span>.<span class="ident">is_empty</span>())
     }
 }
 </pre></div>

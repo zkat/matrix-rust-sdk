@@ -1538,7 +1538,7 @@
 
 <span class="kw">impl</span> <span class="ident">Encode</span> <span class="kw">for</span> <span class="ident">RequestedKeyInfo</span> {
     <span class="kw">fn</span> <span class="ident">encode</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">String</span> {
-        <span class="macro">format</span><span class="macro">!</span>(
+        <span class="macro">format!</span>(
             <span class="string">&quot;{}|{}|{}|{}&quot;</span>,
             <span class="self">self</span>.<span class="ident">sender_key</span>, <span class="self">self</span>.<span class="ident">room_id</span>, <span class="self">self</span>.<span class="ident">session_id</span>, <span class="self">self</span>.<span class="ident">algorithm</span>
         )
@@ -1547,7 +1547,7 @@
 
 <span class="kw">impl</span> <span class="ident">Encode</span> <span class="kw">for</span> <span class="ident">ForwardedRoomKeyToDeviceEventContent</span> {
     <span class="kw">fn</span> <span class="ident">encode</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">String</span> {
-        <span class="macro">format</span><span class="macro">!</span>(
+        <span class="macro">format!</span>(
             <span class="string">&quot;{}|{}|{}|{}&quot;</span>,
             <span class="self">self</span>.<span class="ident">sender_key</span>, <span class="self">self</span>.<span class="ident">room_id</span>, <span class="self">self</span>.<span class="ident">session_id</span>, <span class="self">self</span>.<span class="ident">algorithm</span>
         )
@@ -1694,7 +1694,7 @@
                 <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">info</span>) <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">event</span>.<span class="ident">content</span>.<span class="ident">body</span> {
                     <span class="ident">info</span>
                 } <span class="kw">else</span> {
-                    <span class="macro">warn</span><span class="macro">!</span>(
+                    <span class="macro">warn!</span>(
                         <span class="string">&quot;Received a key request from {} {} with a request \
                           action, but no key info was found&quot;</span>,
                         <span class="ident">event</span>.<span class="ident">sender</span>, <span class="ident">event</span>.<span class="ident">content</span>.<span class="ident">requesting_device_id</span>
@@ -1705,7 +1705,7 @@
             <span class="comment">// We ignore cancellations here since there&#39;s nothing to serve.</span>
             <span class="ident">Action</span>::<span class="ident">CancelRequest</span> <span class="op">=</span><span class="op">&gt;</span> <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="prelude-val">None</span>),
             <span class="ident">action</span> <span class="op">=</span><span class="op">&gt;</span> {
-                <span class="macro">warn</span><span class="macro">!</span>(<span class="string">&quot;Unknown room key request action: {:?}&quot;</span>, <span class="ident">action</span>);
+                <span class="macro">warn!</span>(<span class="string">&quot;Unknown room key request action: {:?}&quot;</span>, <span class="ident">action</span>);
                 <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="prelude-val">None</span>);
             }
         };
@@ -1722,7 +1722,7 @@
         <span class="kw">let</span> <span class="ident">session</span> <span class="op">=</span> <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">s</span>) <span class="op">=</span> <span class="ident">session</span> {
             <span class="ident">s</span>
         } <span class="kw">else</span> {
-            <span class="macro">info</span><span class="macro">!</span>(
+            <span class="macro">info!</span>(
                 <span class="string">&quot;Received a key request from {} {} for an unknown inbound group session {}.&quot;</span>,
                 <span class="kw-2">&amp;</span><span class="ident">event</span>.<span class="ident">sender</span>, <span class="kw-2">&amp;</span><span class="ident">event</span>.<span class="ident">content</span>.<span class="ident">requesting_device_id</span>, <span class="kw-2">&amp;</span><span class="ident">key_info</span>.<span class="ident">session_id</span>
             );
@@ -1742,7 +1742,7 @@
                     .<span class="ident">as_deref</span>(),
             ) {
                 <span class="prelude-val">Err</span>(<span class="ident">e</span>) <span class="op">=</span><span class="op">&gt;</span> {
-                    <span class="macro">info</span><span class="macro">!</span>(
+                    <span class="macro">info!</span>(
                         <span class="string">&quot;Received a key request from {} {} that we won&#39;t serve: {}&quot;</span>,
                         <span class="ident">device</span>.<span class="ident">user_id</span>(),
                         <span class="ident">device</span>.<span class="ident">device_id</span>(),
@@ -1752,7 +1752,7 @@
                     <span class="prelude-val">Ok</span>(<span class="prelude-val">None</span>)
                 }
                 <span class="prelude-val">Ok</span>(<span class="ident">message_index</span>) <span class="op">=</span><span class="op">&gt;</span> {
-                    <span class="macro">info</span><span class="macro">!</span>(
+                    <span class="macro">info!</span>(
                         <span class="string">&quot;Serving a key request for {} from {} {} with message_index {:?}.&quot;</span>,
                         <span class="ident">key_info</span>.<span class="ident">session_id</span>,
                         <span class="ident">device</span>.<span class="ident">user_id</span>(),
@@ -1763,7 +1763,7 @@
                     <span class="kw">match</span> <span class="self">self</span>.<span class="ident">share_session</span>(<span class="kw-2">&amp;</span><span class="ident">session</span>, <span class="kw-2">&amp;</span><span class="ident">device</span>, <span class="ident">message_index</span>).<span class="kw">await</span> {
                         <span class="prelude-val">Ok</span>(<span class="ident">s</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(<span class="ident">s</span>)),
                         <span class="prelude-val">Err</span>(<span class="ident">OlmError</span>::<span class="ident">MissingSession</span>) <span class="op">=</span><span class="op">&gt;</span> {
-                            <span class="macro">info</span><span class="macro">!</span>(
+                            <span class="macro">info!</span>(
                                 <span class="string">&quot;Key request from {} {} is missing an Olm session, \
                              putting the request in the wait queue&quot;</span>,
                                 <span class="ident">device</span>.<span class="ident">user_id</span>(),
@@ -1778,7 +1778,7 @@
                 }
             }
         } <span class="kw">else</span> {
-            <span class="macro">warn</span><span class="macro">!</span>(
+            <span class="macro">warn!</span>(
                 <span class="string">&quot;Received a key request from an unknown device {} {}.&quot;</span>,
                 <span class="kw-2">&amp;</span><span class="ident">event</span>.<span class="ident">sender</span>, <span class="kw-2">&amp;</span><span class="ident">event</span>.<span class="ident">content</span>.<span class="ident">requesting_device_id</span>
             );
@@ -1902,7 +1902,7 @@
             <span class="kw">return</span> <span class="prelude-val">Ok</span>(());
         }
 
-        <span class="macro">info</span><span class="macro">!</span>(<span class="string">&quot;Creating new outgoing room key request {:#?}&quot;</span>, <span class="ident">key_info</span>);
+        <span class="macro">info!</span>(<span class="string">&quot;Creating new outgoing room key request {:#?}&quot;</span>, <span class="ident">key_info</span>);
 
         <span class="kw">let</span> <span class="ident">id</span> <span class="op">=</span> <span class="ident">Uuid</span>::<span class="ident">new_v4</span>();
 
@@ -1974,7 +1974,7 @@
         <span class="kw">let</span> <span class="ident">info</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">OugoingKeyInfo</span><span class="op">&gt;</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">store</span>.<span class="ident">get_object</span>(<span class="kw-2">&amp;</span><span class="ident">id</span>.<span class="ident">to_string</span>()).<span class="kw">await</span><span class="question-mark">?</span>;
 
         <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="kw-2">mut</span> <span class="ident">info</span>) <span class="op">=</span> <span class="ident">info</span> {
-            <span class="macro">trace</span><span class="macro">!</span>(<span class="string">&quot;Marking outgoing key request as sent {:#?}&quot;</span>, <span class="ident">info</span>);
+            <span class="macro">trace!</span>(<span class="string">&quot;Marking outgoing key request as sent {:#?}&quot;</span>, <span class="ident">info</span>);
             <span class="ident">info</span>.<span class="ident">sent_out</span> <span class="op">=</span> <span class="bool-val">true</span>;
             <span class="self">self</span>.<span class="ident">save_outgoing_key_info</span>(<span class="kw-2">*</span><span class="ident">id</span>, <span class="ident">info</span>).<span class="kw">await</span><span class="question-mark">?</span>;
         }
@@ -1987,7 +1987,7 @@
     <span class="doccomment">/// This will queue up a request cancelation.</span>
     <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">mark_as_done</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">key_info</span>: <span class="ident">OugoingKeyInfo</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">CryptoStoreError</span><span class="op">&gt;</span> {
         <span class="comment">// TODO perhaps only remove the key info if the first known index is 0.</span>
-        <span class="macro">trace</span><span class="macro">!</span>(
+        <span class="macro">trace!</span>(
             <span class="string">&quot;Successfully received a forwarded room key for {:#?}&quot;</span>,
             <span class="ident">key_info</span>
         );
@@ -2053,7 +2053,7 @@
             };
 
             <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">s</span>) <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">session</span> {
-                <span class="macro">info</span><span class="macro">!</span>(
+                <span class="macro">info!</span>(
                     <span class="string">&quot;Received a forwarded room key from {} for room {} with session id {}&quot;</span>,
                     <span class="ident">event</span>.<span class="ident">sender</span>,
                     <span class="ident">s</span>.<span class="ident">room_id</span>(),
@@ -2066,7 +2066,7 @@
                 <span class="ident">session</span>,
             ))
         } <span class="kw">else</span> {
-            <span class="macro">info</span><span class="macro">!</span>(
+            <span class="macro">info!</span>(
                 <span class="string">&quot;Received a forwarded room key from {}, but no key info was found.&quot;</span>,
                 <span class="ident">event</span>.<span class="ident">sender</span>,
             );
@@ -2101,7 +2101,7 @@
     <span class="kw">use</span> <span class="kw">super</span>::{<span class="ident">KeyRequestMachine</span>, <span class="ident">KeyshareDecision</span>};
 
     <span class="kw">fn</span> <span class="ident">alice_id</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident">UserId</span> {
-        <span class="macro">user_id</span><span class="macro">!</span>(<span class="string">&quot;@alice:example.org&quot;</span>)
+        <span class="macro">user_id!</span>(<span class="string">&quot;@alice:example.org&quot;</span>)
     }
 
     <span class="kw">fn</span> <span class="ident">alice_device_id</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident">DeviceIdBox</span> {
@@ -2109,7 +2109,7 @@
     }
 
     <span class="kw">fn</span> <span class="ident">bob_id</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident">UserId</span> {
-        <span class="macro">user_id</span><span class="macro">!</span>(<span class="string">&quot;@bob:example.org&quot;</span>)
+        <span class="macro">user_id!</span>(<span class="string">&quot;@bob:example.org&quot;</span>)
     }
 
     <span class="kw">fn</span> <span class="ident">bob_device_id</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident">DeviceIdBox</span> {
@@ -2117,7 +2117,7 @@
     }
 
     <span class="kw">fn</span> <span class="ident">room_id</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident">RoomId</span> {
-        <span class="macro">room_id</span><span class="macro">!</span>(<span class="string">&quot;!test:example.org&quot;</span>)
+        <span class="macro">room_id!</span>(<span class="string">&quot;!test:example.org&quot;</span>)
     }
 
     <span class="kw">fn</span> <span class="ident">account</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ReadOnlyAccount</span> {
@@ -2168,7 +2168,7 @@
     <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">create_machine</span>() {
         <span class="kw">let</span> <span class="ident">machine</span> <span class="op">=</span> <span class="ident">get_machine</span>().<span class="kw">await</span>;
 
-        <span class="macro">assert</span><span class="macro">!</span>(<span class="ident">machine</span>.<span class="ident">outgoing_to_device_requests</span>().<span class="ident">is_empty</span>());
+        <span class="macro">assert!</span>(<span class="ident">machine</span>.<span class="ident">outgoing_to_device_requests</span>().<span class="ident">is_empty</span>());
     }
 
     <span class="attribute">#[<span class="ident">async_test</span>]</span>
@@ -2181,7 +2181,7 @@
             .<span class="kw">await</span>
             .<span class="ident">unwrap</span>();
 
-        <span class="macro">assert</span><span class="macro">!</span>(<span class="ident">machine</span>.<span class="ident">outgoing_to_device_requests</span>().<span class="ident">is_empty</span>());
+        <span class="macro">assert!</span>(<span class="ident">machine</span>.<span class="ident">outgoing_to_device_requests</span>().<span class="ident">is_empty</span>());
         <span class="ident">machine</span>
             .<span class="ident">create_outgoing_key_request</span>(
                 <span class="ident">session</span>.<span class="ident">room_id</span>(),
@@ -2190,8 +2190,8 @@
             )
             .<span class="kw">await</span>
             .<span class="ident">unwrap</span>();
-        <span class="macro">assert</span><span class="macro">!</span>(<span class="op">!</span><span class="ident">machine</span>.<span class="ident">outgoing_to_device_requests</span>().<span class="ident">is_empty</span>());
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">machine</span>.<span class="ident">outgoing_to_device_requests</span>().<span class="ident">len</span>(), <span class="number">1</span>);
+        <span class="macro">assert!</span>(<span class="op">!</span><span class="ident">machine</span>.<span class="ident">outgoing_to_device_requests</span>().<span class="ident">is_empty</span>());
+        <span class="macro">assert_eq!</span>(<span class="ident">machine</span>.<span class="ident">outgoing_to_device_requests</span>().<span class="ident">len</span>(), <span class="number">1</span>);
 
         <span class="ident">machine</span>
             .<span class="ident">create_outgoing_key_request</span>(
@@ -2201,7 +2201,7 @@
             )
             .<span class="kw">await</span>
             .<span class="ident">unwrap</span>();
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">machine</span>.<span class="ident">outgoing_to_device_requests</span>.<span class="ident">len</span>(), <span class="number">1</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">machine</span>.<span class="ident">outgoing_to_device_requests</span>.<span class="ident">len</span>(), <span class="number">1</span>);
 
         <span class="kw">let</span> <span class="ident">request</span> <span class="op">=</span> <span class="ident">machine</span>.<span class="ident">outgoing_to_device_requests</span>.<span class="ident">iter</span>().<span class="ident">next</span>().<span class="ident">unwrap</span>();
 
@@ -2209,7 +2209,7 @@
         <span class="ident">drop</span>(<span class="ident">request</span>);
 
         <span class="ident">machine</span>.<span class="ident">mark_outgoing_request_as_sent</span>(<span class="kw-2">&amp;</span><span class="ident">id</span>).<span class="kw">await</span>.<span class="ident">unwrap</span>();
-        <span class="macro">assert</span><span class="macro">!</span>(<span class="ident">machine</span>.<span class="ident">outgoing_to_device_requests</span>.<span class="ident">is_empty</span>());
+        <span class="macro">assert!</span>(<span class="ident">machine</span>.<span class="ident">outgoing_to_device_requests</span>.<span class="ident">is_empty</span>());
     }
 
     <span class="attribute">#[<span class="ident">async_test</span>]</span>
@@ -2245,7 +2245,7 @@
             <span class="ident">content</span>,
         };
 
-        <span class="macro">assert</span><span class="macro">!</span>(
+        <span class="macro">assert!</span>(
             <span class="ident">machine</span>
                 .<span class="ident">store</span>
                 .<span class="ident">get_inbound_group_session</span>(
@@ -2264,7 +2264,7 @@
             .<span class="ident">unwrap</span>();
         <span class="kw">let</span> <span class="ident">first_session</span> <span class="op">=</span> <span class="ident">first_session</span>.<span class="ident">unwrap</span>();
 
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">first_session</span>.<span class="ident">first_known_index</span>(), <span class="number">10</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">first_session</span>.<span class="ident">first_known_index</span>(), <span class="number">10</span>);
 
         <span class="ident">machine</span>
             .<span class="ident">store</span>
@@ -2307,7 +2307,7 @@
             .<span class="kw">await</span>
             .<span class="ident">unwrap</span>();
 
-        <span class="macro">assert</span><span class="macro">!</span>(<span class="ident">second_session</span>.<span class="ident">is_none</span>());
+        <span class="macro">assert!</span>(<span class="ident">second_session</span>.<span class="ident">is_none</span>());
 
         <span class="kw">let</span> <span class="ident">export</span> <span class="op">=</span> <span class="ident">session</span>.<span class="ident">export_at_index</span>(<span class="number">0</span>).<span class="kw">await</span>;
 
@@ -2323,7 +2323,7 @@
             .<span class="kw">await</span>
             .<span class="ident">unwrap</span>();
 
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">second_session</span>.<span class="ident">unwrap</span>().<span class="ident">first_known_index</span>(), <span class="number">0</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">second_session</span>.<span class="ident">unwrap</span>().<span class="ident">first_known_index</span>(), <span class="number">0</span>);
     }
 
     <span class="attribute">#[<span class="ident">async_test</span>]</span>
@@ -2339,7 +2339,7 @@
             .<span class="ident">unwrap</span>();
 
         <span class="comment">// We don&#39;t share keys with untrusted devices.</span>
-        <span class="macro">assert_eq</span><span class="macro">!</span>(
+        <span class="macro">assert_eq!</span>(
             <span class="ident">machine</span>
                 .<span class="ident">should_share_session</span>(<span class="kw-2">&amp;</span><span class="ident">own_device</span>, <span class="prelude-val">None</span>)
                 .<span class="ident">expect_err</span>(<span class="string">&quot;Should not share with untrusted&quot;</span>),
@@ -2347,7 +2347,7 @@
         );
         <span class="ident">own_device</span>.<span class="ident">set_trust_state</span>(<span class="ident">LocalTrust</span>::<span class="ident">Verified</span>);
         <span class="comment">// Now we do want to share the keys.</span>
-        <span class="macro">assert</span><span class="macro">!</span>(<span class="ident">machine</span>.<span class="ident">should_share_session</span>(<span class="kw-2">&amp;</span><span class="ident">own_device</span>, <span class="prelude-val">None</span>).<span class="ident">is_ok</span>());
+        <span class="macro">assert!</span>(<span class="ident">machine</span>.<span class="ident">should_share_session</span>(<span class="kw-2">&amp;</span><span class="ident">own_device</span>, <span class="prelude-val">None</span>).<span class="ident">is_ok</span>());
 
         <span class="kw">let</span> <span class="ident">bob_device</span> <span class="op">=</span> <span class="ident">ReadOnlyDevice</span>::<span class="ident">from_account</span>(<span class="kw-2">&amp;</span><span class="ident">bob_account</span>()).<span class="kw">await</span>;
         <span class="ident">machine</span>.<span class="ident">store</span>.<span class="ident">save_devices</span>(<span class="kw-2">&amp;</span>[<span class="ident">bob_device</span>]).<span class="kw">await</span>.<span class="ident">unwrap</span>();
@@ -2361,7 +2361,7 @@
 
         <span class="comment">// We don&#39;t share sessions with other user&#39;s devices if no outbound</span>
         <span class="comment">// session was provided.</span>
-        <span class="macro">assert_eq</span><span class="macro">!</span>(
+        <span class="macro">assert_eq!</span>(
             <span class="ident">machine</span>
                 .<span class="ident">should_share_session</span>(<span class="kw-2">&amp;</span><span class="ident">bob_device</span>, <span class="prelude-val">None</span>)
                 .<span class="ident">expect_err</span>(<span class="string">&quot;Should not share with other.&quot;</span>),
@@ -2375,7 +2375,7 @@
 
         <span class="comment">// We don&#39;t share sessions with other user&#39;s devices if the session</span>
         <span class="comment">// wasn&#39;t shared in the first place.</span>
-        <span class="macro">assert_eq</span><span class="macro">!</span>(
+        <span class="macro">assert_eq!</span>(
             <span class="ident">machine</span>
                 .<span class="ident">should_share_session</span>(<span class="kw-2">&amp;</span><span class="ident">bob_device</span>, <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="ident">session</span>))
                 .<span class="ident">expect_err</span>(<span class="string">&quot;Should not share with other unless shared.&quot;</span>),
@@ -2386,7 +2386,7 @@
 
         <span class="comment">// We don&#39;t share sessions with other user&#39;s devices if the session</span>
         <span class="comment">// wasn&#39;t shared in the first place even if the device is trusted.</span>
-        <span class="macro">assert_eq</span><span class="macro">!</span>(
+        <span class="macro">assert_eq!</span>(
             <span class="ident">machine</span>
                 .<span class="ident">should_share_session</span>(<span class="kw-2">&amp;</span><span class="ident">bob_device</span>, <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="ident">session</span>))
                 .<span class="ident">expect_err</span>(<span class="string">&quot;Should not share with other unless shared.&quot;</span>),
@@ -2394,7 +2394,7 @@
         );
 
         <span class="ident">session</span>.<span class="ident">mark_shared_with</span>(<span class="ident">bob_device</span>.<span class="ident">user_id</span>(), <span class="ident">bob_device</span>.<span class="ident">device_id</span>());
-        <span class="macro">assert</span><span class="macro">!</span>(<span class="ident">machine</span>
+        <span class="macro">assert!</span>(<span class="ident">machine</span>
             .<span class="ident">should_share_session</span>(<span class="kw-2">&amp;</span><span class="ident">bob_device</span>, <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="ident">session</span>))
             .<span class="ident">is_ok</span>());
     }
@@ -2497,13 +2497,13 @@
         };
 
         <span class="comment">// Bob doesn&#39;t have any outgoing requests.</span>
-        <span class="macro">assert</span><span class="macro">!</span>(<span class="ident">bob_machine</span>.<span class="ident">outgoing_to_device_requests</span>.<span class="ident">is_empty</span>());
+        <span class="macro">assert!</span>(<span class="ident">bob_machine</span>.<span class="ident">outgoing_to_device_requests</span>.<span class="ident">is_empty</span>());
 
         <span class="comment">// Receive the room key request from alice.</span>
         <span class="ident">bob_machine</span>.<span class="ident">receive_incoming_key_request</span>(<span class="kw-2">&amp;</span><span class="ident">event</span>);
         <span class="ident">bob_machine</span>.<span class="ident">collect_incoming_key_requests</span>().<span class="kw">await</span>.<span class="ident">unwrap</span>();
         <span class="comment">// Now bob does have an outgoing request.</span>
-        <span class="macro">assert</span><span class="macro">!</span>(<span class="op">!</span><span class="ident">bob_machine</span>.<span class="ident">outgoing_to_device_requests</span>.<span class="ident">is_empty</span>());
+        <span class="macro">assert!</span>(<span class="op">!</span><span class="ident">bob_machine</span>.<span class="ident">outgoing_to_device_requests</span>.<span class="ident">is_empty</span>());
 
         <span class="comment">// Get the request and convert it to a encrypted to-device event.</span>
         <span class="kw">let</span> <span class="ident">request</span> <span class="op">=</span> <span class="ident">bob_machine</span>
@@ -2536,7 +2536,7 @@
         };
 
         <span class="comment">// Check that alice doesn&#39;t have the session.</span>
-        <span class="macro">assert</span><span class="macro">!</span>(<span class="ident">alice_machine</span>
+        <span class="macro">assert!</span>(<span class="ident">alice_machine</span>
             .<span class="ident">store</span>
             .<span class="ident">get_inbound_group_session</span>(
                 <span class="kw-2">&amp;</span><span class="ident">room_id</span>(),
@@ -2560,7 +2560,7 @@
                 .<span class="kw">await</span>
                 .<span class="ident">unwrap</span>();
         } <span class="kw">else</span> {
-            <span class="macro">panic</span><span class="macro">!</span>(<span class="string">&quot;Invalid decrypted event type&quot;</span>);
+            <span class="macro">panic!</span>(<span class="string">&quot;Invalid decrypted event type&quot;</span>);
         }
 
         <span class="comment">// Check that alice now does have the session.</span>
@@ -2575,7 +2575,7 @@
             .<span class="ident">unwrap</span>()
             .<span class="ident">unwrap</span>();
 
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">session</span>.<span class="ident">session_id</span>(), <span class="ident">group_session</span>.<span class="ident">session_id</span>())
+        <span class="macro">assert_eq!</span>(<span class="ident">session</span>.<span class="ident">session_id</span>(), <span class="ident">group_session</span>.<span class="ident">session_id</span>())
     }
 
     <span class="attribute">#[<span class="ident">async_test</span>]</span>
@@ -2666,17 +2666,17 @@
         };
 
         <span class="comment">// Bob doesn&#39;t have any outgoing requests.</span>
-        <span class="macro">assert</span><span class="macro">!</span>(<span class="ident">bob_machine</span>.<span class="ident">outgoing_to_device_requests</span>.<span class="ident">is_empty</span>());
-        <span class="macro">assert</span><span class="macro">!</span>(<span class="ident">bob_machine</span>.<span class="ident">users_for_key_claim</span>.<span class="ident">is_empty</span>());
-        <span class="macro">assert</span><span class="macro">!</span>(<span class="ident">bob_machine</span>.<span class="ident">wait_queue</span>.<span class="ident">is_empty</span>());
+        <span class="macro">assert!</span>(<span class="ident">bob_machine</span>.<span class="ident">outgoing_to_device_requests</span>.<span class="ident">is_empty</span>());
+        <span class="macro">assert!</span>(<span class="ident">bob_machine</span>.<span class="ident">users_for_key_claim</span>.<span class="ident">is_empty</span>());
+        <span class="macro">assert!</span>(<span class="ident">bob_machine</span>.<span class="ident">wait_queue</span>.<span class="ident">is_empty</span>());
 
         <span class="comment">// Receive the room key request from alice.</span>
         <span class="ident">bob_machine</span>.<span class="ident">receive_incoming_key_request</span>(<span class="kw-2">&amp;</span><span class="ident">event</span>);
         <span class="ident">bob_machine</span>.<span class="ident">collect_incoming_key_requests</span>().<span class="kw">await</span>.<span class="ident">unwrap</span>();
         <span class="comment">// Bob doens&#39;t have an outgoing requests since we&#39;re lacking a session.</span>
-        <span class="macro">assert</span><span class="macro">!</span>(<span class="ident">bob_machine</span>.<span class="ident">outgoing_to_device_requests</span>.<span class="ident">is_empty</span>());
-        <span class="macro">assert</span><span class="macro">!</span>(<span class="op">!</span><span class="ident">bob_machine</span>.<span class="ident">users_for_key_claim</span>.<span class="ident">is_empty</span>());
-        <span class="macro">assert</span><span class="macro">!</span>(<span class="op">!</span><span class="ident">bob_machine</span>.<span class="ident">wait_queue</span>.<span class="ident">is_empty</span>());
+        <span class="macro">assert!</span>(<span class="ident">bob_machine</span>.<span class="ident">outgoing_to_device_requests</span>.<span class="ident">is_empty</span>());
+        <span class="macro">assert!</span>(<span class="op">!</span><span class="ident">bob_machine</span>.<span class="ident">users_for_key_claim</span>.<span class="ident">is_empty</span>());
+        <span class="macro">assert!</span>(<span class="op">!</span><span class="ident">bob_machine</span>.<span class="ident">wait_queue</span>.<span class="ident">is_empty</span>());
 
         <span class="comment">// We create a session now.</span>
         <span class="ident">alice_machine</span>
@@ -2691,11 +2691,11 @@
             .<span class="ident">unwrap</span>();
 
         <span class="ident">bob_machine</span>.<span class="ident">retry_keyshare</span>(<span class="kw-2">&amp;</span><span class="ident">alice_id</span>(), <span class="kw-2">&amp;</span><span class="ident">alice_device_id</span>());
-        <span class="macro">assert</span><span class="macro">!</span>(<span class="ident">bob_machine</span>.<span class="ident">users_for_key_claim</span>.<span class="ident">is_empty</span>());
+        <span class="macro">assert!</span>(<span class="ident">bob_machine</span>.<span class="ident">users_for_key_claim</span>.<span class="ident">is_empty</span>());
         <span class="ident">bob_machine</span>.<span class="ident">collect_incoming_key_requests</span>().<span class="kw">await</span>.<span class="ident">unwrap</span>();
         <span class="comment">// Bob now has an outgoing requests.</span>
-        <span class="macro">assert</span><span class="macro">!</span>(<span class="op">!</span><span class="ident">bob_machine</span>.<span class="ident">outgoing_to_device_requests</span>.<span class="ident">is_empty</span>());
-        <span class="macro">assert</span><span class="macro">!</span>(<span class="ident">bob_machine</span>.<span class="ident">wait_queue</span>.<span class="ident">is_empty</span>());
+        <span class="macro">assert!</span>(<span class="op">!</span><span class="ident">bob_machine</span>.<span class="ident">outgoing_to_device_requests</span>.<span class="ident">is_empty</span>());
+        <span class="macro">assert!</span>(<span class="ident">bob_machine</span>.<span class="ident">wait_queue</span>.<span class="ident">is_empty</span>());
 
         <span class="comment">// Get the request and convert it to a encrypted to-device event.</span>
         <span class="kw">let</span> <span class="ident">request</span> <span class="op">=</span> <span class="ident">bob_machine</span>
@@ -2728,7 +2728,7 @@
         };
 
         <span class="comment">// Check that alice doesn&#39;t have the session.</span>
-        <span class="macro">assert</span><span class="macro">!</span>(<span class="ident">alice_machine</span>
+        <span class="macro">assert!</span>(<span class="ident">alice_machine</span>
             .<span class="ident">store</span>
             .<span class="ident">get_inbound_group_session</span>(
                 <span class="kw-2">&amp;</span><span class="ident">room_id</span>(),
@@ -2752,7 +2752,7 @@
                 .<span class="kw">await</span>
                 .<span class="ident">unwrap</span>();
         } <span class="kw">else</span> {
-            <span class="macro">panic</span><span class="macro">!</span>(<span class="string">&quot;Invalid decrypted event type&quot;</span>);
+            <span class="macro">panic!</span>(<span class="string">&quot;Invalid decrypted event type&quot;</span>);
         }
 
         <span class="comment">// Check that alice now does have the session.</span>
@@ -2767,7 +2767,7 @@
             .<span class="ident">unwrap</span>()
             .<span class="ident">unwrap</span>();
 
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">session</span>.<span class="ident">session_id</span>(), <span class="ident">group_session</span>.<span class="ident">session_id</span>())
+        <span class="macro">assert_eq!</span>(<span class="ident">session</span>.<span class="ident">session_id</span>(), <span class="ident">group_session</span>.<span class="ident">session_id</span>())
     }
 }
 </pre></div>
