@@ -1093,6 +1093,9 @@
 <span id="1090">1090</span>
 <span id="1091">1091</span>
 <span id="1092">1092</span>
+<span id="1093">1093</span>
+<span id="1094">1094</span>
+<span id="1095">1095</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="comment">// Copyright 2020 The Matrix.org Foundation C.I.C.</span>
 <span class="comment">//</span>
@@ -1896,10 +1899,7 @@
             <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">signatures</span> <span class="op">=</span> <span class="ident">BTreeMap</span>::<span class="ident">new</span>();
             <span class="ident">signatures</span>.<span class="ident">insert</span>((<span class="kw-2">*</span><span class="self">self</span>.<span class="ident">user_id</span>).<span class="ident">clone</span>(), <span class="ident">signature_map</span>);
 
-            <span class="kw">let</span> <span class="ident">signed_key</span> <span class="op">=</span> <span class="ident">SignedKey</span> {
-                <span class="ident">key</span>: <span class="ident">key</span>.<span class="ident">to_owned</span>(),
-                <span class="ident">signatures</span>,
-            };
+            <span class="kw">let</span> <span class="ident">signed_key</span> <span class="op">=</span> <span class="ident">SignedKey</span>::<span class="ident">new</span>(<span class="ident">key</span>.<span class="ident">to_owned</span>(), <span class="ident">signatures</span>);
 
             <span class="ident">one_time_key_map</span>.<span class="ident">insert</span>(
                 <span class="ident">DeviceKeyId</span>::<span class="ident">from_parts</span>(
@@ -1986,6 +1986,12 @@
             <span class="ident">OneTimeKey</span>::<span class="ident">SignedKey</span>(<span class="ident">k</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">k</span>,
             <span class="ident">OneTimeKey</span>::<span class="ident">Key</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> {
                 <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">SessionCreationError</span>::<span class="ident">OneTimeKeyNotSigned</span>(
+                    <span class="ident">device</span>.<span class="ident">user_id</span>().<span class="ident">to_owned</span>(),
+                    <span class="ident">device</span>.<span class="ident">device_id</span>().<span class="ident">into</span>(),
+                ));
+            }
+            <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> {
+                <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">SessionCreationError</span>::<span class="ident">OneTimeKeyUnknown</span>(
                     <span class="ident">device</span>.<span class="ident">user_id</span>().<span class="ident">to_owned</span>(),
                     <span class="ident">device</span>.<span class="ident">device_id</span>().<span class="ident">into</span>(),
                 ));
