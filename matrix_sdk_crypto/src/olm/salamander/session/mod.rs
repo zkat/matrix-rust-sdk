@@ -17,7 +17,13 @@ mod double_ratchet;
 use x25519_dalek::PublicKey as Curve25591PublicKey;
 
 use double_ratchet::{LocalDoubleRatchet, RemoteDoubleRatchet, RemoteRatchetKey};
-pub use double_ratchet::{OlmMessage, PrekeyMessage, RemoteShared3DHSecret, Shared3DHSecret};
+pub use double_ratchet::{
+    OlmMessage as InnerMessage, PrekeyMessage as InnerPreKeyMessage, RemoteShared3DHSecret,
+    Shared3DHSecret,
+};
+
+use super::message::{Message, OlmMessage, PreKeyMessage};
+use crate::utilities::{decode, encode};
 
 pub(super) struct SessionKeys {
     identity_key: Curve25591PublicKey,
@@ -26,7 +32,7 @@ pub(super) struct SessionKeys {
 }
 
 impl SessionKeys {
-    pub(super) fn new(
+    pub fn new(
         identity_key: Curve25591PublicKey,
         ephemeral_key: Curve25591PublicKey,
         one_time_key: Curve25591PublicKey,
@@ -72,7 +78,7 @@ impl Session {
         }
     }
 
-    pub fn encrypt(&mut self, plaintext: &str) -> Vec<u8> {
+    pub fn encrypt(&mut self, plaintext: &str) -> OlmMessage {
         let message = match &mut self.sending_ratchet {
             LocalDoubleRatchet::Inactive(ratchet) => {
                 let mut ratchet = ratchet.activate();
@@ -84,27 +90,49 @@ impl Session {
         };
 
         if let Some(session_keys) = &self.session_keys {
-            PrekeyMessage::from_parts(
+            let message = InnerPreKeyMessage::from_parts(
                 &session_keys.one_time_key,
                 &session_keys.ephemeral_key,
                 &session_keys.identity_key,
                 message.into_vec(),
             )
-            .into_vec()
+            .into_vec();
+
+            OlmMessage::PreKey(PreKeyMessage {
+                inner: encode(message),
+            })
         } else {
-            message.into_vec()
+            let message = message.into_vec();
+            OlmMessage::Normal(Message {
+                inner: encode(message),
+            })
         }
     }
 
-    pub fn decrypt_prekey(&mut self, message: Vec<u8>) -> Vec<u8> {
-        let message = PrekeyMessage::from(message);
-        let (_, _, _, message) = message.decode().unwrap();
+    pub fn decrypt(&mut self, message: &OlmMessage) -> String {
+        let decrypted = match message {
+            OlmMessage::Normal(m) => {
+                let message = decode(&m.inner).unwrap();
+                self.decrypt_normal(message)
+            }
+            OlmMessage::PreKey(m) => {
+                let message = decode(&m.inner).unwrap();
+                self.decrypt_prekey(message)
+            }
+        };
 
-        self.decrypt(message)
+        String::from_utf8_lossy(&decrypted).to_string()
     }
 
-    pub fn decrypt(&mut self, message: Vec<u8>) -> Vec<u8> {
-        let message = OlmMessage::from(message);
+    fn decrypt_prekey(&mut self, message: Vec<u8>) -> Vec<u8> {
+        let message = InnerPreKeyMessage::from(message);
+        let (_, _, _, message) = message.decode().unwrap();
+
+        self.decrypt_normal(message)
+    }
+
+    fn decrypt_normal(&mut self, message: Vec<u8>) -> Vec<u8> {
+        let message = InnerMessage::from(message);
         let decoded = message.decode().unwrap();
 
         // TODO try to use existing message keys.

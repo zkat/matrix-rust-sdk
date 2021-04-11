@@ -21,10 +21,14 @@ use x25519_dalek::{PublicKey as Curve25591PublicKey, StaticSecret as Curve25591S
 
 use dashmap::DashMap;
 
-use crate::utilities::encode;
+use crate::utilities::{decode, encode};
 
-use super::session::{
-    OlmMessage, PrekeyMessage, RemoteShared3DHSecret, Session, SessionKeys, Shared3DHSecret,
+use super::{
+    message::PreKeyMessage,
+    session::{
+        InnerMessage, InnerPreKeyMessage, RemoteShared3DHSecret, Session, SessionKeys,
+        Shared3DHSecret,
+    },
 };
 
 struct Ed25519Keypair {
@@ -165,8 +169,10 @@ impl Account {
         Session::new(shared_secret, session_keys)
     }
 
-    pub fn session(&self, message: Vec<u8>) -> Session {
-        let message = PrekeyMessage::from(message);
+    pub fn session(&self, message: &PreKeyMessage) -> Session {
+        let message = decode(&message.inner).unwrap();
+        let message = InnerPreKeyMessage::from(message);
+
         let (public_one_time_key, remote_one_time_key, remote_identity_key, m) =
             message.decode().unwrap();
 
@@ -182,7 +188,7 @@ impl Account {
             &remote_one_time_key,
         );
 
-        let message = OlmMessage::from(m);
+        let message = InnerMessage::from(m);
         let decoded = message.decode().unwrap();
 
         Session::new_remote(shared_secret, decoded.ratchet_key)
@@ -218,9 +224,10 @@ impl Account {
 
 #[cfg(test)]
 mod test {
-    use super::{Account, Curve25591PublicKey};
-    use crate::utilities::{decode, encode};
     use olm_rs::{account::OlmAccount, session::OlmMessage};
+
+    use super::{Account, Curve25591PublicKey};
+    use crate::{olm::salamander, utilities::decode};
 
     #[test]
     fn test_encryption() {
@@ -252,9 +259,7 @@ mod test {
 
         let message = "It's a secret to everybody";
 
-        let olm_message = alice_session.encrypt(message);
-        let olm_message = encode(olm_message);
-        let olm_message = OlmMessage::from_type_and_ciphertext(0, olm_message).unwrap();
+        let olm_message: OlmMessage = alice_session.encrypt(message).into();
         bob.mark_keys_as_published();
 
         if let OlmMessage::PreKey(m) = olm_message.clone() {
@@ -267,9 +272,7 @@ mod test {
             assert_eq!(message, plaintext);
 
             let second_text = "Here's another secret to everybody";
-            let olm_message = alice_session.encrypt(second_text);
-            let olm_message = encode(olm_message);
-            let olm_message = OlmMessage::from_type_and_ciphertext(0, olm_message).unwrap();
+            let olm_message = alice_session.encrypt(second_text).into();
 
             let plaintext = session
                 .decrypt(olm_message)
@@ -277,22 +280,18 @@ mod test {
             assert_eq!(second_text, plaintext);
 
             let reply_plain = "Yes, take this, it's dangerous out there";
-            let (_, reply) = session.encrypt(reply_plain).to_tuple();
-            let reply = decode(reply).unwrap();
-            let plaintext = String::from_utf8(alice_session.decrypt(reply)).unwrap();
+            let reply = session.encrypt(reply_plain).into();
+            let plaintext = alice_session.decrypt(&reply);
 
             assert_eq!(&plaintext, reply_plain);
 
             let another_reply = "Last one";
-            let (_, reply) = session.encrypt(another_reply).to_tuple();
-            let reply = decode(reply).unwrap();
-            let plaintext = String::from_utf8(alice_session.decrypt(reply)).unwrap();
+            let reply = session.encrypt(another_reply).into();
+            let plaintext = alice_session.decrypt(&reply);
             assert_eq!(&plaintext, another_reply);
 
             let last_text = "Nope, I'll have the last word";
-            let olm_message = alice_session.encrypt(last_text);
-            let olm_message = encode(olm_message);
-            let olm_message = OlmMessage::from_type_and_ciphertext(1, olm_message).unwrap();
+            let olm_message = alice_session.encrypt(last_text).into();
 
             let plaintext = session
                 .decrypt(olm_message)
@@ -318,13 +317,17 @@ mod test {
 
         let text = "It's a secret to everybody";
 
-        let (_, message) = alice_session.encrypt(text).to_tuple();
-        let message = decode(message).unwrap();
+        let message: salamander::message::OlmMessage =
+            alice_session.encrypt(text).into();
 
-        let mut session = bob.session(message.clone());
+        let mut session = if let salamander::message::OlmMessage::PreKey(m) = &message {
+            bob.session(m)
+        } else {
+            panic!("Got invalid message type from olm_rs");
+        };
 
-        let decrypted = session.decrypt_prekey(message);
+        let decrypted = session.decrypt(&message);
 
-        assert_eq!(text, String::from_utf8(decrypted).unwrap());
+        assert_eq!(text, decrypted);
     }
 }
