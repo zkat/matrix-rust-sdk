@@ -129,9 +129,9 @@ struct RemoteDoubleRatchet {
 }
 
 impl RemoteDoubleRatchet {
-    fn decrypt(&mut self, message: Vec<u8>) -> Vec<u8> {
+    fn decrypt(&mut self, message: &OlmMessage, ciphertext: &[u8], mac: [u8; 8]) -> Vec<u8> {
         let message_key = self.hkdf_ratchet.create_message_key();
-        message_key.decrypt(message)
+        message_key.decrypt(message, ciphertext, mac)
     }
 
     fn belongs_to(&self, ratchet_key: &RemoteRatchetKey) -> bool {
@@ -189,15 +189,15 @@ impl Session {
         }
     }
 
-    pub fn encrypt(&mut self, plaintext: &[u8]) -> Vec<u8> {
+    pub fn encrypt(&mut self, plaintext: &str) -> Vec<u8> {
         let message = match &mut self.sending_ratchet {
             LocalDoubleRatchet::Inactive(ratchet) => {
                 let mut ratchet = ratchet.activate();
-                let message = ratchet.encrypt(plaintext);
+                let message = ratchet.encrypt(plaintext.as_bytes());
                 self.sending_ratchet = LocalDoubleRatchet::Active(ratchet);
                 message
             }
-            LocalDoubleRatchet::Active(ratchet) => ratchet.encrypt(plaintext),
+            LocalDoubleRatchet::Active(ratchet) => ratchet.encrypt(plaintext.as_bytes()),
         };
 
         if let Some(session_keys) = &self.session_keys {
@@ -222,19 +222,20 @@ impl Session {
 
     pub fn decrypt(&mut self, message: Vec<u8>) -> Vec<u8> {
         let message = OlmMessage::from(message);
-        let (ratchet_key, _index, ciphertext) = message.decode().unwrap();
+        let decoded = message.decode().unwrap();
 
         // TODO try to use existing message keys.
 
         if !self
             .receiving_ratchet
             .as_ref()
-            .map_or(false, |r| r.belongs_to(&ratchet_key))
+            .map_or(false, |r| r.belongs_to(&decoded.ratchet_key))
         {
-            let (sending_ratchet, mut remote_ratchet) = self.sending_ratchet.advance(ratchet_key);
+            let (sending_ratchet, mut remote_ratchet) =
+                self.sending_ratchet.advance(decoded.ratchet_key);
 
             // TODO don't update the state if the message doesn't decrypt
-            let plaintext = remote_ratchet.decrypt(ciphertext);
+            let plaintext = remote_ratchet.decrypt(&message, &decoded.ciphertext, decoded.mac);
 
             self.sending_ratchet = LocalDoubleRatchet::Inactive(sending_ratchet);
             self.receiving_ratchet = Some(remote_ratchet);
@@ -242,7 +243,7 @@ impl Session {
 
             plaintext
         } else if let Some(ref mut remote_ratchet) = self.receiving_ratchet {
-            remote_ratchet.decrypt(ciphertext)
+            remote_ratchet.decrypt(&message, &decoded.ciphertext, decoded.mac)
         } else {
             todo!()
         }

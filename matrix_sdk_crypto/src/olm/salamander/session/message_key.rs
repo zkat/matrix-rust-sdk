@@ -87,9 +87,21 @@ impl RemoteMessageKey {
         expanded_keys.split()
     }
 
-    pub fn decrypt(self, ciphertext: Vec<u8>) -> Vec<u8> {
-        let (aes_key, _hmac_key, iv) = self.expand_keys();
-        // TODO check the MAC
+    pub fn decrypt(self, message: &OlmMessage, ciphertext: &[u8], mac: [u8; 8]) -> Vec<u8> {
+        let (aes_key, hmac_key, iv) = self.expand_keys();
+
+        let mut hmac = Hmac::<Sha256>::new_varkey(&hmac_key.into_bytes()).unwrap();
+        hmac.update(message.as_payload_bytes());
+
+        let new_mac = hmac.finalize().into_bytes();
+        let mut truncated_mac = [0u8; 8];
+        truncated_mac.copy_from_slice(&new_mac[0..8]);
+
+        // TODO use subtle to do a constant time comparison.
+        if truncated_mac != mac {
+            panic!("Invalid MAC");
+        }
+
         let cipher = Aes256Cbc::new_var(&aes_key.into_bytes(), &iv.into_bytes()).unwrap();
         cipher.decrypt_vec(&ciphertext).unwrap()
     }

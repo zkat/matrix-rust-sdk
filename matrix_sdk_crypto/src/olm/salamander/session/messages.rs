@@ -101,7 +101,7 @@ impl OlmMessage {
         self.inner[end - 8..].copy_from_slice(&mac[0..8]);
     }
 
-    pub fn decode(self) -> Result<(RemoteRatchetKey, u64, Vec<u8>), ()> {
+    pub(crate) fn decode(&self) -> Result<DecodedMessage, ()> {
         let version = *self.inner.get(0).unwrap();
 
         if version != Self::VERSION {
@@ -112,12 +112,21 @@ impl OlmMessage {
 
         let mut key = [0u8; 32];
         key.copy_from_slice(&inner.ratchet_key);
+        let mut mac = [0u8; 8];
+        mac.copy_from_slice(&self.inner[self.inner.len() - 8..]);
 
         let key = RemoteRatchetKey::from(key);
         let chain_index = inner.chain_index;
         let ciphertext = inner.ciphertext;
 
-        Ok((key, chain_index, ciphertext))
+        let message = DecodedMessage {
+            ratchet_key: key,
+            chain_index,
+            ciphertext,
+            mac,
+        };
+
+        Ok(message)
     }
 
     fn from_parts_untyped(ratchet_key: Vec<u8>, index: u64, ciphertext: Vec<u8>) -> Self {
@@ -261,6 +270,13 @@ impl From<Vec<u8>> for PrekeyMessage {
     fn from(bytes: Vec<u8>) -> Self {
         Self { inner: bytes }
     }
+}
+
+pub(crate) struct DecodedMessage {
+    pub ratchet_key: RemoteRatchetKey,
+    pub chain_index: u64,
+    pub ciphertext: Vec<u8>,
+    pub mac: [u8; 8],
 }
 
 #[derive(Clone, Message, PartialEq)]

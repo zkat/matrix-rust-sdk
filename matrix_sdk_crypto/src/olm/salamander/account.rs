@@ -183,9 +183,9 @@ impl Account {
         );
 
         let message = OlmMessage::from(m);
-        let (ratchet_key, _, _) = message.decode().unwrap();
+        let decoded = message.decode().unwrap();
 
-        Session::new_remote(shared_secret, ratchet_key)
+        Session::new_remote(shared_secret, decoded.ratchet_key)
     }
 
     /// Get a reference to the account's public curve25519 key
@@ -252,7 +252,7 @@ mod test {
 
         let message = "It's a secret to everybody";
 
-        let olm_message = alice_session.encrypt(message.as_bytes());
+        let olm_message = alice_session.encrypt(message);
         let olm_message = encode(olm_message);
         let olm_message = OlmMessage::from_type_and_ciphertext(0, olm_message).unwrap();
         bob.mark_keys_as_published();
@@ -267,7 +267,7 @@ mod test {
             assert_eq!(message, plaintext);
 
             let second_text = "Here's another secret to everybody";
-            let olm_message = alice_session.encrypt(second_text.as_bytes());
+            let olm_message = alice_session.encrypt(second_text);
             let olm_message = encode(olm_message);
             let olm_message = OlmMessage::from_type_and_ciphertext(0, olm_message).unwrap();
 
@@ -290,7 +290,7 @@ mod test {
             assert_eq!(&plaintext, another_reply);
 
             let last_text = "Nope, I'll have the last word";
-            let olm_message = alice_session.encrypt(last_text.as_bytes());
+            let olm_message = alice_session.encrypt(last_text);
             let olm_message = encode(olm_message);
             let olm_message = OlmMessage::from_type_and_ciphertext(1, olm_message).unwrap();
 
