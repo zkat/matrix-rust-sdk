@@ -43,7 +43,7 @@ use sled::{
 };
 use tracing::info;
 
-use crate::{deserialized_responses::MemberEvent, rooms::StrippedRoomInfo};
+use crate::deserialized_responses::MemberEvent;
 
 use self::store_key::{EncryptedEvent, StoreKey};
 
@@ -249,10 +249,7 @@ impl SledStore {
         SledStore::open_helper(db, Some(path), None)
     }
 
-    fn serialize_event(
-        &self,
-        event: &impl Serialize,
-    ) -> std::result::Result<Vec<u8>, SerializationError> {
+    fn serialize_event(&self, event: &impl Serialize) -> Result<Vec<u8>, SerializationError> {
         if let Some(key) = &*self.store_key {
             let encrypted = key.encrypt(event)?;
             Ok(serde_json::to_vec(&encrypted)?)
@@ -264,7 +261,7 @@ impl SledStore {
     fn deserialize_event<T: for<'b> Deserialize<'b>>(
         &self,
         event: &[u8],
-    ) -> std::result::Result<T, SerializationError> {
+    ) -> Result<T, SerializationError> {
         if let Some(key) = &*self.store_key {
             let encrypted: EncryptedEvent = serde_json::from_slice(&event)?;
             Ok(key.decrypt(encrypted)?)
@@ -297,7 +294,7 @@ impl SledStore {
     pub async fn save_changes(&self, changes: &StateChanges) -> Result<()> {
         let now = SystemTime::now();
 
-        let ret: std::result::Result<(), TransactionError<SerializationError>> = (
+        let ret: Result<(), TransactionError<SerializationError>> = (
             &self.session,
             &self.account_data,
             &self.members,
@@ -527,6 +524,13 @@ impl SledStore {
             .transpose()?)
     }
 
+    pub async fn get_user_ids(&self, room_id: &RoomId) -> impl Stream<Item = Result<UserId>> {
+        stream::iter(self.members.scan_prefix(room_id.encode()).map(|u| {
+            UserId::try_from(String::from_utf8_lossy(&u?.1).to_string())
+                .map_err(StoreError::Identifier)
+        }))
+    }
+
     pub async fn get_invited_user_ids(
         &self,
         room_id: &RoomId,
@@ -560,7 +564,7 @@ impl SledStore {
         )
     }
 
-    pub async fn get_stripped_room_infos(&self) -> impl Stream<Item = Result<StrippedRoomInfo>> {
+    pub async fn get_stripped_room_infos(&self) -> impl Stream<Item = Result<RoomInfo>> {
         let db = self.clone();
         stream::iter(
             self.stripped_room_info
@@ -632,6 +636,10 @@ impl StateStore for SledStore {
         self.get_member_event(room_id, state_key).await
     }
 
+    async fn get_user_ids(&self, room_id: &RoomId) -> Result<Vec<UserId>> {
+        self.get_user_ids(room_id).await.try_collect().await
+    }
+
     async fn get_invited_user_ids(&self, room_id: &RoomId) -> Result<Vec<UserId>> {
         self.get_invited_user_ids(room_id).await.try_collect().await
     }
@@ -644,7 +652,7 @@ impl StateStore for SledStore {
         self.get_room_infos().await.try_collect().await
     }
 
-    async fn get_stripped_room_infos(&self) -> Result<Vec<StrippedRoomInfo>> {
+    async fn get_stripped_room_infos(&self) -> Result<Vec<RoomInfo>> {
         self.get_stripped_room_infos().await.try_collect().await
     }
 

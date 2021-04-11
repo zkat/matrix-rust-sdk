@@ -14,30 +14,26 @@ use matrix_sdk::{
         room::message::{MessageEventContent, MessageType, TextMessageEventContent},
         SyncMessageEvent,
     },
-    Client, EventHandler, RoomState, SyncSettings,
+    room::Room,
+    Client, EventHandler, SyncSettings,
 };
 use url::Url;
 
 struct ImageBot {
-    client: Client,
     image: Arc<Mutex<File>>,
 }
 
 impl ImageBot {
-    pub fn new(client: Client, image: File) -> Self {
+    pub fn new(image: File) -> Self {
         let image = Arc::new(Mutex::new(image));
-        Self { client, image }
+        Self { image }
     }
 }
 
 #[async_trait]
 impl EventHandler for ImageBot {
-    async fn on_room_message(
-        &self,
-        room: RoomState,
-        event: &SyncMessageEvent<MessageEventContent>,
-    ) {
-        if let RoomState::Joined(room) = room {
+    async fn on_room_message(&self, room: Room, event: &SyncMessageEvent<MessageEventContent>) {
+        if let Room::Joined(room) = room {
             let msg_body = if let SyncMessageEvent {
                 content:
                     MessageEventContent {
@@ -56,14 +52,7 @@ impl EventHandler for ImageBot {
                 println!("sending image");
                 let mut image = self.image.lock().await;
 
-                self.client
-                    .room_send_attachment(
-                        room.room_id(),
-                        "cat",
-                        &mime::IMAGE_JPEG,
-                        &mut *image,
-                        None,
-                    )
+                room.send_attachment("cat", &mime::IMAGE_JPEG, &mut *image, None)
                     .await
                     .unwrap();
 
@@ -90,7 +79,7 @@ async fn login_and_sync(
 
     client.sync_once(SyncSettings::default()).await.unwrap();
     client
-        .set_event_handler(Box::new(ImageBot::new(client.clone(), image)))
+        .set_event_handler(Box::new(ImageBot::new(image)))
         .await;
 
     let settings = SyncSettings::default().token(client.sync_token().await.unwrap());

@@ -199,6 +199,22 @@ lazy_static! {
 }
 
 lazy_static! {
+    pub static ref LOGIN_TYPES: JsonValue = json!({
+        "flows": [
+            {
+                "type": "m.login.password"
+            },
+            {
+                "type": "m.login.sso"
+            },
+            {
+                "type": "m.login.token"
+            }
+        ]
+    });
+}
+
+lazy_static! {
     pub static ref LOGOUT: JsonValue = json!({});
 }
 
@@ -391,7 +407,7 @@ lazy_static! {
 lazy_static! {
     pub static ref PRESENCE: JsonValue = json!({
         "content": {
-            "avatar_url": "mxc://localhost:wefuiwegh8742w",
+            "avatar_url": "mxc://localhost/wefuiwegh8742w",
             "currently_active": false,
             "last_active_ago": 1,
             "presence": "online",

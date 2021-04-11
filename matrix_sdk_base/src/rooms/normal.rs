@@ -29,9 +29,9 @@ use matrix_sdk_common::{
             guest_access::GuestAccess, history_visibility::HistoryVisibility, join_rules::JoinRule,
             tombstone::TombstoneEventContent,
         },
-        AnySyncStateEvent, EventType,
+        AnyStateEventContent, AnySyncStateEvent, EventType,
     },
-    identifiers::{RoomAliasId, RoomId, UserId},
+    identifiers::{MxcUri, RoomAliasId, RoomId, UserId},
 };
 use serde::{Deserialize, Serialize};
 use tracing::info;
@@ -43,7 +43,7 @@ use crate::{
 
 use super::{BaseRoomInfo, RoomMember};
 
-/// The underlying room data structure collecting state for joined and left rooms.
+/// The underlying room data structure collecting state for joined, left and invtied rooms.
 #[derive(Debug, Clone)]
 pub struct Room {
     room_id: Arc<RoomId>,
@@ -67,7 +67,7 @@ pub struct RoomSummary {
 
 /// Enum keeping track in which state the room is, e.g. if our own user is
 /// joined, invited, or has left the room.
-#[derive(Clone, Copy, Debug, Serialize, Deserialize)]
+#[derive(Clone, Copy, Debug, Eq, PartialEq, Serialize, Deserialize)]
 pub enum RoomType {
     /// The room is in a joined state.
     Joined,
@@ -148,7 +148,7 @@ impl Room {
     }
 
     /// Get the avatar url of this room.
-    pub fn avatar_url(&self) -> Option<String> {
+    pub fn avatar_url(&self) -> Option<MxcUri> {
         self.inner.read().unwrap().base_info.avatar_url.clone()
     }
 
@@ -259,6 +259,22 @@ impl Room {
     /// this room.
     pub async fn joined_user_ids(&self) -> StoreResult<Vec<UserId>> {
         self.store.get_joined_user_ids(self.room_id()).await
+    }
+
+    /// Get the all `RoomMember`s of this room that are known to the store.
+    pub async fn members(&self) -> StoreResult<Vec<RoomMember>> {
+        let user_ids = self.store.get_user_ids(self.room_id()).await?;
+        let mut members = Vec::new();
+
+        for u in user_ids {
+            let m = self.get_member(&u).await?;
+
+            if let Some(member) = m {
+                members.push(member);
+            }
+        }
+
+        Ok(members)
     }
 
     /// Get the list of `RoomMember`s that are considered to be joined members
@@ -484,8 +500,8 @@ impl RoomInfo {
         self.base_info.encryption.is_some()
     }
 
-    pub(crate) fn handle_state_event(&mut self, event: &AnySyncStateEvent) -> bool {
-        self.base_info.handle_state_event(&event.content())
+    pub(crate) fn handle_state_event(&mut self, event: &AnyStateEventContent) -> bool {
+        self.base_info.handle_state_event(&event)
     }
 
     pub(crate) fn update_notification_count(

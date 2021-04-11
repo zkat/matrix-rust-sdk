@@ -45,6 +45,7 @@
 //! of Synapse in compliance with the Matrix API specification.
 //! * `markdown`: Support for sending markdown formatted messages.
 //! * `socks`: Enables SOCKS support in reqwest, the default HTTP client.
+//! * `sso_login`: Enables SSO login with a local http server.
 
 #![deny(
     missing_debug_implementations,
@@ -64,12 +65,15 @@ compile_error!("one of 'native-tls' or 'rustls-tls' features must be enabled");
 #[cfg(all(feature = "native-tls", feature = "rustls-tls",))]
 compile_error!("only one of 'native-tls' or 'rustls-tls' features can be enabled");
 
+#[cfg(all(feature = "sso_login", target_arch = "wasm32"))]
+compile_error!("'sso_login' cannot be enabled on 'wasm32' arch");
+
 #[cfg(feature = "encryption")]
 #[cfg_attr(feature = "docs", doc(cfg(encryption)))]
 pub use matrix_sdk_base::crypto::{EncryptionInfo, LocalTrust};
 pub use matrix_sdk_base::{
-    CustomEvent, Error as BaseError, EventHandler, InvitedRoom, JoinedRoom, LeftRoom, RoomInfo,
-    RoomMember, RoomState, Session, StateChanges, StoreError,
+    Error as BaseError, Room as BaseRoom, RoomInfo, RoomMember as BaseRoomMember, RoomType,
+    Session, StateChanges, StoreError,
 };
 
 pub use matrix_sdk_common::*;
@@ -77,7 +81,12 @@ pub use reqwest;
 
 mod client;
 mod error;
+mod event_handler;
 mod http_client;
+/// High-level room API
+pub mod room;
+/// High-level room API
+mod room_member;
 
 #[cfg(feature = "encryption")]
 mod device;
@@ -86,12 +95,14 @@ mod sas;
 #[cfg(feature = "encryption")]
 mod verification_request;
 
-pub use client::{Client, ClientConfig, LoopCtrl, SyncSettings};
+pub use client::{Client, ClientConfig, LoopCtrl, RequestConfig, SyncSettings};
 #[cfg(feature = "encryption")]
 #[cfg_attr(feature = "docs", doc(cfg(encryption)))]
 pub use device::Device;
 pub use error::{Error, HttpError, Result};
+pub use event_handler::{CustomEvent, EventHandler};
 pub use http_client::HttpSend;
+pub use room_member::RoomMember;
 #[cfg(feature = "encryption")]
 #[cfg_attr(feature = "docs", doc(cfg(encryption)))]
 pub use sas::Sas;

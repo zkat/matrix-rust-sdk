@@ -62,11 +62,9 @@ use zeroize::Zeroizing;
 
 use crate::{
     error::Result,
-    event_handler::Handler,
-    rooms::{RoomInfo, RoomType, StrippedRoomInfo},
+    rooms::{Room, RoomInfo, RoomType},
     session::Session,
     store::{ambiguity_map::AmbiguityCache, Result as StoreResult, StateChanges, Store},
-    EventHandler, RoomState,
 };
 
 pub type Token = String;
@@ -153,17 +151,6 @@ fn hoist_room_event_prev_content(
     Ok(ev)
 }
 
-/// Signals to the `BaseClient` which `RoomState` to send to `EventHandler`.
-#[derive(Debug)]
-pub enum RoomStateType {
-    /// Represents a joined room, the `joined_rooms` HashMap will be used.
-    Joined,
-    /// Represents a left room, the `left_rooms` HashMap will be used.
-    Left,
-    /// Represents an invited room, the `invited_rooms` HashMap will be used.
-    Invited,
-}
-
 /// A no IO Client implementation.
 ///
 /// This Client is a state machine that receives responses and events and
@@ -183,9 +170,6 @@ pub struct BaseClient {
     cryptostore: Arc<Mutex<Option<Box<dyn CryptoStore>>>>,
     store_path: Arc<Option<PathBuf>>,
     store_passphrase: Arc<Option<Zeroizing<String>>>,
-    /// Any implementor of EventHandler will act as the callbacks for various
-    /// events.
-    event_handler: Arc<RwLock<Option<Handler>>>,
 }
 
 #[cfg(not(tarpaulin_include))]
@@ -331,7 +315,6 @@ impl BaseClient {
             cryptostore: Mutex::new(crypto_store).into(),
             store_path: config.store_path.into(),
             store_passphrase: config.passphrase.into(),
-            event_handler: RwLock::new(None).into(),
         })
     }
 
@@ -430,17 +413,6 @@ impl BaseClient {
         self.sync_token.read().await.clone()
     }
 
-    /// Add `EventHandler` to `Client`.
-    ///
-    /// The methods of `EventHandler` are called when the respective `RoomEvents` occur.
-    pub async fn set_event_handler(&self, handler: Box<dyn EventHandler>) {
-        let handler = Handler {
-            inner: handler,
-            store: self.store.clone(),
-        };
-        *self.event_handler.write().await = Some(handler);
-    }
-
     async fn handle_timeline(
         &self,
         room_id: &RoomId,
@@ -492,7 +464,7 @@ impl BaseClient {
                                 }
                             }
                             _ => {
-                                room_info.handle_state_event(&s);
+                                room_info.handle_state_event(&s.content());
                                 changes.add_state_event(room_id, s.clone());
                             }
                         },
@@ -536,7 +508,7 @@ impl BaseClient {
     fn handle_invited_state(
         &self,
         events: Vec<Raw<AnyStrippedStateEvent>>,
-        room_info: &mut StrippedRoomInfo,
+        room_info: &mut RoomInfo,
     ) -> (
         InviteState,
         BTreeMap<UserId, StrippedMemberEvent>,
@@ -560,7 +532,7 @@ impl BaseClient {
                                 ),
                             }
                         } else {
-                            room_info.handle_state_event(&e);
+                            room_info.handle_state_event(&e.content());
                             state_events
                                 .entry(e.content().event_type().to_owned())
                                 .or_insert_with(BTreeMap::new)
@@ -609,7 +581,7 @@ impl BaseClient {
                 })
         {
             state.events.push(event.clone());
-            room_info.handle_state_event(&event);
+            room_info.handle_state_event(&event.content());
 
             if let AnySyncStateEvent::RoomMember(member) = event {
                 match MemberEvent::try_from(member) {
@@ -945,10 +917,6 @@ impl BaseClient {
             },
         };
 
-        if let Some(handler) = self.event_handler.read().await.as_ref() {
-            handler.handle_sync(&response).await;
-        }
-
         Ok(response)
     }
 
@@ -1189,7 +1157,7 @@ impl BaseClient {
     /// # Arguments
     ///
     /// * `room_id` - The id of the room that should be fetched.
-    pub fn get_room(&self, room_id: &RoomId) -> Option<RoomState> {
+    pub fn get_room(&self, room_id: &RoomId) -> Option<Room> {
         self.store.get_room(room_id)
     }
 

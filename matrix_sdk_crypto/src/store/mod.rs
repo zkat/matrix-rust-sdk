@@ -82,7 +82,7 @@ use crate::{
 };
 
 /// A `CryptoStore` specific result type.
-pub type Result<T> = std::result::Result<T, CryptoStoreError>;
+pub type Result<T, E = CryptoStoreError> = std::result::Result<T, E>;
 
 /// A wrapper for our CryptoStore trait object.
 ///
@@ -124,6 +124,15 @@ pub struct DeviceChanges {
     pub new: Vec<ReadOnlyDevice>,
     pub changed: Vec<ReadOnlyDevice>,
     pub deleted: Vec<ReadOnlyDevice>,
+}
+
+impl DeviceChanges {
+    /// Merge the given `DeviceChanges` into this instance of `DeviceChanges`.
+    pub fn extend(&mut self, other: DeviceChanges) {
+        self.new.extend(other.new);
+        self.changed.extend(other.changed);
+        self.deleted.extend(other.deleted);
+    }
 }
 
 impl Store {

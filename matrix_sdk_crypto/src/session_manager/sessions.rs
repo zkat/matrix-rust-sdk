@@ -189,15 +189,15 @@ impl SessionManager {
     pub async fn get_missing_sessions(
         &self,
         users: impl Iterator<Item = &UserId>,
-    ) -> OlmResult<Option<(Uuid, KeysClaimRequest)>> {
+    ) -> StoreResult<Option<(Uuid, KeysClaimRequest)>> {
         let mut missing = BTreeMap::new();
 
         // Add the list of devices that the user wishes to establish sessions
         // right now.
         for user_id in users {
-            let user_devices = self.store.get_user_devices(user_id).await?;
+            let user_devices = self.store.get_readonly_devices(user_id).await?;
 
-            for device in user_devices.devices() {
+            for (device_id, device) in user_devices.into_iter() {
                 let sender_key = if let Some(k) = device.get_key(DeviceKeyAlgorithm::Curve25519) {
                     k
                 } else {
@@ -216,10 +216,7 @@ impl SessionManager {
                     missing
                         .entry(user_id.to_owned())
                         .or_insert_with(BTreeMap::new)
-                        .insert(
-                            device.device_id().into(),
-                            DeviceKeyAlgorithm::SignedCurve25519,
-                        );
+                        .insert(device_id, DeviceKeyAlgorithm::SignedCurve25519);
                 }
             }
         }
