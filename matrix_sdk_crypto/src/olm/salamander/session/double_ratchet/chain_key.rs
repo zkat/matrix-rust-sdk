@@ -18,26 +18,26 @@ fn expand_chain_key(key: &[u8; 32]) -> [u8; 32] {
     key
 }
 
-pub(super) struct ChainKey {
+pub struct ChainKey {
     key: [u8; 32],
     index: u64,
 }
 
 #[derive(Debug)]
-pub(super) struct RemoteChainKey {
+pub struct RemoteChainKey {
     key: [u8; 32],
     index: u64,
 }
 
 impl RemoteChainKey {
-    pub fn new(bytes: [u8; 32]) -> Self {
+    pub(super) fn new(bytes: [u8; 32]) -> Self {
         Self {
             key: bytes,
             index: 0,
         }
     }
 
-    pub fn fill(&mut self, key: &[u8]) {
+    pub(super) fn fill(&mut self, key: &[u8]) {
         self.key.copy_from_slice(&key);
     }
 
@@ -50,7 +50,7 @@ impl RemoteChainKey {
         self.index += 1;
     }
 
-    pub fn create_message_key(&mut self) -> RemoteMessageKey {
+    pub(super) fn create_message_key(&mut self) -> RemoteMessageKey {
         let key = expand_chain_key(&self.key);
         let message_key = RemoteMessageKey::new(key, self.index);
 
@@ -61,14 +61,14 @@ impl RemoteChainKey {
 }
 
 impl ChainKey {
-    pub fn new(bytes: [u8; 32]) -> Self {
+    pub(super) fn new(bytes: [u8; 32]) -> Self {
         Self {
             key: bytes,
             index: 0,
         }
     }
 
-    pub fn fill(&mut self, key: &[u8]) {
+    pub(super) fn fill(&mut self, key: &[u8]) {
         self.key.copy_from_slice(&key);
     }
 
@@ -81,7 +81,7 @@ impl ChainKey {
         self.index += 1;
     }
 
-    pub fn create_message_key(&mut self, ratchet_key: RatchetPublicKey) -> MessageKey {
+    pub(super) fn create_message_key(&mut self, ratchet_key: RatchetPublicKey) -> MessageKey {
         let key = expand_chain_key(&self.key);
         let message_key = MessageKey::new(key, ratchet_key, self.index);
 

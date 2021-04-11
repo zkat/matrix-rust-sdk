@@ -12,7 +12,7 @@ use super::{
 pub(super) struct RatchetKey(Curve25591SecretKey);
 
 #[derive(Debug)]
-pub(super) struct RatchetPublicKey(Curve25591PublicKey);
+pub struct RatchetPublicKey(Curve25591PublicKey);
 
 #[derive(Clone, Debug, Hash, PartialEq)]
 pub struct RemoteRatchetKey(Curve25591PublicKey);

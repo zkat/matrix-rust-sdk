@@ -7,8 +7,8 @@ use super::{
     root_key::{RemoteRootKey, RootKey},
 };
 
-pub(crate) struct Shared3DHSecret([u8; 96]);
-pub(crate) struct RemoteShared3DHSecret([u8; 96]);
+pub struct Shared3DHSecret([u8; 96]);
+pub struct RemoteShared3DHSecret([u8; 96]);
 
 fn expand(shared_secret: [u8; 96]) -> ([u8; 32], [u8; 32]) {
     let hkdf: Hkdf<Sha256> = Hkdf::new(Some(&[0]), &shared_secret);
@@ -46,7 +46,7 @@ impl RemoteShared3DHSecret {
         secret
     }
 
-    pub(super) fn expand(self) -> (RemoteRootKey, RemoteChainKey) {
+    pub fn expand(self) -> (RemoteRootKey, RemoteChainKey) {
         let (root_key, chain_key) = expand(self.0);
         let root_key = RemoteRootKey::new(root_key);
         let chain_key = RemoteChainKey::new(chain_key);
@@ -75,7 +75,7 @@ impl Shared3DHSecret {
         secret
     }
 
-    pub(super) fn expand(self) -> (RootKey, ChainKey) {
+    pub fn expand(self) -> (RootKey, ChainKey) {
         let (root_key, chain_key) = expand(self.0);
 
         let root_key = RootKey::new(root_key);

@@ -163,7 +163,7 @@ impl OlmMessage {
 }
 
 #[derive(Clone, Debug)]
-pub(crate) struct PrekeyMessage {
+pub struct PrekeyMessage {
     pub(super) inner: Vec<u8>,
 }
 
@@ -179,7 +179,7 @@ impl PrekeyMessage {
         self.inner.as_ref()
     }
 
-    pub(super) fn from_parts_untyped(
+    fn from_parts_untyped(
         one_time_key: Vec<u8>,
         base_key: Vec<u8>,
         identity_key: Vec<u8>,
@@ -244,7 +244,25 @@ impl PrekeyMessage {
         Ok((one_time_key, base_key, identity_key, inner.message))
     }
 
-    pub(super) fn from_parts_untyped_prost(
+    pub fn from_parts(
+        one_time_key: &Curve25591PublicKey,
+        base_key: &Curve25591PublicKey,
+        identity_key: &Curve25591PublicKey,
+        message: Vec<u8>,
+    ) -> Self {
+        Self::from_parts_untyped_prost(
+            one_time_key.as_bytes().to_vec(),
+            base_key.as_bytes().to_vec(),
+            identity_key.as_bytes().to_vec(),
+            message,
+        )
+    }
+
+    pub fn into_vec(self) -> Vec<u8> {
+        self.inner
+    }
+
+    fn from_parts_untyped_prost(
         one_time_key: Vec<u8>,
         base_key: Vec<u8>,
         identity_key: Vec<u8>,
