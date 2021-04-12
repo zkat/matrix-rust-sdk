@@ -1919,6 +1919,8 @@
 <span id="1916">1916</span>
 <span id="1917">1917</span>
 <span id="1918">1918</span>
+<span id="1919">1919</span>
+<span id="1920">1920</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="comment">// Copyright 2020 The Matrix.org Foundation C.I.C.</span>
 <span class="comment">//</span>
@@ -2594,8 +2596,10 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// Returns true if a session was invalidated, false if there was no session</span>
     <span class="doccomment">/// to invalidate.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">invalidate_group_session</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">room_id</span>: <span class="kw-2">&amp;</span><span class="ident">RoomId</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">group_session_manager</span>.<span class="ident">invalidate_group_session</span>(<span class="ident">room_id</span>)
+    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">invalidate_group_session</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">room_id</span>: <span class="kw-2">&amp;</span><span class="ident">RoomId</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">StoreResult</span><span class="op">&lt;</span><span class="ident">bool</span><span class="op">&gt;</span> {
+        <span class="self">self</span>.<span class="ident">group_session_manager</span>
+            .<span class="ident">invalidate_group_session</span>(<span class="ident">room_id</span>)
+            .<span class="kw">await</span>
     }
 
     <span class="doccomment">/// Get to-device requests to share a group session with users in a room.</span>
