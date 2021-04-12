@@ -3571,9 +3571,6 @@
 <span id="3568">3568</span>
 <span id="3569">3569</span>
 <span id="3570">3570</span>
-<span id="3571">3571</span>
-<span id="3572">3572</span>
-<span id="3573">3573</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="comment">// Copyright 2020 Damir Jelić</span>
 <span class="comment">// Copyright 2020 The Matrix.org Foundation C.I.C.</span>
@@ -3608,7 +3605,6 @@
     <span class="ident">sync::Arc</span>,
 };
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;encryption&quot;</span>)]</span>
 <span class="kw">use</span> <span class="ident">dashmap::DashMap</span>;
 <span class="kw">use</span> <span class="ident">futures_timer::Delay</span> <span class="kw">as</span> <span class="ident">sleep</span>;
 <span class="kw">use</span> <span class="ident">http::HeaderValue</span>;
@@ -3693,18 +3689,17 @@
 
 <span class="kw">use</span> <span class="kw">crate</span>::{
     <span class="ident">error::HttpError</span>,
+    <span class="ident">event_handler::Handler</span>,
     <span class="ident">http_client</span>::{<span class="ident">client_with_config</span>, <span class="ident">HttpClient</span>, <span class="ident">HttpSend</span>},
-    <span class="ident">room</span>, <span class="ident">Error</span>, <span class="ident">OutgoingRequest</span>, <span class="prelude-ty">Result</span>,
+    <span class="ident">room</span>, <span class="ident">Error</span>, <span class="ident">EventHandler</span>, <span class="ident">OutgoingRequest</span>, <span class="prelude-ty">Result</span>,
 };
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;encryption&quot;</span>)]</span>
 <span class="kw">use</span> <span class="kw">crate</span>::{
     <span class="ident">device</span>::{<span class="ident">Device</span>, <span class="ident">UserDevices</span>},
-    <span class="ident">event_handler::Handler</span>,
     <span class="ident">identifiers::DeviceId</span>,
     <span class="ident">sas::Sas</span>,
     <span class="ident">verification_request::VerificationRequest</span>,
-    <span class="ident">EventHandler</span>,
 };
 
 <span class="kw">const</span> <span class="ident">DEFAULT_REQUEST_TIMEOUT</span>: <span class="ident">Duration</span> <span class="op">=</span> <span class="ident">Duration::from_secs</span>(<span class="number">10</span>);
@@ -5102,7 +5097,6 @@
         <span class="ident">content</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">AnyMessageEventContent</span><span class="op">&gt;</span>,
         <span class="ident">txn_id</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Uuid</span><span class="op">&gt;</span>,
     ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">send_message_event::Response</span><span class="op">&gt;</span> {
-        <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;encryption&quot;</span>)]</span>
         <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">room</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">get_joined_room</span>(<span class="ident">room_id</span>) {
             <span class="ident">room</span>.<span class="ident">send</span>(<span class="ident">content</span>, <span class="ident">txn_id</span>).<span class="kw">await</span>
         } <span class="kw">else</span> {
