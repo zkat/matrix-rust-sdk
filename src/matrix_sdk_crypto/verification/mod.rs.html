@@ -158,8 +158,8 @@
 <span class="kw">mod</span> <span class="ident">requests</span>;
 <span class="kw">mod</span> <span class="ident">sas</span>;
 
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">machine</span>::<span class="ident">VerificationMachine</span>;
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">requests</span>::<span class="ident">VerificationRequest</span>;
+<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">machine::VerificationMachine</span>;
+<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">requests::VerificationRequest</span>;
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">sas</span>::{<span class="ident">AcceptSettings</span>, <span class="ident">Sas</span>, <span class="ident">VerificationResult</span>};
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
@@ -168,14 +168,14 @@
         <span class="ident">requests</span>::{<span class="ident">OutgoingRequest</span>, <span class="ident">OutgoingRequests</span>},
         <span class="ident">OutgoingVerificationRequest</span>,
     };
-    <span class="kw">use</span> <span class="ident">serde_json</span>::<span class="ident">Value</span>;
+    <span class="kw">use</span> <span class="ident">serde_json::Value</span>;
 
     <span class="kw">use</span> <span class="ident">matrix_sdk_common</span>::{
         <span class="ident">events</span>::{<span class="ident">AnyToDeviceEvent</span>, <span class="ident">AnyToDeviceEventContent</span>, <span class="ident">EventType</span>, <span class="ident">ToDeviceEvent</span>},
-        <span class="ident">identifiers</span>::<span class="ident">UserId</span>,
+        <span class="ident">identifiers::UserId</span>,
     };
 
-    <span class="kw">use</span> <span class="kw">super</span>::<span class="ident">sas</span>::<span class="ident">OutgoingContent</span>;
+    <span class="kw">use</span> <span class="kw">super</span><span class="ident">::sas::OutgoingContent</span>;
 
     <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">request_to_event</span>(
         <span class="ident">sender</span>: <span class="kw-2">&amp;</span><span class="ident">UserId</span>,
@@ -190,7 +190,7 @@
         <span class="ident">request</span>: <span class="kw-2">&amp;</span><span class="ident">OutgoingRequest</span>,
     ) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">AnyToDeviceEvent</span> {
         <span class="kw">match</span> <span class="ident">request</span>.<span class="ident">request</span>() {
-            <span class="ident">OutgoingRequests</span>::<span class="ident">ToDeviceRequest</span>(<span class="ident">r</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">request_to_event</span>(<span class="ident">sender</span>, <span class="kw-2">&amp;</span><span class="ident">r</span>.<span class="ident">clone</span>().<span class="ident">into</span>()),
+            <span class="ident">OutgoingRequests::ToDeviceRequest</span>(<span class="ident">r</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">request_to_event</span>(<span class="ident">sender</span>, <span class="kw-2">&amp;</span><span class="ident">r</span>.<span class="ident">clone</span>().<span class="ident">into</span>()),
             <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">panic!</span>(<span class="string">&quot;Unsupported outgoing request&quot;</span>),
         }
     }
@@ -199,33 +199,33 @@
         <span class="ident">sender</span>: <span class="kw-2">&amp;</span><span class="ident">UserId</span>,
         <span class="ident">content</span>: <span class="ident">OutgoingContent</span>,
     ) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">AnyToDeviceEvent</span> {
-        <span class="kw">let</span> <span class="ident">content</span> <span class="op">=</span> <span class="kw">if</span> <span class="kw">let</span> <span class="ident">OutgoingContent</span>::<span class="ident">ToDevice</span>(<span class="ident">c</span>) <span class="op">=</span> <span class="ident">content</span> {
+        <span class="kw">let</span> <span class="ident">content</span> <span class="op">=</span> <span class="kw">if</span> <span class="kw">let</span> <span class="ident">OutgoingContent::ToDevice</span>(<span class="ident">c</span>) <span class="op">=</span> <span class="ident">content</span> {
             <span class="ident">c</span>
         } <span class="kw">else</span> {
             <span class="macro">unreachable!</span>()
         };
 
         <span class="kw">match</span> <span class="ident">content</span> {
-            <span class="ident">AnyToDeviceEventContent</span>::<span class="ident">KeyVerificationKey</span>(<span class="ident">c</span>) <span class="op">=</span><span class="op">&gt;</span> {
-                <span class="ident">AnyToDeviceEvent</span>::<span class="ident">KeyVerificationKey</span>(<span class="ident">ToDeviceEvent</span> {
+            <span class="ident">AnyToDeviceEventContent::KeyVerificationKey</span>(<span class="ident">c</span>) <span class="op">=</span><span class="op">&gt;</span> {
+                <span class="ident">AnyToDeviceEvent::KeyVerificationKey</span>(<span class="ident">ToDeviceEvent</span> {
                     <span class="ident">sender</span>: <span class="ident">sender</span>.<span class="ident">clone</span>(),
                     <span class="ident">content</span>: <span class="ident">c</span>,
                 })
             }
-            <span class="ident">AnyToDeviceEventContent</span>::<span class="ident">KeyVerificationStart</span>(<span class="ident">c</span>) <span class="op">=</span><span class="op">&gt;</span> {
-                <span class="ident">AnyToDeviceEvent</span>::<span class="ident">KeyVerificationStart</span>(<span class="ident">ToDeviceEvent</span> {
+            <span class="ident">AnyToDeviceEventContent::KeyVerificationStart</span>(<span class="ident">c</span>) <span class="op">=</span><span class="op">&gt;</span> {
+                <span class="ident">AnyToDeviceEvent::KeyVerificationStart</span>(<span class="ident">ToDeviceEvent</span> {
                     <span class="ident">sender</span>: <span class="ident">sender</span>.<span class="ident">clone</span>(),
                     <span class="ident">content</span>: <span class="ident">c</span>,
                 })
             }
-            <span class="ident">AnyToDeviceEventContent</span>::<span class="ident">KeyVerificationAccept</span>(<span class="ident">c</span>) <span class="op">=</span><span class="op">&gt;</span> {
-                <span class="ident">AnyToDeviceEvent</span>::<span class="ident">KeyVerificationAccept</span>(<span class="ident">ToDeviceEvent</span> {
+            <span class="ident">AnyToDeviceEventContent::KeyVerificationAccept</span>(<span class="ident">c</span>) <span class="op">=</span><span class="op">&gt;</span> {
+                <span class="ident">AnyToDeviceEvent::KeyVerificationAccept</span>(<span class="ident">ToDeviceEvent</span> {
                     <span class="ident">sender</span>: <span class="ident">sender</span>.<span class="ident">clone</span>(),
                     <span class="ident">content</span>: <span class="ident">c</span>,
                 })
             }
-            <span class="ident">AnyToDeviceEventContent</span>::<span class="ident">KeyVerificationMac</span>(<span class="ident">c</span>) <span class="op">=</span><span class="op">&gt;</span> {
-                <span class="ident">AnyToDeviceEvent</span>::<span class="ident">KeyVerificationMac</span>(<span class="ident">ToDeviceEvent</span> {
+            <span class="ident">AnyToDeviceEventContent::KeyVerificationMac</span>(<span class="ident">c</span>) <span class="op">=</span><span class="op">&gt;</span> {
+                <span class="ident">AnyToDeviceEvent::KeyVerificationMac</span>(<span class="ident">ToDeviceEvent</span> {
                     <span class="ident">sender</span>: <span class="ident">sender</span>.<span class="ident">clone</span>(),
                     <span class="ident">content</span>: <span class="ident">c</span>,
                 })
@@ -238,13 +238,13 @@
     <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">get_content_from_request</span>(
         <span class="ident">request</span>: <span class="kw-2">&amp;</span><span class="ident">OutgoingVerificationRequest</span>,
     ) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">OutgoingContent</span> {
-        <span class="kw">let</span> <span class="ident">request</span> <span class="op">=</span> <span class="kw">if</span> <span class="kw">let</span> <span class="ident">OutgoingVerificationRequest</span>::<span class="ident">ToDevice</span>(<span class="ident">r</span>) <span class="op">=</span> <span class="ident">request</span> {
+        <span class="kw">let</span> <span class="ident">request</span> <span class="op">=</span> <span class="kw">if</span> <span class="kw">let</span> <span class="ident">OutgoingVerificationRequest::ToDevice</span>(<span class="ident">r</span>) <span class="op">=</span> <span class="ident">request</span> {
             <span class="ident">r</span>
         } <span class="kw">else</span> {
             <span class="macro">unreachable!</span>()
         };
 
-        <span class="kw">let</span> <span class="ident">json</span>: <span class="ident">Value</span> <span class="op">=</span> <span class="ident">serde_json</span>::<span class="ident">from_str</span>(
+        <span class="kw">let</span> <span class="ident">json</span>: <span class="ident">Value</span> <span class="op">=</span> <span class="ident">serde_json::from_str</span>(
             <span class="ident">request</span>
                 .<span class="ident">messages</span>
                 .<span class="ident">values</span>()
@@ -258,20 +258,20 @@
         .<span class="ident">unwrap</span>();
 
         <span class="kw">match</span> <span class="ident">request</span>.<span class="ident">event_type</span> {
-            <span class="ident">EventType</span>::<span class="ident">KeyVerificationStart</span> <span class="op">=</span><span class="op">&gt;</span> {
-                <span class="ident">AnyToDeviceEventContent</span>::<span class="ident">KeyVerificationStart</span>(<span class="ident">serde_json</span>::<span class="ident">from_value</span>(<span class="ident">json</span>).<span class="ident">unwrap</span>())
+            <span class="ident">EventType::KeyVerificationStart</span> <span class="op">=</span><span class="op">&gt;</span> {
+                <span class="ident">AnyToDeviceEventContent::KeyVerificationStart</span>(<span class="ident">serde_json::from_value</span>(<span class="ident">json</span>).<span class="ident">unwrap</span>())
             }
-            <span class="ident">EventType</span>::<span class="ident">KeyVerificationKey</span> <span class="op">=</span><span class="op">&gt;</span> {
-                <span class="ident">AnyToDeviceEventContent</span>::<span class="ident">KeyVerificationKey</span>(<span class="ident">serde_json</span>::<span class="ident">from_value</span>(<span class="ident">json</span>).<span class="ident">unwrap</span>())
+            <span class="ident">EventType::KeyVerificationKey</span> <span class="op">=</span><span class="op">&gt;</span> {
+                <span class="ident">AnyToDeviceEventContent::KeyVerificationKey</span>(<span class="ident">serde_json::from_value</span>(<span class="ident">json</span>).<span class="ident">unwrap</span>())
             }
-            <span class="ident">EventType</span>::<span class="ident">KeyVerificationAccept</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">AnyToDeviceEventContent</span>::<span class="ident">KeyVerificationAccept</span>(
-                <span class="ident">serde_json</span>::<span class="ident">from_value</span>(<span class="ident">json</span>).<span class="ident">unwrap</span>(),
+            <span class="ident">EventType::KeyVerificationAccept</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">AnyToDeviceEventContent::KeyVerificationAccept</span>(
+                <span class="ident">serde_json::from_value</span>(<span class="ident">json</span>).<span class="ident">unwrap</span>(),
             ),
-            <span class="ident">EventType</span>::<span class="ident">KeyVerificationMac</span> <span class="op">=</span><span class="op">&gt;</span> {
-                <span class="ident">AnyToDeviceEventContent</span>::<span class="ident">KeyVerificationMac</span>(<span class="ident">serde_json</span>::<span class="ident">from_value</span>(<span class="ident">json</span>).<span class="ident">unwrap</span>())
+            <span class="ident">EventType::KeyVerificationMac</span> <span class="op">=</span><span class="op">&gt;</span> {
+                <span class="ident">AnyToDeviceEventContent::KeyVerificationMac</span>(<span class="ident">serde_json::from_value</span>(<span class="ident">json</span>).<span class="ident">unwrap</span>())
             }
-            <span class="ident">EventType</span>::<span class="ident">KeyVerificationCancel</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">AnyToDeviceEventContent</span>::<span class="ident">KeyVerificationCancel</span>(
-                <span class="ident">serde_json</span>::<span class="ident">from_value</span>(<span class="ident">json</span>).<span class="ident">unwrap</span>(),
+            <span class="ident">EventType::KeyVerificationCancel</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">AnyToDeviceEventContent::KeyVerificationCancel</span>(
+                <span class="ident">serde_json::from_value</span>(<span class="ident">json</span>).<span class="ident">unwrap</span>(),
             ),
             <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">unreachable!</span>(),
         }

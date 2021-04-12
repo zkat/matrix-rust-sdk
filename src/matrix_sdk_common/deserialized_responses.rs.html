@@ -344,14 +344,14 @@
 <span id="341">341</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="kw">use</span> <span class="ident">serde</span>::{<span class="ident">Deserialize</span>, <span class="ident">Serialize</span>};
-<span class="kw">use</span> <span class="ident">std</span>::{<span class="ident">collections</span>::<span class="ident">BTreeMap</span>, <span class="ident">convert</span>::<span class="ident">TryFrom</span>, <span class="ident">time</span>::<span class="ident">SystemTime</span>};
+<span class="kw">use</span> <span class="ident">std</span>::{<span class="ident">collections::BTreeMap</span>, <span class="ident">convert::TryFrom</span>, <span class="ident">time::SystemTime</span>};
 
 <span class="kw">use</span> <span class="kw">super</span>::{
-    <span class="ident">api</span>::<span class="ident">r0</span>::<span class="ident">sync</span>::<span class="ident">sync_events</span>::{
+    <span class="ident">api::r0::sync::sync_events</span>::{
         <span class="ident">DeviceLists</span>, <span class="ident">UnreadNotificationsCount</span> <span class="kw">as</span> <span class="ident">RumaUnreadNotificationsCount</span>,
     },
     <span class="ident">events</span>::{
-        <span class="ident">presence</span>::<span class="ident">PresenceEvent</span>, <span class="ident">room</span>::<span class="ident">member</span>::<span class="ident">MemberEventContent</span>, <span class="ident">AnyBasicEvent</span>,
+        <span class="ident">presence::PresenceEvent</span>, <span class="ident">room::member::MemberEventContent</span>, <span class="ident">AnyBasicEvent</span>,
         <span class="ident">AnyStrippedStateEvent</span>, <span class="ident">AnySyncEphemeralRoomEvent</span>, <span class="ident">AnySyncRoomEvent</span>, <span class="ident">AnySyncStateEvent</span>,
         <span class="ident">AnyToDeviceEvent</span>, <span class="ident">StateEvent</span>, <span class="ident">StrippedStateEvent</span>, <span class="ident">SyncStateEvent</span>, <span class="ident">Unsigned</span>,
     },
@@ -406,7 +406,7 @@
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">next_batch</span>: <span class="ident">String</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
         <span class="self">Self</span> {
             <span class="ident">next_batch</span>,
-            ..<span class="ident">Default</span>::<span class="ident">default</span>()
+            ..<span class="ident">Default::default</span>()
         }
     }
 }
@@ -568,7 +568,7 @@
         <span class="self">Self</span> {
             <span class="ident">limited</span>,
             <span class="ident">prev_batch</span>,
-            ..<span class="ident">Default</span>::<span class="ident">default</span>()
+            ..<span class="ident">Default::default</span>()
         }
     }
 }
@@ -596,32 +596,32 @@
 }
 
 <span class="kw">impl</span> <span class="ident">TryFrom</span><span class="op">&lt;</span><span class="ident">SyncStateEvent</span><span class="op">&lt;</span><span class="ident">MemberEventContent</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">MemberEvent</span> {
-    <span class="kw">type</span> <span class="ident">Error</span> <span class="op">=</span> <span class="kw">super</span>::<span class="ident">identifiers</span>::<span class="ident">Error</span>;
+    <span class="kw">type</span> <span class="ident">Error</span> <span class="op">=</span> <span class="kw">super</span><span class="ident">::identifiers::Error</span>;
 
-    <span class="kw">fn</span> <span class="ident">try_from</span>(<span class="ident">event</span>: <span class="ident">SyncStateEvent</span><span class="op">&lt;</span><span class="ident">MemberEventContent</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="self">Self</span>::<span class="ident">Error</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">try_from</span>(<span class="ident">event</span>: <span class="ident">SyncStateEvent</span><span class="op">&lt;</span><span class="ident">MemberEventContent</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="self">Self</span><span class="ident">::Error</span><span class="op">&gt;</span> {
         <span class="prelude-val">Ok</span>(<span class="ident">MemberEvent</span> {
             <span class="ident">content</span>: <span class="ident">event</span>.<span class="ident">content</span>,
             <span class="ident">event_id</span>: <span class="ident">event</span>.<span class="ident">event_id</span>,
             <span class="ident">origin_server_ts</span>: <span class="ident">event</span>.<span class="ident">origin_server_ts</span>,
             <span class="ident">prev_content</span>: <span class="ident">event</span>.<span class="ident">prev_content</span>,
             <span class="ident">sender</span>: <span class="ident">event</span>.<span class="ident">sender</span>,
-            <span class="ident">state_key</span>: <span class="ident">UserId</span>::<span class="ident">try_from</span>(<span class="ident">event</span>.<span class="ident">state_key</span>)<span class="question-mark">?</span>,
+            <span class="ident">state_key</span>: <span class="ident">UserId::try_from</span>(<span class="ident">event</span>.<span class="ident">state_key</span>)<span class="question-mark">?</span>,
             <span class="ident">unsigned</span>: <span class="ident">event</span>.<span class="ident">unsigned</span>,
         })
     }
 }
 
 <span class="kw">impl</span> <span class="ident">TryFrom</span><span class="op">&lt;</span><span class="ident">StateEvent</span><span class="op">&lt;</span><span class="ident">MemberEventContent</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">MemberEvent</span> {
-    <span class="kw">type</span> <span class="ident">Error</span> <span class="op">=</span> <span class="kw">super</span>::<span class="ident">identifiers</span>::<span class="ident">Error</span>;
+    <span class="kw">type</span> <span class="ident">Error</span> <span class="op">=</span> <span class="kw">super</span><span class="ident">::identifiers::Error</span>;
 
-    <span class="kw">fn</span> <span class="ident">try_from</span>(<span class="ident">event</span>: <span class="ident">StateEvent</span><span class="op">&lt;</span><span class="ident">MemberEventContent</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="self">Self</span>::<span class="ident">Error</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">try_from</span>(<span class="ident">event</span>: <span class="ident">StateEvent</span><span class="op">&lt;</span><span class="ident">MemberEventContent</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="self">Self</span><span class="ident">::Error</span><span class="op">&gt;</span> {
         <span class="prelude-val">Ok</span>(<span class="ident">MemberEvent</span> {
             <span class="ident">content</span>: <span class="ident">event</span>.<span class="ident">content</span>,
             <span class="ident">event_id</span>: <span class="ident">event</span>.<span class="ident">event_id</span>,
             <span class="ident">origin_server_ts</span>: <span class="ident">event</span>.<span class="ident">origin_server_ts</span>,
             <span class="ident">prev_content</span>: <span class="ident">event</span>.<span class="ident">prev_content</span>,
             <span class="ident">sender</span>: <span class="ident">event</span>.<span class="ident">sender</span>,
-            <span class="ident">state_key</span>: <span class="ident">UserId</span>::<span class="ident">try_from</span>(<span class="ident">event</span>.<span class="ident">state_key</span>)<span class="question-mark">?</span>,
+            <span class="ident">state_key</span>: <span class="ident">UserId::try_from</span>(<span class="ident">event</span>.<span class="ident">state_key</span>)<span class="question-mark">?</span>,
             <span class="ident">unsigned</span>: <span class="ident">event</span>.<span class="ident">unsigned</span>,
         })
     }
@@ -653,13 +653,13 @@
 }
 
 <span class="kw">impl</span> <span class="ident">TryFrom</span><span class="op">&lt;</span><span class="ident">StrippedStateEvent</span><span class="op">&lt;</span><span class="ident">MemberEventContent</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">StrippedMemberEvent</span> {
-    <span class="kw">type</span> <span class="ident">Error</span> <span class="op">=</span> <span class="kw">super</span>::<span class="ident">identifiers</span>::<span class="ident">Error</span>;
+    <span class="kw">type</span> <span class="ident">Error</span> <span class="op">=</span> <span class="kw">super</span><span class="ident">::identifiers::Error</span>;
 
-    <span class="kw">fn</span> <span class="ident">try_from</span>(<span class="ident">event</span>: <span class="ident">StrippedStateEvent</span><span class="op">&lt;</span><span class="ident">MemberEventContent</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="self">Self</span>::<span class="ident">Error</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">try_from</span>(<span class="ident">event</span>: <span class="ident">StrippedStateEvent</span><span class="op">&lt;</span><span class="ident">MemberEventContent</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="self">Self</span><span class="ident">::Error</span><span class="op">&gt;</span> {
         <span class="prelude-val">Ok</span>(<span class="ident">StrippedMemberEvent</span> {
             <span class="ident">content</span>: <span class="ident">event</span>.<span class="ident">content</span>,
             <span class="ident">sender</span>: <span class="ident">event</span>.<span class="ident">sender</span>,
-            <span class="ident">state_key</span>: <span class="ident">UserId</span>::<span class="ident">try_from</span>(<span class="ident">event</span>.<span class="ident">state_key</span>)<span class="question-mark">?</span>,
+            <span class="ident">state_key</span>: <span class="ident">UserId::try_from</span>(<span class="ident">event</span>.<span class="ident">state_key</span>)<span class="question-mark">?</span>,
         })
     }
 }

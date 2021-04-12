@@ -187,25 +187,25 @@
 <span class="kw">mod</span> <span class="ident">normal</span>;
 
 <span class="kw">use</span> <span class="ident">matrix_sdk_common</span>::{
-    <span class="ident">events</span>::<span class="ident">room</span>::{
-        <span class="ident">create</span>::<span class="ident">CreateEventContent</span>, <span class="ident">guest_access</span>::<span class="ident">GuestAccess</span>,
-        <span class="ident">history_visibility</span>::<span class="ident">HistoryVisibility</span>, <span class="ident">join_rules</span>::<span class="ident">JoinRule</span>,
+    <span class="ident">events::room</span>::{
+        <span class="ident">create::CreateEventContent</span>, <span class="ident">guest_access::GuestAccess</span>,
+        <span class="ident">history_visibility::HistoryVisibility</span>, <span class="ident">join_rules::JoinRule</span>,
     },
     <span class="ident">identifiers</span>::{<span class="ident">MxcUri</span>, <span class="ident">UserId</span>},
 };
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">normal</span>::{<span class="ident">Room</span>, <span class="ident">RoomInfo</span>, <span class="ident">RoomType</span>};
 
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">members</span>::<span class="ident">RoomMember</span>;
+<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">members::RoomMember</span>;
 
 <span class="kw">use</span> <span class="ident">serde</span>::{<span class="ident">Deserialize</span>, <span class="ident">Serialize</span>};
-<span class="kw">use</span> <span class="ident">std</span>::<span class="ident">cmp</span>::<span class="ident">max</span>;
+<span class="kw">use</span> <span class="ident">std::cmp::max</span>;
 
 <span class="kw">use</span> <span class="ident">matrix_sdk_common</span>::{
     <span class="ident">events</span>::{
-        <span class="ident">room</span>::{<span class="ident">encryption</span>::<span class="ident">EncryptionEventContent</span>, <span class="ident">tombstone</span>::<span class="ident">TombstoneEventContent</span>},
+        <span class="ident">room</span>::{<span class="ident">encryption::EncryptionEventContent</span>, <span class="ident">tombstone::TombstoneEventContent</span>},
         <span class="ident">AnyStateEventContent</span>,
     },
-    <span class="ident">identifiers</span>::<span class="ident">RoomAliasId</span>,
+    <span class="ident">identifiers::RoomAliasId</span>,
 };
 
 <span class="doccomment">/// A base room info struct that is the backbone of normal as well as stripped</span>
@@ -243,7 +243,7 @@
 <span class="kw">impl</span> <span class="ident">BaseRoomInfo</span> {
     <span class="doccomment">/// Create a new, empty base room info.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
-        <span class="self">Self</span>::<span class="ident">default</span>()
+        <span class="self">Self</span><span class="ident">::default</span>()
     }
 
     <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">calculate_room_name</span>(
@@ -289,19 +289,19 @@
     <span class="doccomment">/// Returns true if the event modified the info, false otherwise.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">handle_state_event</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">content</span>: <span class="kw-2">&amp;</span><span class="ident">AnyStateEventContent</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
         <span class="kw">match</span> <span class="ident">content</span> {
-            <span class="ident">AnyStateEventContent</span>::<span class="ident">RoomEncryption</span>(<span class="ident">encryption</span>) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">AnyStateEventContent::RoomEncryption</span>(<span class="ident">encryption</span>) <span class="op">=</span><span class="op">&gt;</span> {
                 <span class="self">self</span>.<span class="ident">encryption</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">encryption</span>.<span class="ident">clone</span>());
                 <span class="bool-val">true</span>
             }
-            <span class="ident">AnyStateEventContent</span>::<span class="ident">RoomAvatar</span>(<span class="ident">a</span>) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">AnyStateEventContent::RoomAvatar</span>(<span class="ident">a</span>) <span class="op">=</span><span class="op">&gt;</span> {
                 <span class="self">self</span>.<span class="ident">avatar_url</span> <span class="op">=</span> <span class="ident">a</span>.<span class="ident">url</span>.<span class="ident">clone</span>();
                 <span class="bool-val">true</span>
             }
-            <span class="ident">AnyStateEventContent</span>::<span class="ident">RoomName</span>(<span class="ident">n</span>) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">AnyStateEventContent::RoomName</span>(<span class="ident">n</span>) <span class="op">=</span><span class="op">&gt;</span> {
                 <span class="self">self</span>.<span class="ident">name</span> <span class="op">=</span> <span class="ident">n</span>.<span class="ident">name</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">n</span><span class="op">|</span> <span class="ident">n</span>.<span class="ident">to_string</span>());
                 <span class="bool-val">true</span>
             }
-            <span class="ident">AnyStateEventContent</span>::<span class="ident">RoomCreate</span>(<span class="ident">c</span>) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">AnyStateEventContent::RoomCreate</span>(<span class="ident">c</span>) <span class="op">=</span><span class="op">&gt;</span> {
                 <span class="kw">if</span> <span class="self">self</span>.<span class="ident">create</span>.<span class="ident">is_none</span>() {
                     <span class="self">self</span>.<span class="ident">create</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">c</span>.<span class="ident">clone</span>());
                     <span class="bool-val">true</span>
@@ -309,31 +309,31 @@
                     <span class="bool-val">false</span>
                 }
             }
-            <span class="ident">AnyStateEventContent</span>::<span class="ident">RoomHistoryVisibility</span>(<span class="ident">h</span>) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">AnyStateEventContent::RoomHistoryVisibility</span>(<span class="ident">h</span>) <span class="op">=</span><span class="op">&gt;</span> {
                 <span class="self">self</span>.<span class="ident">history_visibility</span> <span class="op">=</span> <span class="ident">h</span>.<span class="ident">history_visibility</span>.<span class="ident">clone</span>();
                 <span class="bool-val">true</span>
             }
-            <span class="ident">AnyStateEventContent</span>::<span class="ident">RoomGuestAccess</span>(<span class="ident">g</span>) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">AnyStateEventContent::RoomGuestAccess</span>(<span class="ident">g</span>) <span class="op">=</span><span class="op">&gt;</span> {
                 <span class="self">self</span>.<span class="ident">guest_access</span> <span class="op">=</span> <span class="ident">g</span>.<span class="ident">guest_access</span>.<span class="ident">clone</span>();
                 <span class="bool-val">true</span>
             }
-            <span class="ident">AnyStateEventContent</span>::<span class="ident">RoomJoinRules</span>(<span class="ident">c</span>) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">AnyStateEventContent::RoomJoinRules</span>(<span class="ident">c</span>) <span class="op">=</span><span class="op">&gt;</span> {
                 <span class="self">self</span>.<span class="ident">join_rule</span> <span class="op">=</span> <span class="ident">c</span>.<span class="ident">join_rule</span>.<span class="ident">clone</span>();
                 <span class="bool-val">true</span>
             }
-            <span class="ident">AnyStateEventContent</span>::<span class="ident">RoomCanonicalAlias</span>(<span class="ident">a</span>) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">AnyStateEventContent::RoomCanonicalAlias</span>(<span class="ident">a</span>) <span class="op">=</span><span class="op">&gt;</span> {
                 <span class="self">self</span>.<span class="ident">canonical_alias</span> <span class="op">=</span> <span class="ident">a</span>.<span class="ident">alias</span>.<span class="ident">clone</span>();
                 <span class="bool-val">true</span>
             }
-            <span class="ident">AnyStateEventContent</span>::<span class="ident">RoomTopic</span>(<span class="ident">t</span>) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">AnyStateEventContent::RoomTopic</span>(<span class="ident">t</span>) <span class="op">=</span><span class="op">&gt;</span> {
                 <span class="self">self</span>.<span class="ident">topic</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">t</span>.<span class="ident">topic</span>.<span class="ident">clone</span>());
                 <span class="bool-val">true</span>
             }
-            <span class="ident">AnyStateEventContent</span>::<span class="ident">RoomTombstone</span>(<span class="ident">t</span>) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">AnyStateEventContent::RoomTombstone</span>(<span class="ident">t</span>) <span class="op">=</span><span class="op">&gt;</span> {
                 <span class="self">self</span>.<span class="ident">tombstone</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">t</span>.<span class="ident">clone</span>());
                 <span class="bool-val">true</span>
             }
-            <span class="ident">AnyStateEventContent</span>::<span class="ident">RoomPowerLevels</span>(<span class="ident">p</span>) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">AnyStateEventContent::RoomPowerLevels</span>(<span class="ident">p</span>) <span class="op">=</span><span class="op">&gt;</span> {
                 <span class="kw">let</span> <span class="ident">max_power_level</span> <span class="op">=</span> <span class="ident">p</span>
                     .<span class="ident">users</span>
                     .<span class="ident">values</span>()
@@ -354,9 +354,9 @@
             <span class="ident">create</span>: <span class="prelude-val">None</span>,
             <span class="ident">dm_target</span>: <span class="prelude-val">None</span>,
             <span class="ident">encryption</span>: <span class="prelude-val">None</span>,
-            <span class="ident">guest_access</span>: <span class="ident">GuestAccess</span>::<span class="ident">CanJoin</span>,
-            <span class="ident">history_visibility</span>: <span class="ident">HistoryVisibility</span>::<span class="ident">WorldReadable</span>,
-            <span class="ident">join_rule</span>: <span class="ident">JoinRule</span>::<span class="ident">Public</span>,
+            <span class="ident">guest_access</span>: <span class="ident">GuestAccess::CanJoin</span>,
+            <span class="ident">history_visibility</span>: <span class="ident">HistoryVisibility::WorldReadable</span>,
+            <span class="ident">join_rule</span>: <span class="ident">JoinRule::Public</span>,
             <span class="ident">max_power_level</span>: <span class="number">100</span>,
             <span class="ident">name</span>: <span class="prelude-val">None</span>,
             <span class="ident">tombstone</span>: <span class="prelude-val">None</span>,

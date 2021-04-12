@@ -84,15 +84,15 @@
 
 <span class="doccomment">//! Error conditions.</span>
 
-<span class="kw">use</span> <span class="ident">serde_json</span>::<span class="ident">Error</span> <span class="kw">as</span> <span class="ident">JsonError</span>;
-<span class="kw">use</span> <span class="ident">std</span>::<span class="ident">io</span>::<span class="ident">Error</span> <span class="kw">as</span> <span class="ident">IoError</span>;
-<span class="kw">use</span> <span class="ident">thiserror</span>::<span class="ident">Error</span>;
+<span class="kw">use</span> <span class="ident">serde_json::Error</span> <span class="kw">as</span> <span class="ident">JsonError</span>;
+<span class="kw">use</span> <span class="ident">std::io::Error</span> <span class="kw">as</span> <span class="ident">IoError</span>;
+<span class="kw">use</span> <span class="ident">thiserror::Error</span>;
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;encryption&quot;</span>)]</span>
 <span class="kw">use</span> <span class="ident">matrix_sdk_crypto</span>::{<span class="ident">CryptoStoreError</span>, <span class="ident">MegolmError</span>, <span class="ident">OlmError</span>};
 
 <span class="doccomment">/// Result type of the rust-sdk.</span>
-<span class="kw">pub</span> <span class="kw">type</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">E</span> <span class="op">=</span> <span class="ident">Error</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">std</span>::<span class="ident">result</span>::<span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">E</span><span class="op">&gt;</span>;
+<span class="kw">pub</span> <span class="kw">type</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">E</span> <span class="op">=</span> <span class="ident">Error</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">std::result::Result</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">E</span><span class="op">&gt;</span>;
 
 <span class="doccomment">/// Internal representation of errors.</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Error</span>, <span class="ident">Debug</span>)]</span>
@@ -104,7 +104,7 @@
     <span class="doccomment">/// A generic error returned when the state store fails not due to</span>
     <span class="doccomment">/// IO or (de)serialization.</span>
     <span class="attribute">#[<span class="ident">error</span>(<span class="ident">transparent</span>)]</span>
-    <span class="ident">StateStore</span>(<span class="attribute">#[<span class="ident">from</span>]</span> <span class="kw">crate</span>::<span class="ident">store</span>::<span class="ident">StoreError</span>),
+    <span class="ident">StateStore</span>(<span class="attribute">#[<span class="ident">from</span>]</span> <span class="kw">crate</span><span class="ident">::store::StoreError</span>),
 
     <span class="doccomment">/// An error when (de)serializing JSON.</span>
     <span class="attribute">#[<span class="ident">error</span>(<span class="ident">transparent</span>)]</span>

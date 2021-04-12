@@ -370,27 +370,27 @@
 <span class="comment">// limitations under the License.</span>
 
 <span class="kw">use</span> <span class="ident">std</span>::{
-    <span class="ident">collections</span>::<span class="ident">BTreeMap</span>,
+    <span class="ident">collections::BTreeMap</span>,
     <span class="ident">io</span>::{<span class="ident">Error</span> <span class="kw">as</span> <span class="ident">IoError</span>, <span class="ident">ErrorKind</span>, <span class="ident">Read</span>},
 };
 
-<span class="kw">use</span> <span class="ident">thiserror</span>::<span class="ident">Error</span>;
-<span class="kw">use</span> <span class="ident">zeroize</span>::<span class="ident">Zeroizing</span>;
+<span class="kw">use</span> <span class="ident">thiserror::Error</span>;
+<span class="kw">use</span> <span class="ident">zeroize::Zeroizing</span>;
 
 <span class="kw">use</span> <span class="ident">serde</span>::{<span class="ident">Deserialize</span>, <span class="ident">Serialize</span>};
 
-<span class="kw">use</span> <span class="ident">matrix_sdk_common</span>::<span class="ident">events</span>::<span class="ident">room</span>::<span class="ident">JsonWebKey</span>;
+<span class="kw">use</span> <span class="ident">matrix_sdk_common::events::room::JsonWebKey</span>;
 
-<span class="kw">use</span> <span class="ident">getrandom</span>::<span class="ident">getrandom</span>;
+<span class="kw">use</span> <span class="ident">getrandom::getrandom</span>;
 
 <span class="kw">use</span> <span class="ident">aes_ctr</span>::{
     <span class="ident">cipher</span>::{<span class="ident">NewStreamCipher</span>, <span class="ident">SyncStreamCipher</span>},
     <span class="ident">Aes256Ctr</span>,
 };
-<span class="kw">use</span> <span class="ident">base64</span>::<span class="ident">DecodeError</span>;
+<span class="kw">use</span> <span class="ident">base64::DecodeError</span>;
 <span class="kw">use</span> <span class="ident">sha2</span>::{<span class="ident">Digest</span>, <span class="ident">Sha256</span>};
 
-<span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">utilities</span>::{<span class="ident">decode</span>, <span class="ident">decode_url_safe</span>, <span class="ident">encode</span>, <span class="ident">encode_url_safe</span>};
+<span class="kw">use</span> <span class="kw">crate</span><span class="ident">::utilities</span>::{<span class="ident">decode</span>, <span class="ident">decode_url_safe</span>, <span class="ident">encode</span>, <span class="ident">encode_url_safe</span>};
 
 <span class="kw">const</span> <span class="ident">IV_SIZE</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="number">16</span>;
 <span class="kw">const</span> <span class="ident">KEY_SIZE</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="number">32</span>;
@@ -407,7 +407,7 @@
 }
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">R</span>: <span class="ident">Read</span><span class="op">&gt;</span> <span class="ident">Read</span> <span class="kw">for</span> <span class="ident">AttachmentDecryptor</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">R</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">read</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">buf</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> [<span class="ident">u8</span>]) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">std</span>::<span class="ident">io</span>::<span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">read</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">buf</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> [<span class="ident">u8</span>]) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">std::io::Result</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">read_bytes</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">inner_reader</span>.<span class="ident">read</span>(<span class="ident">buf</span>)<span class="question-mark">?</span>;
 
         <span class="kw">if</span> <span class="ident">read_bytes</span> <span class="op">=</span><span class="op">=</span> <span class="number">0</span> {
@@ -416,8 +416,8 @@
             <span class="kw">if</span> <span class="ident">hash</span>.<span class="ident">as_slice</span>() <span class="op">=</span><span class="op">=</span> <span class="self">self</span>.<span class="ident">expected_hash</span>.<span class="ident">as_slice</span>() {
                 <span class="prelude-val">Ok</span>(<span class="number">0</span>)
             } <span class="kw">else</span> {
-                <span class="prelude-val">Err</span>(<span class="ident">IoError</span>::<span class="ident">new</span>(
-                    <span class="ident">ErrorKind</span>::<span class="ident">Other</span>,
+                <span class="prelude-val">Err</span>(<span class="ident">IoError::new</span>(
+                    <span class="ident">ErrorKind::Other</span>,
                     <span class="string">&quot;Hash missmatch while decrypting&quot;</span>,
                 ))
             }
@@ -484,19 +484,19 @@
         <span class="ident">info</span>: <span class="ident">EncryptionInfo</span>,
     ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">AttachmentDecryptor</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">R</span><span class="op">&gt;</span>, <span class="ident">DecryptorError</span><span class="op">&gt;</span> {
         <span class="kw">if</span> <span class="ident">info</span>.<span class="ident">version</span> <span class="op">!</span><span class="op">=</span> <span class="ident">VERSION</span> {
-            <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">DecryptorError</span>::<span class="ident">UnknownVersion</span>);
+            <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">DecryptorError::UnknownVersion</span>);
         }
 
         <span class="kw">let</span> <span class="ident">hash</span> <span class="op">=</span> <span class="ident">decode</span>(
             <span class="ident">info</span>.<span class="ident">hashes</span>
                 .<span class="ident">get</span>(<span class="string">&quot;sha256&quot;</span>)
-                .<span class="ident">ok_or</span>(<span class="ident">DecryptorError</span>::<span class="ident">MissingHash</span>)<span class="question-mark">?</span>,
+                .<span class="ident">ok_or</span>(<span class="ident">DecryptorError::MissingHash</span>)<span class="question-mark">?</span>,
         )<span class="question-mark">?</span>;
-        <span class="kw">let</span> <span class="ident">key</span> <span class="op">=</span> <span class="ident">Zeroizing</span>::<span class="ident">from</span>(<span class="ident">decode_url_safe</span>(<span class="ident">info</span>.<span class="ident">web_key</span>.<span class="ident">k</span>)<span class="question-mark">?</span>);
+        <span class="kw">let</span> <span class="ident">key</span> <span class="op">=</span> <span class="ident">Zeroizing::from</span>(<span class="ident">decode_url_safe</span>(<span class="ident">info</span>.<span class="ident">web_key</span>.<span class="ident">k</span>)<span class="question-mark">?</span>);
         <span class="kw">let</span> <span class="ident">iv</span> <span class="op">=</span> <span class="ident">decode</span>(<span class="ident">info</span>.<span class="ident">iv</span>)<span class="question-mark">?</span>;
 
-        <span class="kw">let</span> <span class="ident">sha</span> <span class="op">=</span> <span class="ident">Sha256</span>::<span class="ident">default</span>();
-        <span class="kw">let</span> <span class="ident">aes</span> <span class="op">=</span> <span class="ident">Aes256Ctr</span>::<span class="ident">new_var</span>(<span class="kw-2">&amp;</span><span class="ident">key</span>, <span class="kw-2">&amp;</span><span class="ident">iv</span>).<span class="ident">map_err</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="ident">DecryptorError</span>::<span class="ident">KeyNonceLength</span>)<span class="question-mark">?</span>;
+        <span class="kw">let</span> <span class="ident">sha</span> <span class="op">=</span> <span class="ident">Sha256::default</span>();
+        <span class="kw">let</span> <span class="ident">aes</span> <span class="op">=</span> <span class="ident">Aes256Ctr::new_var</span>(<span class="kw-2">&amp;</span><span class="ident">key</span>, <span class="kw-2">&amp;</span><span class="ident">iv</span>).<span class="ident">map_err</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="ident">DecryptorError::KeyNonceLength</span>)<span class="question-mark">?</span>;
 
         <span class="prelude-val">Ok</span>(<span class="ident">AttachmentDecryptor</span> {
             <span class="ident">inner_reader</span>: <span class="ident">input</span>,
@@ -520,7 +520,7 @@
 }
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">R</span>: <span class="ident">Read</span> <span class="op">+</span> <span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">Read</span> <span class="kw">for</span> <span class="ident">AttachmentEncryptor</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">R</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">read</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">buf</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> [<span class="ident">u8</span>]) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">std</span>::<span class="ident">io</span>::<span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">read</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">buf</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> [<span class="ident">u8</span>]) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">std::io::Result</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">read_bytes</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">inner_reader</span>.<span class="ident">read</span>(<span class="ident">buf</span>)<span class="question-mark">?</span>;
 
         <span class="kw">if</span> <span class="ident">read_bytes</span> <span class="op">=</span><span class="op">=</span> <span class="number">0</span> {
@@ -568,8 +568,8 @@
     <span class="doccomment">/// let key = encryptor.finish();</span>
     <span class="doccomment">/// ```</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">reader</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> <span class="ident">R</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">key</span> <span class="op">=</span> <span class="ident">Zeroizing</span>::<span class="ident">new</span>([<span class="number">0u8</span>; <span class="ident">KEY_SIZE</span>]);
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">iv</span> <span class="op">=</span> <span class="ident">Zeroizing</span>::<span class="ident">new</span>([<span class="number">0u8</span>; <span class="ident">IV_SIZE</span>]);
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">key</span> <span class="op">=</span> <span class="ident">Zeroizing::new</span>([<span class="number">0u8</span>; <span class="ident">KEY_SIZE</span>]);
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">iv</span> <span class="op">=</span> <span class="ident">Zeroizing::new</span>([<span class="number">0u8</span>; <span class="ident">IV_SIZE</span>]);
 
         <span class="ident">getrandom</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="kw-2">*</span><span class="ident">key</span>).<span class="ident">expect</span>(<span class="string">&quot;Can&#39;t generate randomness&quot;</span>);
         <span class="comment">// Only populate the the first 8 bits with randomness, the rest is 0</span>
@@ -585,16 +585,16 @@
         };
         <span class="kw">let</span> <span class="ident">encoded_iv</span> <span class="op">=</span> <span class="ident">encode</span>(<span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="ident">iv</span>);
 
-        <span class="kw">let</span> <span class="ident">aes</span> <span class="op">=</span> <span class="ident">Aes256Ctr</span>::<span class="ident">new_var</span>(<span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="ident">key</span>, <span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="ident">iv</span>).<span class="ident">expect</span>(<span class="string">&quot;Cannot create AES encryption object.&quot;</span>);
+        <span class="kw">let</span> <span class="ident">aes</span> <span class="op">=</span> <span class="ident">Aes256Ctr::new_var</span>(<span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="ident">key</span>, <span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="ident">iv</span>).<span class="ident">expect</span>(<span class="string">&quot;Cannot create AES encryption object.&quot;</span>);
 
         <span class="ident">AttachmentEncryptor</span> {
             <span class="ident">finished</span>: <span class="bool-val">false</span>,
             <span class="ident">inner_reader</span>: <span class="ident">reader</span>,
             <span class="ident">iv</span>: <span class="ident">encoded_iv</span>,
             <span class="ident">web_key</span>,
-            <span class="ident">hashes</span>: <span class="ident">BTreeMap</span>::<span class="ident">new</span>(),
+            <span class="ident">hashes</span>: <span class="ident">BTreeMap::new</span>(),
             <span class="ident">aes</span>,
-            <span class="ident">sha</span>: <span class="ident">Sha256</span>::<span class="ident">default</span>(),
+            <span class="ident">sha</span>: <span class="ident">Sha256::default</span>(),
         }
     }
 
@@ -632,8 +632,8 @@
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
 <span class="kw">mod</span> <span class="ident">test</span> {
     <span class="kw">use</span> <span class="kw">super</span>::{<span class="ident">AttachmentDecryptor</span>, <span class="ident">AttachmentEncryptor</span>, <span class="ident">EncryptionInfo</span>};
-    <span class="kw">use</span> <span class="ident">serde_json</span>::<span class="ident">json</span>;
-    <span class="kw">use</span> <span class="ident">std</span>::<span class="ident">io</span>::{<span class="ident">Cursor</span>, <span class="ident">Read</span>};
+    <span class="kw">use</span> <span class="ident">serde_json::json</span>;
+    <span class="kw">use</span> <span class="ident">std::io</span>::{<span class="ident">Cursor</span>, <span class="ident">Read</span>};
 
     <span class="kw">const</span> <span class="ident">EXAMPLE_DATA</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>] <span class="op">=</span> <span class="kw-2">&amp;</span>[
         <span class="number">179</span>, <span class="number">154</span>, <span class="number">118</span>, <span class="number">127</span>, <span class="number">186</span>, <span class="number">127</span>, <span class="number">110</span>, <span class="number">33</span>, <span class="number">203</span>, <span class="number">33</span>, <span class="number">33</span>, <span class="number">134</span>, <span class="number">67</span>, <span class="number">100</span>, <span class="number">173</span>, <span class="number">46</span>, <span class="number">235</span>, <span class="number">27</span>, <span class="number">215</span>,
@@ -656,54 +656,54 @@
             }
         });
 
-        <span class="ident">serde_json</span>::<span class="ident">from_value</span>(<span class="ident">info</span>).<span class="ident">unwrap</span>()
+        <span class="ident">serde_json::from_value</span>(<span class="ident">info</span>).<span class="ident">unwrap</span>()
     }
 
     <span class="attribute">#[<span class="ident">test</span>]</span>
     <span class="kw">fn</span> <span class="ident">encrypt_decrypt_cycle</span>() {
         <span class="kw">let</span> <span class="ident">data</span> <span class="op">=</span> <span class="string">&quot;Hello world&quot;</span>.<span class="ident">to_owned</span>();
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">cursor</span> <span class="op">=</span> <span class="ident">Cursor</span>::<span class="ident">new</span>(<span class="ident">data</span>.<span class="ident">clone</span>());
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">cursor</span> <span class="op">=</span> <span class="ident">Cursor::new</span>(<span class="ident">data</span>.<span class="ident">clone</span>());
 
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">encryptor</span> <span class="op">=</span> <span class="ident">AttachmentEncryptor</span>::<span class="ident">new</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">cursor</span>);
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">encryptor</span> <span class="op">=</span> <span class="ident">AttachmentEncryptor::new</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">cursor</span>);
 
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">encrypted</span> <span class="op">=</span> <span class="ident">Vec</span>::<span class="ident">new</span>();
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">encrypted</span> <span class="op">=</span> <span class="ident">Vec::new</span>();
 
         <span class="ident">encryptor</span>.<span class="ident">read_to_end</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">encrypted</span>).<span class="ident">unwrap</span>();
         <span class="kw">let</span> <span class="ident">key</span> <span class="op">=</span> <span class="ident">encryptor</span>.<span class="ident">finish</span>();
         <span class="macro">assert_ne!</span>(<span class="ident">encrypted</span>.<span class="ident">as_slice</span>(), <span class="ident">data</span>.<span class="ident">as_bytes</span>());
 
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">cursor</span> <span class="op">=</span> <span class="ident">Cursor</span>::<span class="ident">new</span>(<span class="ident">encrypted</span>);
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">decryptor</span> <span class="op">=</span> <span class="ident">AttachmentDecryptor</span>::<span class="ident">new</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">cursor</span>, <span class="ident">key</span>).<span class="ident">unwrap</span>();
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">decrypted_data</span> <span class="op">=</span> <span class="ident">Vec</span>::<span class="ident">new</span>();
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">cursor</span> <span class="op">=</span> <span class="ident">Cursor::new</span>(<span class="ident">encrypted</span>);
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">decryptor</span> <span class="op">=</span> <span class="ident">AttachmentDecryptor::new</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">cursor</span>, <span class="ident">key</span>).<span class="ident">unwrap</span>();
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">decrypted_data</span> <span class="op">=</span> <span class="ident">Vec::new</span>();
 
         <span class="ident">decryptor</span>.<span class="ident">read_to_end</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">decrypted_data</span>).<span class="ident">unwrap</span>();
 
-        <span class="kw">let</span> <span class="ident">decrypted</span> <span class="op">=</span> <span class="ident">String</span>::<span class="ident">from_utf8</span>(<span class="ident">decrypted_data</span>).<span class="ident">unwrap</span>();
+        <span class="kw">let</span> <span class="ident">decrypted</span> <span class="op">=</span> <span class="ident">String::from_utf8</span>(<span class="ident">decrypted_data</span>).<span class="ident">unwrap</span>();
 
         <span class="macro">assert_eq!</span>(<span class="ident">data</span>, <span class="ident">decrypted</span>);
     }
 
     <span class="attribute">#[<span class="ident">test</span>]</span>
     <span class="kw">fn</span> <span class="ident">real_decrypt</span>() {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">cursor</span> <span class="op">=</span> <span class="ident">Cursor</span>::<span class="ident">new</span>(<span class="ident">EXAMPLE_DATA</span>.<span class="ident">to_vec</span>());
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">cursor</span> <span class="op">=</span> <span class="ident">Cursor::new</span>(<span class="ident">EXAMPLE_DATA</span>.<span class="ident">to_vec</span>());
         <span class="kw">let</span> <span class="ident">key</span> <span class="op">=</span> <span class="ident">example_key</span>();
 
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">decryptor</span> <span class="op">=</span> <span class="ident">AttachmentDecryptor</span>::<span class="ident">new</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">cursor</span>, <span class="ident">key</span>).<span class="ident">unwrap</span>();
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">decrypted_data</span> <span class="op">=</span> <span class="ident">Vec</span>::<span class="ident">new</span>();
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">decryptor</span> <span class="op">=</span> <span class="ident">AttachmentDecryptor::new</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">cursor</span>, <span class="ident">key</span>).<span class="ident">unwrap</span>();
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">decrypted_data</span> <span class="op">=</span> <span class="ident">Vec::new</span>();
 
         <span class="ident">decryptor</span>.<span class="ident">read_to_end</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">decrypted_data</span>).<span class="ident">unwrap</span>();
-        <span class="kw">let</span> <span class="ident">decrypted</span> <span class="op">=</span> <span class="ident">String</span>::<span class="ident">from_utf8</span>(<span class="ident">decrypted_data</span>).<span class="ident">unwrap</span>();
+        <span class="kw">let</span> <span class="ident">decrypted</span> <span class="op">=</span> <span class="ident">String::from_utf8</span>(<span class="ident">decrypted_data</span>).<span class="ident">unwrap</span>();
 
         <span class="macro">assert_eq!</span>(<span class="string">&quot;It&#39;s a secret to everybody&quot;</span>, <span class="ident">decrypted</span>);
     }
 
     <span class="attribute">#[<span class="ident">test</span>]</span>
     <span class="kw">fn</span> <span class="ident">decrypt_invalid_hash</span>() {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">cursor</span> <span class="op">=</span> <span class="ident">Cursor</span>::<span class="ident">new</span>(<span class="string">&quot;fake message&quot;</span>);
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">cursor</span> <span class="op">=</span> <span class="ident">Cursor::new</span>(<span class="string">&quot;fake message&quot;</span>);
         <span class="kw">let</span> <span class="ident">key</span> <span class="op">=</span> <span class="ident">example_key</span>();
 
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">decryptor</span> <span class="op">=</span> <span class="ident">AttachmentDecryptor</span>::<span class="ident">new</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">cursor</span>, <span class="ident">key</span>).<span class="ident">unwrap</span>();
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">decrypted_data</span> <span class="op">=</span> <span class="ident">Vec</span>::<span class="ident">new</span>();
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">decryptor</span> <span class="op">=</span> <span class="ident">AttachmentDecryptor::new</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">cursor</span>, <span class="ident">key</span>).<span class="ident">unwrap</span>();
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">decrypted_data</span> <span class="op">=</span> <span class="ident">Vec::new</span>();
 
         <span class="macro">assert!</span>(<span class="ident">decryptor</span>.<span class="ident">read_to_end</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">decrypted_data</span>).<span class="ident">is_err</span>())
     }

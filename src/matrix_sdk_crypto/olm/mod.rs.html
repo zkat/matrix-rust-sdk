@@ -298,15 +298,15 @@
     <span class="ident">OutboundGroupSession</span>, <span class="ident">PickledInboundGroupSession</span>, <span class="ident">PickledOutboundGroupSession</span>,
 };
 <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">use</span> <span class="ident">group_sessions</span>::{<span class="ident">GroupSessionKey</span>, <span class="ident">ShareState</span>};
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">olm_rs</span>::{<span class="ident">account</span>::<span class="ident">IdentityKeys</span>, <span class="ident">PicklingMode</span>};
+<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">olm_rs</span>::{<span class="ident">account::IdentityKeys</span>, <span class="ident">PicklingMode</span>};
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">session</span>::{<span class="ident">PickledSession</span>, <span class="ident">Session</span>, <span class="ident">SessionPickle</span>};
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">signing</span>::{<span class="ident">PickledCrossSigningIdentity</span>, <span class="ident">PrivateCrossSigningIdentity</span>};
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">use</span> <span class="ident">utility</span>::<span class="ident">Utility</span>;
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">use</span> <span class="ident">utility::Utility</span>;
 
-<span class="kw">use</span> <span class="ident">matrix_sdk_common</span>::<span class="ident">instant</span>::{<span class="ident">Duration</span>, <span class="ident">Instant</span>};
+<span class="kw">use</span> <span class="ident">matrix_sdk_common::instant</span>::{<span class="ident">Duration</span>, <span class="ident">Instant</span>};
 <span class="kw">use</span> <span class="ident">serde</span>::{<span class="ident">Deserialize</span>, <span class="ident">Deserializer</span>, <span class="ident">Serialize</span>, <span class="ident">Serializer</span>};
 
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">serialize_instant</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span>(<span class="ident">instant</span>: <span class="kw-2">&amp;</span><span class="ident">Instant</span>, <span class="ident">serializer</span>: <span class="ident">S</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">S</span>::<span class="prelude-val">Ok</span>, <span class="ident">S</span>::<span class="ident">Error</span><span class="op">&gt;</span>
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">serialize_instant</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span>(<span class="ident">instant</span>: <span class="kw-2">&amp;</span><span class="ident">Instant</span>, <span class="ident">serializer</span>: <span class="ident">S</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">S::Ok</span>, <span class="ident">S::Error</span><span class="op">&gt;</span>
 <span class="kw">where</span>
     <span class="ident">S</span>: <span class="ident">Serializer</span>,
 {
@@ -314,28 +314,28 @@
     <span class="ident">duration</span>.<span class="ident">serialize</span>(<span class="ident">serializer</span>)
 }
 
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">deserialize_instant</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span>, <span class="ident">D</span><span class="op">&gt;</span>(<span class="ident">deserializer</span>: <span class="ident">D</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Instant</span>, <span class="ident">D</span>::<span class="ident">Error</span><span class="op">&gt;</span>
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">deserialize_instant</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span>, <span class="ident">D</span><span class="op">&gt;</span>(<span class="ident">deserializer</span>: <span class="ident">D</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Instant</span>, <span class="ident">D::Error</span><span class="op">&gt;</span>
 <span class="kw">where</span>
     <span class="ident">D</span>: <span class="ident">Deserializer</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span>,
 {
-    <span class="kw">let</span> <span class="ident">duration</span> <span class="op">=</span> <span class="ident">Duration</span>::<span class="ident">deserialize</span>(<span class="ident">deserializer</span>)<span class="question-mark">?</span>;
-    <span class="kw">let</span> <span class="ident">now</span> <span class="op">=</span> <span class="ident">Instant</span>::<span class="ident">now</span>();
+    <span class="kw">let</span> <span class="ident">duration</span> <span class="op">=</span> <span class="ident">Duration::deserialize</span>(<span class="ident">deserializer</span>)<span class="question-mark">?</span>;
+    <span class="kw">let</span> <span class="ident">now</span> <span class="op">=</span> <span class="ident">Instant::now</span>();
     <span class="kw">let</span> <span class="ident">instant</span> <span class="op">=</span> <span class="ident">now</span>
         .<span class="ident">checked_sub</span>(<span class="ident">duration</span>)
-        .<span class="ident">ok_or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">serde</span>::<span class="ident">de</span>::<span class="ident">Error</span>::<span class="ident">custom</span>(<span class="string">&quot;Can&#39;t substract the the current instant&quot;</span>))<span class="question-mark">?</span>;
+        .<span class="ident">ok_or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">serde::de::Error::custom</span>(<span class="string">&quot;Can&#39;t substract the the current instant&quot;</span>))<span class="question-mark">?</span>;
     <span class="prelude-val">Ok</span>(<span class="ident">instant</span>)
 }
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
 <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">mod</span> <span class="ident">test</span> {
-    <span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">olm</span>::{<span class="ident">InboundGroupSession</span>, <span class="ident">ReadOnlyAccount</span>, <span class="ident">Session</span>};
+    <span class="kw">use</span> <span class="kw">crate</span><span class="ident">::olm</span>::{<span class="ident">InboundGroupSession</span>, <span class="ident">ReadOnlyAccount</span>, <span class="ident">Session</span>};
     <span class="kw">use</span> <span class="ident">matrix_sdk_common</span>::{
-        <span class="ident">api</span>::<span class="ident">r0</span>::<span class="ident">keys</span>::<span class="ident">SignedKey</span>,
-        <span class="ident">events</span>::<span class="ident">forwarded_room_key</span>::<span class="ident">ForwardedRoomKeyToDeviceEventContent</span>,
+        <span class="ident">api::r0::keys::SignedKey</span>,
+        <span class="ident">events::forwarded_room_key::ForwardedRoomKeyToDeviceEventContent</span>,
         <span class="ident">identifiers</span>::{<span class="ident">room_id</span>, <span class="ident">user_id</span>, <span class="ident">DeviceId</span>, <span class="ident">UserId</span>},
     };
-    <span class="kw">use</span> <span class="ident">olm_rs</span>::<span class="ident">session</span>::<span class="ident">OlmMessage</span>;
-    <span class="kw">use</span> <span class="ident">std</span>::{<span class="ident">collections</span>::<span class="ident">BTreeMap</span>, <span class="ident">convert</span>::<span class="ident">TryInto</span>};
+    <span class="kw">use</span> <span class="ident">olm_rs::session::OlmMessage</span>;
+    <span class="kw">use</span> <span class="ident">std</span>::{<span class="ident">collections::BTreeMap</span>, <span class="ident">convert::TryInto</span>};
 
     <span class="kw">fn</span> <span class="ident">alice_id</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident">UserId</span> {
         <span class="macro">user_id!</span>(<span class="string">&quot;@alice:example.org&quot;</span>)
@@ -354,8 +354,8 @@
     }
 
     <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">get_account_and_session</span>() <span class="op">-</span><span class="op">&gt;</span> (<span class="ident">ReadOnlyAccount</span>, <span class="ident">Session</span>) {
-        <span class="kw">let</span> <span class="ident">alice</span> <span class="op">=</span> <span class="ident">ReadOnlyAccount</span>::<span class="ident">new</span>(<span class="kw-2">&amp;</span><span class="ident">alice_id</span>(), <span class="kw-2">&amp;</span><span class="ident">alice_device_id</span>());
-        <span class="kw">let</span> <span class="ident">bob</span> <span class="op">=</span> <span class="ident">ReadOnlyAccount</span>::<span class="ident">new</span>(<span class="kw-2">&amp;</span><span class="ident">bob_id</span>(), <span class="kw-2">&amp;</span><span class="ident">bob_device_id</span>());
+        <span class="kw">let</span> <span class="ident">alice</span> <span class="op">=</span> <span class="ident">ReadOnlyAccount::new</span>(<span class="kw-2">&amp;</span><span class="ident">alice_id</span>(), <span class="kw-2">&amp;</span><span class="ident">alice_device_id</span>());
+        <span class="kw">let</span> <span class="ident">bob</span> <span class="op">=</span> <span class="ident">ReadOnlyAccount::new</span>(<span class="kw-2">&amp;</span><span class="ident">bob_id</span>(), <span class="kw-2">&amp;</span><span class="ident">bob_device_id</span>());
 
         <span class="ident">bob</span>.<span class="ident">generate_one_time_keys_helper</span>(<span class="number">1</span>).<span class="kw">await</span>;
         <span class="kw">let</span> <span class="ident">one_time_key</span> <span class="op">=</span> <span class="ident">bob</span>
@@ -367,7 +367,7 @@
             .<span class="ident">unwrap</span>()
             .<span class="number">1</span>
             .<span class="ident">to_owned</span>();
-        <span class="kw">let</span> <span class="ident">one_time_key</span> <span class="op">=</span> <span class="ident">SignedKey</span>::<span class="ident">new</span>(<span class="ident">one_time_key</span>, <span class="ident">BTreeMap</span>::<span class="ident">new</span>());
+        <span class="kw">let</span> <span class="ident">one_time_key</span> <span class="op">=</span> <span class="ident">SignedKey::new</span>(<span class="ident">one_time_key</span>, <span class="ident">BTreeMap::new</span>());
         <span class="kw">let</span> <span class="ident">sender_key</span> <span class="op">=</span> <span class="ident">bob</span>.<span class="ident">identity_keys</span>().<span class="ident">curve25519</span>().<span class="ident">to_owned</span>();
         <span class="kw">let</span> <span class="ident">session</span> <span class="op">=</span> <span class="ident">alice</span>
             .<span class="ident">create_outbound_session_helper</span>(<span class="kw-2">&amp;</span><span class="ident">sender_key</span>, <span class="kw-2">&amp;</span><span class="ident">one_time_key</span>)
@@ -379,7 +379,7 @@
 
     <span class="attribute">#[<span class="ident">test</span>]</span>
     <span class="kw">fn</span> <span class="ident">account_creation</span>() {
-        <span class="kw">let</span> <span class="ident">account</span> <span class="op">=</span> <span class="ident">ReadOnlyAccount</span>::<span class="ident">new</span>(<span class="kw-2">&amp;</span><span class="ident">alice_id</span>(), <span class="kw-2">&amp;</span><span class="ident">alice_device_id</span>());
+        <span class="kw">let</span> <span class="ident">account</span> <span class="op">=</span> <span class="ident">ReadOnlyAccount::new</span>(<span class="kw-2">&amp;</span><span class="ident">alice_id</span>(), <span class="kw-2">&amp;</span><span class="ident">alice_device_id</span>());
         <span class="kw">let</span> <span class="ident">identyty_keys</span> <span class="op">=</span> <span class="ident">account</span>.<span class="ident">identity_keys</span>();
 
         <span class="macro">assert!</span>(<span class="op">!</span><span class="ident">account</span>.<span class="ident">shared</span>());
@@ -398,9 +398,9 @@
         <span class="macro">assert!</span>(<span class="ident">account</span>.<span class="ident">shared</span>());
     }
 
-    <span class="attribute">#[<span class="ident">tokio</span>::<span class="ident">test</span>]</span>
+    <span class="attribute">#[<span class="ident">tokio::test</span>]</span>
     <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">one_time_keys_creation</span>() {
-        <span class="kw">let</span> <span class="ident">account</span> <span class="op">=</span> <span class="ident">ReadOnlyAccount</span>::<span class="ident">new</span>(<span class="kw-2">&amp;</span><span class="ident">alice_id</span>(), <span class="kw-2">&amp;</span><span class="ident">alice_device_id</span>());
+        <span class="kw">let</span> <span class="ident">account</span> <span class="op">=</span> <span class="ident">ReadOnlyAccount::new</span>(<span class="kw-2">&amp;</span><span class="ident">alice_id</span>(), <span class="kw-2">&amp;</span><span class="ident">alice_device_id</span>());
         <span class="kw">let</span> <span class="ident">one_time_keys</span> <span class="op">=</span> <span class="ident">account</span>.<span class="ident">one_time_keys</span>().<span class="kw">await</span>;
 
         <span class="macro">assert!</span>(<span class="ident">one_time_keys</span>.<span class="ident">curve25519</span>().<span class="ident">is_empty</span>());
@@ -425,10 +425,10 @@
         <span class="macro">assert!</span>(<span class="ident">one_time_keys</span>.<span class="ident">curve25519</span>().<span class="ident">is_empty</span>());
     }
 
-    <span class="attribute">#[<span class="ident">tokio</span>::<span class="ident">test</span>]</span>
+    <span class="attribute">#[<span class="ident">tokio::test</span>]</span>
     <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">session_creation</span>() {
-        <span class="kw">let</span> <span class="ident">alice</span> <span class="op">=</span> <span class="ident">ReadOnlyAccount</span>::<span class="ident">new</span>(<span class="kw-2">&amp;</span><span class="ident">alice_id</span>(), <span class="kw-2">&amp;</span><span class="ident">alice_device_id</span>());
-        <span class="kw">let</span> <span class="ident">bob</span> <span class="op">=</span> <span class="ident">ReadOnlyAccount</span>::<span class="ident">new</span>(<span class="kw-2">&amp;</span><span class="ident">bob_id</span>(), <span class="kw-2">&amp;</span><span class="ident">bob_device_id</span>());
+        <span class="kw">let</span> <span class="ident">alice</span> <span class="op">=</span> <span class="ident">ReadOnlyAccount::new</span>(<span class="kw-2">&amp;</span><span class="ident">alice_id</span>(), <span class="kw-2">&amp;</span><span class="ident">alice_device_id</span>());
+        <span class="kw">let</span> <span class="ident">bob</span> <span class="op">=</span> <span class="ident">ReadOnlyAccount::new</span>(<span class="kw-2">&amp;</span><span class="ident">bob_id</span>(), <span class="kw-2">&amp;</span><span class="ident">bob_device_id</span>());
         <span class="kw">let</span> <span class="ident">alice_keys</span> <span class="op">=</span> <span class="ident">alice</span>.<span class="ident">identity_keys</span>();
         <span class="ident">alice</span>.<span class="ident">generate_one_time_keys_helper</span>(<span class="number">1</span>).<span class="kw">await</span>;
         <span class="kw">let</span> <span class="ident">one_time_keys</span> <span class="op">=</span> <span class="ident">alice</span>.<span class="ident">one_time_keys</span>().<span class="kw">await</span>;
@@ -442,7 +442,7 @@
             .<span class="number">1</span>
             .<span class="ident">to_owned</span>();
 
-        <span class="kw">let</span> <span class="ident">one_time_key</span> <span class="op">=</span> <span class="ident">SignedKey</span>::<span class="ident">new</span>(<span class="ident">one_time_key</span>, <span class="ident">BTreeMap</span>::<span class="ident">new</span>());
+        <span class="kw">let</span> <span class="ident">one_time_key</span> <span class="op">=</span> <span class="ident">SignedKey::new</span>(<span class="ident">one_time_key</span>, <span class="ident">BTreeMap::new</span>());
 
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">bob_session</span> <span class="op">=</span> <span class="ident">bob</span>
             .<span class="ident">create_outbound_session_helper</span>(<span class="ident">alice_keys</span>.<span class="ident">curve25519</span>(), <span class="kw-2">&amp;</span><span class="ident">one_time_key</span>)
@@ -454,8 +454,8 @@
         <span class="kw">let</span> <span class="ident">message</span> <span class="op">=</span> <span class="ident">bob_session</span>.<span class="ident">encrypt_helper</span>(<span class="ident">plaintext</span>).<span class="kw">await</span>;
 
         <span class="kw">let</span> <span class="ident">prekey_message</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">message</span>.<span class="ident">clone</span>() {
-            <span class="ident">OlmMessage</span>::<span class="ident">PreKey</span>(<span class="ident">m</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">m</span>,
-            <span class="ident">OlmMessage</span>::<span class="ident">Message</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="macro">panic!</span>(<span class="string">&quot;Incorrect message type&quot;</span>),
+            <span class="ident">OlmMessage::PreKey</span>(<span class="ident">m</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">m</span>,
+            <span class="ident">OlmMessage::Message</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="macro">panic!</span>(<span class="string">&quot;Incorrect message type&quot;</span>),
         };
 
         <span class="kw">let</span> <span class="ident">bob_keys</span> <span class="op">=</span> <span class="ident">bob</span>.<span class="ident">identity_keys</span>();
@@ -475,9 +475,9 @@
         <span class="macro">assert_eq!</span>(<span class="ident">plaintext</span>, <span class="ident">decyrpted</span>);
     }
 
-    <span class="attribute">#[<span class="ident">tokio</span>::<span class="ident">test</span>]</span>
+    <span class="attribute">#[<span class="ident">tokio::test</span>]</span>
     <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">group_session_creation</span>() {
-        <span class="kw">let</span> <span class="ident">alice</span> <span class="op">=</span> <span class="ident">ReadOnlyAccount</span>::<span class="ident">new</span>(<span class="kw-2">&amp;</span><span class="ident">alice_id</span>(), <span class="kw-2">&amp;</span><span class="ident">alice_device_id</span>());
+        <span class="kw">let</span> <span class="ident">alice</span> <span class="op">=</span> <span class="ident">ReadOnlyAccount::new</span>(<span class="kw-2">&amp;</span><span class="ident">alice_id</span>(), <span class="kw-2">&amp;</span><span class="ident">alice_device_id</span>());
         <span class="kw">let</span> <span class="ident">room_id</span> <span class="op">=</span> <span class="macro">room_id!</span>(<span class="string">&quot;!test:localhost&quot;</span>);
 
         <span class="kw">let</span> (<span class="ident">outbound</span>, <span class="kw">_</span>) <span class="op">=</span> <span class="ident">alice</span>
@@ -490,7 +490,7 @@
         <span class="ident">outbound</span>.<span class="ident">mark_as_shared</span>();
         <span class="macro">assert!</span>(<span class="ident">outbound</span>.<span class="ident">shared</span>());
 
-        <span class="kw">let</span> <span class="ident">inbound</span> <span class="op">=</span> <span class="ident">InboundGroupSession</span>::<span class="ident">new</span>(
+        <span class="kw">let</span> <span class="ident">inbound</span> <span class="op">=</span> <span class="ident">InboundGroupSession::new</span>(
             <span class="string">&quot;test_key&quot;</span>,
             <span class="string">&quot;test_key&quot;</span>,
             <span class="kw-2">&amp;</span><span class="ident">room_id</span>,
@@ -512,9 +512,9 @@
         );
     }
 
-    <span class="attribute">#[<span class="ident">tokio</span>::<span class="ident">test</span>]</span>
+    <span class="attribute">#[<span class="ident">tokio::test</span>]</span>
     <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">group_session_export</span>() {
-        <span class="kw">let</span> <span class="ident">alice</span> <span class="op">=</span> <span class="ident">ReadOnlyAccount</span>::<span class="ident">new</span>(<span class="kw-2">&amp;</span><span class="ident">alice_id</span>(), <span class="kw-2">&amp;</span><span class="ident">alice_device_id</span>());
+        <span class="kw">let</span> <span class="ident">alice</span> <span class="op">=</span> <span class="ident">ReadOnlyAccount::new</span>(<span class="kw-2">&amp;</span><span class="ident">alice_id</span>(), <span class="kw-2">&amp;</span><span class="ident">alice_device_id</span>());
         <span class="kw">let</span> <span class="ident">room_id</span> <span class="op">=</span> <span class="macro">room_id!</span>(<span class="string">&quot;!test:localhost&quot;</span>);
 
         <span class="kw">let</span> (<span class="kw">_</span>, <span class="ident">inbound</span>) <span class="op">=</span> <span class="ident">alice</span>
@@ -525,7 +525,7 @@
         <span class="kw">let</span> <span class="ident">export</span> <span class="op">=</span> <span class="ident">inbound</span>.<span class="ident">export</span>().<span class="kw">await</span>;
         <span class="kw">let</span> <span class="ident">export</span>: <span class="ident">ForwardedRoomKeyToDeviceEventContent</span> <span class="op">=</span> <span class="ident">export</span>.<span class="ident">try_into</span>().<span class="ident">unwrap</span>();
 
-        <span class="kw">let</span> <span class="ident">imported</span> <span class="op">=</span> <span class="ident">InboundGroupSession</span>::<span class="ident">from_export</span>(<span class="ident">export</span>).<span class="ident">unwrap</span>();
+        <span class="kw">let</span> <span class="ident">imported</span> <span class="op">=</span> <span class="ident">InboundGroupSession::from_export</span>(<span class="ident">export</span>).<span class="ident">unwrap</span>();
 
         <span class="macro">assert_eq!</span>(<span class="ident">inbound</span>.<span class="ident">session_id</span>(), <span class="ident">imported</span>.<span class="ident">session_id</span>());
     }

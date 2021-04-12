@@ -857,46 +857,46 @@
 <span class="kw">mod</span> <span class="ident">sas_state</span>;
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
-<span class="kw">use</span> <span class="ident">std</span>::<span class="ident">time</span>::<span class="ident">Instant</span>;
+<span class="kw">use</span> <span class="ident">std::time::Instant</span>;
 
-<span class="kw">use</span> <span class="ident">event_enums</span>::<span class="ident">AcceptContent</span>;
-<span class="kw">use</span> <span class="ident">std</span>::<span class="ident">sync</span>::{<span class="ident">Arc</span>, <span class="ident">Mutex</span>};
+<span class="kw">use</span> <span class="ident">event_enums::AcceptContent</span>;
+<span class="kw">use</span> <span class="ident">std::sync</span>::{<span class="ident">Arc</span>, <span class="ident">Mutex</span>};
 <span class="kw">use</span> <span class="ident">tracing</span>::{<span class="ident">error</span>, <span class="ident">info</span>, <span class="ident">trace</span>, <span class="ident">warn</span>};
 
 <span class="kw">use</span> <span class="ident">matrix_sdk_common</span>::{
-    <span class="ident">api</span>::<span class="ident">r0</span>::<span class="ident">keys</span>::<span class="ident">upload_signatures</span>::<span class="ident">Request</span> <span class="kw">as</span> <span class="ident">SignatureUploadRequest</span>,
+    <span class="ident">api::r0::keys::upload_signatures::Request</span> <span class="kw">as</span> <span class="ident">SignatureUploadRequest</span>,
     <span class="ident">events</span>::{
-        <span class="ident">key</span>::<span class="ident">verification</span>::{
+        <span class="ident">key::verification</span>::{
             <span class="ident">accept</span>::{<span class="ident">AcceptEventContent</span>, <span class="ident">AcceptMethod</span>, <span class="ident">AcceptToDeviceEventContent</span>},
-            <span class="ident">cancel</span>::<span class="ident">CancelCode</span>,
+            <span class="ident">cancel::CancelCode</span>,
             <span class="ident">ShortAuthenticationString</span>,
         },
         <span class="ident">AnyMessageEvent</span>, <span class="ident">AnyMessageEventContent</span>, <span class="ident">AnyToDeviceEvent</span>, <span class="ident">AnyToDeviceEventContent</span>,
     },
     <span class="ident">identifiers</span>::{<span class="ident">DeviceId</span>, <span class="ident">EventId</span>, <span class="ident">RoomId</span>, <span class="ident">UserId</span>},
-    <span class="ident">uuid</span>::<span class="ident">Uuid</span>,
+    <span class="ident">uuid::Uuid</span>,
 };
 
 <span class="kw">use</span> <span class="kw">crate</span>::{
-    <span class="ident">error</span>::<span class="ident">SignatureError</span>,
+    <span class="ident">error::SignatureError</span>,
     <span class="ident">identities</span>::{<span class="ident">LocalTrust</span>, <span class="ident">ReadOnlyDevice</span>, <span class="ident">UserIdentities</span>},
-    <span class="ident">olm</span>::<span class="ident">PrivateCrossSigningIdentity</span>,
+    <span class="ident">olm::PrivateCrossSigningIdentity</span>,
     <span class="ident">requests</span>::{<span class="ident">OutgoingVerificationRequest</span>, <span class="ident">RoomMessageRequest</span>},
     <span class="ident">store</span>::{<span class="ident">Changes</span>, <span class="ident">CryptoStore</span>, <span class="ident">CryptoStoreError</span>, <span class="ident">DeviceChanges</span>},
     <span class="ident">ReadOnlyAccount</span>, <span class="ident">ToDeviceRequest</span>,
 };
 
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">helpers</span>::<span class="ident">content_to_request</span>;
-<span class="kw">use</span> <span class="ident">inner_sas</span>::<span class="ident">InnerSas</span>;
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">sas_state</span>::<span class="ident">FlowId</span>;
+<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">helpers::content_to_request</span>;
+<span class="kw">use</span> <span class="ident">inner_sas::InnerSas</span>;
+<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">sas_state::FlowId</span>;
 
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">event_enums</span>::{<span class="ident">OutgoingContent</span>, <span class="ident">StartContent</span>};
 
-<span class="kw">use</span> <span class="self">self</span>::<span class="ident">event_enums</span>::<span class="ident">CancelContent</span>;
+<span class="kw">use</span> <span class="self">self</span><span class="ident">::event_enums::CancelContent</span>;
 
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
 <span class="doccomment">/// A result of a verification flow.</span>
-<span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy</span>::<span class="ident">large_enum_variant</span>)]</span>
+<span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy::large_enum_variant</span>)]</span>
 <span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">VerificationResult</span> {
     <span class="doccomment">/// The verification succeeded, nothing needs to be done.</span>
     <span class="prelude-val">Ok</span>,
@@ -966,7 +966,7 @@
         <span class="kw">let</span> <span class="ident">flow_id</span> <span class="op">=</span> <span class="ident">inner_sas</span>.<span class="ident">verification_flow_id</span>();
 
         <span class="ident">Sas</span> {
-            <span class="ident">inner</span>: <span class="ident">Arc</span>::<span class="ident">new</span>(<span class="ident">Mutex</span>::<span class="ident">new</span>(<span class="ident">inner_sas</span>)),
+            <span class="ident">inner</span>: <span class="ident">Arc::new</span>(<span class="ident">Mutex::new</span>(<span class="ident">inner_sas</span>)),
             <span class="ident">account</span>,
             <span class="ident">private_identity</span>,
             <span class="ident">store</span>,
@@ -993,14 +993,14 @@
         <span class="ident">store</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">CryptoStore</span><span class="op">&gt;</span><span class="op">&gt;</span>,
         <span class="ident">other_identity</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">UserIdentities</span><span class="op">&gt;</span>,
     ) <span class="op">-</span><span class="op">&gt;</span> (<span class="ident">Sas</span>, <span class="ident">StartContent</span>) {
-        <span class="kw">let</span> (<span class="ident">inner</span>, <span class="ident">content</span>) <span class="op">=</span> <span class="ident">InnerSas</span>::<span class="ident">start</span>(
+        <span class="kw">let</span> (<span class="ident">inner</span>, <span class="ident">content</span>) <span class="op">=</span> <span class="ident">InnerSas::start</span>(
             <span class="ident">account</span>.<span class="ident">clone</span>(),
             <span class="ident">other_device</span>.<span class="ident">clone</span>(),
             <span class="ident">other_identity</span>.<span class="ident">clone</span>(),
         );
 
         (
-            <span class="self">Self</span>::<span class="ident">start_helper</span>(
+            <span class="self">Self</span><span class="ident">::start_helper</span>(
                 <span class="ident">inner</span>,
                 <span class="ident">account</span>,
                 <span class="ident">private_identity</span>,
@@ -1032,7 +1032,7 @@
         <span class="ident">store</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">CryptoStore</span><span class="op">&gt;</span><span class="op">&gt;</span>,
         <span class="ident">other_identity</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">UserIdentities</span><span class="op">&gt;</span>,
     ) <span class="op">-</span><span class="op">&gt;</span> (<span class="ident">Sas</span>, <span class="ident">StartContent</span>) {
-        <span class="kw">let</span> (<span class="ident">inner</span>, <span class="ident">content</span>) <span class="op">=</span> <span class="ident">InnerSas</span>::<span class="ident">start_in_room</span>(
+        <span class="kw">let</span> (<span class="ident">inner</span>, <span class="ident">content</span>) <span class="op">=</span> <span class="ident">InnerSas::start_in_room</span>(
             <span class="ident">flow_id</span>,
             <span class="ident">room_id</span>,
             <span class="ident">account</span>.<span class="ident">clone</span>(),
@@ -1041,7 +1041,7 @@
         );
 
         (
-            <span class="self">Self</span>::<span class="ident">start_helper</span>(
+            <span class="self">Self</span><span class="ident">::start_helper</span>(
                 <span class="ident">inner</span>,
                 <span class="ident">account</span>,
                 <span class="ident">private_identity</span>,
@@ -1071,7 +1071,7 @@
         <span class="ident">content</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">StartContent</span><span class="op">&gt;</span>,
         <span class="ident">other_identity</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">UserIdentities</span><span class="op">&gt;</span>,
     ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Sas</span>, <span class="ident">OutgoingContent</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">inner</span> <span class="op">=</span> <span class="ident">InnerSas</span>::<span class="ident">from_start_event</span>(
+        <span class="kw">let</span> <span class="ident">inner</span> <span class="op">=</span> <span class="ident">InnerSas::from_start_event</span>(
             <span class="ident">account</span>.<span class="ident">clone</span>(),
             <span class="ident">other_device</span>.<span class="ident">clone</span>(),
             <span class="ident">content</span>,
@@ -1081,7 +1081,7 @@
         <span class="kw">let</span> <span class="ident">flow_id</span> <span class="op">=</span> <span class="ident">inner</span>.<span class="ident">verification_flow_id</span>();
 
         <span class="prelude-val">Ok</span>(<span class="ident">Sas</span> {
-            <span class="ident">inner</span>: <span class="ident">Arc</span>::<span class="ident">new</span>(<span class="ident">Mutex</span>::<span class="ident">new</span>(<span class="ident">inner</span>)),
+            <span class="ident">inner</span>: <span class="ident">Arc::new</span>(<span class="ident">Mutex::new</span>(<span class="ident">inner</span>)),
             <span class="ident">account</span>,
             <span class="ident">private_identity</span>,
             <span class="ident">other_device</span>,
@@ -1096,7 +1096,7 @@
     <span class="doccomment">/// This does nothing if the verification was already accepted, otherwise it</span>
     <span class="doccomment">/// returns an `AcceptEventContent` that needs to be sent out.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">accept</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">OutgoingVerificationRequest</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">accept_with_settings</span>(<span class="ident">Default</span>::<span class="ident">default</span>())
+        <span class="self">self</span>.<span class="ident">accept_with_settings</span>(<span class="ident">Default::default</span>())
     }
 
     <span class="doccomment">/// Accept the SAS verification customizing the accept method.</span>
@@ -1114,14 +1114,14 @@
             .<span class="ident">unwrap</span>()
             .<span class="ident">accept</span>()
             .<span class="ident">map</span>(<span class="op">|</span><span class="ident">c</span><span class="op">|</span> <span class="kw">match</span> <span class="ident">settings</span>.<span class="ident">apply</span>(<span class="ident">c</span>) {
-                <span class="ident">AcceptContent</span>::<span class="ident">ToDevice</span>(<span class="ident">c</span>) <span class="op">=</span><span class="op">&gt;</span> {
-                    <span class="kw">let</span> <span class="ident">content</span> <span class="op">=</span> <span class="ident">AnyToDeviceEventContent</span>::<span class="ident">KeyVerificationAccept</span>(<span class="ident">c</span>);
+                <span class="ident">AcceptContent::ToDevice</span>(<span class="ident">c</span>) <span class="op">=</span><span class="op">&gt;</span> {
+                    <span class="kw">let</span> <span class="ident">content</span> <span class="op">=</span> <span class="ident">AnyToDeviceEventContent::KeyVerificationAccept</span>(<span class="ident">c</span>);
                     <span class="self">self</span>.<span class="ident">content_to_request</span>(<span class="ident">content</span>).<span class="ident">into</span>()
                 }
-                <span class="ident">AcceptContent</span>::<span class="ident">Room</span>(<span class="ident">room_id</span>, <span class="ident">content</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">RoomMessageRequest</span> {
+                <span class="ident">AcceptContent::Room</span>(<span class="ident">room_id</span>, <span class="ident">content</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">RoomMessageRequest</span> {
                     <span class="ident">room_id</span>,
-                    <span class="ident">txn_id</span>: <span class="ident">Uuid</span>::<span class="ident">new_v4</span>(),
-                    <span class="ident">content</span>: <span class="ident">AnyMessageEventContent</span>::<span class="ident">KeyVerificationAccept</span>(<span class="ident">content</span>),
+                    <span class="ident">txn_id</span>: <span class="ident">Uuid::new_v4</span>(),
+                    <span class="ident">content</span>: <span class="ident">AnyMessageEventContent::KeyVerificationAccept</span>(<span class="ident">content</span>),
                 }
                 .<span class="ident">into</span>(),
             })
@@ -1153,22 +1153,22 @@
         };
 
         <span class="kw">let</span> <span class="ident">mac_request</span> <span class="op">=</span> <span class="ident">content</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">c</span><span class="op">|</span> <span class="kw">match</span> <span class="ident">c</span> {
-            <span class="ident">event_enums</span>::<span class="ident">MacContent</span>::<span class="ident">ToDevice</span>(<span class="ident">c</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="self">self</span>
-                .<span class="ident">content_to_request</span>(<span class="ident">AnyToDeviceEventContent</span>::<span class="ident">KeyVerificationMac</span>(<span class="ident">c</span>))
+            <span class="ident">event_enums::MacContent::ToDevice</span>(<span class="ident">c</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="self">self</span>
+                .<span class="ident">content_to_request</span>(<span class="ident">AnyToDeviceEventContent::KeyVerificationMac</span>(<span class="ident">c</span>))
                 .<span class="ident">into</span>(),
-            <span class="ident">event_enums</span>::<span class="ident">MacContent</span>::<span class="ident">Room</span>(<span class="ident">r</span>, <span class="ident">c</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">RoomMessageRequest</span> {
+            <span class="ident">event_enums::MacContent::Room</span>(<span class="ident">r</span>, <span class="ident">c</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">RoomMessageRequest</span> {
                 <span class="ident">room_id</span>: <span class="ident">r</span>,
-                <span class="ident">txn_id</span>: <span class="ident">Uuid</span>::<span class="ident">new_v4</span>(),
-                <span class="ident">content</span>: <span class="ident">AnyMessageEventContent</span>::<span class="ident">KeyVerificationMac</span>(<span class="ident">c</span>),
+                <span class="ident">txn_id</span>: <span class="ident">Uuid::new_v4</span>(),
+                <span class="ident">content</span>: <span class="ident">AnyMessageEventContent::KeyVerificationMac</span>(<span class="ident">c</span>),
             }
             .<span class="ident">into</span>(),
         });
 
         <span class="kw">if</span> <span class="ident">done</span> {
             <span class="kw">match</span> <span class="self">self</span>.<span class="ident">mark_as_done</span>().<span class="kw">await</span><span class="question-mark">?</span> {
-                <span class="ident">VerificationResult</span>::<span class="ident">Cancel</span>(<span class="ident">r</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>((<span class="prelude-val">Some</span>(<span class="ident">r</span>), <span class="prelude-val">None</span>)),
-                <span class="ident">VerificationResult</span>::<span class="prelude-val">Ok</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>((<span class="ident">mac_request</span>, <span class="prelude-val">None</span>)),
-                <span class="ident">VerificationResult</span>::<span class="ident">SignatureUpload</span>(<span class="ident">r</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>((<span class="ident">mac_request</span>, <span class="prelude-val">Some</span>(<span class="ident">r</span>))),
+                <span class="ident">VerificationResult::Cancel</span>(<span class="ident">r</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>((<span class="prelude-val">Some</span>(<span class="ident">r</span>), <span class="prelude-val">None</span>)),
+                <span class="ident">VerificationResult::Ok</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>((<span class="ident">mac_request</span>, <span class="prelude-val">None</span>)),
+                <span class="ident">VerificationResult::SignatureUpload</span>(<span class="ident">r</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>((<span class="ident">mac_request</span>, <span class="prelude-val">Some</span>(<span class="ident">r</span>))),
             }
         } <span class="kw">else</span> {
             <span class="prelude-val">Ok</span>((<span class="ident">mac_request</span>, <span class="prelude-val">None</span>))
@@ -1183,7 +1183,7 @@
             <span class="kw">let</span> <span class="ident">signature_request</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">device</span>.<span class="ident">user_id</span>() <span class="op">=</span><span class="op">=</span> <span class="self">self</span>.<span class="ident">user_id</span>() {
                 <span class="kw">match</span> <span class="self">self</span>.<span class="ident">private_identity</span>.<span class="ident">sign_device</span>(<span class="kw-2">&amp;</span><span class="ident">device</span>).<span class="kw">await</span> {
                     <span class="prelude-val">Ok</span>(<span class="ident">r</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="ident">r</span>),
-                    <span class="prelude-val">Err</span>(<span class="ident">SignatureError</span>::<span class="ident">MissingSigningKey</span>) <span class="op">=</span><span class="op">&gt;</span> {
+                    <span class="prelude-val">Err</span>(<span class="ident">SignatureError::MissingSigningKey</span>) <span class="op">=</span><span class="op">&gt;</span> {
                         <span class="macro">warn!</span>(
                             <span class="string">&quot;Can&#39;t sign the device keys for {} {}, \
                                   no private user signing key found&quot;</span>,
@@ -1210,9 +1210,9 @@
             <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">changes</span> <span class="op">=</span> <span class="ident">Changes</span> {
                 <span class="ident">devices</span>: <span class="ident">DeviceChanges</span> {
                     <span class="ident">changed</span>: <span class="macro">vec!</span>[<span class="ident">device</span>],
-                    ..<span class="ident">Default</span>::<span class="ident">default</span>()
+                    ..<span class="ident">Default::default</span>()
                 },
-                ..<span class="ident">Default</span>::<span class="ident">default</span>()
+                ..<span class="ident">Default::default</span>()
             };
 
             <span class="kw">let</span> <span class="ident">identity_signature_request</span> <span class="op">=</span> <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">i</span>) <span class="op">=</span> <span class="ident">identity</span> {
@@ -1221,7 +1221,7 @@
                     <span class="comment">// Signing can fail if the user signing key is missing.</span>
                     <span class="kw">match</span> <span class="self">self</span>.<span class="ident">private_identity</span>.<span class="ident">sign_user</span>(<span class="kw-2">&amp;</span><span class="ident">i</span>).<span class="kw">await</span> {
                         <span class="prelude-val">Ok</span>(<span class="ident">r</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="ident">r</span>),
-                        <span class="prelude-val">Err</span>(<span class="ident">SignatureError</span>::<span class="ident">MissingSigningKey</span>) <span class="op">=</span><span class="op">&gt;</span> {
+                        <span class="prelude-val">Err</span>(<span class="ident">SignatureError::MissingSigningKey</span>) <span class="op">=</span><span class="op">&gt;</span> {
                             <span class="macro">warn!</span>(
                                 <span class="string">&quot;Can&#39;t sign the public cross signing keys for {}, \
                                   no private user signing key found&quot;</span>,
@@ -1270,13 +1270,13 @@
             <span class="comment">// TODO store the request as well.</span>
             <span class="self">self</span>.<span class="ident">store</span>.<span class="ident">save_changes</span>(<span class="ident">changes</span>).<span class="kw">await</span><span class="question-mark">?</span>;
             <span class="prelude-val">Ok</span>(<span class="ident">merged_request</span>
-                .<span class="ident">map</span>(<span class="ident">VerificationResult</span>::<span class="ident">SignatureUpload</span>)
-                .<span class="ident">unwrap_or</span>(<span class="ident">VerificationResult</span>::<span class="prelude-val">Ok</span>))
+                .<span class="ident">map</span>(<span class="ident">VerificationResult::SignatureUpload</span>)
+                .<span class="ident">unwrap_or</span>(<span class="ident">VerificationResult::Ok</span>))
         } <span class="kw">else</span> {
             <span class="prelude-val">Ok</span>(<span class="self">self</span>
                 .<span class="ident">cancel</span>()
-                .<span class="ident">map</span>(<span class="ident">VerificationResult</span>::<span class="ident">Cancel</span>)
-                .<span class="ident">unwrap_or</span>(<span class="ident">VerificationResult</span>::<span class="prelude-val">Ok</span>))
+                .<span class="ident">map</span>(<span class="ident">VerificationResult::Cancel</span>)
+                .<span class="ident">unwrap_or</span>(<span class="ident">VerificationResult::Ok</span>))
         }
     }
 
@@ -1308,7 +1308,7 @@
                         <span class="ident">identity</span>.<span class="ident">user_id</span>(),
                     );
 
-                    <span class="kw">if</span> <span class="kw">let</span> <span class="ident">UserIdentities</span>::<span class="ident">Own</span>(<span class="ident">i</span>) <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">identity</span> {
+                    <span class="kw">if</span> <span class="kw">let</span> <span class="ident">UserIdentities::Own</span>(<span class="ident">i</span>) <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">identity</span> {
                         <span class="ident">i</span>.<span class="ident">mark_as_verified</span>();
                     }
 
@@ -1362,7 +1362,7 @@
                         <span class="ident">device</span>.<span class="ident">device_id</span>()
                     );
 
-                    <span class="ident">device</span>.<span class="ident">set_trust_state</span>(<span class="ident">LocalTrust</span>::<span class="ident">Verified</span>);
+                    <span class="ident">device</span>.<span class="ident">set_trust_state</span>(<span class="ident">LocalTrust::Verified</span>);
 
                     <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(<span class="ident">device</span>))
                 } <span class="kw">else</span> {
@@ -1406,18 +1406,18 @@
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">cancel</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">OutgoingVerificationRequest</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">guard</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">lock</span>().<span class="ident">unwrap</span>();
         <span class="kw">let</span> <span class="ident">sas</span>: <span class="ident">InnerSas</span> <span class="op">=</span> (<span class="kw-2">*</span><span class="ident">guard</span>).<span class="ident">clone</span>();
-        <span class="kw">let</span> (<span class="ident">sas</span>, <span class="ident">content</span>) <span class="op">=</span> <span class="ident">sas</span>.<span class="ident">cancel</span>(<span class="ident">CancelCode</span>::<span class="ident">User</span>);
+        <span class="kw">let</span> (<span class="ident">sas</span>, <span class="ident">content</span>) <span class="op">=</span> <span class="ident">sas</span>.<span class="ident">cancel</span>(<span class="ident">CancelCode::User</span>);
         <span class="kw-2">*</span><span class="ident">guard</span> <span class="op">=</span> <span class="ident">sas</span>;
 
         <span class="ident">content</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">c</span><span class="op">|</span> <span class="kw">match</span> <span class="ident">c</span> {
-            <span class="ident">CancelContent</span>::<span class="ident">Room</span>(<span class="ident">room_id</span>, <span class="ident">content</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">RoomMessageRequest</span> {
+            <span class="ident">CancelContent::Room</span>(<span class="ident">room_id</span>, <span class="ident">content</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">RoomMessageRequest</span> {
                 <span class="ident">room_id</span>,
-                <span class="ident">txn_id</span>: <span class="ident">Uuid</span>::<span class="ident">new_v4</span>(),
-                <span class="ident">content</span>: <span class="ident">AnyMessageEventContent</span>::<span class="ident">KeyVerificationCancel</span>(<span class="ident">content</span>),
+                <span class="ident">txn_id</span>: <span class="ident">Uuid::new_v4</span>(),
+                <span class="ident">content</span>: <span class="ident">AnyMessageEventContent::KeyVerificationCancel</span>(<span class="ident">content</span>),
             }
             .<span class="ident">into</span>(),
-            <span class="ident">CancelContent</span>::<span class="ident">ToDevice</span>(<span class="ident">c</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="self">self</span>
-                .<span class="ident">content_to_request</span>(<span class="ident">AnyToDeviceEventContent</span>::<span class="ident">KeyVerificationCancel</span>(<span class="ident">c</span>))
+            <span class="ident">CancelContent::ToDevice</span>(<span class="ident">c</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="self">self</span>
+                .<span class="ident">content_to_request</span>(<span class="ident">AnyToDeviceEventContent::KeyVerificationCancel</span>(<span class="ident">c</span>))
                 .<span class="ident">into</span>(),
         })
     }
@@ -1428,17 +1428,17 @@
         } <span class="kw">else</span> <span class="kw">if</span> <span class="self">self</span>.<span class="ident">timed_out</span>() {
             <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">guard</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">lock</span>().<span class="ident">unwrap</span>();
             <span class="kw">let</span> <span class="ident">sas</span>: <span class="ident">InnerSas</span> <span class="op">=</span> (<span class="kw-2">*</span><span class="ident">guard</span>).<span class="ident">clone</span>();
-            <span class="kw">let</span> (<span class="ident">sas</span>, <span class="ident">content</span>) <span class="op">=</span> <span class="ident">sas</span>.<span class="ident">cancel</span>(<span class="ident">CancelCode</span>::<span class="ident">Timeout</span>);
+            <span class="kw">let</span> (<span class="ident">sas</span>, <span class="ident">content</span>) <span class="op">=</span> <span class="ident">sas</span>.<span class="ident">cancel</span>(<span class="ident">CancelCode::Timeout</span>);
             <span class="kw-2">*</span><span class="ident">guard</span> <span class="op">=</span> <span class="ident">sas</span>;
             <span class="ident">content</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">c</span><span class="op">|</span> <span class="kw">match</span> <span class="ident">c</span> {
-                <span class="ident">CancelContent</span>::<span class="ident">Room</span>(<span class="ident">room_id</span>, <span class="ident">content</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">RoomMessageRequest</span> {
+                <span class="ident">CancelContent::Room</span>(<span class="ident">room_id</span>, <span class="ident">content</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">RoomMessageRequest</span> {
                     <span class="ident">room_id</span>,
-                    <span class="ident">txn_id</span>: <span class="ident">Uuid</span>::<span class="ident">new_v4</span>(),
-                    <span class="ident">content</span>: <span class="ident">AnyMessageEventContent</span>::<span class="ident">KeyVerificationCancel</span>(<span class="ident">content</span>),
+                    <span class="ident">txn_id</span>: <span class="ident">Uuid::new_v4</span>(),
+                    <span class="ident">content</span>: <span class="ident">AnyMessageEventContent::KeyVerificationCancel</span>(<span class="ident">content</span>),
                 }
                 .<span class="ident">into</span>(),
-                <span class="ident">CancelContent</span>::<span class="ident">ToDevice</span>(<span class="ident">c</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="self">self</span>
-                    .<span class="ident">content_to_request</span>(<span class="ident">AnyToDeviceEventContent</span>::<span class="ident">KeyVerificationCancel</span>(<span class="ident">c</span>))
+                <span class="ident">CancelContent::ToDevice</span>(<span class="ident">c</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="self">self</span>
+                    .<span class="ident">content_to_request</span>(<span class="ident">AnyToDeviceEventContent::KeyVerificationCancel</span>(<span class="ident">c</span>))
                     .<span class="ident">into</span>(),
             })
         } <span class="kw">else</span> {
@@ -1525,8 +1525,8 @@
     <span class="kw">fn</span> <span class="ident">default</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
         <span class="self">Self</span> {
             <span class="ident">allowed_methods</span>: <span class="macro">vec!</span>[
-                <span class="ident">ShortAuthenticationString</span>::<span class="ident">Decimal</span>,
-                <span class="ident">ShortAuthenticationString</span>::<span class="ident">Emoji</span>,
+                <span class="ident">ShortAuthenticationString::Decimal</span>,
+                <span class="ident">ShortAuthenticationString::Emoji</span>,
             ],
         }
     }
@@ -1546,14 +1546,14 @@
 
     <span class="kw">fn</span> <span class="ident">apply</span>(<span class="self">self</span>, <span class="kw-2">mut</span> <span class="ident">content</span>: <span class="ident">AcceptContent</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">AcceptContent</span> {
         <span class="kw">match</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">content</span> {
-            <span class="ident">AcceptContent</span>::<span class="ident">ToDevice</span>(<span class="ident">AcceptToDeviceEventContent</span> {
-                <span class="ident">method</span>: <span class="ident">AcceptMethod</span>::<span class="ident">MSasV1</span>(<span class="ident">c</span>),
+            <span class="ident">AcceptContent::ToDevice</span>(<span class="ident">AcceptToDeviceEventContent</span> {
+                <span class="ident">method</span>: <span class="ident">AcceptMethod::MSasV1</span>(<span class="ident">c</span>),
                 ..
             })
-            <span class="op">|</span> <span class="ident">AcceptContent</span>::<span class="ident">Room</span>(
+            <span class="op">|</span> <span class="ident">AcceptContent::Room</span>(
                 <span class="kw">_</span>,
                 <span class="ident">AcceptEventContent</span> {
-                    <span class="ident">method</span>: <span class="ident">AcceptMethod</span>::<span class="ident">MSasV1</span>(<span class="ident">c</span>),
+                    <span class="ident">method</span>: <span class="ident">AcceptMethod::MSasV1</span>(<span class="ident">c</span>),
                     ..
                 },
             ) <span class="op">=</span><span class="op">&gt;</span> {
@@ -1568,21 +1568,21 @@
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
 <span class="kw">mod</span> <span class="ident">test</span> {
-    <span class="kw">use</span> <span class="ident">std</span>::{<span class="ident">convert</span>::<span class="ident">TryFrom</span>, <span class="ident">sync</span>::<span class="ident">Arc</span>};
+    <span class="kw">use</span> <span class="ident">std</span>::{<span class="ident">convert::TryFrom</span>, <span class="ident">sync::Arc</span>};
 
-    <span class="kw">use</span> <span class="ident">matrix_sdk_common</span>::<span class="ident">identifiers</span>::{<span class="ident">DeviceId</span>, <span class="ident">UserId</span>};
+    <span class="kw">use</span> <span class="ident">matrix_sdk_common::identifiers</span>::{<span class="ident">DeviceId</span>, <span class="ident">UserId</span>};
 
     <span class="kw">use</span> <span class="kw">crate</span>::{
-        <span class="ident">olm</span>::<span class="ident">PrivateCrossSigningIdentity</span>,
+        <span class="ident">olm::PrivateCrossSigningIdentity</span>,
         <span class="ident">store</span>::{<span class="ident">CryptoStore</span>, <span class="ident">MemoryStore</span>},
-        <span class="ident">verification</span>::<span class="ident">test</span>::{<span class="ident">get_content_from_request</span>, <span class="ident">wrap_any_to_device_content</span>},
+        <span class="ident">verification::test</span>::{<span class="ident">get_content_from_request</span>, <span class="ident">wrap_any_to_device_content</span>},
         <span class="ident">ReadOnlyAccount</span>, <span class="ident">ReadOnlyDevice</span>,
     };
 
-    <span class="kw">use</span> <span class="kw">super</span>::<span class="ident">Sas</span>;
+    <span class="kw">use</span> <span class="kw">super</span><span class="ident">::Sas</span>;
 
     <span class="kw">fn</span> <span class="ident">alice_id</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident">UserId</span> {
-        <span class="ident">UserId</span>::<span class="ident">try_from</span>(<span class="string">&quot;@alice:example.org&quot;</span>).<span class="ident">unwrap</span>()
+        <span class="ident">UserId::try_from</span>(<span class="string">&quot;@alice:example.org&quot;</span>).<span class="ident">unwrap</span>()
     }
 
     <span class="kw">fn</span> <span class="ident">alice_device_id</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Box</span><span class="op">&lt;</span><span class="ident">DeviceId</span><span class="op">&gt;</span> {
@@ -1590,39 +1590,39 @@
     }
 
     <span class="kw">fn</span> <span class="ident">bob_id</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident">UserId</span> {
-        <span class="ident">UserId</span>::<span class="ident">try_from</span>(<span class="string">&quot;@bob:example.org&quot;</span>).<span class="ident">unwrap</span>()
+        <span class="ident">UserId::try_from</span>(<span class="string">&quot;@bob:example.org&quot;</span>).<span class="ident">unwrap</span>()
     }
 
     <span class="kw">fn</span> <span class="ident">bob_device_id</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Box</span><span class="op">&lt;</span><span class="ident">DeviceId</span><span class="op">&gt;</span> {
         <span class="string">&quot;BOBDEVCIE&quot;</span>.<span class="ident">into</span>()
     }
 
-    <span class="attribute">#[<span class="ident">tokio</span>::<span class="ident">test</span>]</span>
+    <span class="attribute">#[<span class="ident">tokio::test</span>]</span>
     <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">sas_wrapper_full</span>() {
-        <span class="kw">let</span> <span class="ident">alice</span> <span class="op">=</span> <span class="ident">ReadOnlyAccount</span>::<span class="ident">new</span>(<span class="kw-2">&amp;</span><span class="ident">alice_id</span>(), <span class="kw-2">&amp;</span><span class="ident">alice_device_id</span>());
-        <span class="kw">let</span> <span class="ident">alice_device</span> <span class="op">=</span> <span class="ident">ReadOnlyDevice</span>::<span class="ident">from_account</span>(<span class="kw-2">&amp;</span><span class="ident">alice</span>).<span class="kw">await</span>;
+        <span class="kw">let</span> <span class="ident">alice</span> <span class="op">=</span> <span class="ident">ReadOnlyAccount::new</span>(<span class="kw-2">&amp;</span><span class="ident">alice_id</span>(), <span class="kw-2">&amp;</span><span class="ident">alice_device_id</span>());
+        <span class="kw">let</span> <span class="ident">alice_device</span> <span class="op">=</span> <span class="ident">ReadOnlyDevice::from_account</span>(<span class="kw-2">&amp;</span><span class="ident">alice</span>).<span class="kw">await</span>;
 
-        <span class="kw">let</span> <span class="ident">bob</span> <span class="op">=</span> <span class="ident">ReadOnlyAccount</span>::<span class="ident">new</span>(<span class="kw-2">&amp;</span><span class="ident">bob_id</span>(), <span class="kw-2">&amp;</span><span class="ident">bob_device_id</span>());
-        <span class="kw">let</span> <span class="ident">bob_device</span> <span class="op">=</span> <span class="ident">ReadOnlyDevice</span>::<span class="ident">from_account</span>(<span class="kw-2">&amp;</span><span class="ident">bob</span>).<span class="kw">await</span>;
+        <span class="kw">let</span> <span class="ident">bob</span> <span class="op">=</span> <span class="ident">ReadOnlyAccount::new</span>(<span class="kw-2">&amp;</span><span class="ident">bob_id</span>(), <span class="kw-2">&amp;</span><span class="ident">bob_device_id</span>());
+        <span class="kw">let</span> <span class="ident">bob_device</span> <span class="op">=</span> <span class="ident">ReadOnlyDevice::from_account</span>(<span class="kw-2">&amp;</span><span class="ident">bob</span>).<span class="kw">await</span>;
 
-        <span class="kw">let</span> <span class="ident">alice_store</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">CryptoStore</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">Arc</span>::<span class="ident">new</span>(<span class="ident">Box</span>::<span class="ident">new</span>(<span class="ident">MemoryStore</span>::<span class="ident">new</span>()));
-        <span class="kw">let</span> <span class="ident">bob_store</span> <span class="op">=</span> <span class="ident">MemoryStore</span>::<span class="ident">new</span>();
+        <span class="kw">let</span> <span class="ident">alice_store</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">CryptoStore</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">Arc::new</span>(<span class="ident">Box::new</span>(<span class="ident">MemoryStore::new</span>()));
+        <span class="kw">let</span> <span class="ident">bob_store</span> <span class="op">=</span> <span class="ident">MemoryStore::new</span>();
 
         <span class="ident">bob_store</span>.<span class="ident">save_devices</span>(<span class="macro">vec!</span>[<span class="ident">alice_device</span>.<span class="ident">clone</span>()]).<span class="kw">await</span>;
 
-        <span class="kw">let</span> <span class="ident">bob_store</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">CryptoStore</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">Arc</span>::<span class="ident">new</span>(<span class="ident">Box</span>::<span class="ident">new</span>(<span class="ident">bob_store</span>));
+        <span class="kw">let</span> <span class="ident">bob_store</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">CryptoStore</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">Arc::new</span>(<span class="ident">Box::new</span>(<span class="ident">bob_store</span>));
 
-        <span class="kw">let</span> (<span class="ident">alice</span>, <span class="ident">content</span>) <span class="op">=</span> <span class="ident">Sas</span>::<span class="ident">start</span>(
+        <span class="kw">let</span> (<span class="ident">alice</span>, <span class="ident">content</span>) <span class="op">=</span> <span class="ident">Sas::start</span>(
             <span class="ident">alice</span>,
-            <span class="ident">PrivateCrossSigningIdentity</span>::<span class="ident">empty</span>(<span class="ident">alice_id</span>()),
+            <span class="ident">PrivateCrossSigningIdentity::empty</span>(<span class="ident">alice_id</span>()),
             <span class="ident">bob_device</span>,
             <span class="ident">alice_store</span>,
             <span class="prelude-val">None</span>,
         );
 
-        <span class="kw">let</span> <span class="ident">bob</span> <span class="op">=</span> <span class="ident">Sas</span>::<span class="ident">from_start_event</span>(
+        <span class="kw">let</span> <span class="ident">bob</span> <span class="op">=</span> <span class="ident">Sas::from_start_event</span>(
             <span class="ident">bob</span>,
-            <span class="ident">PrivateCrossSigningIdentity</span>::<span class="ident">empty</span>(<span class="ident">bob_id</span>()),
+            <span class="ident">PrivateCrossSigningIdentity::empty</span>(<span class="ident">bob_id</span>()),
             <span class="ident">alice_device</span>,
             <span class="ident">bob_store</span>,
             <span class="ident">content</span>,

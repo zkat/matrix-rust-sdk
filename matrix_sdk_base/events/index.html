@@ -1,8 +1,8 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Crate `ruma_events` contains serializable types for the events in the Matrix specification that can be shared by client and server code."><meta name="keywords" content="rust, rustlang, rust-lang, events"><title>matrix_sdk_base::events - Rust</title><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled ><script id="default-settings"></script><script src="../../storage.js"></script><script src="../../crates.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="icon" type="image/svg+xml" href="../../favicon.svg">
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="(De)serializable types for the events in the Matrix specification. These types are used by other ruma crates."><meta name="keywords" content="rust, rustlang, rust-lang, events"><title>matrix_sdk_base::events - Rust</title><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled ><script id="default-settings"></script><script src="../../storage.js"></script><script src="../../crates.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="icon" type="image/svg+xml" href="../../favicon.svg">
 <link rel="alternate icon" type="image/png" href="../../favicon-16x16.png">
 <link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><style type="text/css">#crate-search{background-image:url("../../down-arrow.svg");}</style></head><body class="rustdoc mod"><!--[if lte IE 8]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu" role="button">&#9776;</div><a href='../../matrix_sdk_base/index.html'><div class='logo-container rust-logo'><img src='../../rust-logo.png' alt='logo'></div></a><p class="location">Module events</p><div class="sidebar-elems"><div class="block items"><ul><li><a href="#modules">Modules</a></li><li><a href="#structs">Structs</a></li><li><a href="#enums">Enums</a></li><li><a href="#traits">Traits</a></li></ul></div><p class="location"><a href="../index.html">matrix_sdk_base</a></p><div id="sidebar-vars" data-name="events" data-ty="mod" data-relpath="../"></div><script defer src="../sidebar-items.js"></script></div></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu"><img src="../../brush.svg" width="18" height="18" alt="Pick another theme!"></button><div id="theme-choices" role="menu"></div></div><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" disabled autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><button type="button" class="help-button">?</button>
-                <a id="settings-menu" href="../../settings.html"><img src="../../wheel.svg" width="18" height="18" alt="Change settings"></a></div></form></nav><section id="main" class="content"><h1 class="fqn"><span class="in-band">Module <a href="../index.html">matrix_sdk_base</a>::<wbr><a class="mod" href="">events</a><button id="copy-path" onclick="copy_path(this)">⎘</button></span><span class="out-of-band"><span id="render-detail"><a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">[<span class="inner">&#x2212;</span>]</a></span></span></h1><div class="docblock"><p>Crate <code>ruma_events</code> contains serializable types for the events in the
-<a href="https://matrix.org">Matrix</a> specification that can be shared by client and server code.</p>
+                <a id="settings-menu" href="../../settings.html"><img src="../../wheel.svg" width="18" height="18" alt="Change settings"></a></div></form></nav><section id="main" class="content"><h1 class="fqn"><span class="in-band">Module <a href="../index.html">matrix_sdk_base</a>::<wbr><a class="mod" href="">events</a><button id="copy-path" onclick="copy_path(this)">⎘</button></span><span class="out-of-band"><span id="render-detail"><a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">[<span class="inner">&#x2212;</span>]</a></span></span></h1><div class="docblock"><p>(De)serializable types for the events in the <a href="https://matrix.org">Matrix</a> specification.
+These types are used by other ruma crates.</p>
 <p>All data exchanged over Matrix is expressed as an event.
 Different event types represent different actions, such as joining a room or sending a message.
 Events are stored and transmitted as simple JSON structures.
@@ -30,8 +30,8 @@ structs, for this event we will use a <code>SyncMessageEvent</code> struct but a
 would work.</p>
 
 <div class="example-wrap"><pre class="rust rust-example-rendered">
-<span class="kw">use</span> <span class="ident">ruma_events</span>::{<span class="ident">macros</span>::<span class="ident">MessageEventContent</span>, <span class="ident">SyncMessageEvent</span>};
-<span class="kw">use</span> <span class="ident">ruma_identifiers</span>::<span class="ident">EventId</span>;
+<span class="kw">use</span> <span class="ident">ruma_events</span>::{<span class="ident">macros::MessageEventContent</span>, <span class="ident">SyncMessageEvent</span>};
+<span class="kw">use</span> <span class="ident">ruma_identifiers::EventId</span>;
 <span class="kw">use</span> <span class="ident">serde</span>::{<span class="ident">Deserialize</span>, <span class="ident">Serialize</span>};
 
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>)]</span>
@@ -59,7 +59,7 @@ would work.</p>
     <span class="kw">pub</span> <span class="ident">relates_to</span>: <span class="ident">RelatesTo</span>,
 }
 
-<span class="kw">let</span> <span class="ident">json</span> <span class="op">=</span> <span class="ident">serde_json</span>::<span class="macro">json!</span>({
+<span class="kw">let</span> <span class="ident">json</span> <span class="op">=</span> <span class="macro">serde_json::json!</span>({
     <span class="string">&quot;content&quot;</span>: {
         <span class="string">&quot;m.relates_to&quot;</span>: {
             <span class="string">&quot;event_id&quot;</span>: <span class="string">&quot;$xxxx-xxxx&quot;</span>,
@@ -78,11 +78,11 @@ would work.</p>
 
 <span class="comment">// The downside of this event is we cannot use it with the `AnyRoomEvent` or `AnyEvent` enums,</span>
 <span class="comment">// but could be deserialized from a `Raw&lt;AnyRoomEvent&gt;` that has failed.</span>
-<span class="ident">matches</span>::<span class="macro">assert_matches!</span>(
-    <span class="ident">serde_json</span>::<span class="ident">from_value</span>::<span class="op">&lt;</span><span class="ident">SyncMessageEvent</span><span class="op">&lt;</span><span class="ident">ReactionEventContent</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="ident">json</span>),
+<span class="macro">matches::assert_matches!</span>(
+    <span class="ident">serde_json::from_value</span>::<span class="op">&lt;</span><span class="ident">SyncMessageEvent</span><span class="op">&lt;</span><span class="ident">ReactionEventContent</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="ident">json</span>),
     <span class="prelude-val">Ok</span>(<span class="ident">SyncMessageEvent</span> {
         <span class="ident">content</span>: <span class="ident">ReactionEventContent</span> {
-            <span class="ident">relates_to</span>: <span class="ident">RelatesTo</span>::<span class="ident">Annotation</span> { <span class="ident">key</span>, .. },
+            <span class="ident">relates_to</span>: <span class="ident">RelatesTo::Annotation</span> { <span class="ident">key</span>, .. },
         },
         ..
     }) <span class="kw">if</span> <span class="ident">key</span> <span class="op">=</span><span class="op">=</span> <span class="string">&quot;👍&quot;</span>

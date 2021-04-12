@@ -389,14 +389,14 @@
 
 <span class="kw">use</span> <span class="ident">std</span>::{
     <span class="ident">collections</span>::{<span class="ident">HashMap</span>, <span class="ident">HashSet</span>},
-    <span class="ident">sync</span>::<span class="ident">Arc</span>,
+    <span class="ident">sync::Arc</span>,
 };
 
 <span class="kw">use</span> <span class="ident">dashmap</span>::{<span class="ident">DashMap</span>, <span class="ident">DashSet</span>};
 <span class="kw">use</span> <span class="ident">matrix_sdk_common</span>::{
     <span class="ident">async_trait</span>,
     <span class="ident">identifiers</span>::{<span class="ident">DeviceId</span>, <span class="ident">DeviceIdBox</span>, <span class="ident">RoomId</span>, <span class="ident">UserId</span>},
-    <span class="ident">locks</span>::<span class="ident">Mutex</span>,
+    <span class="ident">locks::Mutex</span>,
 };
 
 <span class="kw">use</span> <span class="kw">super</span>::{
@@ -424,14 +424,14 @@
 <span class="kw">impl</span> <span class="ident">Default</span> <span class="kw">for</span> <span class="ident">MemoryStore</span> {
     <span class="kw">fn</span> <span class="ident">default</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
         <span class="ident">MemoryStore</span> {
-            <span class="ident">sessions</span>: <span class="ident">SessionStore</span>::<span class="ident">new</span>(),
-            <span class="ident">inbound_group_sessions</span>: <span class="ident">GroupSessionStore</span>::<span class="ident">new</span>(),
-            <span class="ident">tracked_users</span>: <span class="ident">Arc</span>::<span class="ident">new</span>(<span class="ident">DashSet</span>::<span class="ident">new</span>()),
-            <span class="ident">users_for_key_query</span>: <span class="ident">Arc</span>::<span class="ident">new</span>(<span class="ident">DashSet</span>::<span class="ident">new</span>()),
-            <span class="ident">olm_hashes</span>: <span class="ident">Arc</span>::<span class="ident">new</span>(<span class="ident">DashMap</span>::<span class="ident">new</span>()),
-            <span class="ident">devices</span>: <span class="ident">DeviceStore</span>::<span class="ident">new</span>(),
-            <span class="ident">identities</span>: <span class="ident">Arc</span>::<span class="ident">new</span>(<span class="ident">DashMap</span>::<span class="ident">new</span>()),
-            <span class="ident">values</span>: <span class="ident">Arc</span>::<span class="ident">new</span>(<span class="ident">DashMap</span>::<span class="ident">new</span>()),
+            <span class="ident">sessions</span>: <span class="ident">SessionStore::new</span>(),
+            <span class="ident">inbound_group_sessions</span>: <span class="ident">GroupSessionStore::new</span>(),
+            <span class="ident">tracked_users</span>: <span class="ident">Arc::new</span>(<span class="ident">DashSet::new</span>()),
+            <span class="ident">users_for_key_query</span>: <span class="ident">Arc::new</span>(<span class="ident">DashSet::new</span>()),
+            <span class="ident">olm_hashes</span>: <span class="ident">Arc::new</span>(<span class="ident">DashMap::new</span>()),
+            <span class="ident">devices</span>: <span class="ident">DeviceStore::new</span>(),
+            <span class="ident">identities</span>: <span class="ident">Arc::new</span>(<span class="ident">DashMap::new</span>()),
+            <span class="ident">values</span>: <span class="ident">Arc::new</span>(<span class="ident">DashMap::new</span>()),
         }
     }
 }
@@ -439,7 +439,7 @@
 <span class="kw">impl</span> <span class="ident">MemoryStore</span> {
     <span class="doccomment">/// Create a new empty `MemoryStore`.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
-        <span class="self">Self</span>::<span class="ident">default</span>()
+        <span class="self">Self</span><span class="ident">::default</span>()
     }
 
     <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">save_devices</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="kw-2">mut</span> <span class="ident">devices</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">ReadOnlyDevice</span><span class="op">&gt;</span>) {
@@ -501,7 +501,7 @@
         <span class="kw">for</span> <span class="ident">hash</span> <span class="kw">in</span> <span class="ident">changes</span>.<span class="ident">message_hashes</span> {
             <span class="self">self</span>.<span class="ident">olm_hashes</span>
                 .<span class="ident">entry</span>(<span class="ident">hash</span>.<span class="ident">sender_key</span>.<span class="ident">to_owned</span>())
-                .<span class="ident">or_insert_with</span>(<span class="ident">DashSet</span>::<span class="ident">new</span>)
+                .<span class="ident">or_insert_with</span>(<span class="ident">DashSet::new</span>)
                 .<span class="ident">insert</span>(<span class="ident">hash</span>.<span class="ident">hash</span>.<span class="ident">clone</span>());
         }
 
@@ -528,7 +528,7 @@
     }
 
     <span class="kw">fn</span> <span class="ident">users_for_key_query</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">HashSet</span><span class="op">&lt;</span><span class="ident">UserId</span><span class="op">&gt;</span> {
-        <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy</span>::<span class="ident">map_clone</span>)]</span>
+        <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy::map_clone</span>)]</span>
         <span class="self">self</span>.<span class="ident">users_for_key_query</span>.<span class="ident">iter</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">u</span><span class="op">|</span> <span class="ident">u</span>.<span class="ident">clone</span>()).<span class="ident">collect</span>()
     }
 
@@ -578,7 +578,7 @@
     }
 
     <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">get_user_identity</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">user_id</span>: <span class="kw-2">&amp;</span><span class="ident">UserId</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">UserIdentities</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy</span>::<span class="ident">map_clone</span>)]</span>
+        <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy::map_clone</span>)]</span>
         <span class="prelude-val">Ok</span>(<span class="self">self</span>.<span class="ident">identities</span>.<span class="ident">get</span>(<span class="ident">user_id</span>).<span class="ident">map</span>(<span class="op">|</span><span class="ident">i</span><span class="op">|</span> <span class="ident">i</span>.<span class="ident">clone</span>()))
     }
 
@@ -600,11 +600,11 @@
         <span class="prelude-val">Ok</span>(<span class="prelude-val">None</span>)
     }
 
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">is_message_known</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">message_hash</span>: <span class="kw-2">&amp;</span><span class="kw">crate</span>::<span class="ident">olm</span>::<span class="ident">OlmMessageHash</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">bool</span><span class="op">&gt;</span> {
+    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">is_message_known</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">message_hash</span>: <span class="kw-2">&amp;</span><span class="kw">crate</span><span class="ident">::olm::OlmMessageHash</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">bool</span><span class="op">&gt;</span> {
         <span class="prelude-val">Ok</span>(<span class="self">self</span>
             .<span class="ident">olm_hashes</span>
             .<span class="ident">entry</span>(<span class="ident">message_hash</span>.<span class="ident">sender_key</span>.<span class="ident">to_owned</span>())
-            .<span class="ident">or_insert_with</span>(<span class="ident">DashSet</span>::<span class="ident">new</span>)
+            .<span class="ident">or_insert_with</span>(<span class="ident">DashSet::new</span>)
             .<span class="ident">contains</span>(<span class="kw-2">&amp;</span><span class="ident">message_hash</span>.<span class="ident">hash</span>))
     }
 
@@ -619,16 +619,16 @@
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
 <span class="kw">mod</span> <span class="ident">test</span> {
     <span class="kw">use</span> <span class="kw">crate</span>::{
-        <span class="ident">identities</span>::<span class="ident">device</span>::<span class="ident">test</span>::<span class="ident">get_device</span>,
-        <span class="ident">olm</span>::{<span class="ident">test</span>::<span class="ident">get_account_and_session</span>, <span class="ident">InboundGroupSession</span>, <span class="ident">OlmMessageHash</span>},
-        <span class="ident">store</span>::{<span class="ident">memorystore</span>::<span class="ident">MemoryStore</span>, <span class="ident">Changes</span>, <span class="ident">CryptoStore</span>},
+        <span class="ident">identities::device::test::get_device</span>,
+        <span class="ident">olm</span>::{<span class="ident">test::get_account_and_session</span>, <span class="ident">InboundGroupSession</span>, <span class="ident">OlmMessageHash</span>},
+        <span class="ident">store</span>::{<span class="ident">memorystore::MemoryStore</span>, <span class="ident">Changes</span>, <span class="ident">CryptoStore</span>},
     };
-    <span class="kw">use</span> <span class="ident">matrix_sdk_common</span>::<span class="ident">identifiers</span>::<span class="ident">room_id</span>;
+    <span class="kw">use</span> <span class="ident">matrix_sdk_common::identifiers::room_id</span>;
 
-    <span class="attribute">#[<span class="ident">tokio</span>::<span class="ident">test</span>]</span>
+    <span class="attribute">#[<span class="ident">tokio::test</span>]</span>
     <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">test_session_store</span>() {
         <span class="kw">let</span> (<span class="ident">account</span>, <span class="ident">session</span>) <span class="op">=</span> <span class="ident">get_account_and_session</span>().<span class="kw">await</span>;
-        <span class="kw">let</span> <span class="ident">store</span> <span class="op">=</span> <span class="ident">MemoryStore</span>::<span class="ident">new</span>();
+        <span class="kw">let</span> <span class="ident">store</span> <span class="op">=</span> <span class="ident">MemoryStore::new</span>();
 
         <span class="macro">assert!</span>(<span class="ident">store</span>.<span class="ident">load_account</span>().<span class="kw">await</span>.<span class="ident">unwrap</span>().<span class="ident">is_none</span>());
         <span class="ident">store</span>.<span class="ident">save_account</span>(<span class="ident">account</span>).<span class="kw">await</span>.<span class="ident">unwrap</span>();
@@ -647,7 +647,7 @@
         <span class="macro">assert_eq!</span>(<span class="kw-2">&amp;</span><span class="ident">session</span>, <span class="ident">loaded_session</span>);
     }
 
-    <span class="attribute">#[<span class="ident">tokio</span>::<span class="ident">test</span>]</span>
+    <span class="attribute">#[<span class="ident">tokio::test</span>]</span>
     <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">test_group_session_store</span>() {
         <span class="kw">let</span> (<span class="ident">account</span>, <span class="kw">_</span>) <span class="op">=</span> <span class="ident">get_account_and_session</span>().<span class="kw">await</span>;
         <span class="kw">let</span> <span class="ident">room_id</span> <span class="op">=</span> <span class="macro">room_id!</span>(<span class="string">&quot;!test:localhost&quot;</span>);
@@ -656,7 +656,7 @@
             .<span class="ident">create_group_session_pair_with_defaults</span>(<span class="kw-2">&amp;</span><span class="ident">room_id</span>)
             .<span class="kw">await</span>
             .<span class="ident">unwrap</span>();
-        <span class="kw">let</span> <span class="ident">inbound</span> <span class="op">=</span> <span class="ident">InboundGroupSession</span>::<span class="ident">new</span>(
+        <span class="kw">let</span> <span class="ident">inbound</span> <span class="op">=</span> <span class="ident">InboundGroupSession::new</span>(
             <span class="string">&quot;test_key&quot;</span>,
             <span class="string">&quot;test_key&quot;</span>,
             <span class="kw-2">&amp;</span><span class="ident">room_id</span>,
@@ -665,7 +665,7 @@
         )
         .<span class="ident">unwrap</span>();
 
-        <span class="kw">let</span> <span class="ident">store</span> <span class="op">=</span> <span class="ident">MemoryStore</span>::<span class="ident">new</span>();
+        <span class="kw">let</span> <span class="ident">store</span> <span class="op">=</span> <span class="ident">MemoryStore::new</span>();
         <span class="kw">let</span> <span class="kw">_</span> <span class="op">=</span> <span class="ident">store</span>
             .<span class="ident">save_inbound_group_sessions</span>(<span class="macro">vec!</span>[<span class="ident">inbound</span>.<span class="ident">clone</span>()])
             .<span class="kw">await</span>;
@@ -678,10 +678,10 @@
         <span class="macro">assert_eq!</span>(<span class="ident">inbound</span>, <span class="ident">loaded_session</span>);
     }
 
-    <span class="attribute">#[<span class="ident">tokio</span>::<span class="ident">test</span>]</span>
+    <span class="attribute">#[<span class="ident">tokio::test</span>]</span>
     <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">test_device_store</span>() {
         <span class="kw">let</span> <span class="ident">device</span> <span class="op">=</span> <span class="ident">get_device</span>();
-        <span class="kw">let</span> <span class="ident">store</span> <span class="op">=</span> <span class="ident">MemoryStore</span>::<span class="ident">new</span>();
+        <span class="kw">let</span> <span class="ident">store</span> <span class="op">=</span> <span class="ident">MemoryStore::new</span>();
 
         <span class="ident">store</span>.<span class="ident">save_devices</span>(<span class="macro">vec!</span>[<span class="ident">device</span>.<span class="ident">clone</span>()]).<span class="kw">await</span>;
 
@@ -710,10 +710,10 @@
             .<span class="ident">is_none</span>());
     }
 
-    <span class="attribute">#[<span class="ident">tokio</span>::<span class="ident">test</span>]</span>
+    <span class="attribute">#[<span class="ident">tokio::test</span>]</span>
     <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">test_tracked_users</span>() {
         <span class="kw">let</span> <span class="ident">device</span> <span class="op">=</span> <span class="ident">get_device</span>();
-        <span class="kw">let</span> <span class="ident">store</span> <span class="op">=</span> <span class="ident">MemoryStore</span>::<span class="ident">new</span>();
+        <span class="kw">let</span> <span class="ident">store</span> <span class="op">=</span> <span class="ident">MemoryStore::new</span>();
 
         <span class="macro">assert!</span>(<span class="ident">store</span>
             .<span class="ident">update_tracked_user</span>(<span class="ident">device</span>.<span class="ident">user_id</span>(), <span class="bool-val">false</span>)
@@ -727,16 +727,16 @@
         <span class="macro">assert!</span>(<span class="ident">store</span>.<span class="ident">is_user_tracked</span>(<span class="ident">device</span>.<span class="ident">user_id</span>()));
     }
 
-    <span class="attribute">#[<span class="ident">tokio</span>::<span class="ident">test</span>]</span>
+    <span class="attribute">#[<span class="ident">tokio::test</span>]</span>
     <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">test_message_hash</span>() {
-        <span class="kw">let</span> <span class="ident">store</span> <span class="op">=</span> <span class="ident">MemoryStore</span>::<span class="ident">new</span>();
+        <span class="kw">let</span> <span class="ident">store</span> <span class="op">=</span> <span class="ident">MemoryStore::new</span>();
 
         <span class="kw">let</span> <span class="ident">hash</span> <span class="op">=</span> <span class="ident">OlmMessageHash</span> {
             <span class="ident">sender_key</span>: <span class="string">&quot;test_sender&quot;</span>.<span class="ident">to_owned</span>(),
             <span class="ident">hash</span>: <span class="string">&quot;test_hash&quot;</span>.<span class="ident">to_owned</span>(),
         };
 
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">changes</span> <span class="op">=</span> <span class="ident">Changes</span>::<span class="ident">default</span>();
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">changes</span> <span class="op">=</span> <span class="ident">Changes::default</span>();
         <span class="ident">changes</span>.<span class="ident">message_hashes</span>.<span class="ident">push</span>(<span class="ident">hash</span>.<span class="ident">clone</span>());
 
         <span class="macro">assert!</span>(<span class="op">!</span><span class="ident">store</span>.<span class="ident">is_message_known</span>(<span class="kw-2">&amp;</span><span class="ident">hash</span>).<span class="kw">await</span>.<span class="ident">unwrap</span>());

@@ -15,15 +15,15 @@ the same name on the contents of the locked data.</p>
 <a href="https://crates.io/crates/parking_lot"><code>parking_lot</code> crate</a>.</p>
 <h1 id="examples" class="section-header"><a href="#examples">Examples</a></h1>
 <div class="example-wrap"><pre class="rust rust-example-rendered">
-<span class="kw">use</span> <span class="ident">tokio</span>::<span class="ident">sync</span>::{<span class="ident">RwLock</span>, <span class="ident">RwLockWriteGuard</span>};
+<span class="kw">use</span> <span class="ident">tokio::sync</span>::{<span class="ident">RwLock</span>, <span class="ident">RwLockWriteGuard</span>};
 
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>, <span class="ident">Copy</span>, <span class="ident">PartialEq</span>, <span class="ident">Eq</span>)]</span>
 <span class="kw">struct</span> <span class="ident">Foo</span>(<span class="ident">u32</span>);
 
-<span class="kw">let</span> <span class="ident">lock</span> <span class="op">=</span> <span class="ident">RwLock</span>::<span class="ident">new</span>(<span class="ident">Foo</span>(<span class="number">1</span>));
+<span class="kw">let</span> <span class="ident">lock</span> <span class="op">=</span> <span class="ident">RwLock::new</span>(<span class="ident">Foo</span>(<span class="number">1</span>));
 
 {
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">mapped</span> <span class="op">=</span> <span class="ident">RwLockWriteGuard</span>::<span class="ident">map</span>(<span class="ident">lock</span>.<span class="ident">write</span>().<span class="kw">await</span>, <span class="op">|</span><span class="ident">f</span><span class="op">|</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">f</span>.<span class="number">0</span>);
+    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">mapped</span> <span class="op">=</span> <span class="ident">RwLockWriteGuard::map</span>(<span class="ident">lock</span>.<span class="ident">write</span>().<span class="kw">await</span>, <span class="op">|</span><span class="ident">f</span><span class="op">|</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">f</span>.<span class="number">0</span>);
     <span class="kw-2">*</span><span class="ident">mapped</span> <span class="op">=</span> <span class="number">2</span>;
 }
 
@@ -40,16 +40,16 @@ methods of the same name on the contents of the locked data.</p>
 the <a href="https://crates.io/crates/parking_lot"><code>parking_lot</code> crate</a>.</p>
 <h1 id="examples-1" class="section-header"><a href="#examples-1">Examples</a></h1>
 <div class="example-wrap"><pre class="rust rust-example-rendered">
-<span class="kw">use</span> <span class="ident">tokio</span>::<span class="ident">sync</span>::{<span class="ident">RwLock</span>, <span class="ident">RwLockWriteGuard</span>};
+<span class="kw">use</span> <span class="ident">tokio::sync</span>::{<span class="ident">RwLock</span>, <span class="ident">RwLockWriteGuard</span>};
 
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>, <span class="ident">Copy</span>, <span class="ident">PartialEq</span>, <span class="ident">Eq</span>)]</span>
 <span class="kw">struct</span> <span class="ident">Foo</span>(<span class="ident">u32</span>);
 
-<span class="kw">let</span> <span class="ident">lock</span> <span class="op">=</span> <span class="ident">RwLock</span>::<span class="ident">new</span>(<span class="ident">Foo</span>(<span class="number">1</span>));
+<span class="kw">let</span> <span class="ident">lock</span> <span class="op">=</span> <span class="ident">RwLock::new</span>(<span class="ident">Foo</span>(<span class="number">1</span>));
 
 {
     <span class="kw">let</span> <span class="ident">guard</span> <span class="op">=</span> <span class="ident">lock</span>.<span class="ident">write</span>().<span class="kw">await</span>;
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">guard</span> <span class="op">=</span> <span class="ident">RwLockWriteGuard</span>::<span class="ident">try_map</span>(<span class="ident">guard</span>, <span class="op">|</span><span class="ident">f</span><span class="op">|</span> <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">f</span>.<span class="number">0</span>)).<span class="ident">expect</span>(<span class="string">&quot;should not fail&quot;</span>);
+    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">guard</span> <span class="op">=</span> <span class="ident">RwLockWriteGuard::try_map</span>(<span class="ident">guard</span>, <span class="op">|</span><span class="ident">f</span><span class="op">|</span> <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">f</span>.<span class="number">0</span>)).<span class="ident">expect</span>(<span class="string">&quot;should not fail&quot;</span>);
     <span class="kw-2">*</span><span class="ident">guard</span> <span class="op">=</span> <span class="number">2</span>;
 }
 
@@ -67,12 +67,12 @@ in line.</p>
 when dropped.</p>
 <h1 id="examples-2" class="section-header"><a href="#examples-2">Examples</a></h1>
 <div class="example-wrap"><pre class="rust rust-example-rendered">
-<span class="kw">let</span> <span class="ident">lock</span> <span class="op">=</span> <span class="ident">Arc</span>::<span class="ident">new</span>(<span class="ident">RwLock</span>::<span class="ident">new</span>(<span class="number">1</span>));
+<span class="kw">let</span> <span class="ident">lock</span> <span class="op">=</span> <span class="ident">Arc::new</span>(<span class="ident">RwLock::new</span>(<span class="number">1</span>));
 
 <span class="kw">let</span> <span class="ident">n</span> <span class="op">=</span> <span class="ident">lock</span>.<span class="ident">write</span>().<span class="kw">await</span>;
 
 <span class="kw">let</span> <span class="ident">cloned_lock</span> <span class="op">=</span> <span class="ident">lock</span>.<span class="ident">clone</span>();
-<span class="kw">let</span> <span class="ident">handle</span> <span class="op">=</span> <span class="ident">tokio</span>::<span class="ident">spawn</span>(<span class="kw">async</span> <span class="kw">move</span> {
+<span class="kw">let</span> <span class="ident">handle</span> <span class="op">=</span> <span class="ident">tokio::spawn</span>(<span class="kw">async</span> <span class="kw">move</span> {
     <span class="kw-2">*</span><span class="ident">cloned_lock</span>.<span class="ident">write</span>().<span class="kw">await</span> <span class="op">=</span> <span class="number">2</span>;
 });
 

@@ -57,10 +57,10 @@
 <span id="54">54</span>
 <span id="55">55</span>
 </pre><div class="example-wrap"><pre class="rust ">
-<span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">room</span>::<span class="ident">Common</span>, <span class="ident">BaseRoom</span>, <span class="ident">Client</span>, <span class="prelude-ty">Result</span>, <span class="ident">RoomType</span>};
-<span class="kw">use</span> <span class="ident">std</span>::<span class="ident">ops</span>::<span class="ident">Deref</span>;
+<span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">room::Common</span>, <span class="ident">BaseRoom</span>, <span class="ident">Client</span>, <span class="prelude-ty">Result</span>, <span class="ident">RoomType</span>};
+<span class="kw">use</span> <span class="ident">std::ops::Deref</span>;
 
-<span class="kw">use</span> <span class="ident">matrix_sdk_common</span>::<span class="ident">api</span>::<span class="ident">r0</span>::<span class="ident">membership</span>::<span class="ident">forget_room</span>;
+<span class="kw">use</span> <span class="ident">matrix_sdk_common::api::r0::membership::forget_room</span>;
 
 <span class="doccomment">/// A room in the left state.</span>
 <span class="doccomment">///</span>
@@ -80,9 +80,9 @@
     <span class="doccomment">/// * `room` - The underlaying room.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">client</span>: <span class="ident">Client</span>, <span class="ident">room</span>: <span class="ident">BaseRoom</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
         <span class="comment">// TODO: Make this private</span>
-        <span class="kw">if</span> <span class="ident">room</span>.<span class="ident">room_type</span>() <span class="op">=</span><span class="op">=</span> <span class="ident">RoomType</span>::<span class="ident">Left</span> {
+        <span class="kw">if</span> <span class="ident">room</span>.<span class="ident">room_type</span>() <span class="op">=</span><span class="op">=</span> <span class="ident">RoomType::Left</span> {
             <span class="prelude-val">Some</span>(<span class="self">Self</span> {
-                <span class="ident">inner</span>: <span class="ident">Common</span>::<span class="ident">new</span>(<span class="ident">client</span>, <span class="ident">room</span>),
+                <span class="ident">inner</span>: <span class="ident">Common::new</span>(<span class="ident">client</span>, <span class="ident">room</span>),
             })
         } <span class="kw">else</span> {
             <span class="prelude-val">None</span>
@@ -98,7 +98,7 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// This communicates to the homeserver that it should forget the room.</span>
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">forget</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">request</span> <span class="op">=</span> <span class="ident">forget_room</span>::<span class="ident">Request</span>::<span class="ident">new</span>(<span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">room_id</span>());
+        <span class="kw">let</span> <span class="ident">request</span> <span class="op">=</span> <span class="ident">forget_room::Request::new</span>(<span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">room_id</span>());
         <span class="kw">let</span> <span class="ident">_response</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">client</span>.<span class="ident">send</span>(<span class="ident">request</span>, <span class="prelude-val">None</span>).<span class="kw">await</span><span class="question-mark">?</span>;
 
         <span class="prelude-val">Ok</span>(())
@@ -108,7 +108,7 @@
 <span class="kw">impl</span> <span class="ident">Deref</span> <span class="kw">for</span> <span class="ident">Left</span> {
     <span class="kw">type</span> <span class="ident">Target</span> <span class="op">=</span> <span class="ident">Common</span>;
 
-    <span class="kw">fn</span> <span class="ident">deref</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="self">Self</span>::<span class="ident">Target</span> {
+    <span class="kw">fn</span> <span class="ident">deref</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="self">Self</span><span class="ident">::Target</span> {
         <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">inner</span>
     }
 }

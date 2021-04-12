@@ -1236,14 +1236,14 @@
 
 <span class="kw">use</span> <span class="ident">std</span>::{
     <span class="ident">collections</span>::{<span class="ident">HashMap</span>, <span class="ident">HashSet</span>},
-    <span class="ident">convert</span>::<span class="ident">TryFrom</span>,
+    <span class="ident">convert::TryFrom</span>,
     <span class="ident">path</span>::{<span class="ident">Path</span>, <span class="ident">PathBuf</span>},
     <span class="ident">sync</span>::{<span class="ident">Arc</span>, <span class="ident">RwLock</span>},
 };
 
-<span class="kw">use</span> <span class="ident">dashmap</span>::<span class="ident">DashSet</span>;
-<span class="kw">use</span> <span class="ident">olm_rs</span>::{<span class="ident">account</span>::<span class="ident">IdentityKeys</span>, <span class="ident">PicklingMode</span>};
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">sled</span>::<span class="ident">Error</span>;
+<span class="kw">use</span> <span class="ident">dashmap::DashSet</span>;
+<span class="kw">use</span> <span class="ident">olm_rs</span>::{<span class="ident">account::IdentityKeys</span>, <span class="ident">PicklingMode</span>};
+<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">sled::Error</span>;
 <span class="kw">use</span> <span class="ident">sled</span>::{
     <span class="ident">transaction</span>::{<span class="ident">ConflictableTransactionError</span>, <span class="ident">TransactionError</span>},
     <span class="ident">Config</span>, <span class="ident">Db</span>, <span class="ident">Transactional</span>, <span class="ident">Tree</span>,
@@ -1252,11 +1252,11 @@
 <span class="kw">use</span> <span class="ident">matrix_sdk_common</span>::{
     <span class="ident">async_trait</span>,
     <span class="ident">identifiers</span>::{<span class="ident">DeviceId</span>, <span class="ident">DeviceIdBox</span>, <span class="ident">RoomId</span>, <span class="ident">UserId</span>},
-    <span class="ident">locks</span>::<span class="ident">Mutex</span>,
+    <span class="ident">locks::Mutex</span>,
 };
 
 <span class="kw">use</span> <span class="kw">super</span>::{
-    <span class="ident">caches</span>::<span class="ident">SessionStore</span>, <span class="ident">Changes</span>, <span class="ident">CryptoStore</span>, <span class="ident">CryptoStoreError</span>, <span class="ident">InboundGroupSession</span>, <span class="ident">PickleKey</span>,
+    <span class="ident">caches::SessionStore</span>, <span class="ident">Changes</span>, <span class="ident">CryptoStore</span>, <span class="ident">CryptoStoreError</span>, <span class="ident">InboundGroupSession</span>, <span class="ident">PickleKey</span>,
     <span class="ident">ReadOnlyAccount</span>, <span class="prelude-ty">Result</span>, <span class="ident">Session</span>,
 };
 <span class="kw">use</span> <span class="kw">crate</span>::{
@@ -1287,7 +1287,7 @@
 
 <span class="kw">impl</span> <span class="ident">EncodeKey</span> <span class="kw">for</span> <span class="kw-2">&amp;</span><span class="ident">str</span> {
     <span class="kw">fn</span> <span class="ident">encode</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span> {
-        [<span class="self">self</span>.<span class="ident">as_bytes</span>(), <span class="kw-2">&amp;</span>[<span class="self">Self</span>::<span class="ident">SEPARATOR</span>]].<span class="ident">concat</span>()
+        [<span class="self">self</span>.<span class="ident">as_bytes</span>(), <span class="kw-2">&amp;</span>[<span class="self">Self</span><span class="ident">::SEPARATOR</span>]].<span class="ident">concat</span>()
     }
 }
 
@@ -1295,9 +1295,9 @@
     <span class="kw">fn</span> <span class="ident">encode</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span> {
         [
             <span class="self">self</span>.<span class="number">0</span>.<span class="ident">as_bytes</span>(),
-            <span class="kw-2">&amp;</span>[<span class="self">Self</span>::<span class="ident">SEPARATOR</span>],
+            <span class="kw-2">&amp;</span>[<span class="self">Self</span><span class="ident">::SEPARATOR</span>],
             <span class="self">self</span>.<span class="number">1</span>.<span class="ident">as_bytes</span>(),
-            <span class="kw-2">&amp;</span>[<span class="self">Self</span>::<span class="ident">SEPARATOR</span>],
+            <span class="kw-2">&amp;</span>[<span class="self">Self</span><span class="ident">::SEPARATOR</span>],
         ]
         .<span class="ident">concat</span>()
     }
@@ -1307,11 +1307,11 @@
     <span class="kw">fn</span> <span class="ident">encode</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span> {
         [
             <span class="self">self</span>.<span class="number">0</span>.<span class="ident">as_bytes</span>(),
-            <span class="kw-2">&amp;</span>[<span class="self">Self</span>::<span class="ident">SEPARATOR</span>],
+            <span class="kw-2">&amp;</span>[<span class="self">Self</span><span class="ident">::SEPARATOR</span>],
             <span class="self">self</span>.<span class="number">1</span>.<span class="ident">as_bytes</span>(),
-            <span class="kw-2">&amp;</span>[<span class="self">Self</span>::<span class="ident">SEPARATOR</span>],
+            <span class="kw-2">&amp;</span>[<span class="self">Self</span><span class="ident">::SEPARATOR</span>],
             <span class="self">self</span>.<span class="number">2</span>.<span class="ident">as_bytes</span>(),
-            <span class="kw-2">&amp;</span>[<span class="self">Self</span>::<span class="ident">SEPARATOR</span>],
+            <span class="kw-2">&amp;</span>[<span class="self">Self</span><span class="ident">::SEPARATOR</span>],
         ]
         .<span class="ident">concat</span>()
     }
@@ -1352,8 +1352,8 @@
     <span class="ident">values</span>: <span class="ident">Tree</span>,
 }
 
-<span class="kw">impl</span> <span class="ident">std</span>::<span class="ident">fmt</span>::<span class="ident">Debug</span> <span class="kw">for</span> <span class="ident">SledStore</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">std</span>::<span class="ident">fmt</span>::<span class="ident">Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">std</span>::<span class="ident">fmt</span>::<span class="prelude-ty">Result</span> {
+<span class="kw">impl</span> <span class="ident">std::fmt::Debug</span> <span class="kw">for</span> <span class="ident">SledStore</span> {
+    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">std::fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">std::fmt::Result</span> {
         <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">path</span>) <span class="op">=</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">path</span> {
             <span class="ident">f</span>.<span class="ident">debug_struct</span>(<span class="string">&quot;SledStore&quot;</span>).<span class="ident">field</span>(<span class="string">&quot;path&quot;</span>, <span class="kw-2">&amp;</span><span class="ident">path</span>).<span class="ident">finish</span>()
         } <span class="kw">else</span> {
@@ -1364,11 +1364,11 @@
     }
 }
 
-<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">TransactionError</span><span class="op">&lt;</span><span class="ident">serde_json</span>::<span class="ident">Error</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">CryptoStoreError</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">e</span>: <span class="ident">TransactionError</span><span class="op">&lt;</span><span class="ident">serde_json</span>::<span class="ident">Error</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">TransactionError</span><span class="op">&lt;</span><span class="ident">serde_json::Error</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">CryptoStoreError</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">e</span>: <span class="ident">TransactionError</span><span class="op">&lt;</span><span class="ident">serde_json::Error</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
         <span class="kw">match</span> <span class="ident">e</span> {
-            <span class="ident">TransactionError</span>::<span class="ident">Abort</span>(<span class="ident">e</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">CryptoStoreError</span>::<span class="ident">Serialization</span>(<span class="ident">e</span>),
-            <span class="ident">TransactionError</span>::<span class="ident">Storage</span>(<span class="ident">e</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">CryptoStoreError</span>::<span class="ident">Database</span>(<span class="ident">e</span>),
+            <span class="ident">TransactionError::Abort</span>(<span class="ident">e</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">CryptoStoreError::Serialization</span>(<span class="ident">e</span>),
+            <span class="ident">TransactionError::Storage</span>(<span class="ident">e</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">CryptoStoreError::Database</span>(<span class="ident">e</span>),
         }
     }
 }
@@ -1378,15 +1378,15 @@
     <span class="doccomment">/// passphrase to encrypt private data.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">open_with_passphrase</span>(<span class="ident">path</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">Path</span><span class="op">&gt;</span>, <span class="ident">passphrase</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">path</span> <span class="op">=</span> <span class="ident">path</span>.<span class="ident">as_ref</span>().<span class="ident">join</span>(<span class="string">&quot;matrix-sdk-crypto&quot;</span>);
-        <span class="kw">let</span> <span class="ident">db</span> <span class="op">=</span> <span class="ident">Config</span>::<span class="ident">new</span>().<span class="ident">temporary</span>(<span class="bool-val">false</span>).<span class="ident">path</span>(<span class="kw-2">&amp;</span><span class="ident">path</span>).<span class="ident">open</span>()<span class="question-mark">?</span>;
+        <span class="kw">let</span> <span class="ident">db</span> <span class="op">=</span> <span class="ident">Config::new</span>().<span class="ident">temporary</span>(<span class="bool-val">false</span>).<span class="ident">path</span>(<span class="kw-2">&amp;</span><span class="ident">path</span>).<span class="ident">open</span>()<span class="question-mark">?</span>;
 
-        <span class="ident">SledStore</span>::<span class="ident">open_helper</span>(<span class="ident">db</span>, <span class="prelude-val">Some</span>(<span class="ident">path</span>), <span class="ident">passphrase</span>)
+        <span class="ident">SledStore::open_helper</span>(<span class="ident">db</span>, <span class="prelude-val">Some</span>(<span class="ident">path</span>), <span class="ident">passphrase</span>)
     }
 
     <span class="doccomment">/// Create a sled based cryptostore using the given sled database.</span>
     <span class="doccomment">/// The given passphrase will be used to encrypt private data.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">open_with_database</span>(<span class="ident">db</span>: <span class="ident">Db</span>, <span class="ident">passphrase</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
-        <span class="ident">SledStore</span>::<span class="ident">open_helper</span>(<span class="ident">db</span>, <span class="prelude-val">None</span>, <span class="ident">passphrase</span>)
+        <span class="ident">SledStore::open_helper</span>(<span class="ident">db</span>, <span class="prelude-val">None</span>, <span class="ident">passphrase</span>)
     }
 
     <span class="kw">fn</span> <span class="ident">get_account_info</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">AccountInfo</span><span class="op">&gt;</span> {
@@ -1408,17 +1408,17 @@
         <span class="kw">let</span> <span class="ident">identities</span> <span class="op">=</span> <span class="ident">db</span>.<span class="ident">open_tree</span>(<span class="string">&quot;identities&quot;</span>)<span class="question-mark">?</span>;
         <span class="kw">let</span> <span class="ident">values</span> <span class="op">=</span> <span class="ident">db</span>.<span class="ident">open_tree</span>(<span class="string">&quot;values&quot;</span>)<span class="question-mark">?</span>;
 
-        <span class="kw">let</span> <span class="ident">session_cache</span> <span class="op">=</span> <span class="ident">SessionStore</span>::<span class="ident">new</span>();
+        <span class="kw">let</span> <span class="ident">session_cache</span> <span class="op">=</span> <span class="ident">SessionStore::new</span>();
 
         <span class="kw">let</span> <span class="ident">pickle_key</span> <span class="op">=</span> <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">passphrase</span>) <span class="op">=</span> <span class="ident">passphrase</span> {
-            <span class="self">Self</span>::<span class="ident">get_or_create_pickle_key</span>(<span class="kw-2">&amp;</span><span class="ident">passphrase</span>, <span class="kw-2">&amp;</span><span class="ident">db</span>)<span class="question-mark">?</span>
+            <span class="self">Self</span><span class="ident">::get_or_create_pickle_key</span>(<span class="kw-2">&amp;</span><span class="ident">passphrase</span>, <span class="kw-2">&amp;</span><span class="ident">db</span>)<span class="question-mark">?</span>
         } <span class="kw">else</span> {
-            <span class="ident">PickleKey</span>::<span class="ident">try_from</span>(<span class="ident">DEFAULT_PICKLE</span>.<span class="ident">as_bytes</span>().<span class="ident">to_vec</span>())
+            <span class="ident">PickleKey::try_from</span>(<span class="ident">DEFAULT_PICKLE</span>.<span class="ident">as_bytes</span>().<span class="ident">to_vec</span>())
                 .<span class="ident">expect</span>(<span class="string">&quot;Can&#39;t create default pickle key&quot;</span>)
         };
 
         <span class="prelude-val">Ok</span>(<span class="self">Self</span> {
-            <span class="ident">account_info</span>: <span class="ident">RwLock</span>::<span class="ident">new</span>(<span class="prelude-val">None</span>).<span class="ident">into</span>(),
+            <span class="ident">account_info</span>: <span class="ident">RwLock::new</span>(<span class="prelude-val">None</span>).<span class="ident">into</span>(),
             <span class="ident">path</span>,
             <span class="ident">inner</span>: <span class="ident">db</span>,
             <span class="ident">pickle_key</span>: <span class="ident">pickle_key</span>.<span class="ident">into</span>(),
@@ -1426,8 +1426,8 @@
             <span class="ident">private_identity</span>,
             <span class="ident">sessions</span>,
             <span class="ident">session_cache</span>,
-            <span class="ident">tracked_users_cache</span>: <span class="ident">DashSet</span>::<span class="ident">new</span>().<span class="ident">into</span>(),
-            <span class="ident">users_for_key_query_cache</span>: <span class="ident">DashSet</span>::<span class="ident">new</span>().<span class="ident">into</span>(),
+            <span class="ident">tracked_users_cache</span>: <span class="ident">DashSet::new</span>().<span class="ident">into</span>(),
+            <span class="ident">users_for_key_query_cache</span>: <span class="ident">DashSet::new</span>().<span class="ident">into</span>(),
             <span class="ident">inbound_group_sessions</span>,
             <span class="ident">outbound_group_sessions</span>,
             <span class="ident">devices</span>,
@@ -1442,14 +1442,14 @@
     <span class="kw">fn</span> <span class="ident">get_or_create_pickle_key</span>(<span class="ident">passphrase</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">database</span>: <span class="kw-2">&amp;</span><span class="ident">Db</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">PickleKey</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">key</span> <span class="op">=</span> <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">key</span>) <span class="op">=</span> <span class="ident">database</span>
             .<span class="ident">get</span>(<span class="string">&quot;pickle_key&quot;</span>.<span class="ident">encode</span>())<span class="question-mark">?</span>
-            .<span class="ident">map</span>(<span class="op">|</span><span class="ident">v</span><span class="op">|</span> <span class="ident">serde_json</span>::<span class="ident">from_slice</span>(<span class="kw-2">&amp;</span><span class="ident">v</span>))
+            .<span class="ident">map</span>(<span class="op">|</span><span class="ident">v</span><span class="op">|</span> <span class="ident">serde_json::from_slice</span>(<span class="kw-2">&amp;</span><span class="ident">v</span>))
         {
-            <span class="ident">PickleKey</span>::<span class="ident">from_encrypted</span>(<span class="ident">passphrase</span>, <span class="ident">key</span><span class="question-mark">?</span>)
-                .<span class="ident">map_err</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="ident">CryptoStoreError</span>::<span class="ident">UnpicklingError</span>)<span class="question-mark">?</span>
+            <span class="ident">PickleKey::from_encrypted</span>(<span class="ident">passphrase</span>, <span class="ident">key</span><span class="question-mark">?</span>)
+                .<span class="ident">map_err</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="ident">CryptoStoreError::UnpicklingError</span>)<span class="question-mark">?</span>
         } <span class="kw">else</span> {
-            <span class="kw">let</span> <span class="ident">key</span> <span class="op">=</span> <span class="ident">PickleKey</span>::<span class="ident">new</span>();
+            <span class="kw">let</span> <span class="ident">key</span> <span class="op">=</span> <span class="ident">PickleKey::new</span>();
             <span class="kw">let</span> <span class="ident">encrypted</span> <span class="op">=</span> <span class="ident">key</span>.<span class="ident">encrypt</span>(<span class="ident">passphrase</span>);
-            <span class="ident">database</span>.<span class="ident">insert</span>(<span class="string">&quot;pickle_key&quot;</span>.<span class="ident">encode</span>(), <span class="ident">serde_json</span>::<span class="ident">to_vec</span>(<span class="kw-2">&amp;</span><span class="ident">encrypted</span>)<span class="question-mark">?</span>)<span class="question-mark">?</span>;
+            <span class="ident">database</span>.<span class="ident">insert</span>(<span class="string">&quot;pickle_key&quot;</span>.<span class="ident">encode</span>(), <span class="ident">serde_json::to_vec</span>(<span class="kw-2">&amp;</span><span class="ident">encrypted</span>)<span class="question-mark">?</span>)<span class="question-mark">?</span>;
             <span class="ident">key</span>
         };
 
@@ -1467,7 +1467,7 @@
     <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">load_tracked_users</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="kw">for</span> <span class="ident">value</span> <span class="kw">in</span> <span class="self">self</span>.<span class="ident">tracked_users</span>.<span class="ident">iter</span>() {
             <span class="kw">let</span> (<span class="ident">user</span>, <span class="ident">dirty</span>) <span class="op">=</span> <span class="ident">value</span><span class="question-mark">?</span>;
-            <span class="kw">let</span> <span class="ident">user</span> <span class="op">=</span> <span class="ident">UserId</span>::<span class="ident">try_from</span>(<span class="ident">String</span>::<span class="ident">from_utf8_lossy</span>(<span class="kw-2">&amp;</span><span class="ident">user</span>).<span class="ident">to_string</span>())<span class="question-mark">?</span>;
+            <span class="kw">let</span> <span class="ident">user</span> <span class="op">=</span> <span class="ident">UserId::try_from</span>(<span class="ident">String::from_utf8_lossy</span>(<span class="kw-2">&amp;</span><span class="ident">user</span>).<span class="ident">to_string</span>())<span class="question-mark">?</span>;
             <span class="kw">let</span> <span class="ident">dirty</span> <span class="op">=</span> <span class="ident">dirty</span>.<span class="ident">get</span>(<span class="number">0</span>).<span class="ident">map</span>(<span class="op">|</span><span class="ident">d</span><span class="op">|</span> <span class="kw-2">*</span><span class="ident">d</span> <span class="op">=</span><span class="op">=</span> <span class="number">1</span>).<span class="ident">unwrap_or</span>(<span class="bool-val">true</span>);
 
             <span class="self">self</span>.<span class="ident">tracked_users_cache</span>.<span class="ident">insert</span>(<span class="ident">user</span>.<span class="ident">clone</span>());
@@ -1486,20 +1486,20 @@
     ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">OutboundGroupSession</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">account_info</span> <span class="op">=</span> <span class="self">self</span>
             .<span class="ident">get_account_info</span>()
-            .<span class="ident">ok_or</span>(<span class="ident">CryptoStoreError</span>::<span class="ident">AccountUnset</span>)<span class="question-mark">?</span>;
+            .<span class="ident">ok_or</span>(<span class="ident">CryptoStoreError::AccountUnset</span>)<span class="question-mark">?</span>;
 
         <span class="self">self</span>.<span class="ident">outbound_group_sessions</span>
             .<span class="ident">get</span>(<span class="ident">room_id</span>.<span class="ident">encode</span>())<span class="question-mark">?</span>
-            .<span class="ident">map</span>(<span class="op">|</span><span class="ident">p</span><span class="op">|</span> <span class="ident">serde_json</span>::<span class="ident">from_slice</span>(<span class="kw-2">&amp;</span><span class="ident">p</span>).<span class="ident">map_err</span>(<span class="ident">CryptoStoreError</span>::<span class="ident">Serialization</span>))
+            .<span class="ident">map</span>(<span class="op">|</span><span class="ident">p</span><span class="op">|</span> <span class="ident">serde_json::from_slice</span>(<span class="kw-2">&amp;</span><span class="ident">p</span>).<span class="ident">map_err</span>(<span class="ident">CryptoStoreError::Serialization</span>))
             .<span class="ident">transpose</span>()<span class="question-mark">?</span>
             .<span class="ident">map</span>(<span class="op">|</span><span class="ident">p</span><span class="op">|</span> {
-                <span class="ident">OutboundGroupSession</span>::<span class="ident">from_pickle</span>(
+                <span class="ident">OutboundGroupSession::from_pickle</span>(
                     <span class="ident">account_info</span>.<span class="ident">device_id</span>,
                     <span class="ident">account_info</span>.<span class="ident">identity_keys</span>,
                     <span class="ident">p</span>,
                     <span class="self">self</span>.<span class="ident">get_pickle_mode</span>(),
                 )
-                .<span class="ident">map_err</span>(<span class="ident">CryptoStoreError</span>::<span class="ident">OlmGroupSession</span>)
+                .<span class="ident">map_err</span>(<span class="ident">CryptoStoreError::OlmGroupSession</span>)
             })
             .<span class="ident">transpose</span>()
     }
@@ -1518,7 +1518,7 @@
         };
 
         <span class="kw">let</span> <span class="ident">device_changes</span> <span class="op">=</span> <span class="ident">changes</span>.<span class="ident">devices</span>;
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">session_changes</span> <span class="op">=</span> <span class="ident">HashMap</span>::<span class="ident">new</span>();
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">session_changes</span> <span class="op">=</span> <span class="ident">HashMap::new</span>();
 
         <span class="kw">for</span> <span class="ident">session</span> <span class="kw">in</span> <span class="ident">changes</span>.<span class="ident">sessions</span> {
             <span class="kw">let</span> <span class="ident">sender_key</span> <span class="op">=</span> <span class="ident">session</span>.<span class="ident">sender_key</span>();
@@ -1531,7 +1531,7 @@
             <span class="ident">session_changes</span>.<span class="ident">insert</span>(<span class="ident">key</span>, <span class="ident">pickle</span>);
         }
 
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">inbound_session_changes</span> <span class="op">=</span> <span class="ident">HashMap</span>::<span class="ident">new</span>();
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">inbound_session_changes</span> <span class="op">=</span> <span class="ident">HashMap::new</span>();
 
         <span class="kw">for</span> <span class="ident">session</span> <span class="kw">in</span> <span class="ident">changes</span>.<span class="ident">inbound_group_sessions</span> {
             <span class="kw">let</span> <span class="ident">room_id</span> <span class="op">=</span> <span class="ident">session</span>.<span class="ident">room_id</span>();
@@ -1543,7 +1543,7 @@
             <span class="ident">inbound_session_changes</span>.<span class="ident">insert</span>(<span class="ident">key</span>, <span class="ident">pickle</span>);
         }
 
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">outbound_session_changes</span> <span class="op">=</span> <span class="ident">HashMap</span>::<span class="ident">new</span>();
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">outbound_session_changes</span> <span class="op">=</span> <span class="ident">HashMap::new</span>();
 
         <span class="kw">for</span> <span class="ident">session</span> <span class="kw">in</span> <span class="ident">changes</span>.<span class="ident">outbound_group_sessions</span> {
             <span class="kw">let</span> <span class="ident">room_id</span> <span class="op">=</span> <span class="ident">session</span>.<span class="ident">room_id</span>();
@@ -1555,7 +1555,7 @@
         <span class="kw">let</span> <span class="ident">identity_changes</span> <span class="op">=</span> <span class="ident">changes</span>.<span class="ident">identities</span>;
         <span class="kw">let</span> <span class="ident">olm_hashes</span> <span class="op">=</span> <span class="ident">changes</span>.<span class="ident">message_hashes</span>;
 
-        <span class="kw">let</span> <span class="ident">ret</span>: <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">TransactionError</span><span class="op">&lt;</span><span class="ident">serde_json</span>::<span class="ident">Error</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="op">=</span> (
+        <span class="kw">let</span> <span class="ident">ret</span>: <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">TransactionError</span><span class="op">&lt;</span><span class="ident">serde_json::Error</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="op">=</span> (
             <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">account</span>,
             <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">private_identity</span>,
             <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">devices</span>,
@@ -1579,21 +1579,21 @@
                     <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">a</span>) <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">account_pickle</span> {
                         <span class="ident">account</span>.<span class="ident">insert</span>(
                             <span class="string">&quot;account&quot;</span>.<span class="ident">encode</span>(),
-                            <span class="ident">serde_json</span>::<span class="ident">to_vec</span>(<span class="ident">a</span>).<span class="ident">map_err</span>(<span class="ident">ConflictableTransactionError</span>::<span class="ident">Abort</span>)<span class="question-mark">?</span>,
+                            <span class="ident">serde_json::to_vec</span>(<span class="ident">a</span>).<span class="ident">map_err</span>(<span class="ident">ConflictableTransactionError::Abort</span>)<span class="question-mark">?</span>,
                         )<span class="question-mark">?</span>;
                     }
 
                     <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">i</span>) <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">private_identity_pickle</span> {
                         <span class="ident">private_identity</span>.<span class="ident">insert</span>(
                             <span class="string">&quot;identity&quot;</span>.<span class="ident">encode</span>(),
-                            <span class="ident">serde_json</span>::<span class="ident">to_vec</span>(<span class="kw-2">&amp;</span><span class="ident">i</span>).<span class="ident">map_err</span>(<span class="ident">ConflictableTransactionError</span>::<span class="ident">Abort</span>)<span class="question-mark">?</span>,
+                            <span class="ident">serde_json::to_vec</span>(<span class="kw-2">&amp;</span><span class="ident">i</span>).<span class="ident">map_err</span>(<span class="ident">ConflictableTransactionError::Abort</span>)<span class="question-mark">?</span>,
                         )<span class="question-mark">?</span>;
                     }
 
                     <span class="kw">for</span> <span class="ident">device</span> <span class="kw">in</span> <span class="ident">device_changes</span>.<span class="ident">new</span>.<span class="ident">iter</span>().<span class="ident">chain</span>(<span class="kw-2">&amp;</span><span class="ident">device_changes</span>.<span class="ident">changed</span>) {
                         <span class="kw">let</span> <span class="ident">key</span> <span class="op">=</span> (<span class="ident">device</span>.<span class="ident">user_id</span>().<span class="ident">as_str</span>(), <span class="ident">device</span>.<span class="ident">device_id</span>().<span class="ident">as_str</span>()).<span class="ident">encode</span>();
-                        <span class="kw">let</span> <span class="ident">device</span> <span class="op">=</span> <span class="ident">serde_json</span>::<span class="ident">to_vec</span>(<span class="kw-2">&amp;</span><span class="ident">device</span>)
-                            .<span class="ident">map_err</span>(<span class="ident">ConflictableTransactionError</span>::<span class="ident">Abort</span>)<span class="question-mark">?</span>;
+                        <span class="kw">let</span> <span class="ident">device</span> <span class="op">=</span> <span class="ident">serde_json::to_vec</span>(<span class="kw-2">&amp;</span><span class="ident">device</span>)
+                            .<span class="ident">map_err</span>(<span class="ident">ConflictableTransactionError::Abort</span>)<span class="question-mark">?</span>;
                         <span class="ident">devices</span>.<span class="ident">insert</span>(<span class="ident">key</span>, <span class="ident">device</span>)<span class="question-mark">?</span>;
                     }
 
@@ -1605,39 +1605,39 @@
                     <span class="kw">for</span> <span class="ident">identity</span> <span class="kw">in</span> <span class="ident">identity_changes</span>.<span class="ident">changed</span>.<span class="ident">iter</span>().<span class="ident">chain</span>(<span class="kw-2">&amp;</span><span class="ident">identity_changes</span>.<span class="ident">new</span>) {
                         <span class="ident">identities</span>.<span class="ident">insert</span>(
                             <span class="ident">identity</span>.<span class="ident">user_id</span>().<span class="ident">encode</span>(),
-                            <span class="ident">serde_json</span>::<span class="ident">to_vec</span>(<span class="kw-2">&amp;</span><span class="ident">identity</span>)
-                                .<span class="ident">map_err</span>(<span class="ident">ConflictableTransactionError</span>::<span class="ident">Abort</span>)<span class="question-mark">?</span>,
+                            <span class="ident">serde_json::to_vec</span>(<span class="kw-2">&amp;</span><span class="ident">identity</span>)
+                                .<span class="ident">map_err</span>(<span class="ident">ConflictableTransactionError::Abort</span>)<span class="question-mark">?</span>,
                         )<span class="question-mark">?</span>;
                     }
 
                     <span class="kw">for</span> (<span class="ident">key</span>, <span class="ident">session</span>) <span class="kw">in</span> <span class="kw-2">&amp;</span><span class="ident">session_changes</span> {
                         <span class="ident">sessions</span>.<span class="ident">insert</span>(
                             <span class="ident">key</span>.<span class="ident">as_slice</span>(),
-                            <span class="ident">serde_json</span>::<span class="ident">to_vec</span>(<span class="kw-2">&amp;</span><span class="ident">session</span>)
-                                .<span class="ident">map_err</span>(<span class="ident">ConflictableTransactionError</span>::<span class="ident">Abort</span>)<span class="question-mark">?</span>,
+                            <span class="ident">serde_json::to_vec</span>(<span class="kw-2">&amp;</span><span class="ident">session</span>)
+                                .<span class="ident">map_err</span>(<span class="ident">ConflictableTransactionError::Abort</span>)<span class="question-mark">?</span>,
                         )<span class="question-mark">?</span>;
                     }
 
                     <span class="kw">for</span> (<span class="ident">key</span>, <span class="ident">session</span>) <span class="kw">in</span> <span class="kw-2">&amp;</span><span class="ident">inbound_session_changes</span> {
                         <span class="ident">inbound_sessions</span>.<span class="ident">insert</span>(
                             <span class="ident">key</span>.<span class="ident">as_slice</span>(),
-                            <span class="ident">serde_json</span>::<span class="ident">to_vec</span>(<span class="kw-2">&amp;</span><span class="ident">session</span>)
-                                .<span class="ident">map_err</span>(<span class="ident">ConflictableTransactionError</span>::<span class="ident">Abort</span>)<span class="question-mark">?</span>,
+                            <span class="ident">serde_json::to_vec</span>(<span class="kw-2">&amp;</span><span class="ident">session</span>)
+                                .<span class="ident">map_err</span>(<span class="ident">ConflictableTransactionError::Abort</span>)<span class="question-mark">?</span>,
                         )<span class="question-mark">?</span>;
                     }
 
                     <span class="kw">for</span> (<span class="ident">key</span>, <span class="ident">session</span>) <span class="kw">in</span> <span class="kw-2">&amp;</span><span class="ident">outbound_session_changes</span> {
                         <span class="ident">outbound_sessions</span>.<span class="ident">insert</span>(
                             <span class="ident">key</span>.<span class="ident">encode</span>(),
-                            <span class="ident">serde_json</span>::<span class="ident">to_vec</span>(<span class="kw-2">&amp;</span><span class="ident">session</span>)
-                                .<span class="ident">map_err</span>(<span class="ident">ConflictableTransactionError</span>::<span class="ident">Abort</span>)<span class="question-mark">?</span>,
+                            <span class="ident">serde_json::to_vec</span>(<span class="kw-2">&amp;</span><span class="ident">session</span>)
+                                .<span class="ident">map_err</span>(<span class="ident">ConflictableTransactionError::Abort</span>)<span class="question-mark">?</span>,
                         )<span class="question-mark">?</span>;
                     }
 
                     <span class="kw">for</span> <span class="ident">hash</span> <span class="kw">in</span> <span class="kw-2">&amp;</span><span class="ident">olm_hashes</span> {
                         <span class="ident">hashes</span>.<span class="ident">insert</span>(
-                            <span class="ident">serde_json</span>::<span class="ident">to_vec</span>(<span class="kw-2">&amp;</span><span class="ident">hash</span>)
-                                .<span class="ident">map_err</span>(<span class="ident">ConflictableTransactionError</span>::<span class="ident">Abort</span>)<span class="question-mark">?</span>,
+                            <span class="ident">serde_json::to_vec</span>(<span class="kw-2">&amp;</span><span class="ident">hash</span>)
+                                .<span class="ident">map_err</span>(<span class="ident">ConflictableTransactionError::Abort</span>)<span class="question-mark">?</span>,
                             <span class="kw-2">&amp;</span>[<span class="number">0</span>],
                         )<span class="question-mark">?</span>;
                     }
@@ -1657,11 +1657,11 @@
 <span class="kw">impl</span> <span class="ident">CryptoStore</span> <span class="kw">for</span> <span class="ident">SledStore</span> {
     <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">load_account</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ReadOnlyAccount</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">pickle</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">account</span>.<span class="ident">get</span>(<span class="string">&quot;account&quot;</span>.<span class="ident">encode</span>())<span class="question-mark">?</span> {
-            <span class="kw">let</span> <span class="ident">pickle</span> <span class="op">=</span> <span class="ident">serde_json</span>::<span class="ident">from_slice</span>(<span class="kw-2">&amp;</span><span class="ident">pickle</span>)<span class="question-mark">?</span>;
+            <span class="kw">let</span> <span class="ident">pickle</span> <span class="op">=</span> <span class="ident">serde_json::from_slice</span>(<span class="kw-2">&amp;</span><span class="ident">pickle</span>)<span class="question-mark">?</span>;
 
             <span class="self">self</span>.<span class="ident">load_tracked_users</span>().<span class="kw">await</span><span class="question-mark">?</span>;
 
-            <span class="kw">let</span> <span class="ident">account</span> <span class="op">=</span> <span class="ident">ReadOnlyAccount</span>::<span class="ident">from_pickle</span>(<span class="ident">pickle</span>, <span class="self">self</span>.<span class="ident">get_pickle_mode</span>())<span class="question-mark">?</span>;
+            <span class="kw">let</span> <span class="ident">account</span> <span class="op">=</span> <span class="ident">ReadOnlyAccount::from_pickle</span>(<span class="ident">pickle</span>, <span class="self">self</span>.<span class="ident">get_pickle_mode</span>())<span class="question-mark">?</span>;
 
             <span class="kw">let</span> <span class="ident">account_info</span> <span class="op">=</span> <span class="ident">AccountInfo</span> {
                 <span class="ident">user_id</span>: <span class="ident">account</span>.<span class="ident">user_id</span>.<span class="ident">clone</span>(),
@@ -1688,7 +1688,7 @@
 
         <span class="kw">let</span> <span class="ident">changes</span> <span class="op">=</span> <span class="ident">Changes</span> {
             <span class="ident">account</span>: <span class="prelude-val">Some</span>(<span class="ident">account</span>),
-            ..<span class="ident">Default</span>::<span class="ident">default</span>()
+            ..<span class="ident">Default::default</span>()
         };
 
         <span class="self">self</span>.<span class="ident">save_changes</span>(<span class="ident">changes</span>).<span class="kw">await</span>
@@ -1701,22 +1701,22 @@
     <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">get_sessions</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">sender_key</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">Mutex</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Session</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">account_info</span> <span class="op">=</span> <span class="self">self</span>
             .<span class="ident">get_account_info</span>()
-            .<span class="ident">ok_or</span>(<span class="ident">CryptoStoreError</span>::<span class="ident">AccountUnset</span>)<span class="question-mark">?</span>;
+            .<span class="ident">ok_or</span>(<span class="ident">CryptoStoreError::AccountUnset</span>)<span class="question-mark">?</span>;
 
         <span class="kw">if</span> <span class="self">self</span>.<span class="ident">session_cache</span>.<span class="ident">get</span>(<span class="ident">sender_key</span>).<span class="ident">is_none</span>() {
             <span class="kw">let</span> <span class="ident">sessions</span>: <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Session</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="op">=</span> <span class="self">self</span>
                 .<span class="ident">sessions</span>
                 .<span class="ident">scan_prefix</span>(<span class="ident">sender_key</span>.<span class="ident">encode</span>())
-                .<span class="ident">map</span>(<span class="op">|</span><span class="ident">s</span><span class="op">|</span> <span class="ident">serde_json</span>::<span class="ident">from_slice</span>(<span class="kw-2">&amp;</span><span class="ident">s</span><span class="question-mark">?</span>.<span class="number">1</span>).<span class="ident">map_err</span>(<span class="ident">CryptoStoreError</span>::<span class="ident">Serialization</span>))
+                .<span class="ident">map</span>(<span class="op">|</span><span class="ident">s</span><span class="op">|</span> <span class="ident">serde_json::from_slice</span>(<span class="kw-2">&amp;</span><span class="ident">s</span><span class="question-mark">?</span>.<span class="number">1</span>).<span class="ident">map_err</span>(<span class="ident">CryptoStoreError::Serialization</span>))
                 .<span class="ident">map</span>(<span class="op">|</span><span class="ident">p</span><span class="op">|</span> {
-                    <span class="ident">Session</span>::<span class="ident">from_pickle</span>(
+                    <span class="ident">Session::from_pickle</span>(
                         <span class="ident">account_info</span>.<span class="ident">user_id</span>.<span class="ident">clone</span>(),
                         <span class="ident">account_info</span>.<span class="ident">device_id</span>.<span class="ident">clone</span>(),
                         <span class="ident">account_info</span>.<span class="ident">identity_keys</span>.<span class="ident">clone</span>(),
                         <span class="ident">p</span><span class="question-mark">?</span>,
                         <span class="self">self</span>.<span class="ident">get_pickle_mode</span>(),
                     )
-                    .<span class="ident">map_err</span>(<span class="ident">CryptoStoreError</span>::<span class="ident">SessionUnpickling</span>)
+                    .<span class="ident">map_err</span>(<span class="ident">CryptoStoreError::SessionUnpickling</span>)
                 })
                 .<span class="ident">collect</span>();
 
@@ -1736,10 +1736,10 @@
         <span class="kw">let</span> <span class="ident">pickle</span> <span class="op">=</span> <span class="self">self</span>
             .<span class="ident">inbound_group_sessions</span>
             .<span class="ident">get</span>(<span class="kw-2">&amp;</span><span class="ident">key</span>)<span class="question-mark">?</span>
-            .<span class="ident">map</span>(<span class="op">|</span><span class="ident">p</span><span class="op">|</span> <span class="ident">serde_json</span>::<span class="ident">from_slice</span>(<span class="kw-2">&amp;</span><span class="ident">p</span>));
+            .<span class="ident">map</span>(<span class="op">|</span><span class="ident">p</span><span class="op">|</span> <span class="ident">serde_json::from_slice</span>(<span class="kw-2">&amp;</span><span class="ident">p</span>));
 
         <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">pickle</span>) <span class="op">=</span> <span class="ident">pickle</span> {
-            <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(<span class="ident">InboundGroupSession</span>::<span class="ident">from_pickle</span>(
+            <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(<span class="ident">InboundGroupSession::from_pickle</span>(
                 <span class="ident">pickle</span><span class="question-mark">?</span>,
                 <span class="self">self</span>.<span class="ident">get_pickle_mode</span>(),
             )<span class="question-mark">?</span>))
@@ -1752,17 +1752,17 @@
         <span class="kw">let</span> <span class="ident">pickles</span>: <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">PickledInboundGroupSession</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="op">=</span> <span class="self">self</span>
             .<span class="ident">inbound_group_sessions</span>
             .<span class="ident">iter</span>()
-            .<span class="ident">map</span>(<span class="op">|</span><span class="ident">p</span><span class="op">|</span> <span class="ident">serde_json</span>::<span class="ident">from_slice</span>(<span class="kw-2">&amp;</span><span class="ident">p</span><span class="question-mark">?</span>.<span class="number">1</span>).<span class="ident">map_err</span>(<span class="ident">CryptoStoreError</span>::<span class="ident">Serialization</span>))
+            .<span class="ident">map</span>(<span class="op">|</span><span class="ident">p</span><span class="op">|</span> <span class="ident">serde_json::from_slice</span>(<span class="kw-2">&amp;</span><span class="ident">p</span><span class="question-mark">?</span>.<span class="number">1</span>).<span class="ident">map_err</span>(<span class="ident">CryptoStoreError::Serialization</span>))
             .<span class="ident">collect</span>();
 
         <span class="prelude-val">Ok</span>(<span class="ident">pickles</span><span class="question-mark">?</span>
             .<span class="ident">into_iter</span>()
-            .<span class="ident">filter_map</span>(<span class="op">|</span><span class="ident">p</span><span class="op">|</span> <span class="ident">InboundGroupSession</span>::<span class="ident">from_pickle</span>(<span class="ident">p</span>, <span class="self">self</span>.<span class="ident">get_pickle_mode</span>()).<span class="ident">ok</span>())
+            .<span class="ident">filter_map</span>(<span class="op">|</span><span class="ident">p</span><span class="op">|</span> <span class="ident">InboundGroupSession::from_pickle</span>(<span class="ident">p</span>, <span class="self">self</span>.<span class="ident">get_pickle_mode</span>()).<span class="ident">ok</span>())
             .<span class="ident">collect</span>())
     }
 
     <span class="kw">fn</span> <span class="ident">users_for_key_query</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">HashSet</span><span class="op">&lt;</span><span class="ident">UserId</span><span class="op">&gt;</span> {
-        <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy</span>::<span class="ident">map_clone</span>)]</span>
+        <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy::map_clone</span>)]</span>
         <span class="self">self</span>.<span class="ident">users_for_key_query_cache</span>
             .<span class="ident">iter</span>()
             .<span class="ident">map</span>(<span class="op">|</span><span class="ident">u</span><span class="op">|</span> <span class="ident">u</span>.<span class="ident">clone</span>())
@@ -1799,7 +1799,7 @@
         <span class="kw">let</span> <span class="ident">key</span> <span class="op">=</span> (<span class="ident">user_id</span>.<span class="ident">as_str</span>(), <span class="ident">device_id</span>.<span class="ident">as_str</span>()).<span class="ident">encode</span>();
 
         <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">d</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">devices</span>.<span class="ident">get</span>(<span class="ident">key</span>)<span class="question-mark">?</span> {
-            <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(<span class="ident">serde_json</span>::<span class="ident">from_slice</span>(<span class="kw-2">&amp;</span><span class="ident">d</span>)<span class="question-mark">?</span>))
+            <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(<span class="ident">serde_json::from_slice</span>(<span class="kw-2">&amp;</span><span class="ident">d</span>)<span class="question-mark">?</span>))
         } <span class="kw">else</span> {
             <span class="prelude-val">Ok</span>(<span class="prelude-val">None</span>)
         }
@@ -1811,7 +1811,7 @@
     ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">HashMap</span><span class="op">&lt;</span><span class="ident">DeviceIdBox</span>, <span class="ident">ReadOnlyDevice</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">devices</span>
             .<span class="ident">scan_prefix</span>(<span class="ident">user_id</span>.<span class="ident">encode</span>())
-            .<span class="ident">map</span>(<span class="op">|</span><span class="ident">d</span><span class="op">|</span> <span class="ident">serde_json</span>::<span class="ident">from_slice</span>(<span class="kw-2">&amp;</span><span class="ident">d</span><span class="question-mark">?</span>.<span class="number">1</span>).<span class="ident">map_err</span>(<span class="ident">CryptoStoreError</span>::<span class="ident">Serialization</span>))
+            .<span class="ident">map</span>(<span class="op">|</span><span class="ident">d</span><span class="op">|</span> <span class="ident">serde_json::from_slice</span>(<span class="kw-2">&amp;</span><span class="ident">d</span><span class="question-mark">?</span>.<span class="number">1</span>).<span class="ident">map_err</span>(<span class="ident">CryptoStoreError::Serialization</span>))
             .<span class="ident">map</span>(<span class="op">|</span><span class="ident">d</span><span class="op">|</span> {
                 <span class="kw">let</span> <span class="ident">d</span>: <span class="ident">ReadOnlyDevice</span> <span class="op">=</span> <span class="ident">d</span><span class="question-mark">?</span>;
                 <span class="prelude-val">Ok</span>((<span class="ident">d</span>.<span class="ident">device_id</span>().<span class="ident">to_owned</span>(), <span class="ident">d</span>))
@@ -1823,7 +1823,7 @@
         <span class="prelude-val">Ok</span>(<span class="self">self</span>
             .<span class="ident">identities</span>
             .<span class="ident">get</span>(<span class="ident">user_id</span>.<span class="ident">encode</span>())<span class="question-mark">?</span>
-            .<span class="ident">map</span>(<span class="op">|</span><span class="ident">i</span><span class="op">|</span> <span class="ident">serde_json</span>::<span class="ident">from_slice</span>(<span class="kw-2">&amp;</span><span class="ident">i</span>))
+            .<span class="ident">map</span>(<span class="op">|</span><span class="ident">i</span><span class="op">|</span> <span class="ident">serde_json::from_slice</span>(<span class="kw-2">&amp;</span><span class="ident">i</span>))
             .<span class="ident">transpose</span>()<span class="question-mark">?</span>)
     }
 
@@ -1842,26 +1842,26 @@
         <span class="prelude-val">Ok</span>(<span class="self">self</span>
             .<span class="ident">values</span>
             .<span class="ident">get</span>(<span class="ident">key</span>.<span class="ident">encode</span>())<span class="question-mark">?</span>
-            .<span class="ident">map</span>(<span class="op">|</span><span class="ident">v</span><span class="op">|</span> <span class="ident">String</span>::<span class="ident">from_utf8_lossy</span>(<span class="kw-2">&amp;</span><span class="ident">v</span>).<span class="ident">to_string</span>()))
+            .<span class="ident">map</span>(<span class="op">|</span><span class="ident">v</span><span class="op">|</span> <span class="ident">String::from_utf8_lossy</span>(<span class="kw-2">&amp;</span><span class="ident">v</span>).<span class="ident">to_string</span>()))
     }
 
     <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">load_identity</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">PrivateCrossSigningIdentity</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">i</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">private_identity</span>.<span class="ident">get</span>(<span class="string">&quot;identity&quot;</span>.<span class="ident">encode</span>())<span class="question-mark">?</span> {
-            <span class="kw">let</span> <span class="ident">pickle</span> <span class="op">=</span> <span class="ident">serde_json</span>::<span class="ident">from_slice</span>(<span class="kw-2">&amp;</span><span class="ident">i</span>)<span class="question-mark">?</span>;
+            <span class="kw">let</span> <span class="ident">pickle</span> <span class="op">=</span> <span class="ident">serde_json::from_slice</span>(<span class="kw-2">&amp;</span><span class="ident">i</span>)<span class="question-mark">?</span>;
             <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(
-                <span class="ident">PrivateCrossSigningIdentity</span>::<span class="ident">from_pickle</span>(<span class="ident">pickle</span>, <span class="self">self</span>.<span class="ident">get_pickle_key</span>())
+                <span class="ident">PrivateCrossSigningIdentity::from_pickle</span>(<span class="ident">pickle</span>, <span class="self">self</span>.<span class="ident">get_pickle_key</span>())
                     .<span class="kw">await</span>
-                    .<span class="ident">map_err</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="ident">CryptoStoreError</span>::<span class="ident">UnpicklingError</span>)<span class="question-mark">?</span>,
+                    .<span class="ident">map_err</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="ident">CryptoStoreError::UnpicklingError</span>)<span class="question-mark">?</span>,
             ))
         } <span class="kw">else</span> {
             <span class="prelude-val">Ok</span>(<span class="prelude-val">None</span>)
         }
     }
 
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">is_message_known</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">message_hash</span>: <span class="kw-2">&amp;</span><span class="kw">crate</span>::<span class="ident">olm</span>::<span class="ident">OlmMessageHash</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">bool</span><span class="op">&gt;</span> {
+    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">is_message_known</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">message_hash</span>: <span class="kw-2">&amp;</span><span class="kw">crate</span><span class="ident">::olm::OlmMessageHash</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">bool</span><span class="op">&gt;</span> {
         <span class="prelude-val">Ok</span>(<span class="self">self</span>
             .<span class="ident">olm_hashes</span>
-            .<span class="ident">contains_key</span>(<span class="ident">serde_json</span>::<span class="ident">to_vec</span>(<span class="ident">message_hash</span>)<span class="question-mark">?</span>)<span class="question-mark">?</span>)
+            .<span class="ident">contains_key</span>(<span class="ident">serde_json::to_vec</span>(<span class="ident">message_hash</span>)<span class="question-mark">?</span>)<span class="question-mark">?</span>)
     }
 
     <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">get_outbound_group_sessions</span>(
@@ -1876,8 +1876,8 @@
 <span class="kw">mod</span> <span class="ident">test</span> {
     <span class="kw">use</span> <span class="kw">crate</span>::{
         <span class="ident">identities</span>::{
-            <span class="ident">device</span>::<span class="ident">test</span>::<span class="ident">get_device</span>,
-            <span class="ident">user</span>::<span class="ident">test</span>::{<span class="ident">get_other_identity</span>, <span class="ident">get_own_identity</span>},
+            <span class="ident">device::test::get_device</span>,
+            <span class="ident">user::test</span>::{<span class="ident">get_other_identity</span>, <span class="ident">get_own_identity</span>},
         },
         <span class="ident">olm</span>::{
             <span class="ident">GroupSessionKey</span>, <span class="ident">InboundGroupSession</span>, <span class="ident">OlmMessageHash</span>, <span class="ident">PrivateCrossSigningIdentity</span>,
@@ -1886,13 +1886,13 @@
         <span class="ident">store</span>::{<span class="ident">Changes</span>, <span class="ident">DeviceChanges</span>, <span class="ident">IdentityChanges</span>},
     };
     <span class="kw">use</span> <span class="ident">matrix_sdk_common</span>::{
-        <span class="ident">api</span>::<span class="ident">r0</span>::<span class="ident">keys</span>::<span class="ident">SignedKey</span>,
+        <span class="ident">api::r0::keys::SignedKey</span>,
         <span class="ident">identifiers</span>::{<span class="ident">room_id</span>, <span class="ident">user_id</span>, <span class="ident">DeviceId</span>, <span class="ident">UserId</span>},
     };
-    <span class="kw">use</span> <span class="ident">matrix_sdk_test</span>::<span class="ident">async_test</span>;
-    <span class="kw">use</span> <span class="ident">olm_rs</span>::<span class="ident">outbound_group_session</span>::<span class="ident">OlmOutboundGroupSession</span>;
-    <span class="kw">use</span> <span class="ident">std</span>::<span class="ident">collections</span>::<span class="ident">BTreeMap</span>;
-    <span class="kw">use</span> <span class="ident">tempfile</span>::<span class="ident">tempdir</span>;
+    <span class="kw">use</span> <span class="ident">matrix_sdk_test::async_test</span>;
+    <span class="kw">use</span> <span class="ident">olm_rs::outbound_group_session::OlmOutboundGroupSession</span>;
+    <span class="kw">use</span> <span class="ident">std::collections::BTreeMap</span>;
+    <span class="kw">use</span> <span class="ident">tempfile::tempdir</span>;
 
     <span class="kw">use</span> <span class="kw">super</span>::{<span class="ident">CryptoStore</span>, <span class="ident">SledStore</span>};
 
@@ -1912,17 +1912,17 @@
         <span class="string">&quot;BOBDEVICE&quot;</span>.<span class="ident">into</span>()
     }
 
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">get_store</span>(<span class="ident">passphrase</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> (<span class="ident">SledStore</span>, <span class="ident">tempfile</span>::<span class="ident">TempDir</span>) {
+    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">get_store</span>(<span class="ident">passphrase</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> (<span class="ident">SledStore</span>, <span class="ident">tempfile::TempDir</span>) {
         <span class="kw">let</span> <span class="ident">tmpdir</span> <span class="op">=</span> <span class="ident">tempdir</span>().<span class="ident">unwrap</span>();
         <span class="kw">let</span> <span class="ident">tmpdir_path</span> <span class="op">=</span> <span class="ident">tmpdir</span>.<span class="ident">path</span>().<span class="ident">to_str</span>().<span class="ident">unwrap</span>();
 
-        <span class="kw">let</span> <span class="ident">store</span> <span class="op">=</span> <span class="ident">SledStore</span>::<span class="ident">open_with_passphrase</span>(<span class="ident">tmpdir_path</span>, <span class="ident">passphrase</span>)
+        <span class="kw">let</span> <span class="ident">store</span> <span class="op">=</span> <span class="ident">SledStore::open_with_passphrase</span>(<span class="ident">tmpdir_path</span>, <span class="ident">passphrase</span>)
             .<span class="ident">expect</span>(<span class="string">&quot;Can&#39;t create a passphrase protected store&quot;</span>);
 
         (<span class="ident">store</span>, <span class="ident">tmpdir</span>)
     }
 
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">get_loaded_store</span>() <span class="op">-</span><span class="op">&gt;</span> (<span class="ident">ReadOnlyAccount</span>, <span class="ident">SledStore</span>, <span class="ident">tempfile</span>::<span class="ident">TempDir</span>) {
+    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">get_loaded_store</span>() <span class="op">-</span><span class="op">&gt;</span> (<span class="ident">ReadOnlyAccount</span>, <span class="ident">SledStore</span>, <span class="ident">tempfile::TempDir</span>) {
         <span class="kw">let</span> (<span class="ident">store</span>, <span class="ident">dir</span>) <span class="op">=</span> <span class="ident">get_store</span>(<span class="prelude-val">None</span>).<span class="kw">await</span>;
         <span class="kw">let</span> <span class="ident">account</span> <span class="op">=</span> <span class="ident">get_account</span>();
         <span class="ident">store</span>
@@ -1934,12 +1934,12 @@
     }
 
     <span class="kw">fn</span> <span class="ident">get_account</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ReadOnlyAccount</span> {
-        <span class="ident">ReadOnlyAccount</span>::<span class="ident">new</span>(<span class="kw-2">&amp;</span><span class="ident">alice_id</span>(), <span class="kw-2">&amp;</span><span class="ident">alice_device_id</span>())
+        <span class="ident">ReadOnlyAccount::new</span>(<span class="kw-2">&amp;</span><span class="ident">alice_id</span>(), <span class="kw-2">&amp;</span><span class="ident">alice_device_id</span>())
     }
 
     <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">get_account_and_session</span>() <span class="op">-</span><span class="op">&gt;</span> (<span class="ident">ReadOnlyAccount</span>, <span class="ident">Session</span>) {
-        <span class="kw">let</span> <span class="ident">alice</span> <span class="op">=</span> <span class="ident">ReadOnlyAccount</span>::<span class="ident">new</span>(<span class="kw-2">&amp;</span><span class="ident">alice_id</span>(), <span class="kw-2">&amp;</span><span class="ident">alice_device_id</span>());
-        <span class="kw">let</span> <span class="ident">bob</span> <span class="op">=</span> <span class="ident">ReadOnlyAccount</span>::<span class="ident">new</span>(<span class="kw-2">&amp;</span><span class="ident">bob_id</span>(), <span class="kw-2">&amp;</span><span class="ident">bob_device_id</span>());
+        <span class="kw">let</span> <span class="ident">alice</span> <span class="op">=</span> <span class="ident">ReadOnlyAccount::new</span>(<span class="kw-2">&amp;</span><span class="ident">alice_id</span>(), <span class="kw-2">&amp;</span><span class="ident">alice_device_id</span>());
+        <span class="kw">let</span> <span class="ident">bob</span> <span class="op">=</span> <span class="ident">ReadOnlyAccount::new</span>(<span class="kw-2">&amp;</span><span class="ident">bob_id</span>(), <span class="kw-2">&amp;</span><span class="ident">bob_device_id</span>());
 
         <span class="ident">bob</span>.<span class="ident">generate_one_time_keys_helper</span>(<span class="number">1</span>).<span class="kw">await</span>;
         <span class="kw">let</span> <span class="ident">one_time_key</span> <span class="op">=</span> <span class="ident">bob</span>
@@ -1951,7 +1951,7 @@
             .<span class="ident">unwrap</span>()
             .<span class="number">1</span>
             .<span class="ident">to_owned</span>();
-        <span class="kw">let</span> <span class="ident">one_time_key</span> <span class="op">=</span> <span class="ident">SignedKey</span>::<span class="ident">new</span>(<span class="ident">one_time_key</span>, <span class="ident">BTreeMap</span>::<span class="ident">new</span>());
+        <span class="kw">let</span> <span class="ident">one_time_key</span> <span class="op">=</span> <span class="ident">SignedKey::new</span>(<span class="ident">one_time_key</span>, <span class="ident">BTreeMap::new</span>());
         <span class="kw">let</span> <span class="ident">sender_key</span> <span class="op">=</span> <span class="ident">bob</span>.<span class="ident">identity_keys</span>().<span class="ident">curve25519</span>().<span class="ident">to_owned</span>();
         <span class="kw">let</span> <span class="ident">session</span> <span class="op">=</span> <span class="ident">alice</span>
             .<span class="ident">create_outbound_session_helper</span>(<span class="kw-2">&amp;</span><span class="ident">sender_key</span>, <span class="kw-2">&amp;</span><span class="ident">one_time_key</span>)
@@ -1965,7 +1965,7 @@
     <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">create_store</span>() {
         <span class="kw">let</span> <span class="ident">tmpdir</span> <span class="op">=</span> <span class="ident">tempdir</span>().<span class="ident">unwrap</span>();
         <span class="kw">let</span> <span class="ident">tmpdir_path</span> <span class="op">=</span> <span class="ident">tmpdir</span>.<span class="ident">path</span>().<span class="ident">to_str</span>().<span class="ident">unwrap</span>();
-        <span class="kw">let</span> <span class="kw">_</span> <span class="op">=</span> <span class="ident">SledStore</span>::<span class="ident">open_with_passphrase</span>(<span class="ident">tmpdir_path</span>, <span class="prelude-val">None</span>).<span class="ident">expect</span>(<span class="string">&quot;Can&#39;t create store&quot;</span>);
+        <span class="kw">let</span> <span class="kw">_</span> <span class="op">=</span> <span class="ident">SledStore::open_with_passphrase</span>(<span class="ident">tmpdir_path</span>, <span class="prelude-val">None</span>).<span class="ident">expect</span>(<span class="string">&quot;Can&#39;t create store&quot;</span>);
     }
 
     <span class="attribute">#[<span class="ident">async_test</span>]</span>
@@ -2051,7 +2051,7 @@
 
         <span class="kw">let</span> <span class="ident">changes</span> <span class="op">=</span> <span class="ident">Changes</span> {
             <span class="ident">sessions</span>: <span class="macro">vec!</span>[<span class="ident">session</span>.<span class="ident">clone</span>()],
-            ..<span class="ident">Default</span>::<span class="ident">default</span>()
+            ..<span class="ident">Default::default</span>()
         };
 
         <span class="ident">store</span>.<span class="ident">save_changes</span>(<span class="ident">changes</span>).<span class="kw">await</span>.<span class="ident">unwrap</span>();
@@ -2080,7 +2080,7 @@
 
         <span class="kw">let</span> <span class="ident">changes</span> <span class="op">=</span> <span class="ident">Changes</span> {
             <span class="ident">sessions</span>: <span class="macro">vec!</span>[<span class="ident">session</span>.<span class="ident">clone</span>()],
-            ..<span class="ident">Default</span>::<span class="ident">default</span>()
+            ..<span class="ident">Default::default</span>()
         };
         <span class="ident">store</span>.<span class="ident">save_changes</span>(<span class="ident">changes</span>).<span class="kw">await</span>.<span class="ident">unwrap</span>();
 
@@ -2092,7 +2092,7 @@
 
         <span class="ident">drop</span>(<span class="ident">store</span>);
 
-        <span class="kw">let</span> <span class="ident">store</span> <span class="op">=</span> <span class="ident">SledStore</span>::<span class="ident">open_with_passphrase</span>(<span class="ident">dir</span>.<span class="ident">path</span>(), <span class="prelude-val">None</span>).<span class="ident">expect</span>(<span class="string">&quot;Can&#39;t create store&quot;</span>);
+        <span class="kw">let</span> <span class="ident">store</span> <span class="op">=</span> <span class="ident">SledStore::open_with_passphrase</span>(<span class="ident">dir</span>.<span class="ident">path</span>(), <span class="prelude-val">None</span>).<span class="ident">expect</span>(<span class="string">&quot;Can&#39;t create store&quot;</span>);
 
         <span class="kw">let</span> <span class="ident">loaded_account</span> <span class="op">=</span> <span class="ident">store</span>.<span class="ident">load_account</span>().<span class="kw">await</span>.<span class="ident">unwrap</span>().<span class="ident">unwrap</span>();
         <span class="macro">assert_eq!</span>(<span class="ident">account</span>, <span class="ident">loaded_account</span>);
@@ -2109,8 +2109,8 @@
         <span class="kw">let</span> (<span class="ident">account</span>, <span class="ident">store</span>, <span class="ident">_dir</span>) <span class="op">=</span> <span class="ident">get_loaded_store</span>().<span class="kw">await</span>;
 
         <span class="kw">let</span> <span class="ident">identity_keys</span> <span class="op">=</span> <span class="ident">account</span>.<span class="ident">identity_keys</span>();
-        <span class="kw">let</span> <span class="ident">outbound_session</span> <span class="op">=</span> <span class="ident">OlmOutboundGroupSession</span>::<span class="ident">new</span>();
-        <span class="kw">let</span> <span class="ident">session</span> <span class="op">=</span> <span class="ident">InboundGroupSession</span>::<span class="ident">new</span>(
+        <span class="kw">let</span> <span class="ident">outbound_session</span> <span class="op">=</span> <span class="ident">OlmOutboundGroupSession::new</span>();
+        <span class="kw">let</span> <span class="ident">session</span> <span class="op">=</span> <span class="ident">InboundGroupSession::new</span>(
             <span class="ident">identity_keys</span>.<span class="ident">curve25519</span>(),
             <span class="ident">identity_keys</span>.<span class="ident">ed25519</span>(),
             <span class="kw-2">&amp;</span><span class="macro">room_id!</span>(<span class="string">&quot;!test:localhost&quot;</span>),
@@ -2121,7 +2121,7 @@
 
         <span class="kw">let</span> <span class="ident">changes</span> <span class="op">=</span> <span class="ident">Changes</span> {
             <span class="ident">inbound_group_sessions</span>: <span class="macro">vec!</span>[<span class="ident">session</span>],
-            ..<span class="ident">Default</span>::<span class="ident">default</span>()
+            ..<span class="ident">Default::default</span>()
         };
 
         <span class="ident">store</span>
@@ -2135,8 +2135,8 @@
         <span class="kw">let</span> (<span class="ident">account</span>, <span class="ident">store</span>, <span class="ident">dir</span>) <span class="op">=</span> <span class="ident">get_loaded_store</span>().<span class="kw">await</span>;
 
         <span class="kw">let</span> <span class="ident">identity_keys</span> <span class="op">=</span> <span class="ident">account</span>.<span class="ident">identity_keys</span>();
-        <span class="kw">let</span> <span class="ident">outbound_session</span> <span class="op">=</span> <span class="ident">OlmOutboundGroupSession</span>::<span class="ident">new</span>();
-        <span class="kw">let</span> <span class="ident">session</span> <span class="op">=</span> <span class="ident">InboundGroupSession</span>::<span class="ident">new</span>(
+        <span class="kw">let</span> <span class="ident">outbound_session</span> <span class="op">=</span> <span class="ident">OlmOutboundGroupSession::new</span>();
+        <span class="kw">let</span> <span class="ident">session</span> <span class="op">=</span> <span class="ident">InboundGroupSession::new</span>(
             <span class="ident">identity_keys</span>.<span class="ident">curve25519</span>(),
             <span class="ident">identity_keys</span>.<span class="ident">ed25519</span>(),
             <span class="kw-2">&amp;</span><span class="macro">room_id!</span>(<span class="string">&quot;!test:localhost&quot;</span>),
@@ -2149,11 +2149,11 @@
 
         <span class="ident">export</span>.<span class="ident">forwarding_curve25519_key_chain</span> <span class="op">=</span> <span class="macro">vec!</span>[<span class="string">&quot;some_chain&quot;</span>.<span class="ident">to_owned</span>()];
 
-        <span class="kw">let</span> <span class="ident">session</span> <span class="op">=</span> <span class="ident">InboundGroupSession</span>::<span class="ident">from_export</span>(<span class="ident">export</span>).<span class="ident">unwrap</span>();
+        <span class="kw">let</span> <span class="ident">session</span> <span class="op">=</span> <span class="ident">InboundGroupSession::from_export</span>(<span class="ident">export</span>).<span class="ident">unwrap</span>();
 
         <span class="kw">let</span> <span class="ident">changes</span> <span class="op">=</span> <span class="ident">Changes</span> {
             <span class="ident">inbound_group_sessions</span>: <span class="macro">vec!</span>[<span class="ident">session</span>.<span class="ident">clone</span>()],
-            ..<span class="ident">Default</span>::<span class="ident">default</span>()
+            ..<span class="ident">Default::default</span>()
         };
 
         <span class="ident">store</span>
@@ -2163,7 +2163,7 @@
 
         <span class="ident">drop</span>(<span class="ident">store</span>);
 
-        <span class="kw">let</span> <span class="ident">store</span> <span class="op">=</span> <span class="ident">SledStore</span>::<span class="ident">open_with_passphrase</span>(<span class="ident">dir</span>.<span class="ident">path</span>(), <span class="prelude-val">None</span>).<span class="ident">expect</span>(<span class="string">&quot;Can&#39;t create store&quot;</span>);
+        <span class="kw">let</span> <span class="ident">store</span> <span class="op">=</span> <span class="ident">SledStore::open_with_passphrase</span>(<span class="ident">dir</span>.<span class="ident">path</span>(), <span class="prelude-val">None</span>).<span class="ident">expect</span>(<span class="string">&quot;Can&#39;t create store&quot;</span>);
 
         <span class="ident">store</span>.<span class="ident">load_account</span>().<span class="kw">await</span>.<span class="ident">unwrap</span>();
 
@@ -2200,7 +2200,7 @@
         <span class="macro">assert!</span>(<span class="ident">store</span>.<span class="ident">users_for_key_query</span>().<span class="ident">contains</span>(<span class="ident">device</span>.<span class="ident">user_id</span>()));
         <span class="ident">drop</span>(<span class="ident">store</span>);
 
-        <span class="kw">let</span> <span class="ident">store</span> <span class="op">=</span> <span class="ident">SledStore</span>::<span class="ident">open_with_passphrase</span>(<span class="ident">dir</span>.<span class="ident">path</span>(), <span class="prelude-val">None</span>).<span class="ident">expect</span>(<span class="string">&quot;Can&#39;t create store&quot;</span>);
+        <span class="kw">let</span> <span class="ident">store</span> <span class="op">=</span> <span class="ident">SledStore::open_with_passphrase</span>(<span class="ident">dir</span>.<span class="ident">path</span>(), <span class="prelude-val">None</span>).<span class="ident">expect</span>(<span class="string">&quot;Can&#39;t create store&quot;</span>);
 
         <span class="ident">store</span>.<span class="ident">load_account</span>().<span class="kw">await</span>.<span class="ident">unwrap</span>();
 
@@ -2214,7 +2214,7 @@
         <span class="macro">assert!</span>(<span class="op">!</span><span class="ident">store</span>.<span class="ident">users_for_key_query</span>().<span class="ident">contains</span>(<span class="ident">device</span>.<span class="ident">user_id</span>()));
         <span class="ident">drop</span>(<span class="ident">store</span>);
 
-        <span class="kw">let</span> <span class="ident">store</span> <span class="op">=</span> <span class="ident">SledStore</span>::<span class="ident">open_with_passphrase</span>(<span class="ident">dir</span>.<span class="ident">path</span>(), <span class="prelude-val">None</span>).<span class="ident">expect</span>(<span class="string">&quot;Can&#39;t create store&quot;</span>);
+        <span class="kw">let</span> <span class="ident">store</span> <span class="op">=</span> <span class="ident">SledStore::open_with_passphrase</span>(<span class="ident">dir</span>.<span class="ident">path</span>(), <span class="prelude-val">None</span>).<span class="ident">expect</span>(<span class="string">&quot;Can&#39;t create store&quot;</span>);
 
         <span class="ident">store</span>.<span class="ident">load_account</span>().<span class="kw">await</span>.<span class="ident">unwrap</span>();
 
@@ -2229,16 +2229,16 @@
         <span class="kw">let</span> <span class="ident">changes</span> <span class="op">=</span> <span class="ident">Changes</span> {
             <span class="ident">devices</span>: <span class="ident">DeviceChanges</span> {
                 <span class="ident">changed</span>: <span class="macro">vec!</span>[<span class="ident">device</span>.<span class="ident">clone</span>()],
-                ..<span class="ident">Default</span>::<span class="ident">default</span>()
+                ..<span class="ident">Default::default</span>()
             },
-            ..<span class="ident">Default</span>::<span class="ident">default</span>()
+            ..<span class="ident">Default::default</span>()
         };
 
         <span class="ident">store</span>.<span class="ident">save_changes</span>(<span class="ident">changes</span>).<span class="kw">await</span>.<span class="ident">unwrap</span>();
 
         <span class="ident">drop</span>(<span class="ident">store</span>);
 
-        <span class="kw">let</span> <span class="ident">store</span> <span class="op">=</span> <span class="ident">SledStore</span>::<span class="ident">open_with_passphrase</span>(<span class="ident">dir</span>.<span class="ident">path</span>(), <span class="prelude-val">None</span>).<span class="ident">expect</span>(<span class="string">&quot;Can&#39;t create store&quot;</span>);
+        <span class="kw">let</span> <span class="ident">store</span> <span class="op">=</span> <span class="ident">SledStore::open_with_passphrase</span>(<span class="ident">dir</span>.<span class="ident">path</span>(), <span class="prelude-val">None</span>).<span class="ident">expect</span>(<span class="string">&quot;Can&#39;t create store&quot;</span>);
 
         <span class="ident">store</span>.<span class="ident">load_account</span>().<span class="kw">await</span>.<span class="ident">unwrap</span>();
 
@@ -2269,9 +2269,9 @@
         <span class="kw">let</span> <span class="ident">changes</span> <span class="op">=</span> <span class="ident">Changes</span> {
             <span class="ident">devices</span>: <span class="ident">DeviceChanges</span> {
                 <span class="ident">changed</span>: <span class="macro">vec!</span>[<span class="ident">device</span>.<span class="ident">clone</span>()],
-                ..<span class="ident">Default</span>::<span class="ident">default</span>()
+                ..<span class="ident">Default::default</span>()
             },
-            ..<span class="ident">Default</span>::<span class="ident">default</span>()
+            ..<span class="ident">Default::default</span>()
         };
 
         <span class="ident">store</span>.<span class="ident">save_changes</span>(<span class="ident">changes</span>).<span class="kw">await</span>.<span class="ident">unwrap</span>();
@@ -2279,15 +2279,15 @@
         <span class="kw">let</span> <span class="ident">changes</span> <span class="op">=</span> <span class="ident">Changes</span> {
             <span class="ident">devices</span>: <span class="ident">DeviceChanges</span> {
                 <span class="ident">deleted</span>: <span class="macro">vec!</span>[<span class="ident">device</span>.<span class="ident">clone</span>()],
-                ..<span class="ident">Default</span>::<span class="ident">default</span>()
+                ..<span class="ident">Default::default</span>()
             },
-            ..<span class="ident">Default</span>::<span class="ident">default</span>()
+            ..<span class="ident">Default::default</span>()
         };
 
         <span class="ident">store</span>.<span class="ident">save_changes</span>(<span class="ident">changes</span>).<span class="kw">await</span>.<span class="ident">unwrap</span>();
         <span class="ident">drop</span>(<span class="ident">store</span>);
 
-        <span class="kw">let</span> <span class="ident">store</span> <span class="op">=</span> <span class="ident">SledStore</span>::<span class="ident">open_with_passphrase</span>(<span class="ident">dir</span>.<span class="ident">path</span>(), <span class="prelude-val">None</span>).<span class="ident">expect</span>(<span class="string">&quot;Can&#39;t create store&quot;</span>);
+        <span class="kw">let</span> <span class="ident">store</span> <span class="op">=</span> <span class="ident">SledStore::open_with_passphrase</span>(<span class="ident">dir</span>.<span class="ident">path</span>(), <span class="prelude-val">None</span>).<span class="ident">expect</span>(<span class="string">&quot;Can&#39;t create store&quot;</span>);
 
         <span class="ident">store</span>.<span class="ident">load_account</span>().<span class="kw">await</span>.<span class="ident">unwrap</span>();
 
@@ -2307,9 +2307,9 @@
         <span class="kw">let</span> <span class="ident">user_id</span> <span class="op">=</span> <span class="macro">user_id!</span>(<span class="string">&quot;@example:localhost&quot;</span>);
         <span class="kw">let</span> <span class="ident">device_id</span>: <span class="kw-2">&amp;</span><span class="ident">DeviceId</span> <span class="op">=</span> <span class="string">&quot;WSKKLTJZCL&quot;</span>.<span class="ident">into</span>();
 
-        <span class="kw">let</span> <span class="ident">store</span> <span class="op">=</span> <span class="ident">SledStore</span>::<span class="ident">open_with_passphrase</span>(<span class="ident">tmpdir_path</span>, <span class="prelude-val">None</span>).<span class="ident">expect</span>(<span class="string">&quot;Can&#39;t create store&quot;</span>);
+        <span class="kw">let</span> <span class="ident">store</span> <span class="op">=</span> <span class="ident">SledStore::open_with_passphrase</span>(<span class="ident">tmpdir_path</span>, <span class="prelude-val">None</span>).<span class="ident">expect</span>(<span class="string">&quot;Can&#39;t create store&quot;</span>);
 
-        <span class="kw">let</span> <span class="ident">account</span> <span class="op">=</span> <span class="ident">ReadOnlyAccount</span>::<span class="ident">new</span>(<span class="kw-2">&amp;</span><span class="ident">user_id</span>, <span class="kw-2">&amp;</span><span class="ident">device_id</span>);
+        <span class="kw">let</span> <span class="ident">account</span> <span class="op">=</span> <span class="ident">ReadOnlyAccount::new</span>(<span class="kw-2">&amp;</span><span class="ident">user_id</span>, <span class="kw-2">&amp;</span><span class="ident">device_id</span>);
 
         <span class="ident">store</span>
             .<span class="ident">save_account</span>(<span class="ident">account</span>.<span class="ident">clone</span>())
@@ -2321,9 +2321,9 @@
         <span class="kw">let</span> <span class="ident">changes</span> <span class="op">=</span> <span class="ident">Changes</span> {
             <span class="ident">identities</span>: <span class="ident">IdentityChanges</span> {
                 <span class="ident">changed</span>: <span class="macro">vec!</span>[<span class="ident">own_identity</span>.<span class="ident">clone</span>().<span class="ident">into</span>()],
-                ..<span class="ident">Default</span>::<span class="ident">default</span>()
+                ..<span class="ident">Default::default</span>()
             },
-            ..<span class="ident">Default</span>::<span class="ident">default</span>()
+            ..<span class="ident">Default::default</span>()
         };
 
         <span class="ident">store</span>
@@ -2333,7 +2333,7 @@
 
         <span class="ident">drop</span>(<span class="ident">store</span>);
 
-        <span class="kw">let</span> <span class="ident">store</span> <span class="op">=</span> <span class="ident">SledStore</span>::<span class="ident">open_with_passphrase</span>(<span class="ident">dir</span>.<span class="ident">path</span>(), <span class="prelude-val">None</span>).<span class="ident">expect</span>(<span class="string">&quot;Can&#39;t create store&quot;</span>);
+        <span class="kw">let</span> <span class="ident">store</span> <span class="op">=</span> <span class="ident">SledStore::open_with_passphrase</span>(<span class="ident">dir</span>.<span class="ident">path</span>(), <span class="prelude-val">None</span>).<span class="ident">expect</span>(<span class="string">&quot;Can&#39;t create store&quot;</span>);
 
         <span class="ident">store</span>.<span class="ident">load_account</span>().<span class="kw">await</span>.<span class="ident">unwrap</span>();
 
@@ -2355,9 +2355,9 @@
         <span class="kw">let</span> <span class="ident">changes</span> <span class="op">=</span> <span class="ident">Changes</span> {
             <span class="ident">identities</span>: <span class="ident">IdentityChanges</span> {
                 <span class="ident">changed</span>: <span class="macro">vec!</span>[<span class="ident">other_identity</span>.<span class="ident">clone</span>().<span class="ident">into</span>()],
-                ..<span class="ident">Default</span>::<span class="ident">default</span>()
+                ..<span class="ident">Default::default</span>()
             },
-            ..<span class="ident">Default</span>::<span class="ident">default</span>()
+            ..<span class="ident">Default::default</span>()
         };
 
         <span class="ident">store</span>.<span class="ident">save_changes</span>(<span class="ident">changes</span>).<span class="kw">await</span>.<span class="ident">unwrap</span>();
@@ -2380,9 +2380,9 @@
         <span class="kw">let</span> <span class="ident">changes</span> <span class="op">=</span> <span class="ident">Changes</span> {
             <span class="ident">identities</span>: <span class="ident">IdentityChanges</span> {
                 <span class="ident">changed</span>: <span class="macro">vec!</span>[<span class="ident">own_identity</span>.<span class="ident">into</span>()],
-                ..<span class="ident">Default</span>::<span class="ident">default</span>()
+                ..<span class="ident">Default::default</span>()
             },
-            ..<span class="ident">Default</span>::<span class="ident">default</span>()
+            ..<span class="ident">Default::default</span>()
         };
 
         <span class="ident">store</span>.<span class="ident">save_changes</span>(<span class="ident">changes</span>).<span class="kw">await</span>.<span class="ident">unwrap</span>();
@@ -2394,11 +2394,11 @@
     <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">private_identity_saving</span>() {
         <span class="kw">let</span> (<span class="kw">_</span>, <span class="ident">store</span>, <span class="ident">_dir</span>) <span class="op">=</span> <span class="ident">get_loaded_store</span>().<span class="kw">await</span>;
         <span class="macro">assert!</span>(<span class="ident">store</span>.<span class="ident">load_identity</span>().<span class="kw">await</span>.<span class="ident">unwrap</span>().<span class="ident">is_none</span>());
-        <span class="kw">let</span> <span class="ident">identity</span> <span class="op">=</span> <span class="ident">PrivateCrossSigningIdentity</span>::<span class="ident">new</span>(<span class="ident">alice_id</span>()).<span class="kw">await</span>;
+        <span class="kw">let</span> <span class="ident">identity</span> <span class="op">=</span> <span class="ident">PrivateCrossSigningIdentity::new</span>(<span class="ident">alice_id</span>()).<span class="kw">await</span>;
 
         <span class="kw">let</span> <span class="ident">changes</span> <span class="op">=</span> <span class="ident">Changes</span> {
             <span class="ident">private_identity</span>: <span class="prelude-val">Some</span>(<span class="ident">identity</span>.<span class="ident">clone</span>()),
-            ..<span class="ident">Default</span>::<span class="ident">default</span>()
+            ..<span class="ident">Default::default</span>()
         };
 
         <span class="ident">store</span>.<span class="ident">save_changes</span>(<span class="ident">changes</span>).<span class="kw">await</span>.<span class="ident">unwrap</span>();
@@ -2430,7 +2430,7 @@
             <span class="ident">hash</span>: <span class="string">&quot;test_hash&quot;</span>.<span class="ident">to_owned</span>(),
         };
 
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">changes</span> <span class="op">=</span> <span class="ident">Changes</span>::<span class="ident">default</span>();
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">changes</span> <span class="op">=</span> <span class="ident">Changes::default</span>();
         <span class="ident">changes</span>.<span class="ident">message_hashes</span>.<span class="ident">push</span>(<span class="ident">hash</span>.<span class="ident">clone</span>());
 
         <span class="macro">assert!</span>(<span class="op">!</span><span class="ident">store</span>.<span class="ident">is_message_known</span>(<span class="kw-2">&amp;</span><span class="ident">hash</span>).<span class="kw">await</span>.<span class="ident">unwrap</span>());

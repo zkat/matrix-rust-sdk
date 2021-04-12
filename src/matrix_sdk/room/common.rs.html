@@ -215,15 +215,15 @@
 <span id="212">212</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="kw">use</span> <span class="ident">matrix_sdk_common</span>::{
-    <span class="ident">api</span>::<span class="ident">r0</span>::{
+    <span class="ident">api::r0</span>::{
         <span class="ident">media</span>::{<span class="ident">get_content</span>, <span class="ident">get_content_thumbnail</span>},
         <span class="ident">membership</span>::{<span class="ident">get_member_events</span>, <span class="ident">join_room_by_id</span>, <span class="ident">leave_room</span>},
-        <span class="ident">message</span>::<span class="ident">get_message_events</span>,
+        <span class="ident">message::get_message_events</span>,
     },
-    <span class="ident">locks</span>::<span class="ident">Mutex</span>,
+    <span class="ident">locks::Mutex</span>,
 };
 
-<span class="kw">use</span> <span class="ident">std</span>::{<span class="ident">ops</span>::<span class="ident">Deref</span>, <span class="ident">sync</span>::<span class="ident">Arc</span>};
+<span class="kw">use</span> <span class="ident">std</span>::{<span class="ident">ops::Deref</span>, <span class="ident">sync::Arc</span>};
 
 <span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">BaseRoom</span>, <span class="ident">Client</span>, <span class="prelude-ty">Result</span>, <span class="ident">RoomMember</span>};
 
@@ -237,7 +237,7 @@
 <span class="kw">impl</span> <span class="ident">Deref</span> <span class="kw">for</span> <span class="ident">Common</span> {
     <span class="kw">type</span> <span class="ident">Target</span> <span class="op">=</span> <span class="ident">BaseRoom</span>;
 
-    <span class="kw">fn</span> <span class="ident">deref</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="self">Self</span>::<span class="ident">Target</span> {
+    <span class="kw">fn</span> <span class="ident">deref</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="self">Self</span><span class="ident">::Target</span> {
         <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">inner</span>
     }
 }
@@ -261,7 +261,7 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// Only invited and joined rooms can be left</span>
     <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">leave</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">request</span> <span class="op">=</span> <span class="ident">leave_room</span>::<span class="ident">Request</span>::<span class="ident">new</span>(<span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">room_id</span>());
+        <span class="kw">let</span> <span class="ident">request</span> <span class="op">=</span> <span class="ident">leave_room::Request::new</span>(<span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">room_id</span>());
         <span class="kw">let</span> <span class="ident">_response</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">client</span>.<span class="ident">send</span>(<span class="ident">request</span>, <span class="prelude-val">None</span>).<span class="kw">await</span><span class="question-mark">?</span>;
 
         <span class="prelude-val">Ok</span>(())
@@ -271,7 +271,7 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// Only invited and left rooms can be joined via this method</span>
     <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">join</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">request</span> <span class="op">=</span> <span class="ident">join_room_by_id</span>::<span class="ident">Request</span>::<span class="ident">new</span>(<span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">room_id</span>());
+        <span class="kw">let</span> <span class="ident">request</span> <span class="op">=</span> <span class="ident">join_room_by_id::Request::new</span>(<span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">room_id</span>());
         <span class="kw">let</span> <span class="ident">_resposne</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">client</span>.<span class="ident">send</span>(<span class="ident">request</span>, <span class="prelude-val">None</span>).<span class="kw">await</span><span class="question-mark">?</span>;
 
         <span class="prelude-val">Ok</span>(())
@@ -313,11 +313,11 @@
         <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">url</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">avatar_url</span>() {
             <span class="kw">if</span> <span class="kw">let</span> (<span class="prelude-val">Some</span>(<span class="ident">width</span>), <span class="prelude-val">Some</span>(<span class="ident">height</span>)) <span class="op">=</span> (<span class="ident">width</span>, <span class="ident">height</span>) {
                 <span class="kw">let</span> <span class="ident">request</span> <span class="op">=</span>
-                    <span class="ident">get_content_thumbnail</span>::<span class="ident">Request</span>::<span class="ident">from_url</span>(<span class="kw-2">&amp;</span><span class="ident">url</span>, <span class="ident">width</span>.<span class="ident">into</span>(), <span class="ident">height</span>.<span class="ident">into</span>());
+                    <span class="ident">get_content_thumbnail::Request::from_url</span>(<span class="kw-2">&amp;</span><span class="ident">url</span>, <span class="ident">width</span>.<span class="ident">into</span>(), <span class="ident">height</span>.<span class="ident">into</span>())<span class="question-mark">?</span>;
                 <span class="kw">let</span> <span class="ident">response</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">client</span>.<span class="ident">send</span>(<span class="ident">request</span>, <span class="prelude-val">None</span>).<span class="kw">await</span><span class="question-mark">?</span>;
                 <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(<span class="ident">response</span>.<span class="ident">file</span>))
             } <span class="kw">else</span> {
-                <span class="kw">let</span> <span class="ident">request</span> <span class="op">=</span> <span class="ident">get_content</span>::<span class="ident">Request</span>::<span class="ident">from_url</span>(<span class="kw-2">&amp;</span><span class="ident">url</span>);
+                <span class="kw">let</span> <span class="ident">request</span> <span class="op">=</span> <span class="ident">get_content::Request::from_url</span>(<span class="kw-2">&amp;</span><span class="ident">url</span>)<span class="question-mark">?</span>;
                 <span class="kw">let</span> <span class="ident">response</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">client</span>.<span class="ident">send</span>(<span class="ident">request</span>, <span class="prelude-val">None</span>).<span class="kw">await</span><span class="question-mark">?</span>;
                 <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(<span class="ident">response</span>.<span class="ident">file</span>))
             }
@@ -359,14 +359,14 @@
     <span class="doccomment">/// ```</span>
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">messages</span>(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
-        <span class="ident">request</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">get_message_events</span>::<span class="ident">Request</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">get_message_events</span>::<span class="ident">Response</span><span class="op">&gt;</span> {
+        <span class="ident">request</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">get_message_events::Request</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+    ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">get_message_events::Response</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">request</span> <span class="op">=</span> <span class="ident">request</span>.<span class="ident">into</span>();
         <span class="self">self</span>.<span class="ident">client</span>.<span class="ident">send</span>(<span class="ident">request</span>, <span class="prelude-val">None</span>).<span class="kw">await</span>
     }
 
     <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">request_members</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-        <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy</span>::<span class="ident">map_clone</span>)]</span>
+        <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy::map_clone</span>)]</span>
         <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">mutex</span>) <span class="op">=</span> <span class="self">self</span>
             .<span class="ident">client</span>
             .<span class="ident">members_request_locks</span>
@@ -375,14 +375,14 @@
         {
             <span class="ident">mutex</span>.<span class="ident">lock</span>().<span class="kw">await</span>;
         } <span class="kw">else</span> {
-            <span class="kw">let</span> <span class="ident">mutex</span> <span class="op">=</span> <span class="ident">Arc</span>::<span class="ident">new</span>(<span class="ident">Mutex</span>::<span class="ident">new</span>(()));
+            <span class="kw">let</span> <span class="ident">mutex</span> <span class="op">=</span> <span class="ident">Arc::new</span>(<span class="ident">Mutex::new</span>(()));
             <span class="self">self</span>.<span class="ident">client</span>
                 .<span class="ident">members_request_locks</span>
                 .<span class="ident">insert</span>(<span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">room_id</span>().<span class="ident">clone</span>(), <span class="ident">mutex</span>.<span class="ident">clone</span>());
 
             <span class="kw">let</span> <span class="ident">_guard</span> <span class="op">=</span> <span class="ident">mutex</span>.<span class="ident">lock</span>().<span class="kw">await</span>;
 
-            <span class="kw">let</span> <span class="ident">request</span> <span class="op">=</span> <span class="ident">get_member_events</span>::<span class="ident">Request</span>::<span class="ident">new</span>(<span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">room_id</span>());
+            <span class="kw">let</span> <span class="ident">request</span> <span class="op">=</span> <span class="ident">get_member_events::Request::new</span>(<span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">room_id</span>());
             <span class="kw">let</span> <span class="ident">response</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">client</span>.<span class="ident">send</span>(<span class="ident">request</span>, <span class="prelude-val">None</span>).<span class="kw">await</span><span class="question-mark">?</span>;
 
             <span class="self">self</span>.<span class="ident">client</span>
@@ -408,7 +408,7 @@
             .<span class="ident">active_members</span>()
             .<span class="kw">await</span><span class="question-mark">?</span>
             .<span class="ident">into_iter</span>()
-            .<span class="ident">map</span>(<span class="op">|</span><span class="ident">member</span><span class="op">|</span> <span class="ident">RoomMember</span>::<span class="ident">new</span>(<span class="self">self</span>.<span class="ident">client</span>.<span class="ident">clone</span>(), <span class="ident">member</span>))
+            .<span class="ident">map</span>(<span class="op">|</span><span class="ident">member</span><span class="op">|</span> <span class="ident">RoomMember::new</span>(<span class="self">self</span>.<span class="ident">client</span>.<span class="ident">clone</span>(), <span class="ident">member</span>))
             .<span class="ident">collect</span>())
     }
 
@@ -422,7 +422,7 @@
             .<span class="ident">members</span>()
             .<span class="kw">await</span><span class="question-mark">?</span>
             .<span class="ident">into_iter</span>()
-            .<span class="ident">map</span>(<span class="op">|</span><span class="ident">member</span><span class="op">|</span> <span class="ident">RoomMember</span>::<span class="ident">new</span>(<span class="self">self</span>.<span class="ident">client</span>.<span class="ident">clone</span>(), <span class="ident">member</span>))
+            .<span class="ident">map</span>(<span class="op">|</span><span class="ident">member</span><span class="op">|</span> <span class="ident">RoomMember::new</span>(<span class="self">self</span>.<span class="ident">client</span>.<span class="ident">clone</span>(), <span class="ident">member</span>))
             .<span class="ident">collect</span>())
     }
 }
