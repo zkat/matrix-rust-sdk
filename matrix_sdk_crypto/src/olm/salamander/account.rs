@@ -147,11 +147,21 @@ impl Account {
         &self.signing_key.inner.public
     }
 
-    pub fn tripple_diffie_hellman(
-        &self,
-        identity_key: &Curve25591PublicKey,
-        one_time_key: Curve25591PublicKey,
-    ) -> Session {
+    pub fn tripple_diffie_hellman(&self, identity_key: &str, one_time_key: &str) -> Session {
+        let mut id_key = [0u8; 32];
+        let mut one_time = [0u8; 32];
+
+        // TODO check the length of the string
+
+        let identity_key = decode(identity_key).unwrap();
+        let one_time_key = decode(one_time_key).unwrap();
+
+        id_key.copy_from_slice(&identity_key);
+        one_time.copy_from_slice(&one_time_key);
+
+        let identity_key = Curve25591PublicKey::from(id_key);
+        let one_time_key = Curve25591PublicKey::from(one_time);
+
         let rng = thread_rng();
 
         let base_key = Curve25591SecretKey::new(rng);
@@ -226,8 +236,8 @@ impl Account {
 mod test {
     use olm_rs::{account::OlmAccount, session::OlmMessage};
 
-    use super::{Account, Curve25591PublicKey};
-    use crate::{olm::salamander, utilities::decode};
+    use super::Account;
+    use crate::olm::salamander;
 
     #[test]
     fn test_encryption() {
@@ -244,18 +254,9 @@ mod test {
             .next()
             .unwrap();
 
-        let one_time_key_raw = decode(one_time_key).unwrap();
-        let mut one_time_key = [0u8; 32];
-        one_time_key.copy_from_slice(&one_time_key_raw);
-
-        let identity_key_raw = decode(bob.parsed_identity_keys().curve25519()).unwrap();
-        let mut identity_key = [0u8; 32];
-        identity_key.copy_from_slice(&identity_key_raw);
-
-        let one_time_key = Curve25591PublicKey::from(one_time_key);
-        let identity_key = Curve25591PublicKey::from(identity_key);
-
-        let mut alice_session = alice.tripple_diffie_hellman(&identity_key, one_time_key);
+        let identity_keys = bob.parsed_identity_keys();
+        let mut alice_session =
+            alice.tripple_diffie_hellman(identity_keys.curve25519(), &one_time_key);
 
         let message = "It's a secret to everybody";
 
@@ -317,8 +318,7 @@ mod test {
 
         let text = "It's a secret to everybody";
 
-        let message: salamander::message::OlmMessage =
-            alice_session.encrypt(text).into();
+        let message: salamander::message::OlmMessage = alice_session.encrypt(text).into();
 
         let mut session = if let salamander::message::OlmMessage::PreKey(m) = &message {
             bob.session(m)
