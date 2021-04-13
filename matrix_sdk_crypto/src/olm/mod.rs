@@ -31,7 +31,9 @@ pub use group_sessions::{
     OutboundGroupSession, PickledInboundGroupSession, PickledOutboundGroupSession,
 };
 pub(crate) use group_sessions::{GroupSessionKey, ShareState};
-pub use olm_rs::{account::IdentityKeys, PicklingMode};
+// pub use olm_rs::{account::IdentityKeys, PicklingMode};
+pub use olm_rs::PicklingMode;
+pub use salamander::{IdentityKeys, OneTimeKeys};
 pub use session::{PickledSession, Session, SessionPickle};
 pub use signing::{PickledCrossSigningIdentity, PrivateCrossSigningIdentity};
 pub(crate) use utility::verify_json;
@@ -61,13 +63,13 @@ where
 
 #[cfg(test)]
 pub(crate) mod test {
-    use crate::olm::{InboundGroupSession, ReadOnlyAccount, Session};
+    use crate::olm::{InboundGroupSession, ReadOnlyAccount, Session, salamander::OlmMessage};
     use matrix_sdk_common::{
         api::r0::keys::SignedKey,
         events::forwarded_room_key::ForwardedRoomKeyToDeviceEventContent,
         identifiers::{room_id, user_id, DeviceId, UserId},
     };
-    use olm_rs::session::OlmMessage;
+    // use olm_rs::session::OlmMessage;
     use std::{collections::BTreeMap, convert::TryInto};
 
     fn alice_id() -> UserId {
@@ -113,19 +115,13 @@ pub(crate) mod test {
     #[test]
     fn account_creation() {
         let account = ReadOnlyAccount::new(&alice_id(), &alice_device_id());
-        let identyty_keys = account.identity_keys();
+        let identity_keys = account.identity_keys();
 
         assert!(!account.shared());
-        assert!(!identyty_keys.ed25519().is_empty());
-        assert_ne!(identyty_keys.values().len(), 0);
-        assert_ne!(identyty_keys.keys().len(), 0);
-        assert_ne!(identyty_keys.iter().len(), 0);
-        assert!(identyty_keys.contains_key("ed25519"));
-        assert_eq!(
-            identyty_keys.ed25519(),
-            identyty_keys.get("ed25519").unwrap()
-        );
-        assert!(!identyty_keys.curve25519().is_empty());
+        assert!(!identity_keys.ed25519().is_empty());
+        assert_ne!(identity_keys.values().len(), 0);
+        assert_ne!(identity_keys.keys().len(), 0);
+        assert!(!identity_keys.curve25519().is_empty());
 
         account.mark_as_shared();
         assert!(account.shared());
@@ -143,10 +139,10 @@ pub(crate) mod test {
         let one_time_keys = account.one_time_keys().await;
 
         assert!(!one_time_keys.curve25519().is_empty());
-        assert_ne!(one_time_keys.values().len(), 0);
-        assert_ne!(one_time_keys.keys().len(), 0);
-        assert_ne!(one_time_keys.iter().len(), 0);
-        assert!(one_time_keys.contains_key("curve25519"));
+        // assert_ne!(one_time_keys.values().len(), 0);
+        // assert_ne!(one_time_keys.keys().len(), 0);
+        // assert_ne!(one_time_keys.iter().len(), 0);
+        // assert!(one_time_keys.contains_key("curve25519"));
         assert_eq!(one_time_keys.curve25519().keys().len(), 10);
         assert_eq!(
             one_time_keys.curve25519(),
@@ -188,7 +184,7 @@ pub(crate) mod test {
 
         let prekey_message = match message.clone() {
             OlmMessage::PreKey(m) => m,
-            OlmMessage::Message(_) => panic!("Incorrect message type"),
+            OlmMessage::Normal(_) => panic!("Incorrect message type"),
         };
 
         let bob_keys = bob.identity_keys();
@@ -198,14 +194,14 @@ pub(crate) mod test {
             .unwrap();
 
         assert!(alice_session
-            .matches(bob_keys.curve25519(), prekey_message)
+            .matches(bob_keys.curve25519(), &prekey_message)
             .await
             .unwrap());
 
         assert_eq!(bob_session.session_id(), alice_session.session_id());
 
-        let decyrpted = alice_session.decrypt(message).await.unwrap();
-        assert_eq!(plaintext, decyrpted);
+        let decrypted = alice_session.decrypt(&message).await.unwrap();
+        assert_eq!(plaintext, decrypted);
     }
 
     #[tokio::test]

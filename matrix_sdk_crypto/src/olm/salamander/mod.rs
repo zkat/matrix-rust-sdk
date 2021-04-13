@@ -18,3 +18,7 @@ mod account;
 mod message;
 mod sas;
 mod session;
+
+pub use account::{Account, IdentityKeys, ParsedOneTimeKeys as OneTimeKeys};
+pub use session::Session;
+pub use message::{OlmMessage, PreKeyMessage};

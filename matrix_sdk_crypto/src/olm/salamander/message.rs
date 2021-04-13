@@ -12,31 +12,72 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#[derive(Debug, Clone, PartialEq)]
 pub struct Message {
     pub(super) inner: String,
 }
 
+#[derive(Debug, Clone, PartialEq)]
 pub struct PreKeyMessage {
     pub(super) inner: String,
 }
 
+#[derive(Debug, Clone, PartialEq)]
 pub enum OlmMessage {
     Normal(Message),
     PreKey(PreKeyMessage),
 }
 
 impl OlmMessage {
+    pub fn from_type_and_ciphertext(message_type: usize, ciphertext: String) -> Result<Self, ()> {
+        match message_type {
+            0 => Ok(Self::PreKey(PreKeyMessage { inner: ciphertext })),
+            1 => Ok(Self::Normal(Message { inner: ciphertext })),
+            _ => Err(()),
+        }
+    }
+
     pub fn ciphertext(&self) -> &str {
         match self {
             OlmMessage::Normal(m) => &m.inner,
             OlmMessage::PreKey(m) => &m.inner,
         }
     }
+
+    pub fn message_type(&self) -> MessageType {
+        match self {
+            OlmMessage::Normal(_) => MessageType::Normal,
+            OlmMessage::PreKey(_) => MessageType::PreKey,
+        }
+    }
+
+    pub fn to_tuple(self) -> (usize, String) {
+        let message_type = self.message_type();
+
+        match self {
+            OlmMessage::Normal(m) => (message_type.into(), m.inner),
+            OlmMessage::PreKey(m) => (message_type.into(), m.inner),
+        }
+    }
 }
 
+#[derive(Debug, Clone, Copy)]
+#[allow(missing_docs)]
 pub enum MessageType {
     Normal,
     PreKey,
+}
+
+impl TryFrom<usize> for MessageType {
+    type Error = ();
+
+    fn try_from(value: usize) -> Result<Self, Self::Error> {
+        match value {
+            0 => Ok(MessageType::PreKey),
+            1 => Ok(MessageType::Normal),
+            _ => Err(()),
+        }
+    }
 }
 
 impl Into<usize> for MessageType {
@@ -47,6 +88,8 @@ impl Into<usize> for MessageType {
         }
     }
 }
+
+use std::convert::TryFrom;
 
 #[cfg(test)]
 use olm_rs::session::OlmMessage as LibolmMessage;

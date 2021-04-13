@@ -17,7 +17,7 @@ use serde::{Deserialize, Serialize};
 use serde_json::{json, Value};
 use sha2::{Digest, Sha256};
 use std::{
-    collections::BTreeMap,
+    collections::{BTreeMap, HashMap},
     convert::{TryFrom, TryInto},
     fmt,
     ops::Deref,
@@ -45,15 +45,15 @@ use matrix_sdk_common::{
     CanonicalJsonValue, Raw, UInt,
 };
 use olm_rs::{
-    account::{IdentityKeys, OlmAccount, OneTimeKeys},
     errors::{OlmAccountError, OlmSessionError},
-    session::{OlmMessage, PreKeyMessage},
+    // session::{OlmMessage, PreKeyMessage},
     PicklingMode,
 };
 
 use crate::{
     error::{EventError, OlmResult, SessionCreationError},
     identities::ReadOnlyDevice,
+    olm::salamander::{Account as OlmAccount, IdentityKeys, OlmMessage, PreKeyMessage, OneTimeKeys},
     requests::UploadSigningKeysRequest,
     store::{Changes, Store},
     utilities::encode,
@@ -250,14 +250,14 @@ impl Account {
             // If this is a pre-key message check if it was encrypted for our
             // session, if it wasn't decryption will fail so no need to try.
             if let OlmMessage::PreKey(m) = &message {
-                matches = session.matches(sender_key, m.clone()).await?;
+                matches = session.matches(sender_key, m).await?;
 
                 if !matches {
                     continue;
                 }
             }
 
-            let ret = session.decrypt(message.clone()).await;
+            let ret = session.decrypt(message).await;
 
             match ret {
                 Ok(p) => {
@@ -306,7 +306,7 @@ impl Account {
             let mut session = match &message {
                 // A new session can only be created using a pre-key message,
                 // return with an error if it isn't one.
-                OlmMessage::Message(_) => {
+                OlmMessage::Normal(_) => {
                     warn!(
                         "Failed to decrypt a non-pre-key message with all \
                           available sessions {} {}",
@@ -345,7 +345,7 @@ impl Account {
 
             // Decrypt our message, this shouldn't fail since we're using a
             // newly created Session.
-            let plaintext = session.decrypt(message).await?;
+            let plaintext = session.decrypt(&message).await?;
             (SessionType::New(session), plaintext)
         };
 
@@ -509,7 +509,7 @@ impl ReadOnlyAccount {
     #[allow(clippy::ptr_arg)]
     pub fn new(user_id: &UserId, device_id: &DeviceId) -> Self {
         let account = OlmAccount::new();
-        let identity_keys = account.parsed_identity_keys();
+        let identity_keys = account.identity_keys();
 
         Self {
             user_id: Arc::new(user_id.to_owned()),
@@ -665,7 +665,7 @@ impl ReadOnlyAccount {
     /// * `pickle_mode` - The mode that was used to pickle the account, either an
     /// unencrypted mode or an encrypted using passphrase.
     pub async fn pickle(&self, pickle_mode: PicklingMode) -> PickledAccount {
-        let pickle = AccountPickle(self.inner.lock().await.pickle(pickle_mode));
+        let pickle = AccountPickle(self.inner.lock().await.pickle());
 
         PickledAccount {
             user_id: self.user_id().to_owned(),
@@ -688,8 +688,10 @@ impl ReadOnlyAccount {
         pickle: PickledAccount,
         pickle_mode: PicklingMode,
     ) -> Result<Self, OlmAccountError> {
-        let account = OlmAccount::unpickle(pickle.pickle.0, pickle_mode)?;
-        let identity_keys = account.parsed_identity_keys();
+        // let account = OlmAccount::unpickle(pickle.pickle.0, pickle_mode)?;
+        let account = OlmAccount::unpickle();
+        // let identity_keys = account.parsed_identity_keys();
+        let identity_keys = account.identity_keys();
 
         Ok(Self {
             user_id: Arc::new(pickle.user_id),
@@ -843,10 +845,10 @@ impl ReadOnlyAccount {
             .inner
             .lock()
             .await
-            .create_outbound_session(their_identity_key, &their_one_time_key.key)?;
+            .create_outbound_session(their_identity_key, &their_one_time_key.key);
 
         let now = Instant::now();
-        let session_id = session.session_id();
+        let session_id = session.session_id().to_string();
 
         Ok(Session {
             user_id: self.user_id.clone(),
@@ -946,18 +948,18 @@ impl ReadOnlyAccount {
             .inner
             .lock()
             .await
-            .create_inbound_session_from(their_identity_key, message)?;
+            .create_inbound_session_from(their_identity_key, &message);
 
-        self.inner
-            .lock()
-            .await
-            .remove_one_time_keys(&session)
-            .expect(
-            "Session was successfully created but the account doesn't hold a matching one-time key",
-        );
+        // self.inner
+        //     .lock()
+        //     .await
+        //     .remove_one_time_keys(&session)
+        //     .expect(
+        //     "Session was successfully created but the account doesn't hold a matching one-time key",
+        // );
 
         let now = Instant::now();
-        let session_id = session.session_id();
+        let session_id = session.session_id().to_owned();
 
         Ok(Session {
             user_id: self.user_id.clone(),
@@ -1082,7 +1084,7 @@ impl ReadOnlyAccount {
             .await
             .unwrap();
 
-        other_session.decrypt(message).await.unwrap();
+        other_session.decrypt(&message).await.unwrap();
 
         (our_session, other_session)
     }

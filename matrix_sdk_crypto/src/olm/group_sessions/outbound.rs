@@ -47,7 +47,6 @@ use serde::{Deserialize, Serialize};
 use serde_json::{json, Value};
 
 pub use olm_rs::{
-    account::IdentityKeys,
     session::{OlmMessage, PreKeyMessage},
     utility::OlmUtility,
 };
@@ -55,7 +54,7 @@ use olm_rs::{
     errors::OlmGroupSessionError, outbound_group_session::OlmOutboundGroupSession, PicklingMode,
 };
 
-use crate::ToDeviceRequest;
+use crate::{ToDeviceRequest, olm::IdentityKeys};
 
 use super::{
     super::{deserialize_instant, serialize_instant},

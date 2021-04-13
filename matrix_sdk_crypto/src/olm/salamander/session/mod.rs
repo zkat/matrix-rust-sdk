@@ -62,6 +62,29 @@ impl Session {
         }
     }
 
+    pub fn pickle(&self) -> String {
+        // TODO
+        "SESSION_PICKLE".to_string()
+    }
+
+    pub fn unpickle(pickle: String) -> Self {
+        todo!()
+    }
+
+    pub fn session_id(&self) -> &str {
+        // TODO
+        "SESSION_ID"
+    }
+
+    pub fn matches_inbound_session_from(
+        &self,
+        their_identity_key: &str,
+        message: &PreKeyMessage,
+    ) -> bool {
+        // TODO
+        true
+    }
+
     pub(super) fn new_remote(
         shared_secret: RemoteShared3DHSecret,
         remote_ratchet_key: RemoteRatchetKey,

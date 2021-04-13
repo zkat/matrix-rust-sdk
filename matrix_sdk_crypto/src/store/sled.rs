@@ -20,7 +20,7 @@ use std::{
 };
 
 use dashmap::DashSet;
-use olm_rs::{account::IdentityKeys, PicklingMode};
+use olm_rs::PicklingMode;
 pub use sled::Error;
 use sled::{
     transaction::{ConflictableTransactionError, TransactionError},
@@ -39,7 +39,7 @@ use super::{
 };
 use crate::{
     identities::{ReadOnlyDevice, UserIdentities},
-    olm::{OutboundGroupSession, PickledInboundGroupSession, PrivateCrossSigningIdentity},
+    olm::{IdentityKeys, OutboundGroupSession, PickledInboundGroupSession, PrivateCrossSigningIdentity},
 };
 
 /// This needs to be 32 bytes long since AES-GCM requires it, otherwise we will
@@ -425,7 +425,8 @@ impl SledStore {
             );
 
         ret?;
-        self.inner.flush_async().await?;
+        self.inner.flush()?;
+        // self.inner.flush_async().await?;
 
         Ok(())
     }

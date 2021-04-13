@@ -23,19 +23,21 @@ use matrix_sdk_common::{
     instant::Instant,
     locks::Mutex,
 };
-use olm_rs::{errors::OlmSessionError, session::OlmSession, PicklingMode};
+// use olm_rs::{errors::OlmSessionError, session::OlmSession, PicklingMode};
+use olm_rs::{errors::OlmSessionError, PicklingMode};
 use serde::{Deserialize, Serialize};
 use serde_json::{json, Value};
 
 use crate::{
+    olm::salamander::{Session as OlmSession, OlmMessage, PreKeyMessage},
     error::{EventError, OlmResult, SessionUnpicklingError},
     ReadOnlyDevice,
 };
 
-pub use olm_rs::{
-    session::{OlmMessage, PreKeyMessage},
-    utility::OlmUtility,
-};
+// pub use olm_rs::{
+//     session::{OlmMessage, PreKeyMessage},
+//     utility::OlmUtility,
+// };
 
 use super::{deserialize_instant, serialize_instant, IdentityKeys};
 
@@ -72,8 +74,8 @@ impl Session {
     /// # Arguments
     ///
     /// * `message` - The Olm message that should be decrypted.
-    pub async fn decrypt(&mut self, message: OlmMessage) -> Result<String, OlmSessionError> {
-        let plaintext = self.inner.lock().await.decrypt(message)?;
+    pub async fn decrypt(&mut self, message: &OlmMessage) -> Result<String, OlmSessionError> {
+        let plaintext = self.inner.lock().await.decrypt(message);
         self.last_use_time = Arc::new(Instant::now());
         Ok(plaintext)
     }
@@ -163,12 +165,12 @@ impl Session {
     pub async fn matches(
         &self,
         their_identity_key: &str,
-        message: PreKeyMessage,
+        message: &PreKeyMessage,
     ) -> Result<bool, OlmSessionError> {
-        self.inner
+        Ok(self.inner
             .lock()
             .await
-            .matches_inbound_session_from(their_identity_key, message)
+            .matches_inbound_session_from(their_identity_key, message))
     }
 
     /// Returns the unique identifier for this session.
@@ -183,7 +185,7 @@ impl Session {
     /// * `pickle_mode` - The mode that was used to pickle the session, either
     /// an unencrypted mode or an encrypted using passphrase.
     pub async fn pickle(&self, pickle_mode: PicklingMode) -> PickledSession {
-        let pickle = self.inner.lock().await.pickle(pickle_mode);
+        let pickle = self.inner.lock().await.pickle();
 
         PickledSession {
             pickle: SessionPickle::from(pickle),
@@ -217,8 +219,8 @@ impl Session {
         pickle: PickledSession,
         pickle_mode: PicklingMode,
     ) -> Result<Self, SessionUnpicklingError> {
-        let session = OlmSession::unpickle(pickle.pickle.0, pickle_mode)?;
-        let session_id = session.session_id();
+        let session = OlmSession::unpickle(pickle.pickle.0);
+        let session_id = session.session_id().to_owned();
 
         Ok(Session {
             user_id,

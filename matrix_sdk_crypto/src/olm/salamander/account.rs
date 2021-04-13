@@ -12,11 +12,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-use std::collections::HashMap;
+use std::collections::{HashMap, hash_map::{Keys, Values}};
 
 use rand::thread_rng;
 
-use ed25519_dalek::{Keypair, PublicKey as Ed25519PublicKey};
+use ed25519_dalek::{Keypair, PublicKey as Ed25519PublicKey, Signer};
 use x25519_dalek::{PublicKey as Curve25591PublicKey, StaticSecret as Curve25591SecretKey};
 
 use dashmap::DashMap;
@@ -30,6 +30,53 @@ use super::{
         Shared3DHSecret,
     },
 };
+
+
+#[derive(Debug, Clone, PartialEq)]
+#[allow(missing_docs)]
+pub struct IdentityKeys {
+    keys: HashMap<String, String>,
+}
+
+impl IdentityKeys {
+    #[allow(missing_docs)]
+    pub fn keys(&self) -> Keys<'_, String, String> {
+        self.keys.keys()
+    }
+
+    #[allow(missing_docs)]
+    pub fn values(&self) -> Values<'_, String, String> {
+        self.keys.values()
+    }
+
+    #[allow(missing_docs)]
+    pub fn curve25519(&self) -> &str {
+        self.keys.get("curve25519").unwrap()
+    }
+
+    #[allow(missing_docs)]
+    pub fn ed25519(&self) -> &str {
+        self.keys.get("ed25519").unwrap()
+    }
+}
+
+#[derive(Debug, Clone, PartialEq)]
+#[allow(missing_docs)]
+pub struct ParsedOneTimeKeys {
+    keys: HashMap<String, HashMap<String, String>>,
+}
+
+impl ParsedOneTimeKeys {
+    #[allow(missing_docs)]
+    pub fn get(&self, key: &str) -> Option<&HashMap<String, String>> {
+        self.keys.get(key)
+    }
+
+    #[allow(missing_docs)]
+    pub fn curve25519(&self) -> &HashMap<String, String> {
+        self.keys.get("curve25519").unwrap()
+    }
+}
 
 struct Ed25519Keypair {
     inner: Keypair,
@@ -46,6 +93,11 @@ impl Ed25519Keypair {
             inner: keypair,
             encoded_public_key,
         }
+    }
+
+    fn sign(&self, message: &str) -> String {
+        let signature = self.inner.sign(message.as_bytes());
+        encode(signature.to_bytes())
     }
 }
 
@@ -72,6 +124,12 @@ impl Curve25519Keypair {
 
 #[derive(Clone, Debug, Hash, PartialEq, Eq)]
 pub struct KeyId(String);
+
+impl Into<String> for KeyId {
+    fn into(self) -> String {
+        self.0
+    }
+}
 
 struct OneTimeKeys {
     key_id: u64,
@@ -132,22 +190,33 @@ impl Account {
         }
     }
 
-    pub fn from_pickle() -> Self {
-        todo!()
+    pub fn unpickle() -> Self {
+        // TODO
+        Self::new()
     }
 
     pub fn from_libolm_pickle() -> Self {
         todo!()
     }
 
-    pub fn pickle() {}
+    pub fn pickle(&self) -> String {
+        "TEST_PICKLE".to_string()
+    }
+
+    pub fn sign(&self, message: &str) -> String {
+        self.signing_key.sign(message)
+    }
+
+    pub fn max_number_of_one_time_keys(&self) -> usize {
+        50
+    }
 
     /// Get a reference to the account's public ed25519 key
     pub fn ed25519_key(&self) -> &Ed25519PublicKey {
         &self.signing_key.inner.public
     }
 
-    pub fn tripple_diffie_hellman(&self, identity_key: &str, one_time_key: &str) -> Session {
+    pub fn create_outbound_session(&self, identity_key: &str, one_time_key: &str) -> Session {
         let mut id_key = [0u8; 32];
         let mut one_time = [0u8; 32];
 
@@ -179,7 +248,11 @@ impl Account {
         Session::new(shared_secret, session_keys)
     }
 
-    pub fn session(&self, message: &PreKeyMessage) -> Session {
+    pub fn create_inbound_session_from(
+        &self,
+        their_identity_key: &str,
+        message: &PreKeyMessage,
+    ) -> Session {
         let message = decode(&message.inner).unwrap();
         let message = InnerPreKeyMessage::from(message);
 
@@ -215,6 +288,23 @@ impl Account {
         &self.diffie_helman_key.encoded_public_key
     }
 
+    pub fn identity_keys(&self) -> IdentityKeys {
+        IdentityKeys {
+            keys: vec![
+                (
+                    "ed25519".to_string(),
+                    self.signing_key.encoded_public_key.clone(),
+                ),
+                (
+                    "curve25519".to_string(),
+                    self.diffie_helman_key.encoded_public_key.clone(),
+                ),
+            ]
+            .into_iter()
+            .collect(),
+        }
+    }
+
     pub fn generate_one_time_keys(&mut self, count: usize) {
         self.one_time_keys.generate(count);
     }
@@ -225,6 +315,20 @@ impl Account {
             .iter()
             .map(|i| (i.key().clone(), encode(i.value().as_bytes())))
             .collect()
+    }
+    
+    pub fn parsed_one_time_keys(&self) -> ParsedOneTimeKeys {
+        let keys: HashMap<String, String> = self
+            .one_time_keys()
+            .into_iter()
+            .map(|(k, v)| (k.into(), v))
+            .collect();
+
+        let mut key_map = HashMap::new();
+
+        key_map.insert("curve25519".to_owned(), keys);
+
+        ParsedOneTimeKeys { keys: key_map }
     }
 
     pub fn mark_keys_as_published(&self) {
@@ -256,7 +360,7 @@ mod test {
 
         let identity_keys = bob.parsed_identity_keys();
         let mut alice_session =
-            alice.tripple_diffie_hellman(identity_keys.curve25519(), &one_time_key);
+            alice.create_outbound_session(identity_keys.curve25519(), &one_time_key);
 
         let message = "It's a secret to everybody";
 
@@ -321,7 +425,7 @@ mod test {
         let message: salamander::message::OlmMessage = alice_session.encrypt(text).into();
 
         let mut session = if let salamander::message::OlmMessage::PreKey(m) = &message {
-            bob.session(m)
+            bob.create_inbound_session_from(alice.parsed_identity_keys().curve25519(), m)
         } else {
             panic!("Got invalid message type from olm_rs");
         };
