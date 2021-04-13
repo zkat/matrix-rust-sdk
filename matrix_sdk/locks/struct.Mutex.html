@@ -2,20 +2,24 @@
 <link rel="alternate icon" type="image/png" href="../../favicon-16x16.png">
 <link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><style type="text/css">#crate-search{background-image:url("../../down-arrow.svg");}</style></head><body class="rustdoc struct"><!--[if lte IE 8]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu" role="button">&#9776;</div><a href='../../matrix_sdk/index.html'><div class='logo-container rust-logo'><img src='../../rust-logo.png' alt='logo'></div></a><p class="location">Struct Mutex</p><div class="sidebar-elems"><div class="block items"><a class="sidebar-title" href="#implementations">Methods</a><div class="sidebar-links"><a href="#method.get_mut">get_mut</a><a href="#method.into_inner">into_inner</a><a href="#method.lock">lock</a><a href="#method.lock_owned">lock_owned</a><a href="#method.new">new</a><a href="#method.try_lock">try_lock</a><a href="#method.try_lock_owned">try_lock_owned</a></div><a class="sidebar-title" href="#trait-implementations">Trait Implementations</a><div class="sidebar-links"><a href="#impl-Debug">Debug</a><a href="#impl-Default">Default</a><a href="#impl-From%3CT%3E">From&lt;T&gt;</a><a href="#impl-Send">Send</a><a href="#impl-Sync">Sync</a></div><a class="sidebar-title" href="#synthetic-implementations">Auto Trait Implementations</a><div class="sidebar-links"><a href="#impl-RefUnwindSafe">!RefUnwindSafe</a><a href="#impl-Unpin">Unpin</a><a href="#impl-UnwindSafe">UnwindSafe</a></div><a class="sidebar-title" href="#blanket-implementations">Blanket Implementations</a><div class="sidebar-links"><a href="#impl-Any">Any</a><a href="#impl-AsyncTraitDeps">AsyncTraitDeps</a><a href="#impl-Borrow%3CT%3E">Borrow&lt;T&gt;</a><a href="#impl-BorrowMut%3CT%3E">BorrowMut&lt;T&gt;</a><a href="#impl-From%3C!%3E">From&lt;!&gt;</a><a href="#impl-From%3CT%3E">From&lt;T&gt;</a><a href="#impl-Instrument">Instrument</a><a href="#impl-Into%3CU%3E">Into&lt;U&gt;</a><a href="#impl-Pointable">Pointable</a><a href="#impl-Same%3CT%3E">Same&lt;T&gt;</a><a href="#impl-TryFrom%3CU%3E">TryFrom&lt;U&gt;</a><a href="#impl-TryInto%3CU%3E">TryInto&lt;U&gt;</a><a href="#impl-VZip%3CV%3E">VZip&lt;V&gt;</a></div></div><p class="location"><a href="../index.html">matrix_sdk</a>::<wbr><a href="index.html">locks</a></p><div id="sidebar-vars" data-name="Mutex" data-ty="struct" data-relpath=""></div><script defer src="sidebar-items.js"></script></div></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu"><img src="../../brush.svg" width="18" height="18" alt="Pick another theme!"></button><div id="theme-choices" role="menu"></div></div><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" disabled autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><button type="button" class="help-button">?</button>
                 <a id="settings-menu" href="../../settings.html"><img src="../../wheel.svg" width="18" height="18" alt="Change settings"></a></div></form></nav><section id="main" class="content"><h1 class="fqn"><span class="in-band">Struct <a href="../index.html">matrix_sdk</a>::<wbr><a href="index.html">locks</a>::<wbr><a class="struct" href="">Mutex</a><button id="copy-path" onclick="copy_path(this)">⎘</button></span><span class="out-of-band"><span id="render-detail"><a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">[<span class="inner">&#x2212;</span>]</a></span></span></h1><div class="docblock type-decl hidden-by-usual-hider"><pre class="rust struct">pub struct Mutex&lt;T&gt; <span class="where fmt-newline">where<br>&nbsp;&nbsp;&nbsp;&nbsp;T: ?<a class="trait" href="https://doc.rust-lang.org/nightly/core/marker/trait.Sized.html" title="trait core::marker::Sized">Sized</a>,&nbsp;</span> { /* fields omitted */ }</pre></div><div class="docblock"><p>An asynchronous <code>Mutex</code>-like type.</p>
-<p>This type acts similarly to an asynchronous <a href="https://doc.rust-lang.org/nightly/std/sync/mutex/struct.Mutex.html"><code>std::sync::Mutex</code></a>, with one
-major difference: <a href="../../matrix_sdk/locks/struct.Mutex.html#method.lock"><code>lock</code></a> does not block and the lock guard can be held
-across await points.</p>
+<p>This type acts similarly to <a href="https://doc.rust-lang.org/nightly/std/sync/mutex/struct.Mutex.html"><code>std::sync::Mutex</code></a>, with two major
+differences: <a href="../../matrix_sdk/locks/struct.Mutex.html#method.lock"><code>lock</code></a> is an async method so does not block, and the lock
+guard is designed to be held across <code>.await</code> points.</p>
 <h1 id="which-kind-of-mutex-should-you-use" class="section-header"><a href="#which-kind-of-mutex-should-you-use">Which kind of mutex should you use?</a></h1>
 <p>Contrary to popular belief, it is ok and often preferred to use the ordinary
-<a href="https://doc.rust-lang.org/nightly/std/sync/mutex/struct.Mutex.html"><code>Mutex</code></a> from the standard library in asynchronous code. This section
-will help you decide on which kind of mutex you should use.</p>
-<p>The primary use case of the async mutex is to provide shared mutable access
-to IO resources such as a database connection. If the data stored behind the
-mutex is just data, it is often better to use a blocking mutex such as the
-one in the standard library or <a href="https://docs.rs/parking_lot"><code>parking_lot</code></a>. This is because the feature
-that the async mutex offers over the blocking mutex is that it is possible
-to keep the mutex locked across an <code>.await</code> point, which is rarely necessary
-for data.</p>
+<a href="https://doc.rust-lang.org/nightly/std/sync/mutex/struct.Mutex.html"><code>Mutex</code></a> from the standard library in asynchronous code.</p>
+<p>The feature that the async mutex offers over the blocking mutex is the
+ability to keep it locked across an <code>.await</code> point. This makes the async
+mutex more expensive than the blocking mutex, so the blocking mutex should
+be preferred in the cases where it can be used. The primary use case for the
+async mutex is to provide shared mutable access to IO resources such as a
+database connection. If the value behind the mutex is just data, it’s
+usually appropriate to use a blocking mutex such as the one in the standard
+library or <a href="https://docs.rs/parking_lot"><code>parking_lot</code></a>.</p>
+<p>Note that, although the compiler will not prevent the std <code>Mutex</code> from holding
+its guard across <code>.await</code> points in situations where the task is not movable
+between threads, this virtually never leads to correct concurrent code in
+practice as it can easily lead to deadlocks.</p>
 <p>A common pattern is to wrap the <code>Arc&lt;Mutex&lt;...&gt;&gt;</code> in a struct that provides
 non-async methods for performing operations on the data within, and only
 lock the mutex inside these methods. The <a href="https://github.com/tokio-rs/mini-redis/blob/master/src/db.rs">mini-redis</a> example provides an
