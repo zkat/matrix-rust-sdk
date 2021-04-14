@@ -1921,6 +1921,9 @@
 <span id="1918">1918</span>
 <span id="1919">1919</span>
 <span id="1920">1920</span>
+<span id="1921">1921</span>
+<span id="1922">1922</span>
+<span id="1923">1923</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="comment">// Copyright 2020 The Matrix.org Foundation C.I.C.</span>
 <span class="comment">//</span>
@@ -2988,12 +2991,13 @@
     <span class="doccomment">/// # block_on(async {</span>
     <span class="doccomment">/// # let export = Cursor::new(&quot;&quot;.to_owned());</span>
     <span class="doccomment">/// let exported_keys = decrypt_key_export(export, &quot;1234&quot;).unwrap();</span>
-    <span class="doccomment">/// machine.import_keys(exported_keys).await.unwrap();</span>
+    <span class="doccomment">/// machine.import_keys(exported_keys, |_, _| {}).await.unwrap();</span>
     <span class="doccomment">/// # });</span>
     <span class="doccomment">/// ```</span>
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">import_keys</span>(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         <span class="ident">exported_keys</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">ExportedRoomKey</span><span class="op">&gt;</span>,
+        <span class="ident">progress_listener</span>: <span class="kw">impl</span> <span class="ident">Fn</span>(<span class="ident">usize</span>, <span class="ident">usize</span>),
     ) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">StoreResult</span><span class="op">&lt;</span>(<span class="ident">usize</span>, <span class="ident">usize</span>)<span class="op">&gt;</span> {
         <span class="kw">struct</span> <span class="ident">ShallowSessions</span> {
             <span class="ident">inner</span>: <span class="ident">BTreeMap</span><span class="op">&lt;</span><span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">RoomId</span><span class="op">&gt;</span>, <span class="ident">u32</span><span class="op">&gt;</span>,
@@ -3025,7 +3029,7 @@
 
         <span class="kw">let</span> <span class="ident">total_sessions</span> <span class="op">=</span> <span class="ident">exported_keys</span>.<span class="ident">len</span>();
 
-        <span class="kw">for</span> <span class="ident">key</span> <span class="kw">in</span> <span class="ident">exported_keys</span>.<span class="ident">into_iter</span>() {
+        <span class="kw">for</span> (<span class="ident">i</span>, <span class="ident">key</span>) <span class="kw">in</span> <span class="ident">exported_keys</span>.<span class="ident">into_iter</span>().<span class="ident">enumerate</span>() {
             <span class="kw">let</span> <span class="ident">session</span> <span class="op">=</span> <span class="ident">InboundGroupSession::from_export</span>(<span class="ident">key</span>)<span class="question-mark">?</span>;
 
             <span class="comment">// Only import the session if we didn&#39;t have this session or if it&#39;s</span>
@@ -3034,6 +3038,8 @@
             <span class="kw">if</span> <span class="op">!</span><span class="ident">existing_sessions</span>.<span class="ident">has_better_session</span>(<span class="kw-2">&amp;</span><span class="ident">session</span>) {
                 <span class="ident">sessions</span>.<span class="ident">push</span>(<span class="ident">session</span>)
             }
+
+            <span class="ident">progress_listener</span>(<span class="ident">i</span>, <span class="ident">total_sessions</span>)
         }
 
         <span class="kw">let</span> <span class="ident">num_sessions</span> <span class="op">=</span> <span class="ident">sessions</span>.<span class="ident">len</span>();
