@@ -342,7 +342,7 @@
 
 <span class="kw">use</span> <span class="ident">matrix_sdk_common</span>::{
     <span class="ident">api::r0::media::create_content</span>, <span class="ident">async_trait</span>, <span class="ident">locks::RwLock</span>, <span class="ident">AsyncTraitDeps</span>, <span class="ident">AuthScheme</span>,
-    <span class="ident">FromHttpResponseError</span>,
+    <span class="ident">FromHttpResponseError</span>, <span class="ident">IncomingResponse</span>,
 };
 
 <span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">error::HttpError</span>, <span class="ident">ClientConfig</span>, <span class="ident">OutgoingRequest</span>, <span class="ident">RequestConfig</span>, <span class="ident">Session</span>};
@@ -455,7 +455,7 @@
         <span class="kw">let</span> <span class="ident">response</span> <span class="op">=</span> <span class="self">self</span>
             .<span class="ident">send_request</span>(<span class="ident">request</span>, <span class="self">self</span>.<span class="ident">session</span>.<span class="ident">clone</span>(), <span class="ident">config</span>)
             .<span class="kw">await</span><span class="question-mark">?</span>;
-        <span class="prelude-val">Ok</span>(<span class="ident">create_content::Response::try_from</span>(<span class="ident">response</span>)<span class="question-mark">?</span>)
+        <span class="prelude-val">Ok</span>(<span class="ident">create_content::Response::try_from_http_response</span>(<span class="ident">response</span>)<span class="question-mark">?</span>)
     }
 
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">send</span><span class="op">&lt;</span><span class="ident">Request</span><span class="op">&gt;</span>(
@@ -473,7 +473,7 @@
 
         <span class="macro">trace!</span>(<span class="string">&quot;Got response: {:?}&quot;</span>, <span class="ident">response</span>);
 
-        <span class="kw">let</span> <span class="ident">response</span> <span class="op">=</span> <span class="ident">Request::IncomingResponse::try_from</span>(<span class="ident">response</span>)<span class="question-mark">?</span>;
+        <span class="kw">let</span> <span class="ident">response</span> <span class="op">=</span> <span class="ident">Request::IncomingResponse::try_from_http_response</span>(<span class="ident">response</span>)<span class="question-mark">?</span>;
 
         <span class="prelude-val">Ok</span>(<span class="ident">response</span>)
     }
@@ -625,5 +625,5 @@
     }
 }
 </pre></div>
-</section><section id="search" class="content hidden"></section><section class="footer"></section><div id="rustdoc-vars" data-root-path="../../" data-current-crate="matrix_sdk" data-search-js="../../search-index.js"></div>
+</section><section id="search" class="content hidden"></section><section class="footer"></section><div id="rustdoc-vars" data-root-path="../../" data-current-crate="matrix_sdk" data-search-index-js="../../search-index.js" data-search-js="../../search.js"></div>
     <script src="../../main.js"></script><script src="../../source-script.js"></script><script src="../../source-files.js"></script></body></html>
