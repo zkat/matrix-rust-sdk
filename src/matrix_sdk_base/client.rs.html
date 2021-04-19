@@ -1330,6 +1330,22 @@
 <span id="1327">1327</span>
 <span id="1328">1328</span>
 <span id="1329">1329</span>
+<span id="1330">1330</span>
+<span id="1331">1331</span>
+<span id="1332">1332</span>
+<span id="1333">1333</span>
+<span id="1334">1334</span>
+<span id="1335">1335</span>
+<span id="1336">1336</span>
+<span id="1337">1337</span>
+<span id="1338">1338</span>
+<span id="1339">1339</span>
+<span id="1340">1340</span>
+<span id="1341">1341</span>
+<span id="1342">1342</span>
+<span id="1343">1343</span>
+<span id="1344">1344</span>
+<span id="1345">1345</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="comment">// Copyright 2020 Damir Jelić</span>
 <span class="comment">// Copyright 2020 The Matrix.org Foundation C.I.C.</span>
@@ -2015,11 +2031,35 @@
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         <span class="ident">response</span>: <span class="ident">api::sync::sync_events::Response</span>,
     ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">SyncResponse</span><span class="op">&gt;</span> {
+        <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
+        <span class="kw">let</span> <span class="ident">api::sync::sync_events::Response</span> {
+            <span class="ident">next_batch</span>,
+            <span class="ident">rooms</span>,
+            <span class="ident">presence</span>,
+            <span class="ident">account_data</span>,
+            <span class="ident">to_device</span>,
+            <span class="ident">device_lists</span>,
+            <span class="ident">device_one_time_keys_count</span>,
+            <span class="ident">__test_exhaustive</span>: <span class="kw">_</span>,
+        } <span class="op">=</span> <span class="ident">response</span>;
+
+        <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">test</span>))]</span>
+        <span class="kw">let</span> <span class="ident">api::sync::sync_events::Response</span> {
+            <span class="ident">next_batch</span>,
+            <span class="ident">rooms</span>,
+            <span class="ident">presence</span>,
+            <span class="ident">account_data</span>,
+            <span class="ident">to_device</span>,
+            <span class="ident">device_lists</span>,
+            <span class="ident">device_one_time_keys_count</span>,
+            ..
+        } <span class="op">=</span> <span class="ident">response</span>;
+
         <span class="comment">// The server might respond multiple times with the same sync token, in</span>
         <span class="comment">// that case we already received this response and there&#39;s nothing to</span>
         <span class="comment">// do.</span>
-        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">sync_token</span>.<span class="ident">read</span>().<span class="kw">await</span>.<span class="ident">as_ref</span>() <span class="op">=</span><span class="op">=</span> <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="ident">response</span>.<span class="ident">next_batch</span>) {
-            <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="ident">SyncResponse::new</span>(<span class="ident">response</span>.<span class="ident">next_batch</span>));
+        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">sync_token</span>.<span class="ident">read</span>().<span class="kw">await</span>.<span class="ident">as_ref</span>() <span class="op">=</span><span class="op">=</span> <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="ident">next_batch</span>) {
+            <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="ident">SyncResponse::new</span>(<span class="ident">next_batch</span>));
         }
 
         <span class="kw">let</span> <span class="ident">now</span> <span class="op">=</span> <span class="ident">Instant::now</span>();
@@ -2033,15 +2073,10 @@
                 <span class="comment">// decryptes to-device events, but leaves room events alone.</span>
                 <span class="comment">// This makes sure that we have the deryption keys for the room</span>
                 <span class="comment">// events at hand.</span>
-                <span class="ident">o</span>.<span class="ident">receive_sync_changes</span>(
-                    <span class="kw-2">&amp;</span><span class="ident">response</span>.<span class="ident">to_device</span>,
-                    <span class="kw-2">&amp;</span><span class="ident">response</span>.<span class="ident">device_lists</span>,
-                    <span class="kw-2">&amp;</span><span class="ident">response</span>.<span class="ident">device_one_time_keys_count</span>,
-                )
-                .<span class="kw">await</span><span class="question-mark">?</span>
+                <span class="ident">o</span>.<span class="ident">receive_sync_changes</span>(<span class="kw-2">&amp;</span><span class="ident">to_device</span>, <span class="kw-2">&amp;</span><span class="ident">device_lists</span>, <span class="kw-2">&amp;</span><span class="ident">device_one_time_keys_count</span>)
+                    .<span class="kw">await</span><span class="question-mark">?</span>
             } <span class="kw">else</span> {
-                <span class="ident">response</span>
-                    .<span class="ident">to_device</span>
+                <span class="ident">to_device</span>
                     .<span class="ident">events</span>
                     .<span class="ident">into_iter</span>()
                     .<span class="ident">filter_map</span>(<span class="op">|</span><span class="ident">e</span><span class="op">|</span> <span class="ident">e</span>.<span class="ident">deserialize</span>().<span class="ident">ok</span>())
@@ -2050,20 +2085,19 @@
             }
         };
         <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;encryption&quot;</span>))]</span>
-        <span class="kw">let</span> <span class="ident">to_device</span> <span class="op">=</span> <span class="ident">response</span>
-            .<span class="ident">to_device</span>
+        <span class="kw">let</span> <span class="ident">to_device</span> <span class="op">=</span> <span class="ident">to_device</span>
             .<span class="ident">events</span>
             .<span class="ident">into_iter</span>()
             .<span class="ident">filter_map</span>(<span class="op">|</span><span class="ident">e</span><span class="op">|</span> <span class="ident">e</span>.<span class="ident">deserialize</span>().<span class="ident">ok</span>())
             .<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">AnyToDeviceEvent</span><span class="op">&gt;</span><span class="op">&gt;</span>()
             .<span class="ident">into</span>();
 
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">changes</span> <span class="op">=</span> <span class="ident">StateChanges::new</span>(<span class="ident">response</span>.<span class="ident">next_batch</span>.<span class="ident">clone</span>());
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">changes</span> <span class="op">=</span> <span class="ident">StateChanges::new</span>(<span class="ident">next_batch</span>.<span class="ident">clone</span>());
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">ambiguity_cache</span> <span class="op">=</span> <span class="ident">AmbiguityCache::new</span>(<span class="self">self</span>.<span class="ident">store</span>.<span class="ident">clone</span>());
 
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">rooms</span> <span class="op">=</span> <span class="ident">Rooms::default</span>();
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">new_rooms</span> <span class="op">=</span> <span class="ident">Rooms::default</span>();
 
-        <span class="kw">for</span> (<span class="ident">room_id</span>, <span class="ident">new_info</span>) <span class="kw">in</span> <span class="ident">response</span>.<span class="ident">rooms</span>.<span class="ident">join</span> {
+        <span class="kw">for</span> (<span class="ident">room_id</span>, <span class="ident">new_info</span>) <span class="kw">in</span> <span class="ident">rooms</span>.<span class="ident">join</span> {
             <span class="kw">let</span> <span class="ident">room</span> <span class="op">=</span> <span class="self">self</span>
                 .<span class="ident">store</span>
                 .<span class="ident">get_or_create_room</span>(<span class="kw-2">&amp;</span><span class="ident">room_id</span>, <span class="ident">RoomType::Joined</span>)
@@ -2132,7 +2166,7 @@
                     .<span class="ident">collect</span>(),
             };
 
-            <span class="ident">rooms</span>.<span class="ident">join</span>.<span class="ident">insert</span>(
+            <span class="ident">new_rooms</span>.<span class="ident">join</span>.<span class="ident">insert</span>(
                 <span class="ident">room_id</span>,
                 <span class="ident">JoinedRoom::new</span>(<span class="ident">timeline</span>, <span class="ident">state</span>, <span class="ident">account_data</span>, <span class="ident">ephemeral</span>, <span class="ident">notification_count</span>),
             );
@@ -2140,7 +2174,7 @@
             <span class="ident">changes</span>.<span class="ident">add_room</span>(<span class="ident">room_info</span>);
         }
 
-        <span class="kw">for</span> (<span class="ident">room_id</span>, <span class="ident">new_info</span>) <span class="kw">in</span> <span class="ident">response</span>.<span class="ident">rooms</span>.<span class="ident">leave</span> {
+        <span class="kw">for</span> (<span class="ident">room_id</span>, <span class="ident">new_info</span>) <span class="kw">in</span> <span class="ident">rooms</span>.<span class="ident">leave</span> {
             <span class="kw">let</span> <span class="ident">room</span> <span class="op">=</span> <span class="self">self</span>
                 .<span class="ident">store</span>
                 .<span class="ident">get_or_create_room</span>(<span class="kw-2">&amp;</span><span class="ident">room_id</span>, <span class="ident">RoomType::Left</span>)
@@ -2173,12 +2207,12 @@
                 .<span class="kw">await</span>;
 
             <span class="ident">changes</span>.<span class="ident">add_room</span>(<span class="ident">room_info</span>);
-            <span class="ident">rooms</span>
+            <span class="ident">new_rooms</span>
                 .<span class="ident">leave</span>
                 .<span class="ident">insert</span>(<span class="ident">room_id</span>, <span class="ident">LeftRoom::new</span>(<span class="ident">timeline</span>, <span class="ident">state</span>, <span class="ident">account_data</span>));
         }
 
-        <span class="kw">for</span> (<span class="ident">room_id</span>, <span class="ident">new_info</span>) <span class="kw">in</span> <span class="ident">response</span>.<span class="ident">rooms</span>.<span class="ident">invite</span> {
+        <span class="kw">for</span> (<span class="ident">room_id</span>, <span class="ident">new_info</span>) <span class="kw">in</span> <span class="ident">rooms</span>.<span class="ident">invite</span> {
             {
                 <span class="kw">let</span> <span class="ident">room</span> <span class="op">=</span> <span class="self">self</span>
                     .<span class="ident">store</span>
@@ -2203,11 +2237,10 @@
                 <span class="ident">invite_state</span>: <span class="ident">state</span>,
             };
 
-            <span class="ident">rooms</span>.<span class="ident">invite</span>.<span class="ident">insert</span>(<span class="ident">room_id</span>, <span class="ident">room</span>);
+            <span class="ident">new_rooms</span>.<span class="ident">invite</span>.<span class="ident">insert</span>(<span class="ident">room_id</span>, <span class="ident">room</span>);
         }
 
-        <span class="kw">let</span> <span class="ident">presence</span>: <span class="ident">BTreeMap</span><span class="op">&lt;</span><span class="ident">UserId</span>, <span class="ident">PresenceEvent</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">response</span>
-            .<span class="ident">presence</span>
+        <span class="kw">let</span> <span class="ident">presence</span>: <span class="ident">BTreeMap</span><span class="op">&lt;</span><span class="ident">UserId</span>, <span class="ident">PresenceEvent</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">presence</span>
             .<span class="ident">events</span>
             .<span class="ident">into_iter</span>()
             .<span class="ident">filter_map</span>(<span class="op">|</span><span class="ident">e</span><span class="op">|</span> {
@@ -2218,20 +2251,20 @@
 
         <span class="ident">changes</span>.<span class="ident">presence</span> <span class="op">=</span> <span class="ident">presence</span>;
 
-        <span class="self">self</span>.<span class="ident">handle_account_data</span>(<span class="ident">response</span>.<span class="ident">account_data</span>.<span class="ident">events</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">changes</span>)
+        <span class="self">self</span>.<span class="ident">handle_account_data</span>(<span class="ident">account_data</span>.<span class="ident">events</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">changes</span>)
             .<span class="kw">await</span>;
 
         <span class="ident">changes</span>.<span class="ident">ambiguity_maps</span> <span class="op">=</span> <span class="ident">ambiguity_cache</span>.<span class="ident">cache</span>;
 
         <span class="self">self</span>.<span class="ident">store</span>.<span class="ident">save_changes</span>(<span class="kw-2">&amp;</span><span class="ident">changes</span>).<span class="kw">await</span><span class="question-mark">?</span>;
-        <span class="kw-2">*</span><span class="self">self</span>.<span class="ident">sync_token</span>.<span class="ident">write</span>().<span class="kw">await</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">response</span>.<span class="ident">next_batch</span>.<span class="ident">clone</span>());
+        <span class="kw-2">*</span><span class="self">self</span>.<span class="ident">sync_token</span>.<span class="ident">write</span>().<span class="kw">await</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">next_batch</span>.<span class="ident">clone</span>());
         <span class="self">self</span>.<span class="ident">apply_changes</span>(<span class="kw-2">&amp;</span><span class="ident">changes</span>).<span class="kw">await</span>;
 
         <span class="macro">info!</span>(<span class="string">&quot;Processed a sync response in {:?}&quot;</span>, <span class="ident">now</span>.<span class="ident">elapsed</span>());
 
         <span class="kw">let</span> <span class="ident">response</span> <span class="op">=</span> <span class="ident">SyncResponse</span> {
-            <span class="ident">next_batch</span>: <span class="ident">response</span>.<span class="ident">next_batch</span>,
-            <span class="ident">rooms</span>,
+            <span class="ident">next_batch</span>,
+            <span class="ident">rooms</span>: <span class="ident">new_rooms</span>,
             <span class="ident">presence</span>: <span class="ident">Presence</span> {
                 <span class="ident">events</span>: <span class="ident">changes</span>.<span class="ident">presence</span>.<span class="ident">into_iter</span>().<span class="ident">map</span>(<span class="op">|</span>(<span class="kw">_</span>, <span class="ident">v</span>)<span class="op">|</span> <span class="ident">v</span>).<span class="ident">collect</span>(),
             },
@@ -2239,9 +2272,8 @@
                 <span class="ident">events</span>: <span class="ident">changes</span>.<span class="ident">account_data</span>.<span class="ident">into_iter</span>().<span class="ident">map</span>(<span class="op">|</span>(<span class="kw">_</span>, <span class="ident">e</span>)<span class="op">|</span> <span class="ident">e</span>).<span class="ident">collect</span>(),
             },
             <span class="ident">to_device</span>,
-            <span class="ident">device_lists</span>: <span class="ident">response</span>.<span class="ident">device_lists</span>,
-            <span class="ident">device_one_time_keys_count</span>: <span class="ident">response</span>
-                .<span class="ident">device_one_time_keys_count</span>
+            <span class="ident">device_lists</span>,
+            <span class="ident">device_one_time_keys_count</span>: <span class="ident">device_one_time_keys_count</span>
                 .<span class="ident">into_iter</span>()
                 .<span class="ident">map</span>(<span class="op">|</span>(<span class="ident">k</span>, <span class="ident">v</span>)<span class="op">|</span> (<span class="ident">k</span>, <span class="ident">v</span>.<span class="ident">into</span>()))
                 .<span class="ident">collect</span>(),
