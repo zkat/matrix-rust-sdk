@@ -113,6 +113,7 @@
 <span id="110">110</span>
 <span id="111">111</span>
 <span id="112">112</span>
+<span id="113">113</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="comment">// Copyright 2020 Damir Jelić</span>
 <span class="comment">// Copyright 2020 The Matrix.org Foundation C.I.C.</span>
@@ -157,11 +158,12 @@
 <span class="doccomment">//! keys. If this is disabled and `encryption` support is enabled the keys will</span>
 <span class="doccomment">//! by default be stored only in memory and thus lost after the client is</span>
 <span class="doccomment">//! destroyed.</span>
-<span class="doccomment">//! * `unstable-synapse-quirks`: Enables support to deal with inconsistencies</span>
-<span class="doccomment">//! of Synapse in compliance with the Matrix API specification.</span>
 <span class="doccomment">//! * `markdown`: Support for sending markdown formatted messages.</span>
 <span class="doccomment">//! * `socks`: Enables SOCKS support in reqwest, the default HTTP client.</span>
 <span class="doccomment">//! * `sso_login`: Enables SSO login with a local http server.</span>
+<span class="doccomment">//! * `require_auth_for_profile_requests`: Whether to send the access token in the authentication</span>
+<span class="doccomment">//! header when calling endpoints that retrieve profile data. This matches the synapse</span>
+<span class="doccomment">//! configuration `require_auth_for_profile_requests`. Enabled by default.</span>
 
 <span class="attribute">#![<span class="ident">deny</span>(
     <span class="ident">missing_debug_implementations</span>,
@@ -192,7 +194,7 @@
     <span class="ident">Session</span>, <span class="ident">StateChanges</span>, <span class="ident">StoreError</span>,
 };
 
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">bytes::Bytes</span>;
+<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">bytes</span>::{<span class="ident">Bytes</span>, <span class="ident">BytesMut</span>};
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">matrix_sdk_common</span>::<span class="kw-2">*</span>;
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">reqwest</span>;
 
