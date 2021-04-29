@@ -347,7 +347,31 @@
 <span id="344">344</span>
 <span id="345">345</span>
 <span id="346">346</span>
+<span id="347">347</span>
+<span id="348">348</span>
+<span id="349">349</span>
+<span id="350">350</span>
+<span id="351">351</span>
+<span id="352">352</span>
+<span id="353">353</span>
+<span id="354">354</span>
+<span id="355">355</span>
+<span id="356">356</span>
+<span id="357">357</span>
+<span id="358">358</span>
+<span id="359">359</span>
+<span id="360">360</span>
+<span id="361">361</span>
+<span id="362">362</span>
+<span id="363">363</span>
 </pre><div class="example-wrap"><pre class="rust ">
+<span class="kw">use</span> <span class="ident">ruma</span>::{
+    <span class="ident">api::client::r0::sync::sync_events</span>::{
+        <span class="ident">AccountData</span>, <span class="ident">Ephemeral</span>, <span class="ident">InvitedRoom</span>, <span class="ident">Presence</span>, <span class="ident">State</span>, <span class="ident">ToDevice</span>,
+    },
+    <span class="ident">serde::Raw</span>,
+    <span class="ident">DeviceIdBox</span>,
+};
 <span class="kw">use</span> <span class="ident">serde</span>::{<span class="ident">Deserialize</span>, <span class="ident">Serialize</span>};
 <span class="kw">use</span> <span class="ident">std</span>::{<span class="ident">collections::BTreeMap</span>, <span class="ident">convert::TryFrom</span>, <span class="ident">time::SystemTime</span>};
 
@@ -359,9 +383,8 @@
         },
     },
     <span class="ident">events</span>::{
-        <span class="ident">presence::PresenceEvent</span>, <span class="ident">room::member::MemberEventContent</span>, <span class="ident">AnyBasicEvent</span>,
-        <span class="ident">AnyStrippedStateEvent</span>, <span class="ident">AnySyncEphemeralRoomEvent</span>, <span class="ident">AnySyncRoomEvent</span>, <span class="ident">AnySyncStateEvent</span>,
-        <span class="ident">AnyToDeviceEvent</span>, <span class="ident">StateEvent</span>, <span class="ident">StrippedStateEvent</span>, <span class="ident">SyncStateEvent</span>, <span class="ident">Unsigned</span>,
+        <span class="ident">room::member::MemberEventContent</span>, <span class="ident">AnySyncRoomEvent</span>, <span class="ident">StateEvent</span>, <span class="ident">StrippedStateEvent</span>,
+        <span class="ident">SyncStateEvent</span>, <span class="ident">Unsigned</span>,
     },
     <span class="ident">identifiers</span>::{<span class="ident">DeviceKeyAlgorithm</span>, <span class="ident">EventId</span>, <span class="ident">RoomId</span>, <span class="ident">UserId</span>},
 };
@@ -385,6 +408,72 @@
     <span class="doccomment">/// A map from room id to a map of an event id to the `AmbiguityChange` that</span>
     <span class="doccomment">/// the event with the given id caused.</span>
     <span class="kw">pub</span> <span class="ident">changes</span>: <span class="ident">BTreeMap</span><span class="op">&lt;</span><span class="ident">RoomId</span>, <span class="ident">BTreeMap</span><span class="op">&lt;</span><span class="ident">EventId</span>, <span class="ident">AmbiguityChange</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+}
+
+<span class="doccomment">/// The verification state of the device that sent an event to us.</span>
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>)]</span>
+<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">VerificationState</span> {
+    <span class="doccomment">/// The device is trusted.</span>
+    <span class="ident">Trusted</span>,
+    <span class="doccomment">/// The device is not trusted.</span>
+    <span class="ident">Untrusted</span>,
+    <span class="doccomment">/// The device is not known to us.</span>
+    <span class="ident">UnknownDevice</span>,
+}
+
+<span class="doccomment">/// The algorithm specific information of a decrypted event.</span>
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>)]</span>
+<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">AlgorithmInfo</span> {
+    <span class="doccomment">/// The info if the event was encrypted using m.megolm.v1.aes-sha2</span>
+    <span class="ident">MegolmV1AesSha2</span> {
+        <span class="doccomment">/// The curve25519 key of the device that created the megolm decryption</span>
+        <span class="doccomment">/// key originally.</span>
+        <span class="ident">curve25519_key</span>: <span class="ident">String</span>,
+        <span class="doccomment">/// The signing keys that have created the megolm key that was used to</span>
+        <span class="doccomment">/// decrypt this session. This map will usually contain a signle ed25519</span>
+        <span class="doccomment">/// key.</span>
+        <span class="ident">sender_claimed_keys</span>: <span class="ident">BTreeMap</span><span class="op">&lt;</span><span class="ident">DeviceKeyAlgorithm</span>, <span class="ident">String</span><span class="op">&gt;</span>,
+        <span class="doccomment">/// Chain of curve25519 keys through which this session was forwarded,</span>
+        <span class="doccomment">/// via m.forwarded_room_key events.</span>
+        <span class="ident">forwarding_curve25519_key_chain</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
+    },
+}
+
+<span class="doccomment">/// Struct containing information on how an event was decrypted.</span>
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>)]</span>
+<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">EncryptionInfo</span> {
+    <span class="doccomment">/// The user ID of the event sender, note this is untrusted data unless the</span>
+    <span class="doccomment">/// `verification_state` is as well trusted.</span>
+    <span class="kw">pub</span> <span class="ident">sender</span>: <span class="ident">UserId</span>,
+    <span class="doccomment">/// The device ID of the device that sent us the event, note this is</span>
+    <span class="doccomment">/// untrusted data unless `verification_state` is as well trusted.</span>
+    <span class="kw">pub</span> <span class="ident">sender_device</span>: <span class="ident">DeviceIdBox</span>,
+    <span class="doccomment">/// Information about the algorithm that was used to encrypt the event.</span>
+    <span class="kw">pub</span> <span class="ident">algorithm_info</span>: <span class="ident">AlgorithmInfo</span>,
+    <span class="doccomment">/// The verification state of the device that sent us the event, note this</span>
+    <span class="doccomment">/// is the state of the device at the time of decryption. It may change in</span>
+    <span class="doccomment">/// the future if a device gets verified or deleted.</span>
+    <span class="kw">pub</span> <span class="ident">verification_state</span>: <span class="ident">VerificationState</span>,
+}
+
+<span class="doccomment">/// A customized version of a room event coming from a sync that holds optional</span>
+<span class="doccomment">/// encryption info.</span>
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>)]</span>
+<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">SyncRoomEvent</span> {
+    <span class="doccomment">/// The actual event.</span>
+    <span class="kw">pub</span> <span class="ident">event</span>: <span class="ident">Raw</span><span class="op">&lt;</span><span class="ident">AnySyncRoomEvent</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// The encryption info about the event. Will be `None` if the event was not</span>
+    <span class="doccomment">/// encrypted.</span>
+    <span class="kw">pub</span> <span class="ident">encryption_info</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">EncryptionInfo</span><span class="op">&gt;</span>,
+}
+
+<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">Raw</span><span class="op">&lt;</span><span class="ident">AnySyncRoomEvent</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">SyncRoomEvent</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">inner</span>: <span class="ident">Raw</span><span class="op">&lt;</span><span class="ident">AnySyncRoomEvent</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+        <span class="self">Self</span> {
+            <span class="ident">encryption_info</span>: <span class="prelude-val">None</span>,
+            <span class="ident">event</span>: <span class="ident">inner</span>,
+        }
+    }
 }
 
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Default</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>)]</span>
@@ -418,33 +507,6 @@
             <span class="ident">next_batch</span>,
             ..<span class="ident">Default::default</span>()
         }
-    }
-}
-
-<span class="doccomment">/// Updates to the presence status of other users.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Default</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Presence</span> {
-    <span class="doccomment">/// A list of events.</span>
-    <span class="kw">pub</span> <span class="ident">events</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">PresenceEvent</span><span class="op">&gt;</span>,
-}
-
-<span class="doccomment">/// Data that the user has attached to either the account or a specific room.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Default</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">AccountData</span> {
-    <span class="doccomment">/// The list of account data events.</span>
-    <span class="kw">pub</span> <span class="ident">events</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">AnyBasicEvent</span><span class="op">&gt;</span>,
-}
-
-<span class="doccomment">/// Messages sent dirrectly between devices.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Default</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">ToDevice</span> {
-    <span class="doccomment">/// A list of events.</span>
-    <span class="kw">pub</span> <span class="ident">events</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">AnyToDeviceEvent</span><span class="op">&gt;</span>,
-}
-
-<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">AnyToDeviceEvent</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">ToDevice</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">events</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">AnyToDeviceEvent</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
-        <span class="self">Self</span> { <span class="ident">events</span> }
     }
 }
 
@@ -494,20 +556,6 @@
     }
 }
 
-<span class="doccomment">/// Updates to the rooms that the user has been invited to.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Default</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">InvitedRoom</span> {
-    <span class="doccomment">/// The state of a room that the user has been invited to.</span>
-    <span class="kw">pub</span> <span class="ident">invite_state</span>: <span class="ident">InviteState</span>,
-}
-
-<span class="doccomment">/// The state of a room that the user has been invited to.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Default</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">InviteState</span> {
-    <span class="doccomment">/// A list of state events.</span>
-    <span class="kw">pub</span> <span class="ident">events</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">AnyStrippedStateEvent</span><span class="op">&gt;</span>,
-}
-
 <span class="doccomment">/// Counts of unread notifications for a room.</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Copy</span>, <span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Default</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">UnreadNotificationsCount</span> {
@@ -527,13 +575,6 @@
                 .<span class="ident">unwrap_or</span>(<span class="number">0</span>),
         }
     }
-}
-
-<span class="doccomment">/// The ephemeral events in the room that aren&#39;t recorded in the timeline or</span>
-<span class="doccomment">/// state of the room. e.g. typing.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Ephemeral</span> {
-    <span class="kw">pub</span> <span class="ident">events</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">AnySyncEphemeralRoomEvent</span><span class="op">&gt;</span>,
 }
 
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>)]</span>
@@ -570,7 +611,7 @@
     <span class="kw">pub</span> <span class="ident">prev_batch</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
 
     <span class="doccomment">/// A list of events.</span>
-    <span class="kw">pub</span> <span class="ident">events</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">AnySyncRoomEvent</span><span class="op">&gt;</span>,
+    <span class="kw">pub</span> <span class="ident">events</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">SyncRoomEvent</span><span class="op">&gt;</span>,
 }
 
 <span class="kw">impl</span> <span class="ident">Timeline</span> {
@@ -581,13 +622,6 @@
             ..<span class="ident">Default::default</span>()
         }
     }
-}
-
-<span class="doccomment">/// State events in the room.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Default</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">State</span> {
-    <span class="doccomment">/// A list of state events.</span>
-    <span class="kw">pub</span> <span class="ident">events</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">AnySyncStateEvent</span><span class="op">&gt;</span>,
 }
 
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>)]</span>
