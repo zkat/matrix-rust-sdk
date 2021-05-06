@@ -283,10 +283,6 @@
 <span id="280">280</span>
 <span id="281">281</span>
 <span id="282">282</span>
-<span id="283">283</span>
-<span id="284">284</span>
-<span id="285">285</span>
-<span id="286">286</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="comment">// Copyright 2021 The Matrix.org Foundation C.I.C.</span>
 <span class="comment">//</span>
@@ -473,14 +469,10 @@
             .<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">m</span><span class="op">|</span> <span class="ident">m</span>.<span class="ident">get</span>(<span class="kw-2">&amp;</span><span class="ident">member_event</span>.<span class="ident">state_key</span>))
         {
             <span class="prelude-val">Some</span>(<span class="ident">m</span>.<span class="ident">clone</span>())
-        } <span class="kw">else</span> <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">m</span>) <span class="op">=</span> <span class="self">self</span>
-            .<span class="ident">store</span>
-            .<span class="ident">get_member_event</span>(<span class="ident">room_id</span>, <span class="kw-2">&amp;</span><span class="ident">member_event</span>.<span class="ident">state_key</span>)
-            .<span class="kw">await</span><span class="question-mark">?</span>
-        {
-            <span class="prelude-val">Some</span>(<span class="ident">m</span>)
         } <span class="kw">else</span> {
-            <span class="prelude-val">None</span>
+            <span class="self">self</span>.<span class="ident">store</span>
+                .<span class="ident">get_member_event</span>(<span class="ident">room_id</span>, <span class="kw-2">&amp;</span><span class="ident">member_event</span>.<span class="ident">state_key</span>)
+                .<span class="kw">await</span><span class="question-mark">?</span>
         };
 
         <span class="kw">let</span> <span class="ident">old_display_name</span> <span class="op">=</span> <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">event</span>) <span class="op">=</span> <span class="ident">old_event</span> {
