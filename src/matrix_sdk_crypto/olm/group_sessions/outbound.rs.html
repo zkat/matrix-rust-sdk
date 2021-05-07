@@ -624,6 +624,9 @@
 <span id="621">621</span>
 <span id="622">622</span>
 <span id="623">623</span>
+<span id="624">624</span>
+<span id="625">625</span>
+<span id="626">626</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="comment">// Copyright 2020 The Matrix.org Foundation C.I.C.</span>
 <span class="comment">//</span>
@@ -643,8 +646,7 @@
 <span class="kw">use</span> <span class="ident">matrix_sdk_common</span>::{
     <span class="ident">api::r0::to_device::DeviceIdOrAllDevices</span>,
     <span class="ident">events::room</span>::{
-        <span class="ident">encrypted</span>::{<span class="ident">MegolmV1AesSha2Content</span>, <span class="ident">MegolmV1AesSha2ContentInit</span>},
-        <span class="ident">history_visibility::HistoryVisibility</span>,
+        <span class="ident">encrypted::MegolmV1AesSha2ContentInit</span>, <span class="ident">history_visibility::HistoryVisibility</span>,
         <span class="ident">message::Relation</span>,
     },
     <span class="ident">uuid::Uuid</span>,
@@ -663,7 +665,10 @@
 
 <span class="kw">use</span> <span class="ident">matrix_sdk_common</span>::{
     <span class="ident">events</span>::{
-        <span class="ident">room</span>::{<span class="ident">encrypted::EncryptedEventContent</span>, <span class="ident">encryption::EncryptionEventContent</span>},
+        <span class="ident">room</span>::{
+            <span class="ident">encrypted</span>::{<span class="ident">EncryptedEventContent</span>, <span class="ident">EncryptedEventScheme</span>},
+            <span class="ident">encryption::EncryptionEventContent</span>,
+        },
         <span class="ident">AnyMessageEventContent</span>, <span class="ident">EventContent</span>,
     },
     <span class="ident">identifiers</span>::{<span class="ident">DeviceId</span>, <span class="ident">DeviceIdBox</span>, <span class="ident">EventEncryptionAlgorithm</span>, <span class="ident">RoomId</span>, <span class="ident">UserId</span>},
@@ -933,7 +938,7 @@
 
         <span class="kw">let</span> <span class="ident">ciphertext</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">encrypt_helper</span>(<span class="ident">plaintext</span>).<span class="kw">await</span>;
 
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">encrypted_content</span>: <span class="ident">MegolmV1AesSha2Content</span> <span class="op">=</span> <span class="ident">MegolmV1AesSha2ContentInit</span> {
+        <span class="kw">let</span> <span class="ident">encrypted_content</span> <span class="op">=</span> <span class="ident">MegolmV1AesSha2ContentInit</span> {
             <span class="ident">ciphertext</span>,
             <span class="ident">sender_key</span>: <span class="self">self</span>.<span class="ident">account_identity_keys</span>.<span class="ident">curve25519</span>().<span class="ident">to_owned</span>(),
             <span class="ident">session_id</span>: <span class="self">self</span>.<span class="ident">session_id</span>().<span class="ident">to_owned</span>(),
@@ -941,9 +946,10 @@
         }
         .<span class="ident">into</span>();
 
-        <span class="ident">encrypted_content</span>.<span class="ident">relates_to</span> <span class="op">=</span> <span class="ident">relates_to</span>;
-
-        <span class="ident">EncryptedEventContent::MegolmV1AesSha2</span>(<span class="ident">encrypted_content</span>)
+        <span class="ident">EncryptedEventContent::new</span>(
+            <span class="ident">EncryptedEventScheme::MegolmV1AesSha2</span>(<span class="ident">encrypted_content</span>),
+            <span class="ident">relates_to</span>,
+        )
     }
 
     <span class="doccomment">/// Check if the session has expired and if it should be rotated.</span>

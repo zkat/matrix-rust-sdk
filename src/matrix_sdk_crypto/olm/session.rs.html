@@ -282,6 +282,15 @@
 <span id="279">279</span>
 <span id="280">280</span>
 <span id="281">281</span>
+<span id="282">282</span>
+<span id="283">283</span>
+<span id="284">284</span>
+<span id="285">285</span>
+<span id="286">286</span>
+<span id="287">287</span>
+<span id="288">288</span>
+<span id="289">289</span>
+<span id="290">290</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="comment">// Copyright 2020 The Matrix.org Foundation C.I.C.</span>
 <span class="comment">//</span>
@@ -301,7 +310,10 @@
 
 <span class="kw">use</span> <span class="ident">matrix_sdk_common</span>::{
     <span class="ident">events</span>::{
-        <span class="ident">room::encrypted</span>::{<span class="ident">CiphertextInfo</span>, <span class="ident">EncryptedEventContent</span>, <span class="ident">OlmV1Curve25519AesSha2Content</span>},
+        <span class="ident">room::encrypted</span>::{
+            <span class="ident">CiphertextInfo</span>, <span class="ident">EncryptedEventContent</span>, <span class="ident">EncryptedEventScheme</span>,
+            <span class="ident">OlmV1Curve25519AesSha2Content</span>,
+        },
         <span class="ident">EventType</span>,
     },
     <span class="ident">identifiers</span>::{<span class="ident">DeviceId</span>, <span class="ident">DeviceKeyAlgorithm</span>, <span class="ident">UserId</span>},
@@ -403,6 +415,11 @@
             .<span class="ident">get_key</span>(<span class="ident">DeviceKeyAlgorithm::Ed25519</span>)
             .<span class="ident">ok_or</span>(<span class="ident">EventError::MissingSigningKey</span>)<span class="question-mark">?</span>;
 
+        <span class="kw">let</span> <span class="ident">relates_to</span> <span class="op">=</span> <span class="ident">content</span>
+            .<span class="ident">get</span>(<span class="string">&quot;m.relates_to&quot;</span>)
+            .<span class="ident">cloned</span>()
+            .<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">v</span><span class="op">|</span> <span class="ident">serde_json::from_value</span>(<span class="ident">v</span>).<span class="ident">ok</span>());
+
         <span class="kw">let</span> <span class="ident">payload</span> <span class="op">=</span> <span class="macro">json!</span>({
             <span class="string">&quot;sender&quot;</span>: <span class="self">self</span>.<span class="ident">user_id</span>.<span class="ident">as_str</span>(),
             <span class="string">&quot;sender_device&quot;</span>: <span class="self">self</span>.<span class="ident">device_id</span>.<span class="ident">as_ref</span>(),
@@ -426,11 +443,12 @@
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">content</span> <span class="op">=</span> <span class="ident">BTreeMap::new</span>();
         <span class="ident">content</span>.<span class="ident">insert</span>((<span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="self">self</span>.<span class="ident">sender_key</span>).<span class="ident">to_owned</span>(), <span class="ident">ciphertext</span>);
 
-        <span class="prelude-val">Ok</span>(<span class="ident">EncryptedEventContent::OlmV1Curve25519AesSha2</span>(
-            <span class="ident">OlmV1Curve25519AesSha2Content::new</span>(
+        <span class="prelude-val">Ok</span>(<span class="ident">EncryptedEventContent::new</span>(
+            <span class="ident">EncryptedEventScheme::OlmV1Curve25519AesSha2</span>(<span class="ident">OlmV1Curve25519AesSha2Content::new</span>(
                 <span class="ident">content</span>,
                 <span class="self">self</span>.<span class="ident">our_identity_keys</span>.<span class="ident">curve25519</span>().<span class="ident">to_string</span>(),
-            ),
+            )),
+            <span class="ident">relates_to</span>,
         ))
     }
 
