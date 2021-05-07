@@ -834,6 +834,16 @@
 <span id="831">831</span>
 <span id="832">832</span>
 <span id="833">833</span>
+<span id="834">834</span>
+<span id="835">835</span>
+<span id="836">836</span>
+<span id="837">837</span>
+<span id="838">838</span>
+<span id="839">839</span>
+<span id="840">840</span>
+<span id="841">841</span>
+<span id="842">842</span>
+<span id="843">843</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="comment">// Copyright 2020 The Matrix.org Foundation C.I.C.</span>
 <span class="comment">//</span>
@@ -1464,10 +1474,20 @@
 
     <span class="doccomment">/// Get the emoji version of the short auth string.</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// Returns None if we can&#39;t yet present the short auth string, otherwise a</span>
-    <span class="doccomment">/// Vec of tuples with the emoji and description.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">emoji</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>, <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>)<span class="op">&gt;</span><span class="op">&gt;</span> {
+    <span class="doccomment">/// Returns None if we can&#39;t yet present the short auth string, otherwise</span>
+    <span class="doccomment">/// seven tuples containing the emoji and description.</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">emoji</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span>[(<span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>, <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>); <span class="number">7</span>]<span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">lock</span>().<span class="ident">unwrap</span>().<span class="ident">emoji</span>()
+    }
+
+    <span class="doccomment">/// Get the index of the emoji representing the short auth string</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// Returns None if we can&#39;t yet present the short auth string, otherwise</span>
+    <span class="doccomment">/// seven u8 numbers in the range from 0 to 63 inclusive which can be</span>
+    <span class="doccomment">/// converted to an emoji using the</span>
+    <span class="doccomment">/// [relevant spec entry](https://spec.matrix.org/unstable/client-server-api/#sas-method-emoji).</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">emoji_index</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span>[<span class="ident">u8</span>; <span class="number">7</span>]<span class="op">&gt;</span> {
+        <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">lock</span>().<span class="ident">unwrap</span>().<span class="ident">emoji_index</span>()
     }
 
     <span class="doccomment">/// Get the decimal version of the short auth string.</span>

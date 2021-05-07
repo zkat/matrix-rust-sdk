@@ -1404,6 +1404,35 @@
 <span id="1401">1401</span>
 <span id="1402">1402</span>
 <span id="1403">1403</span>
+<span id="1404">1404</span>
+<span id="1405">1405</span>
+<span id="1406">1406</span>
+<span id="1407">1407</span>
+<span id="1408">1408</span>
+<span id="1409">1409</span>
+<span id="1410">1410</span>
+<span id="1411">1411</span>
+<span id="1412">1412</span>
+<span id="1413">1413</span>
+<span id="1414">1414</span>
+<span id="1415">1415</span>
+<span id="1416">1416</span>
+<span id="1417">1417</span>
+<span id="1418">1418</span>
+<span id="1419">1419</span>
+<span id="1420">1420</span>
+<span id="1421">1421</span>
+<span id="1422">1422</span>
+<span id="1423">1423</span>
+<span id="1424">1424</span>
+<span id="1425">1425</span>
+<span id="1426">1426</span>
+<span id="1427">1427</span>
+<span id="1428">1428</span>
+<span id="1429">1429</span>
+<span id="1430">1430</span>
+<span id="1431">1431</span>
+<span id="1432">1432</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="comment">// Copyright 2020 The Matrix.org Foundation C.I.C.</span>
 <span class="comment">//</span>
@@ -1454,7 +1483,8 @@
         <span class="ident">AcceptContent</span>, <span class="ident">CancelContent</span>, <span class="ident">DoneContent</span>, <span class="ident">KeyContent</span>, <span class="ident">MacContent</span>, <span class="ident">StartContent</span>,
     },
     <span class="ident">helpers</span>::{
-        <span class="ident">calculate_commitment</span>, <span class="ident">get_decimal</span>, <span class="ident">get_emoji</span>, <span class="ident">get_mac_content</span>, <span class="ident">receive_mac_event</span>, <span class="ident">SasIds</span>,
+        <span class="ident">calculate_commitment</span>, <span class="ident">get_decimal</span>, <span class="ident">get_emoji</span>, <span class="ident">get_emoji_index</span>, <span class="ident">get_mac_content</span>,
+        <span class="ident">receive_mac_event</span>, <span class="ident">SasIds</span>,
     },
 };
 
@@ -2152,10 +2182,24 @@
 
     <span class="doccomment">/// Get the emoji version of the short authentication string.</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// Returns a vector of tuples where the first element is the emoji and the</span>
+    <span class="doccomment">/// Returns a seven tuples where the first element is the emoji and the</span>
     <span class="doccomment">/// second element the English description of the emoji.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_emoji</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Vec</span><span class="op">&lt;</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>, <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>)<span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_emoji</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> [(<span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>, <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>); <span class="number">7</span>] {
         <span class="ident">get_emoji</span>(
+            <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">lock</span>().<span class="ident">unwrap</span>(),
+            <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">ids</span>,
+            <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">state</span>.<span class="ident">their_pubkey</span>,
+            <span class="self">self</span>.<span class="ident">verification_flow_id</span>.<span class="ident">as_str</span>(),
+            <span class="self">self</span>.<span class="ident">state</span>.<span class="ident">we_started</span>,
+        )
+    }
+
+    <span class="doccomment">/// Get the index of the emoji of the short authentication string.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// Returns seven u8 numbers in the range from 0 to 63 inclusive, those numbers</span>
+    <span class="doccomment">/// can be converted to a unique emoji defined by the spec.</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_emoji_index</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> [<span class="ident">u8</span>; <span class="number">7</span>] {
+        <span class="ident">get_emoji_index</span>(
             <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">lock</span>().<span class="ident">unwrap</span>(),
             <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">ids</span>,
             <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">state</span>.<span class="ident">their_pubkey</span>,
@@ -2375,12 +2419,26 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// Returns a vector of tuples where the first element is the emoji and the</span>
     <span class="doccomment">/// second element the English description of the emoji.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_emoji</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Vec</span><span class="op">&lt;</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>, <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>)<span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_emoji</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> [(<span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>, <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>); <span class="number">7</span>] {
         <span class="ident">get_emoji</span>(
             <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">lock</span>().<span class="ident">unwrap</span>(),
             <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">ids</span>,
             <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">state</span>.<span class="ident">their_pubkey</span>,
             <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">verification_flow_id</span>.<span class="ident">as_str</span>(),
+            <span class="self">self</span>.<span class="ident">state</span>.<span class="ident">we_started</span>,
+        )
+    }
+
+    <span class="doccomment">/// Get the index of the emoji of the short authentication string.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// Returns seven u8 numbers in the range from 0 to 63 inclusive, those numbers</span>
+    <span class="doccomment">/// can be converted to a unique emoji defined by the spec.</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_emoji_index</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> [<span class="ident">u8</span>; <span class="number">7</span>] {
+        <span class="ident">get_emoji_index</span>(
+            <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">lock</span>().<span class="ident">unwrap</span>(),
+            <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">ids</span>,
+            <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">state</span>.<span class="ident">their_pubkey</span>,
+            <span class="self">self</span>.<span class="ident">verification_flow_id</span>.<span class="ident">as_str</span>(),
             <span class="self">self</span>.<span class="ident">state</span>.<span class="ident">we_started</span>,
         )
     }
