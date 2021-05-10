@@ -551,6 +551,21 @@
 <span id="548">548</span>
 <span id="549">549</span>
 <span id="550">550</span>
+<span id="551">551</span>
+<span id="552">552</span>
+<span id="553">553</span>
+<span id="554">554</span>
+<span id="555">555</span>
+<span id="556">556</span>
+<span id="557">557</span>
+<span id="558">558</span>
+<span id="559">559</span>
+<span id="560">560</span>
+<span id="561">561</span>
+<span id="562">562</span>
+<span id="563">563</span>
+<span id="564">564</span>
+<span id="565">565</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="comment">// Copyright 2020 The Matrix.org Foundation C.I.C.</span>
 <span class="comment">//</span>
@@ -583,7 +598,8 @@
             <span class="ident">guest_access::GuestAccess</span>, <span class="ident">history_visibility::HistoryVisibility</span>, <span class="ident">join_rules::JoinRule</span>,
             <span class="ident">tombstone::TombstoneEventContent</span>,
         },
-        <span class="ident">AnyStateEventContent</span>, <span class="ident">AnySyncStateEvent</span>, <span class="ident">EventType</span>,
+        <span class="ident">tag::Tags</span>,
+        <span class="ident">AnyBasicEvent</span>, <span class="ident">AnyStateEventContent</span>, <span class="ident">AnySyncStateEvent</span>, <span class="ident">EventType</span>,
     },
     <span class="ident">identifiers</span>::{<span class="ident">MxcUri</span>, <span class="ident">RoomAliasId</span>, <span class="ident">RoomId</span>, <span class="ident">UserId</span>},
 };
@@ -1000,6 +1016,20 @@
             <span class="ident">is_room_creator</span>,
             <span class="ident">display_name_ambiguous</span>: <span class="ident">ambiguous</span>,
         }))
+    }
+
+    <span class="doccomment">/// Get the `Tags` for this room.</span>
+    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">tags</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">StoreResult</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Tags</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">AnyBasicEvent::Tag</span>(<span class="ident">event</span>)) <span class="op">=</span> <span class="self">self</span>
+            .<span class="ident">store</span>
+            .<span class="ident">get_room_account_data_event</span>(<span class="self">self</span>.<span class="ident">room_id</span>(), <span class="ident">EventType::Tag</span>)
+            .<span class="kw">await</span><span class="question-mark">?</span>
+            .<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">r</span><span class="op">|</span> <span class="ident">r</span>.<span class="ident">deserialize</span>().<span class="ident">ok</span>())
+        {
+            <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(<span class="ident">event</span>.<span class="ident">content</span>.<span class="ident">tags</span>))
+        } <span class="kw">else</span> {
+            <span class="prelude-val">Ok</span>(<span class="prelude-val">None</span>)
+        }
     }
 }
 
