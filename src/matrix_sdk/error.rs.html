@@ -149,6 +149,10 @@
 <span id="146">146</span>
 <span id="147">147</span>
 <span id="148">148</span>
+<span id="149">149</span>
+<span id="150">150</span>
+<span id="151">151</span>
+<span id="152">152</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="comment">// Copyright 2020 The Matrix.org Foundation C.I.C.</span>
 <span class="comment">//</span>
@@ -171,10 +175,10 @@
 <span class="kw">use</span> <span class="ident">matrix_sdk_common</span>::{
     <span class="ident">api</span>::{
         <span class="ident">r0::uiaa</span>::{<span class="ident">UiaaInfo</span>, <span class="ident">UiaaResponse</span> <span class="kw">as</span> <span class="ident">UiaaError</span>},
-        <span class="ident">Error</span> <span class="kw">as</span> <span class="ident">RumaClientError</span>,
+        <span class="ident">Error</span> <span class="kw">as</span> <span class="ident">RumaClientApiError</span>,
     },
     <span class="ident">identifiers::Error</span> <span class="kw">as</span> <span class="ident">IdentifierError</span>,
-    <span class="ident">FromHttpResponseError</span>, <span class="ident">IntoHttpError</span>, <span class="ident">ServerError</span>,
+    <span class="ident">FromHttpResponseError</span>, <span class="ident">IntoHttpError</span>, <span class="ident">MatrixError</span> <span class="kw">as</span> <span class="ident">RumaApiError</span>, <span class="ident">ServerError</span>,
 };
 <span class="kw">use</span> <span class="ident">reqwest::Error</span> <span class="kw">as</span> <span class="ident">ReqwestError</span>;
 <span class="kw">use</span> <span class="ident">serde_json::Error</span> <span class="kw">as</span> <span class="ident">JsonError</span>;
@@ -207,9 +211,13 @@
     <span class="attribute">#[<span class="ident">error</span>(<span class="string">&quot;the queried endpoint is not meant for clients&quot;</span>)]</span>
     <span class="ident">NotClientRequest</span>,
 
+    <span class="doccomment">/// An error converting between ruma_*_api types and Hyper types.</span>
+    <span class="attribute">#[<span class="ident">error</span>(<span class="ident">transparent</span>)]</span>
+    <span class="ident">Api</span>(<span class="attribute">#[<span class="ident">from</span>]</span> <span class="ident">FromHttpResponseError</span><span class="op">&lt;</span><span class="ident">RumaApiError</span><span class="op">&gt;</span>),
+
     <span class="doccomment">/// An error converting between ruma_client_api types and Hyper types.</span>
     <span class="attribute">#[<span class="ident">error</span>(<span class="ident">transparent</span>)]</span>
-    <span class="ident">FromHttpResponse</span>(<span class="attribute">#[<span class="ident">from</span>]</span> <span class="ident">FromHttpResponseError</span><span class="op">&lt;</span><span class="ident">RumaClientError</span><span class="op">&gt;</span>),
+    <span class="ident">ClientApi</span>(<span class="attribute">#[<span class="ident">from</span>]</span> <span class="ident">FromHttpResponseError</span><span class="op">&lt;</span><span class="ident">RumaClientApiError</span><span class="op">&gt;</span>),
 
     <span class="doccomment">/// An error converting between ruma_client_api types and Hyper types.</span>
     <span class="attribute">#[<span class="ident">error</span>(<span class="ident">transparent</span>)]</span>
