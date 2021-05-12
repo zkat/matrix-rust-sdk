@@ -364,10 +364,11 @@
 <span id="361">361</span>
 <span id="362">362</span>
 <span id="363">363</span>
+<span id="364">364</span>
 </pre><pre class="rust">
 <span class="kw">use</span> <span class="ident">ruma</span>::{
     <span class="ident">api::client::r0::sync::sync_events</span>::{
-        <span class="ident">AccountData</span>, <span class="ident">Ephemeral</span>, <span class="ident">InvitedRoom</span>, <span class="ident">Presence</span>, <span class="ident">State</span>, <span class="ident">ToDevice</span>,
+        <span class="ident">Ephemeral</span>, <span class="ident">InvitedRoom</span>, <span class="ident">Presence</span>, <span class="ident">RoomAccountData</span>, <span class="ident">State</span>, <span class="ident">ToDevice</span>,
     },
     <span class="ident">serde::Raw</span>,
     <span class="ident">DeviceIdBox</span>,
@@ -379,7 +380,8 @@
     <span class="ident">api::r0</span>::{
         <span class="ident">push::get_notifications::Notification</span>,
         <span class="ident">sync::sync_events</span>::{
-            <span class="ident">DeviceLists</span>, <span class="ident">UnreadNotificationsCount</span> <span class="kw">as</span> <span class="ident">RumaUnreadNotificationsCount</span>,
+            <span class="ident">DeviceLists</span>, <span class="ident">GlobalAccountData</span>,
+            <span class="ident">UnreadNotificationsCount</span> <span class="kw">as</span> <span class="ident">RumaUnreadNotificationsCount</span>,
         },
     },
     <span class="ident">events</span>::{
@@ -485,7 +487,7 @@
     <span class="doccomment">/// Updates to the presence status of other users.</span>
     <span class="kw">pub</span> <span class="ident">presence</span>: <span class="ident">Presence</span>,
     <span class="doccomment">/// The global private data created by this user.</span>
-    <span class="kw">pub</span> <span class="ident">account_data</span>: <span class="ident">AccountData</span>,
+    <span class="kw">pub</span> <span class="ident">account_data</span>: <span class="ident">GlobalAccountData</span>,
     <span class="doccomment">/// Messages sent dirrectly between devices.</span>
     <span class="kw">pub</span> <span class="ident">to_device</span>: <span class="ident">ToDevice</span>,
     <span class="doccomment">/// Information on E2E device updates.</span>
@@ -532,7 +534,7 @@
     <span class="doccomment">/// given, or `full_state` is true).</span>
     <span class="kw">pub</span> <span class="ident">state</span>: <span class="ident">State</span>,
     <span class="doccomment">/// The private data that this user has attached to this room.</span>
-    <span class="kw">pub</span> <span class="ident">account_data</span>: <span class="ident">AccountData</span>,
+    <span class="kw">pub</span> <span class="ident">account_data</span>: <span class="ident">RoomAccountData</span>,
     <span class="doccomment">/// The ephemeral events in the room that aren&#39;t recorded in the timeline or state of the</span>
     <span class="doccomment">/// room. e.g. typing.</span>
     <span class="kw">pub</span> <span class="ident">ephemeral</span>: <span class="ident">Ephemeral</span>,
@@ -542,7 +544,7 @@
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(
         <span class="ident">timeline</span>: <span class="ident">Timeline</span>,
         <span class="ident">state</span>: <span class="ident">State</span>,
-        <span class="ident">account_data</span>: <span class="ident">AccountData</span>,
+        <span class="ident">account_data</span>: <span class="ident">RoomAccountData</span>,
         <span class="ident">ephemeral</span>: <span class="ident">Ephemeral</span>,
         <span class="ident">unread_notifications</span>: <span class="ident">UnreadNotificationsCount</span>,
     ) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
@@ -587,11 +589,11 @@
     <span class="doccomment">/// given, or `full_state` is true).</span>
     <span class="kw">pub</span> <span class="ident">state</span>: <span class="ident">State</span>,
     <span class="doccomment">/// The private data that this user has attached to this room.</span>
-    <span class="kw">pub</span> <span class="ident">account_data</span>: <span class="ident">AccountData</span>,
+    <span class="kw">pub</span> <span class="ident">account_data</span>: <span class="ident">RoomAccountData</span>,
 }
 
 <span class="kw">impl</span> <span class="ident">LeftRoom</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">timeline</span>: <span class="ident">Timeline</span>, <span class="ident">state</span>: <span class="ident">State</span>, <span class="ident">account_data</span>: <span class="ident">AccountData</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">timeline</span>: <span class="ident">Timeline</span>, <span class="ident">state</span>: <span class="ident">State</span>, <span class="ident">account_data</span>: <span class="ident">RoomAccountData</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
         <span class="self">Self</span> {
             <span class="ident">timeline</span>,
             <span class="ident">state</span>,

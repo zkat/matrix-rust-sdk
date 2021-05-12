@@ -1478,6 +1478,10 @@
 <span id="1475">1475</span>
 <span id="1476">1476</span>
 <span id="1477">1477</span>
+<span id="1478">1478</span>
+<span id="1479">1479</span>
+<span id="1480">1480</span>
+<span id="1481">1481</span>
 </pre><pre class="rust">
 <span class="comment">// Copyright 2020 Damir Jelić</span>
 <span class="comment">// Copyright 2020 The Matrix.org Foundation C.I.C.</span>
@@ -1523,8 +1527,8 @@
     },
     <span class="ident">events</span>::{
         <span class="ident">room::member</span>::{<span class="ident">MemberEventContent</span>, <span class="ident">MembershipState</span>},
-        <span class="ident">AnyBasicEvent</span>, <span class="ident">AnyStrippedStateEvent</span>, <span class="ident">AnySyncRoomEvent</span>, <span class="ident">AnySyncStateEvent</span>, <span class="ident">EventContent</span>,
-        <span class="ident">EventType</span>, <span class="ident">StateEvent</span>,
+        <span class="ident">AnyGlobalAccountDataEvent</span>, <span class="ident">AnyRoomAccountDataEvent</span>, <span class="ident">AnyStrippedStateEvent</span>,
+        <span class="ident">AnySyncRoomEvent</span>, <span class="ident">AnySyncStateEvent</span>, <span class="ident">EventContent</span>, <span class="ident">EventType</span>, <span class="ident">StateEvent</span>,
     },
     <span class="ident">identifiers</span>::{<span class="ident">RoomId</span>, <span class="ident">UserId</span>},
     <span class="ident">instant::Instant</span>,
@@ -2138,7 +2142,7 @@
     <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">handle_room_account_data</span>(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         <span class="ident">room_id</span>: <span class="kw-2">&amp;</span><span class="ident">RoomId</span>,
-        <span class="ident">events</span>: <span class="kw-2">&amp;</span>[<span class="ident">Raw</span><span class="op">&lt;</span><span class="ident">AnyBasicEvent</span><span class="op">&gt;</span>],
+        <span class="ident">events</span>: <span class="kw-2">&amp;</span>[<span class="ident">Raw</span><span class="op">&lt;</span><span class="ident">AnyRoomAccountDataEvent</span><span class="op">&gt;</span>],
         <span class="ident">changes</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">StateChanges</span>,
     ) {
         <span class="kw">for</span> <span class="ident">raw_event</span> <span class="kw">in</span> <span class="ident">events</span> {
@@ -2148,7 +2152,11 @@
         }
     }
 
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">handle_account_data</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">events</span>: <span class="kw-2">&amp;</span>[<span class="ident">Raw</span><span class="op">&lt;</span><span class="ident">AnyBasicEvent</span><span class="op">&gt;</span>], <span class="ident">changes</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">StateChanges</span>) {
+    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">handle_account_data</span>(
+        <span class="kw-2">&amp;</span><span class="self">self</span>,
+        <span class="ident">events</span>: <span class="kw-2">&amp;</span>[<span class="ident">Raw</span><span class="op">&lt;</span><span class="ident">AnyGlobalAccountDataEvent</span><span class="op">&gt;</span>],
+        <span class="ident">changes</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">StateChanges</span>,
+    ) {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">account_data</span> <span class="op">=</span> <span class="ident">BTreeMap::new</span>();
 
         <span class="kw">for</span> <span class="ident">raw_event</span> <span class="kw">in</span> <span class="ident">events</span> {
@@ -2158,7 +2166,7 @@
                 <span class="kw">continue</span>;
             };
 
-            <span class="kw">if</span> <span class="kw">let</span> <span class="ident">AnyBasicEvent::Direct</span>(<span class="ident">e</span>) <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">event</span> {
+            <span class="kw">if</span> <span class="kw">let</span> <span class="ident">AnyGlobalAccountDataEvent::Direct</span>(<span class="ident">e</span>) <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">event</span> {
                 <span class="kw">for</span> (<span class="ident">user_id</span>, <span class="ident">rooms</span>) <span class="kw">in</span> <span class="ident">e</span>.<span class="ident">content</span>.<span class="ident">iter</span>() {
                     <span class="kw">for</span> <span class="ident">room_id</span> <span class="kw">in</span> <span class="ident">rooms</span> {
                         <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">room</span>) <span class="op">=</span> <span class="ident">changes</span>.<span class="ident">room_infos</span>.<span class="ident">get_mut</span>(<span class="ident">room_id</span>) {
@@ -2829,13 +2837,13 @@
     <span class="doccomment">/// Gets the push rules from `changes` if they have been updated, otherwise get them from the</span>
     <span class="doccomment">/// store. As a fallback, uses `Ruleset::server_default` if the user is logged in.</span>
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">get_push_rules</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">changes</span>: <span class="kw-2">&amp;</span><span class="ident">StateChanges</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Ruleset</span><span class="op">&gt;</span> {
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">AnyBasicEvent::PushRules</span>(<span class="ident">event</span>)) <span class="op">=</span> <span class="ident">changes</span>
+        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">AnyGlobalAccountDataEvent::PushRules</span>(<span class="ident">event</span>)) <span class="op">=</span> <span class="ident">changes</span>
             .<span class="ident">account_data</span>
             .<span class="ident">get</span>(<span class="ident">EventType::PushRules</span>.<span class="ident">as_str</span>())
             .<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">e</span><span class="op">|</span> <span class="ident">e</span>.<span class="ident">deserialize</span>().<span class="ident">ok</span>())
         {
             <span class="prelude-val">Ok</span>(<span class="ident">event</span>.<span class="ident">content</span>.<span class="ident">global</span>)
-        } <span class="kw">else</span> <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">AnyBasicEvent::PushRules</span>(<span class="ident">event</span>)) <span class="op">=</span> <span class="self">self</span>
+        } <span class="kw">else</span> <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">AnyGlobalAccountDataEvent::PushRules</span>(<span class="ident">event</span>)) <span class="op">=</span> <span class="self">self</span>
             .<span class="ident">store</span>
             .<span class="ident">get_account_data_event</span>(<span class="ident">EventType::PushRules</span>)
             .<span class="kw">await</span><span class="question-mark">?</span>

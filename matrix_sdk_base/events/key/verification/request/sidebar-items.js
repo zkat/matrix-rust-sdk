@@ -1,1 +1,1 @@
-initSidebarItems({"struct":[["RequestToDeviceEventContent","The payload for `RequestEvent`."]]});
+initSidebarItems({"struct":[["RedactedRequestToDeviceEventContent","The payload for a redacted `RequestToDeviceEventContent`"],["RequestToDeviceEventContent","The payload for `RequestEvent`."]]});

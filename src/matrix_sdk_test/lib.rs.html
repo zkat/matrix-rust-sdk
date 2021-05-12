@@ -418,8 +418,8 @@
 <span class="kw">use</span> <span class="ident">matrix_sdk_common</span>::{
     <span class="ident">api::r0::sync::sync_events::Response</span> <span class="kw">as</span> <span class="ident">SyncResponse</span>,
     <span class="ident">events</span>::{
-        <span class="ident">presence::PresenceEvent</span>, <span class="ident">AnyBasicEvent</span>, <span class="ident">AnySyncEphemeralRoomEvent</span>, <span class="ident">AnySyncRoomEvent</span>,
-        <span class="ident">AnySyncStateEvent</span>,
+        <span class="ident">presence::PresenceEvent</span>, <span class="ident">AnyGlobalAccountDataEvent</span>, <span class="ident">AnySyncEphemeralRoomEvent</span>,
+        <span class="ident">AnySyncRoomEvent</span>, <span class="ident">AnySyncStateEvent</span>,
     },
     <span class="ident">identifiers</span>::{<span class="ident">room_id</span>, <span class="ident">RoomId</span>},
     <span class="ident">IncomingResponse</span>,
@@ -506,7 +506,7 @@
     <span class="doccomment">/// The ephemeral room events that determine the state of a `Room`.</span>
     <span class="ident">ephemeral</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">AnySyncEphemeralRoomEvent</span><span class="op">&gt;</span>,
     <span class="doccomment">/// The account data events that determine the state of a `Room`.</span>
-    <span class="ident">account_data</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">AnyBasicEvent</span><span class="op">&gt;</span>,
+    <span class="ident">account_data</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">AnyGlobalAccountDataEvent</span><span class="op">&gt;</span>,
     <span class="doccomment">/// Internal counter to enable the `prev_batch` and `next_batch` of each sync response to vary.</span>
     <span class="ident">batch_counter</span>: <span class="ident">i64</span>,
 }
@@ -536,7 +536,7 @@
             <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">panic!</span>(<span class="string">&quot;unknown account event {:?}&quot;</span>, <span class="ident">json</span>),
         };
 
-        <span class="kw">let</span> <span class="ident">event</span> <span class="op">=</span> <span class="ident">serde_json::from_value</span>::<span class="op">&lt;</span><span class="ident">AnyBasicEvent</span><span class="op">&gt;</span>(<span class="ident">val</span>.<span class="ident">clone</span>()).<span class="ident">unwrap</span>();
+        <span class="kw">let</span> <span class="ident">event</span> <span class="op">=</span> <span class="ident">serde_json::from_value</span>::<span class="op">&lt;</span><span class="ident">AnyGlobalAccountDataEvent</span><span class="op">&gt;</span>(<span class="ident">val</span>.<span class="ident">clone</span>()).<span class="ident">unwrap</span>();
         <span class="self">self</span>.<span class="ident">account_data</span>.<span class="ident">push</span>(<span class="ident">event</span>);
         <span class="self">self</span>
     }

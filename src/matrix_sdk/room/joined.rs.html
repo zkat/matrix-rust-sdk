@@ -650,8 +650,6 @@
 <span id="647">647</span>
 <span id="648">648</span>
 <span id="649">649</span>
-<span id="650">650</span>
-<span id="651">651</span>
 </pre><pre class="rust">
 <span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">room::Common</span>, <span class="ident">BaseRoom</span>, <span class="ident">Client</span>, <span class="prelude-ty">Result</span>, <span class="ident">RoomType</span>};
 <span class="kw">use</span> <span class="ident">std</span>::{<span class="ident">io::Read</span>, <span class="ident">ops::Deref</span>};
@@ -686,6 +684,7 @@
     },
     <span class="ident">identifiers</span>::{<span class="ident">EventId</span>, <span class="ident">UserId</span>},
     <span class="ident">instant</span>::{<span class="ident">Duration</span>, <span class="ident">Instant</span>},
+    <span class="ident">receipt::ReceiptType</span>,
     <span class="ident">uuid::Uuid</span>,
 };
 
@@ -880,11 +879,8 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// * `event_id` - The `EventId` specifies the event to set the read receipt on.</span>
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">read_receipt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">event_id</span>: <span class="kw-2">&amp;</span><span class="ident">EventId</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">request</span> <span class="op">=</span> <span class="ident">create_receipt::Request::new</span>(
-            <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">room_id</span>(),
-            <span class="ident">create_receipt::ReceiptType::Read</span>,
-            <span class="ident">event_id</span>,
-        );
+        <span class="kw">let</span> <span class="ident">request</span> <span class="op">=</span>
+            <span class="ident">create_receipt::Request::new</span>(<span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">room_id</span>(), <span class="ident">ReceiptType::Read</span>, <span class="ident">event_id</span>);
 
         <span class="self">self</span>.<span class="ident">client</span>.<span class="ident">send</span>(<span class="ident">request</span>, <span class="prelude-val">None</span>).<span class="kw">await</span><span class="question-mark">?</span>;
         <span class="prelude-val">Ok</span>(())
