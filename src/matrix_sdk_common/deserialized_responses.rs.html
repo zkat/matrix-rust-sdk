@@ -1,6 +1,6 @@
 <!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `matrix_sdk_common/src/deserialized_responses.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>deserialized_responses.rs - source</title><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled ><script id="default-settings"></script><script src="../../storage.js"></script><script src="../../crates.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="icon" type="image/svg+xml" href="../../favicon.svg">
 <link rel="alternate icon" type="image/png" href="../../favicon-16x16.png">
-<link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><style type="text/css">#crate-search{background-image:url("../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu" role="button">&#9776;</div><a href='../../matrix_sdk_common/index.html'><div class='logo-container rust-logo'><img src='../../rust-logo.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu"><img src="../../brush.svg" width="18" height="18" alt="Pick another theme!"></button><div id="theme-choices" role="menu"></div></div><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" disabled autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><button type="button" class="help-button">?</button>
+<link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><style type="text/css">#crate-search{background-image:url("../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu" role="button">&#9776;</div><a href='../../matrix_sdk_common/index.html'><div class='logo-container rust-logo'><img src='../../rust-logo.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu"><img src="../../brush.svg" width="18" height="18" alt="Pick another theme!"></button><div id="theme-choices" role="menu"></div></div><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" disabled autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><button type="button" id="help-button">?</button>
                 <a id="settings-menu" href="../../settings.html"><img src="../../wheel.svg" width="18" height="18" alt="Change settings"></a></div></form></nav><section id="main" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">  1</span>
 <span id="2">  2</span>
 <span id="3">  3</span>
@@ -348,24 +348,9 @@
 <span id="345">345</span>
 <span id="346">346</span>
 <span id="347">347</span>
-<span id="348">348</span>
-<span id="349">349</span>
-<span id="350">350</span>
-<span id="351">351</span>
-<span id="352">352</span>
-<span id="353">353</span>
-<span id="354">354</span>
-<span id="355">355</span>
-<span id="356">356</span>
-<span id="357">357</span>
-<span id="358">358</span>
-<span id="359">359</span>
-<span id="360">360</span>
-<span id="361">361</span>
-<span id="362">362</span>
-<span id="363">363</span>
-<span id="364">364</span>
 </pre><pre class="rust">
+<span class="kw">use</span> <span class="ident">std</span>::{<span class="ident">collections::BTreeMap</span>, <span class="ident">convert::TryFrom</span>, <span class="ident">time::SystemTime</span>};
+
 <span class="kw">use</span> <span class="ident">ruma</span>::{
     <span class="ident">api::client::r0::sync::sync_events</span>::{
         <span class="ident">Ephemeral</span>, <span class="ident">InvitedRoom</span>, <span class="ident">Presence</span>, <span class="ident">RoomAccountData</span>, <span class="ident">State</span>, <span class="ident">ToDevice</span>,
@@ -374,7 +359,6 @@
     <span class="ident">DeviceIdBox</span>,
 };
 <span class="kw">use</span> <span class="ident">serde</span>::{<span class="ident">Deserialize</span>, <span class="ident">Serialize</span>};
-<span class="kw">use</span> <span class="ident">std</span>::{<span class="ident">collections::BTreeMap</span>, <span class="ident">convert::TryFrom</span>, <span class="ident">time::SystemTime</span>};
 
 <span class="kw">use</span> <span class="kw">super</span>::{
     <span class="ident">api::r0</span>::{
@@ -471,16 +455,14 @@
 
 <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">Raw</span><span class="op">&lt;</span><span class="ident">AnySyncRoomEvent</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">SyncRoomEvent</span> {
     <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">inner</span>: <span class="ident">Raw</span><span class="op">&lt;</span><span class="ident">AnySyncRoomEvent</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
-        <span class="self">Self</span> {
-            <span class="ident">encryption_info</span>: <span class="prelude-val">None</span>,
-            <span class="ident">event</span>: <span class="ident">inner</span>,
-        }
+        <span class="self">Self</span> { <span class="ident">encryption_info</span>: <span class="prelude-val">None</span>, <span class="ident">event</span>: <span class="ident">inner</span> }
     }
 }
 
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Default</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">SyncResponse</span> {
-    <span class="doccomment">/// The batch token to supply in the `since` param of the next `/sync` request.</span>
+    <span class="doccomment">/// The batch token to supply in the `since` param of the next `/sync`</span>
+    <span class="doccomment">/// request.</span>
     <span class="kw">pub</span> <span class="ident">next_batch</span>: <span class="ident">String</span>,
     <span class="doccomment">/// Updates to rooms.</span>
     <span class="kw">pub</span> <span class="ident">rooms</span>: <span class="ident">Rooms</span>,
@@ -505,10 +487,7 @@
 
 <span class="kw">impl</span> <span class="ident">SyncResponse</span> {
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">next_batch</span>: <span class="ident">String</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
-        <span class="self">Self</span> {
-            <span class="ident">next_batch</span>,
-            ..<span class="ident">Default::default</span>()
-        }
+        <span class="self">Self</span> { <span class="ident">next_batch</span>, ..<span class="ident">Default::default</span>() }
     }
 }
 
@@ -529,14 +508,15 @@
     <span class="kw">pub</span> <span class="ident">unread_notifications</span>: <span class="ident">UnreadNotificationsCount</span>,
     <span class="doccomment">/// The timeline of messages and state changes in the room.</span>
     <span class="kw">pub</span> <span class="ident">timeline</span>: <span class="ident">Timeline</span>,
-    <span class="doccomment">/// Updates to the state, between the time indicated by the `since` parameter, and the start</span>
-    <span class="doccomment">/// of the `timeline` (or all state up to the start of the `timeline`, if `since` is not</span>
-    <span class="doccomment">/// given, or `full_state` is true).</span>
+    <span class="doccomment">/// Updates to the state, between the time indicated by the `since`</span>
+    <span class="doccomment">/// parameter, and the start of the `timeline` (or all state up to the</span>
+    <span class="doccomment">/// start of the `timeline`, if `since` is not given, or `full_state` is</span>
+    <span class="doccomment">/// true).</span>
     <span class="kw">pub</span> <span class="ident">state</span>: <span class="ident">State</span>,
     <span class="doccomment">/// The private data that this user has attached to this room.</span>
     <span class="kw">pub</span> <span class="ident">account_data</span>: <span class="ident">RoomAccountData</span>,
-    <span class="doccomment">/// The ephemeral events in the room that aren&#39;t recorded in the timeline or state of the</span>
-    <span class="doccomment">/// room. e.g. typing.</span>
+    <span class="doccomment">/// The ephemeral events in the room that aren&#39;t recorded in the timeline or</span>
+    <span class="doccomment">/// state of the room. e.g. typing.</span>
     <span class="kw">pub</span> <span class="ident">ephemeral</span>: <span class="ident">Ephemeral</span>,
 }
 
@@ -548,20 +528,15 @@
         <span class="ident">ephemeral</span>: <span class="ident">Ephemeral</span>,
         <span class="ident">unread_notifications</span>: <span class="ident">UnreadNotificationsCount</span>,
     ) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
-        <span class="self">Self</span> {
-            <span class="ident">unread_notifications</span>,
-            <span class="ident">timeline</span>,
-            <span class="ident">state</span>,
-            <span class="ident">account_data</span>,
-            <span class="ident">ephemeral</span>,
-        }
+        <span class="self">Self</span> { <span class="ident">unread_notifications</span>, <span class="ident">timeline</span>, <span class="ident">state</span>, <span class="ident">account_data</span>, <span class="ident">ephemeral</span> }
     }
 }
 
 <span class="doccomment">/// Counts of unread notifications for a room.</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Copy</span>, <span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Default</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">UnreadNotificationsCount</span> {
-    <span class="doccomment">/// The number of unread notifications for this room with the highlight flag set.</span>
+    <span class="doccomment">/// The number of unread notifications for this room with the highlight flag</span>
+    <span class="doccomment">/// set.</span>
     <span class="kw">pub</span> <span class="ident">highlight_count</span>: <span class="ident">u64</span>,
     <span class="doccomment">/// The total number of unread notifications for this room.</span>
     <span class="kw">pub</span> <span class="ident">notification_count</span>: <span class="ident">u64</span>,
@@ -571,10 +546,7 @@
     <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">notifications</span>: <span class="ident">RumaUnreadNotificationsCount</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
         <span class="self">Self</span> {
             <span class="ident">highlight_count</span>: <span class="ident">notifications</span>.<span class="ident">highlight_count</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">c</span><span class="op">|</span> <span class="ident">c</span>.<span class="ident">into</span>()).<span class="ident">unwrap_or</span>(<span class="number">0</span>),
-            <span class="ident">notification_count</span>: <span class="ident">notifications</span>
-                .<span class="ident">notification_count</span>
-                .<span class="ident">map</span>(<span class="op">|</span><span class="ident">c</span><span class="op">|</span> <span class="ident">c</span>.<span class="ident">into</span>())
-                .<span class="ident">unwrap_or</span>(<span class="number">0</span>),
+            <span class="ident">notification_count</span>: <span class="ident">notifications</span>.<span class="ident">notification_count</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">c</span><span class="op">|</span> <span class="ident">c</span>.<span class="ident">into</span>()).<span class="ident">unwrap_or</span>(<span class="number">0</span>),
         }
     }
 }
@@ -584,9 +556,10 @@
     <span class="doccomment">/// The timeline of messages and state changes in the room up to the point</span>
     <span class="doccomment">/// when the user left.</span>
     <span class="kw">pub</span> <span class="ident">timeline</span>: <span class="ident">Timeline</span>,
-    <span class="doccomment">/// Updates to the state, between the time indicated by the `since` parameter, and the start</span>
-    <span class="doccomment">/// of the `timeline` (or all state up to the start of the `timeline`, if `since` is not</span>
-    <span class="doccomment">/// given, or `full_state` is true).</span>
+    <span class="doccomment">/// Updates to the state, between the time indicated by the `since`</span>
+    <span class="doccomment">/// parameter, and the start of the `timeline` (or all state up to the</span>
+    <span class="doccomment">/// start of the `timeline`, if `since` is not given, or `full_state` is</span>
+    <span class="doccomment">/// true).</span>
     <span class="kw">pub</span> <span class="ident">state</span>: <span class="ident">State</span>,
     <span class="doccomment">/// The private data that this user has attached to this room.</span>
     <span class="kw">pub</span> <span class="ident">account_data</span>: <span class="ident">RoomAccountData</span>,
@@ -594,18 +567,15 @@
 
 <span class="kw">impl</span> <span class="ident">LeftRoom</span> {
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">timeline</span>: <span class="ident">Timeline</span>, <span class="ident">state</span>: <span class="ident">State</span>, <span class="ident">account_data</span>: <span class="ident">RoomAccountData</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
-        <span class="self">Self</span> {
-            <span class="ident">timeline</span>,
-            <span class="ident">state</span>,
-            <span class="ident">account_data</span>,
-        }
+        <span class="self">Self</span> { <span class="ident">timeline</span>, <span class="ident">state</span>, <span class="ident">account_data</span> }
     }
 }
 
 <span class="doccomment">/// Events in the room.</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Default</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Timeline</span> {
-    <span class="doccomment">/// True if the number of events returned was limited by the `limit` on the filter.</span>
+    <span class="doccomment">/// True if the number of events returned was limited by the `limit` on the</span>
+    <span class="doccomment">/// filter.</span>
     <span class="kw">pub</span> <span class="ident">limited</span>: <span class="ident">bool</span>,
 
     <span class="doccomment">/// A token that can be supplied to to the `from` parameter of the</span>
@@ -618,11 +588,7 @@
 
 <span class="kw">impl</span> <span class="ident">Timeline</span> {
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">limited</span>: <span class="ident">bool</span>, <span class="ident">prev_batch</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
-        <span class="self">Self</span> {
-            <span class="ident">limited</span>,
-            <span class="ident">prev_batch</span>,
-            ..<span class="ident">Default::default</span>()
-        }
+        <span class="self">Self</span> { <span class="ident">limited</span>, <span class="ident">prev_batch</span>, ..<span class="ident">Default::default</span>() }
     }
 }
 

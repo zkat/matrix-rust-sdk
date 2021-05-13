@@ -1,6 +1,6 @@
 <!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `matrix_sdk_appservice/src/lib.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>lib.rs - source</title><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled ><script id="default-settings"></script><script src="../../storage.js"></script><script src="../../crates.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="icon" type="image/svg+xml" href="../../favicon.svg">
 <link rel="alternate icon" type="image/png" href="../../favicon-16x16.png">
-<link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><style type="text/css">#crate-search{background-image:url("../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu" role="button">&#9776;</div><a href='../../matrix_sdk_appservice/index.html'><div class='logo-container rust-logo'><img src='../../rust-logo.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu"><img src="../../brush.svg" width="18" height="18" alt="Pick another theme!"></button><div id="theme-choices" role="menu"></div></div><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" disabled autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><button type="button" class="help-button">?</button>
+<link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><style type="text/css">#crate-search{background-image:url("../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu" role="button">&#9776;</div><a href='../../matrix_sdk_appservice/index.html'><div class='logo-container rust-logo'><img src='../../rust-logo.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu"><img src="../../brush.svg" width="18" height="18" alt="Pick another theme!"></button><div id="theme-choices" role="menu"></div></div><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" disabled autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><button type="button" id="help-button">?</button>
                 <a id="settings-menu" href="../../settings.html"><img src="../../wheel.svg" width="18" height="18" alt="Change settings"></a></div></form></nav><section id="main" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">  1</span>
 <span id="2">  2</span>
 <span id="3">  3</span>
@@ -332,6 +332,10 @@
 <span id="329">329</span>
 <span id="330">330</span>
 <span id="331">331</span>
+<span id="332">332</span>
+<span id="333">333</span>
+<span id="334">334</span>
+<span id="335">335</span>
 </pre><pre class="rust">
 <span class="comment">// Copyright 2021 Famedly GmbH</span>
 <span class="comment">//</span>
@@ -349,11 +353,14 @@
 
 <span class="doccomment">//! Matrix [Application Service] library</span>
 <span class="doccomment">//!</span>
-<span class="doccomment">//! The appservice crate aims to provide a batteries-included experience. That means that we</span>
-<span class="doccomment">//! * ship with functionality to configure your webserver crate or simply run the webserver for you</span>
+<span class="doccomment">//! The appservice crate aims to provide a batteries-included experience. That</span>
+<span class="doccomment">//! means that we</span>
+<span class="doccomment">//! * ship with functionality to configure your webserver crate or simply run</span>
+<span class="doccomment">//!   the webserver for you</span>
 <span class="doccomment">//! * receive and validate requests from the homeserver correctly</span>
 <span class="doccomment">//! * allow calling the homeserver with proper virtual user identity assertion</span>
-<span class="doccomment">//! * have the goal to have a consistent room state available by leveraging the stores that the matrix-sdk provides</span>
+<span class="doccomment">//! * have the goal to have a consistent room state available by leveraging the</span>
+<span class="doccomment">//!   stores that the matrix-sdk provides</span>
 <span class="doccomment">//!</span>
 <span class="doccomment">//! # Quickstart</span>
 <span class="doccomment">//!</span>
@@ -397,6 +404,8 @@
 };
 
 <span class="kw">use</span> <span class="ident">http::Uri</span>;
+<span class="attribute">#[<span class="ident">doc</span>(<span class="ident">inline</span>)]</span>
+<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">matrix_sdk::api_appservice</span> <span class="kw">as</span> <span class="ident">api</span>;
 <span class="kw">use</span> <span class="ident">matrix_sdk</span>::{
     <span class="ident">api</span>::{
         <span class="ident">error::ErrorKind</span>,
@@ -415,9 +424,6 @@
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;actix&quot;</span>))]</span>
 <span class="kw">use</span> <span class="ident">tracing::error</span>;
 <span class="kw">use</span> <span class="ident">tracing::warn</span>;
-
-<span class="attribute">#[<span class="ident">doc</span>(<span class="ident">inline</span>)]</span>
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">matrix_sdk::api_appservice</span> <span class="kw">as</span> <span class="ident">api</span>;
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;actix&quot;</span>)]</span>
 <span class="kw">mod</span> <span class="ident">actix</span>;
@@ -439,9 +445,7 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// See the fields of [`Registration`] for the required format</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">try_from_yaml_str</span>(<span class="ident">value</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">str</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
-        <span class="prelude-val">Ok</span>(<span class="self">Self</span> {
-            <span class="ident">inner</span>: <span class="ident">serde_yaml::from_str</span>(<span class="ident">value</span>.<span class="ident">as_ref</span>())<span class="question-mark">?</span>,
-        })
+        <span class="prelude-val">Ok</span>(<span class="self">Self</span> { <span class="ident">inner</span>: <span class="ident">serde_yaml::from_str</span>(<span class="ident">value</span>.<span class="ident">as_ref</span>())<span class="question-mark">?</span> })
     }
 
     <span class="doccomment">/// Try to load registration from yaml file</span>
@@ -450,9 +454,7 @@
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">try_from_yaml_file</span>(<span class="ident">path</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">PathBuf</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">file</span> <span class="op">=</span> <span class="ident">File::open</span>(<span class="ident">path</span>.<span class="ident">into</span>())<span class="question-mark">?</span>;
 
-        <span class="prelude-val">Ok</span>(<span class="self">Self</span> {
-            <span class="ident">inner</span>: <span class="ident">serde_yaml::from_reader</span>(<span class="ident">file</span>)<span class="question-mark">?</span>,
-        })
+        <span class="prelude-val">Ok</span>(<span class="self">Self</span> { <span class="ident">inner</span>: <span class="ident">serde_yaml::from_reader</span>(<span class="ident">file</span>)<span class="question-mark">?</span> })
     }
 }
 
@@ -512,8 +514,10 @@
     <span class="doccomment">/// # Arguments</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// * `homeserver_url` - The homeserver that the client should connect to.</span>
-    <span class="doccomment">/// * `server_name` - The server name to use when constructing user ids from the localpart.</span>
-    <span class="doccomment">/// * `registration` - The [Appservice Registration] to use when interacting with the homserver.</span>
+    <span class="doccomment">/// * `server_name` - The server name to use when constructing user ids from</span>
+    <span class="doccomment">///   the localpart.</span>
+    <span class="doccomment">/// * `registration` - The [Appservice Registration] to use when interacting</span>
+    <span class="doccomment">///   with the homserver.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// [Appservice Registration]: https://matrix.org/docs/spec/application_service/r0.1.2#registration</span>
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">new</span>(
@@ -544,8 +548,9 @@
 
     <span class="doccomment">/// Get `Client` for the given `localpart`</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// If the `localpart` is covered by the `namespaces` in the [registration] all requests to the</span>
-    <span class="doccomment">/// homeserver will [assert the identity] to the according virtual user.</span>
+    <span class="doccomment">/// If the `localpart` is covered by the `namespaces` in the [registration]</span>
+    <span class="doccomment">/// all requests to the homeserver will [assert the identity] to the</span>
+    <span class="doccomment">/// according virtual user.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// [registration]: https://matrix.org/docs/spec/application_service/r0.1.2#registration</span>
     <span class="doccomment">/// [assert the identity]:</span>
@@ -626,7 +631,8 @@
 
     <span class="doccomment">/// Get the host and port from the registration URL</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// If no port is found it falls back to scheme defaults: 80 for http and 443 for https</span>
+    <span class="doccomment">/// If no port is found it falls back to scheme defaults: 80 for http and</span>
+    <span class="doccomment">/// 443 for https</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_host_and_port_from_registration</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(<span class="ident">Host</span>, <span class="ident">Port</span>)<span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">uri</span> <span class="op">=</span> <span class="ident">Uri::try_from</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">registration</span>.<span class="ident">url</span>)<span class="question-mark">?</span>;
 
@@ -650,9 +656,11 @@
         <span class="ident">actix::get_scope</span>().<span class="ident">data</span>(<span class="self">self</span>.<span class="ident">clone</span>())
     }
 
-    <span class="doccomment">/// Convenience method that runs an http server depending on the selected server feature</span>
+    <span class="doccomment">/// Convenience method that runs an http server depending on the selected</span>
+    <span class="doccomment">/// server feature</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// This is a blocking call that tries to listen on the provided host and port</span>
+    <span class="doccomment">/// This is a blocking call that tries to listen on the provided host and</span>
+    <span class="doccomment">/// port</span>
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">run</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">host</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">str</span><span class="op">&gt;</span>, <span class="ident">port</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">u16</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;actix&quot;</span>)]</span>
         {

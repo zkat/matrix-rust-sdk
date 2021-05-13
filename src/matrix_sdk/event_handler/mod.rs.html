@@ -1,6 +1,6 @@
 <!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `matrix_sdk/src/event_handler/mod.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>mod.rs - source</title><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled ><script id="default-settings"></script><script src="../../../storage.js"></script><script src="../../../crates.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="icon" type="image/svg+xml" href="../../../favicon.svg">
 <link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png">
-<link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><style type="text/css">#crate-search{background-image:url("../../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu" role="button">&#9776;</div><a href='../../../matrix_sdk/index.html'><div class='logo-container rust-logo'><img src='../../../rust-logo.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu"><img src="../../../brush.svg" width="18" height="18" alt="Pick another theme!"></button><div id="theme-choices" role="menu"></div></div><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" disabled autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><button type="button" class="help-button">?</button>
+<link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><style type="text/css">#crate-search{background-image:url("../../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu" role="button">&#9776;</div><a href='../../../matrix_sdk/index.html'><div class='logo-container rust-logo'><img src='../../../rust-logo.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu"><img src="../../../brush.svg" width="18" height="18" alt="Pick another theme!"></button><div id="theme-choices" role="menu"></div></div><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" disabled autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><button type="button" id="help-button">?</button>
                 <a id="settings-menu" href="../../../settings.html"><img src="../../../wheel.svg" width="18" height="18" alt="Change settings"></a></div></form></nav><section id="main" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">  1</span>
 <span id="2">  2</span>
 <span id="3">  3</span>
@@ -895,63 +895,6 @@
 <span id="892">892</span>
 <span id="893">893</span>
 <span id="894">894</span>
-<span id="895">895</span>
-<span id="896">896</span>
-<span id="897">897</span>
-<span id="898">898</span>
-<span id="899">899</span>
-<span id="900">900</span>
-<span id="901">901</span>
-<span id="902">902</span>
-<span id="903">903</span>
-<span id="904">904</span>
-<span id="905">905</span>
-<span id="906">906</span>
-<span id="907">907</span>
-<span id="908">908</span>
-<span id="909">909</span>
-<span id="910">910</span>
-<span id="911">911</span>
-<span id="912">912</span>
-<span id="913">913</span>
-<span id="914">914</span>
-<span id="915">915</span>
-<span id="916">916</span>
-<span id="917">917</span>
-<span id="918">918</span>
-<span id="919">919</span>
-<span id="920">920</span>
-<span id="921">921</span>
-<span id="922">922</span>
-<span id="923">923</span>
-<span id="924">924</span>
-<span id="925">925</span>
-<span id="926">926</span>
-<span id="927">927</span>
-<span id="928">928</span>
-<span id="929">929</span>
-<span id="930">930</span>
-<span id="931">931</span>
-<span id="932">932</span>
-<span id="933">933</span>
-<span id="934">934</span>
-<span id="935">935</span>
-<span id="936">936</span>
-<span id="937">937</span>
-<span id="938">938</span>
-<span id="939">939</span>
-<span id="940">940</span>
-<span id="941">941</span>
-<span id="942">942</span>
-<span id="943">943</span>
-<span id="944">944</span>
-<span id="945">945</span>
-<span id="946">946</span>
-<span id="947">947</span>
-<span id="948">948</span>
-<span id="949">949</span>
-<span id="950">950</span>
-<span id="951">951</span>
 </pre><pre class="rust">
 <span class="comment">// Copyright 2020 Damir Jelić</span>
 <span class="comment">// Copyright 2020 The Matrix.org Foundation C.I.C.</span>
@@ -971,6 +914,7 @@
 
 <span class="kw">use</span> <span class="ident">matrix_sdk_common</span>::{
     <span class="ident">api::r0::push::get_notifications::Notification</span>,
+    <span class="ident">async_trait</span>,
     <span class="ident">events</span>::{
         <span class="ident">fully_read::FullyReadEventContent</span>, <span class="ident">AnySyncRoomEvent</span>, <span class="ident">GlobalAccountDataEvent</span>,
         <span class="ident">RoomAccountDataEvent</span>,
@@ -1011,7 +955,6 @@
     <span class="ident">room::Room</span>,
     <span class="ident">Client</span>,
 };
-<span class="kw">use</span> <span class="ident">matrix_sdk_common::async_trait</span>;
 
 <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct</span> <span class="ident">Handler</span> {
     <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">inner</span>: <span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">EventHandler</span><span class="op">&gt;</span>,
@@ -1032,50 +975,29 @@
     }
 
     <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">handle_sync</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">response</span>: <span class="kw-2">&amp;</span><span class="ident">SyncResponse</span>) {
-        <span class="kw">for</span> <span class="ident">event</span> <span class="kw">in</span> <span class="ident">response</span>
-            .<span class="ident">account_data</span>
-            .<span class="ident">events</span>
-            .<span class="ident">iter</span>()
-            .<span class="ident">filter_map</span>(<span class="op">|</span><span class="ident">e</span><span class="op">|</span> <span class="ident">e</span>.<span class="ident">deserialize</span>().<span class="ident">ok</span>())
-        {
+        <span class="kw">for</span> <span class="ident">event</span> <span class="kw">in</span> <span class="ident">response</span>.<span class="ident">account_data</span>.<span class="ident">events</span>.<span class="ident">iter</span>().<span class="ident">filter_map</span>(<span class="op">|</span><span class="ident">e</span><span class="op">|</span> <span class="ident">e</span>.<span class="ident">deserialize</span>().<span class="ident">ok</span>()) {
             <span class="self">self</span>.<span class="ident">handle_account_data_event</span>(<span class="kw-2">&amp;</span><span class="ident">event</span>).<span class="kw">await</span>;
         }
 
         <span class="kw">for</span> (<span class="ident">room_id</span>, <span class="ident">room_info</span>) <span class="kw">in</span> <span class="kw-2">&amp;</span><span class="ident">response</span>.<span class="ident">rooms</span>.<span class="ident">join</span> {
             <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">room</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">get_room</span>(<span class="ident">room_id</span>) {
-                <span class="kw">for</span> <span class="ident">event</span> <span class="kw">in</span> <span class="ident">room_info</span>
-                    .<span class="ident">ephemeral</span>
-                    .<span class="ident">events</span>
-                    .<span class="ident">iter</span>()
-                    .<span class="ident">filter_map</span>(<span class="op">|</span><span class="ident">e</span><span class="op">|</span> <span class="ident">e</span>.<span class="ident">deserialize</span>().<span class="ident">ok</span>())
+                <span class="kw">for</span> <span class="ident">event</span> <span class="kw">in</span> <span class="ident">room_info</span>.<span class="ident">ephemeral</span>.<span class="ident">events</span>.<span class="ident">iter</span>().<span class="ident">filter_map</span>(<span class="op">|</span><span class="ident">e</span><span class="op">|</span> <span class="ident">e</span>.<span class="ident">deserialize</span>().<span class="ident">ok</span>())
                 {
                     <span class="self">self</span>.<span class="ident">handle_ephemeral_event</span>(<span class="ident">room</span>.<span class="ident">clone</span>(), <span class="kw-2">&amp;</span><span class="ident">event</span>).<span class="kw">await</span>;
                 }
 
-                <span class="kw">for</span> <span class="ident">event</span> <span class="kw">in</span> <span class="ident">room_info</span>
-                    .<span class="ident">account_data</span>
-                    .<span class="ident">events</span>
-                    .<span class="ident">iter</span>()
-                    .<span class="ident">filter_map</span>(<span class="op">|</span><span class="ident">e</span><span class="op">|</span> <span class="ident">e</span>.<span class="ident">deserialize</span>().<span class="ident">ok</span>())
+                <span class="kw">for</span> <span class="ident">event</span> <span class="kw">in</span>
+                    <span class="ident">room_info</span>.<span class="ident">account_data</span>.<span class="ident">events</span>.<span class="ident">iter</span>().<span class="ident">filter_map</span>(<span class="op">|</span><span class="ident">e</span><span class="op">|</span> <span class="ident">e</span>.<span class="ident">deserialize</span>().<span class="ident">ok</span>())
                 {
-                    <span class="self">self</span>.<span class="ident">handle_room_account_data_event</span>(<span class="ident">room</span>.<span class="ident">clone</span>(), <span class="kw-2">&amp;</span><span class="ident">event</span>)
-                        .<span class="kw">await</span>;
+                    <span class="self">self</span>.<span class="ident">handle_room_account_data_event</span>(<span class="ident">room</span>.<span class="ident">clone</span>(), <span class="kw-2">&amp;</span><span class="ident">event</span>).<span class="kw">await</span>;
                 }
 
-                <span class="kw">for</span> <span class="ident">event</span> <span class="kw">in</span> <span class="ident">room_info</span>
-                    .<span class="ident">state</span>
-                    .<span class="ident">events</span>
-                    .<span class="ident">iter</span>()
-                    .<span class="ident">filter_map</span>(<span class="op">|</span><span class="ident">e</span><span class="op">|</span> <span class="ident">e</span>.<span class="ident">deserialize</span>().<span class="ident">ok</span>())
-                {
+                <span class="kw">for</span> <span class="ident">event</span> <span class="kw">in</span> <span class="ident">room_info</span>.<span class="ident">state</span>.<span class="ident">events</span>.<span class="ident">iter</span>().<span class="ident">filter_map</span>(<span class="op">|</span><span class="ident">e</span><span class="op">|</span> <span class="ident">e</span>.<span class="ident">deserialize</span>().<span class="ident">ok</span>()) {
                     <span class="self">self</span>.<span class="ident">handle_state_event</span>(<span class="ident">room</span>.<span class="ident">clone</span>(), <span class="kw-2">&amp;</span><span class="ident">event</span>).<span class="kw">await</span>;
                 }
 
-                <span class="kw">for</span> <span class="ident">event</span> <span class="kw">in</span> <span class="ident">room_info</span>
-                    .<span class="ident">timeline</span>
-                    .<span class="ident">events</span>
-                    .<span class="ident">iter</span>()
-                    .<span class="ident">filter_map</span>(<span class="op">|</span><span class="ident">e</span><span class="op">|</span> <span class="ident">e</span>.<span class="ident">event</span>.<span class="ident">deserialize</span>().<span class="ident">ok</span>())
+                <span class="kw">for</span> <span class="ident">event</span> <span class="kw">in</span>
+                    <span class="ident">room_info</span>.<span class="ident">timeline</span>.<span class="ident">events</span>.<span class="ident">iter</span>().<span class="ident">filter_map</span>(<span class="op">|</span><span class="ident">e</span><span class="op">|</span> <span class="ident">e</span>.<span class="ident">event</span>.<span class="ident">deserialize</span>().<span class="ident">ok</span>())
                 {
                     <span class="self">self</span>.<span class="ident">handle_timeline_event</span>(<span class="ident">room</span>.<span class="ident">clone</span>(), <span class="kw-2">&amp;</span><span class="ident">event</span>).<span class="kw">await</span>;
                 }
@@ -1084,30 +1006,18 @@
 
         <span class="kw">for</span> (<span class="ident">room_id</span>, <span class="ident">room_info</span>) <span class="kw">in</span> <span class="kw-2">&amp;</span><span class="ident">response</span>.<span class="ident">rooms</span>.<span class="ident">leave</span> {
             <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">room</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">get_room</span>(<span class="ident">room_id</span>) {
-                <span class="kw">for</span> <span class="ident">event</span> <span class="kw">in</span> <span class="ident">room_info</span>
-                    .<span class="ident">account_data</span>
-                    .<span class="ident">events</span>
-                    .<span class="ident">iter</span>()
-                    .<span class="ident">filter_map</span>(<span class="op">|</span><span class="ident">e</span><span class="op">|</span> <span class="ident">e</span>.<span class="ident">deserialize</span>().<span class="ident">ok</span>())
+                <span class="kw">for</span> <span class="ident">event</span> <span class="kw">in</span>
+                    <span class="ident">room_info</span>.<span class="ident">account_data</span>.<span class="ident">events</span>.<span class="ident">iter</span>().<span class="ident">filter_map</span>(<span class="op">|</span><span class="ident">e</span><span class="op">|</span> <span class="ident">e</span>.<span class="ident">deserialize</span>().<span class="ident">ok</span>())
                 {
-                    <span class="self">self</span>.<span class="ident">handle_room_account_data_event</span>(<span class="ident">room</span>.<span class="ident">clone</span>(), <span class="kw-2">&amp;</span><span class="ident">event</span>)
-                        .<span class="kw">await</span>;
+                    <span class="self">self</span>.<span class="ident">handle_room_account_data_event</span>(<span class="ident">room</span>.<span class="ident">clone</span>(), <span class="kw-2">&amp;</span><span class="ident">event</span>).<span class="kw">await</span>;
                 }
 
-                <span class="kw">for</span> <span class="ident">event</span> <span class="kw">in</span> <span class="ident">room_info</span>
-                    .<span class="ident">state</span>
-                    .<span class="ident">events</span>
-                    .<span class="ident">iter</span>()
-                    .<span class="ident">filter_map</span>(<span class="op">|</span><span class="ident">e</span><span class="op">|</span> <span class="ident">e</span>.<span class="ident">deserialize</span>().<span class="ident">ok</span>())
-                {
+                <span class="kw">for</span> <span class="ident">event</span> <span class="kw">in</span> <span class="ident">room_info</span>.<span class="ident">state</span>.<span class="ident">events</span>.<span class="ident">iter</span>().<span class="ident">filter_map</span>(<span class="op">|</span><span class="ident">e</span><span class="op">|</span> <span class="ident">e</span>.<span class="ident">deserialize</span>().<span class="ident">ok</span>()) {
                     <span class="self">self</span>.<span class="ident">handle_state_event</span>(<span class="ident">room</span>.<span class="ident">clone</span>(), <span class="kw-2">&amp;</span><span class="ident">event</span>).<span class="kw">await</span>;
                 }
 
-                <span class="kw">for</span> <span class="ident">event</span> <span class="kw">in</span> <span class="ident">room_info</span>
-                    .<span class="ident">timeline</span>
-                    .<span class="ident">events</span>
-                    .<span class="ident">iter</span>()
-                    .<span class="ident">filter_map</span>(<span class="op">|</span><span class="ident">e</span><span class="op">|</span> <span class="ident">e</span>.<span class="ident">event</span>.<span class="ident">deserialize</span>().<span class="ident">ok</span>())
+                <span class="kw">for</span> <span class="ident">event</span> <span class="kw">in</span>
+                    <span class="ident">room_info</span>.<span class="ident">timeline</span>.<span class="ident">events</span>.<span class="ident">iter</span>().<span class="ident">filter_map</span>(<span class="op">|</span><span class="ident">e</span><span class="op">|</span> <span class="ident">e</span>.<span class="ident">event</span>.<span class="ident">deserialize</span>().<span class="ident">ok</span>())
                 {
                     <span class="self">self</span>.<span class="ident">handle_timeline_event</span>(<span class="ident">room</span>.<span class="ident">clone</span>(), <span class="kw-2">&amp;</span><span class="ident">event</span>).<span class="kw">await</span>;
                 }
@@ -1116,31 +1026,22 @@
 
         <span class="kw">for</span> (<span class="ident">room_id</span>, <span class="ident">room_info</span>) <span class="kw">in</span> <span class="kw-2">&amp;</span><span class="ident">response</span>.<span class="ident">rooms</span>.<span class="ident">invite</span> {
             <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">room</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">get_room</span>(<span class="ident">room_id</span>) {
-                <span class="kw">for</span> <span class="ident">event</span> <span class="kw">in</span> <span class="ident">room_info</span>
-                    .<span class="ident">invite_state</span>
-                    .<span class="ident">events</span>
-                    .<span class="ident">iter</span>()
-                    .<span class="ident">filter_map</span>(<span class="op">|</span><span class="ident">e</span><span class="op">|</span> <span class="ident">e</span>.<span class="ident">deserialize</span>().<span class="ident">ok</span>())
+                <span class="kw">for</span> <span class="ident">event</span> <span class="kw">in</span>
+                    <span class="ident">room_info</span>.<span class="ident">invite_state</span>.<span class="ident">events</span>.<span class="ident">iter</span>().<span class="ident">filter_map</span>(<span class="op">|</span><span class="ident">e</span><span class="op">|</span> <span class="ident">e</span>.<span class="ident">deserialize</span>().<span class="ident">ok</span>())
                 {
                     <span class="self">self</span>.<span class="ident">handle_stripped_state_event</span>(<span class="ident">room</span>.<span class="ident">clone</span>(), <span class="kw-2">&amp;</span><span class="ident">event</span>).<span class="kw">await</span>;
                 }
             }
         }
 
-        <span class="kw">for</span> <span class="ident">event</span> <span class="kw">in</span> <span class="ident">response</span>
-            .<span class="ident">presence</span>
-            .<span class="ident">events</span>
-            .<span class="ident">iter</span>()
-            .<span class="ident">filter_map</span>(<span class="op">|</span><span class="ident">e</span><span class="op">|</span> <span class="ident">e</span>.<span class="ident">deserialize</span>().<span class="ident">ok</span>())
-        {
+        <span class="kw">for</span> <span class="ident">event</span> <span class="kw">in</span> <span class="ident">response</span>.<span class="ident">presence</span>.<span class="ident">events</span>.<span class="ident">iter</span>().<span class="ident">filter_map</span>(<span class="op">|</span><span class="ident">e</span><span class="op">|</span> <span class="ident">e</span>.<span class="ident">deserialize</span>().<span class="ident">ok</span>()) {
             <span class="self">self</span>.<span class="ident">on_presence_event</span>(<span class="kw-2">&amp;</span><span class="ident">event</span>).<span class="kw">await</span>;
         }
 
         <span class="kw">for</span> (<span class="ident">room_id</span>, <span class="ident">notifications</span>) <span class="kw">in</span> <span class="kw-2">&amp;</span><span class="ident">response</span>.<span class="ident">notifications</span> {
             <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">room</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">get_room</span>(<span class="kw-2">&amp;</span><span class="ident">room_id</span>) {
                 <span class="kw">for</span> <span class="ident">notification</span> <span class="kw">in</span> <span class="ident">notifications</span> {
-                    <span class="self">self</span>.<span class="ident">on_room_notification</span>(<span class="ident">room</span>.<span class="ident">clone</span>(), <span class="ident">notification</span>.<span class="ident">clone</span>())
-                        .<span class="kw">await</span>;
+                    <span class="self">self</span>.<span class="ident">on_room_notification</span>(<span class="ident">room</span>.<span class="ident">clone</span>(), <span class="ident">notification</span>.<span class="ident">clone</span>()).<span class="kw">await</span>;
                 }
             }
         }
@@ -1204,8 +1105,7 @@
                 <span class="self">self</span>.<span class="ident">on_room_tombstone</span>(<span class="ident">room</span>, <span class="kw-2">&amp;</span><span class="ident">tomb</span>).<span class="kw">await</span>
             }
             <span class="ident">AnySyncStateEvent::Custom</span>(<span class="ident">custom</span>) <span class="op">=</span><span class="op">&gt;</span> {
-                <span class="self">self</span>.<span class="ident">on_custom_event</span>(<span class="ident">room</span>, <span class="kw-2">&amp;</span><span class="ident">CustomEvent::State</span>(<span class="ident">custom</span>))
-                    .<span class="kw">await</span>
+                <span class="self">self</span>.<span class="ident">on_custom_event</span>(<span class="ident">room</span>, <span class="kw-2">&amp;</span><span class="ident">CustomEvent::State</span>(<span class="ident">custom</span>)).<span class="kw">await</span>
             }
             <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> {}
         }
@@ -1223,8 +1123,7 @@
             }
             <span class="ident">AnyStrippedStateEvent::RoomName</span>(<span class="ident">name</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="self">self</span>.<span class="ident">on_stripped_state_name</span>(<span class="ident">room</span>, <span class="kw-2">&amp;</span><span class="ident">name</span>).<span class="kw">await</span>,
             <span class="ident">AnyStrippedStateEvent::RoomCanonicalAlias</span>(<span class="ident">canonical</span>) <span class="op">=</span><span class="op">&gt;</span> {
-                <span class="self">self</span>.<span class="ident">on_stripped_state_canonical_alias</span>(<span class="ident">room</span>, <span class="kw-2">&amp;</span><span class="ident">canonical</span>)
-                    .<span class="kw">await</span>
+                <span class="self">self</span>.<span class="ident">on_stripped_state_canonical_alias</span>(<span class="ident">room</span>, <span class="kw-2">&amp;</span><span class="ident">canonical</span>).<span class="kw">await</span>
             }
             <span class="ident">AnyStrippedStateEvent::RoomAliases</span>(<span class="ident">aliases</span>) <span class="op">=</span><span class="op">&gt;</span> {
                 <span class="self">self</span>.<span class="ident">on_stripped_state_aliases</span>(<span class="ident">room</span>, <span class="kw-2">&amp;</span><span class="ident">aliases</span>).<span class="kw">await</span>
@@ -1296,8 +1195,9 @@
     <span class="ident">StrippedState</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;c</span> <span class="ident">StrippedStateEvent</span><span class="op">&lt;</span><span class="ident">CustomEventContent</span><span class="op">&gt;</span>),
 }
 
-<span class="doccomment">/// This trait allows any type implementing `EventHandler` to specify event callbacks for each event.</span>
-<span class="doccomment">/// The `Client` calls each method when the corresponding event is received.</span>
+<span class="doccomment">/// This trait allows any type implementing `EventHandler` to specify event</span>
+<span class="doccomment">/// callbacks for each event. The `Client` calls each method when the</span>
+<span class="doccomment">/// corresponding event is received.</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// # Examples</span>
 <span class="doccomment">/// ```</span>
@@ -1382,8 +1282,8 @@
     <span class="doccomment">/// Fires when `Client` receives a `RoomEvent::Tombstone` event.</span>
     <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">on_room_tombstone</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="kw">_</span>: <span class="ident">Room</span>, <span class="kw">_</span>: <span class="kw-2">&amp;</span><span class="ident">SyncStateEvent</span><span class="op">&lt;</span><span class="ident">TombstoneEventContent</span><span class="op">&gt;</span>) {}
 
-    <span class="doccomment">/// Fires when `Client` receives room events that trigger notifications according to</span>
-    <span class="doccomment">/// the push rules of the user.</span>
+    <span class="doccomment">/// Fires when `Client` receives room events that trigger notifications</span>
+    <span class="doccomment">/// according to the push rules of the user.</span>
     <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">on_room_notification</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="kw">_</span>: <span class="ident">Room</span>, <span class="kw">_</span>: <span class="ident">Notification</span>) {}
 
     <span class="comment">// `RoomEvent`s from `IncomingState`</span>
@@ -1408,7 +1308,8 @@
     <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">on_state_join_rules</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="kw">_</span>: <span class="ident">Room</span>, <span class="kw">_</span>: <span class="kw-2">&amp;</span><span class="ident">SyncStateEvent</span><span class="op">&lt;</span><span class="ident">JoinRulesEventContent</span><span class="op">&gt;</span>) {}
 
     <span class="comment">// `AnyStrippedStateEvent`s</span>
-    <span class="doccomment">/// Fires when `Client` receives a `AnyStrippedStateEvent::StrippedRoomMember` event.</span>
+    <span class="doccomment">/// Fires when `Client` receives a</span>
+    <span class="doccomment">/// `AnyStrippedStateEvent::StrippedRoomMember` event.</span>
     <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">on_stripped_state_member</span>(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         <span class="kw">_</span>: <span class="ident">Room</span>,
@@ -1416,32 +1317,38 @@
         <span class="kw">_</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">MemberEventContent</span><span class="op">&gt;</span>,
     ) {
     }
-    <span class="doccomment">/// Fires when `Client` receives a `AnyStrippedStateEvent::StrippedRoomName` event.</span>
+    <span class="doccomment">/// Fires when `Client` receives a `AnyStrippedStateEvent::StrippedRoomName`</span>
+    <span class="doccomment">/// event.</span>
     <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">on_stripped_state_name</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="kw">_</span>: <span class="ident">Room</span>, <span class="kw">_</span>: <span class="kw-2">&amp;</span><span class="ident">StrippedStateEvent</span><span class="op">&lt;</span><span class="ident">NameEventContent</span><span class="op">&gt;</span>) {}
-    <span class="doccomment">/// Fires when `Client` receives a `AnyStrippedStateEvent::StrippedRoomCanonicalAlias` event.</span>
+    <span class="doccomment">/// Fires when `Client` receives a</span>
+    <span class="doccomment">/// `AnyStrippedStateEvent::StrippedRoomCanonicalAlias` event.</span>
     <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">on_stripped_state_canonical_alias</span>(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         <span class="kw">_</span>: <span class="ident">Room</span>,
         <span class="kw">_</span>: <span class="kw-2">&amp;</span><span class="ident">StrippedStateEvent</span><span class="op">&lt;</span><span class="ident">CanonicalAliasEventContent</span><span class="op">&gt;</span>,
     ) {
     }
-    <span class="doccomment">/// Fires when `Client` receives a `AnyStrippedStateEvent::StrippedRoomAliases` event.</span>
+    <span class="doccomment">/// Fires when `Client` receives a</span>
+    <span class="doccomment">/// `AnyStrippedStateEvent::StrippedRoomAliases` event.</span>
     <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">on_stripped_state_aliases</span>(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         <span class="kw">_</span>: <span class="ident">Room</span>,
         <span class="kw">_</span>: <span class="kw-2">&amp;</span><span class="ident">StrippedStateEvent</span><span class="op">&lt;</span><span class="ident">AliasesEventContent</span><span class="op">&gt;</span>,
     ) {
     }
-    <span class="doccomment">/// Fires when `Client` receives a `AnyStrippedStateEvent::StrippedRoomAvatar` event.</span>
+    <span class="doccomment">/// Fires when `Client` receives a</span>
+    <span class="doccomment">/// `AnyStrippedStateEvent::StrippedRoomAvatar` event.</span>
     <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">on_stripped_state_avatar</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="kw">_</span>: <span class="ident">Room</span>, <span class="kw">_</span>: <span class="kw-2">&amp;</span><span class="ident">StrippedStateEvent</span><span class="op">&lt;</span><span class="ident">AvatarEventContent</span><span class="op">&gt;</span>) {}
-    <span class="doccomment">/// Fires when `Client` receives a `AnyStrippedStateEvent::StrippedRoomPowerLevels` event.</span>
+    <span class="doccomment">/// Fires when `Client` receives a</span>
+    <span class="doccomment">/// `AnyStrippedStateEvent::StrippedRoomPowerLevels` event.</span>
     <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">on_stripped_state_power_levels</span>(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         <span class="kw">_</span>: <span class="ident">Room</span>,
         <span class="kw">_</span>: <span class="kw-2">&amp;</span><span class="ident">StrippedStateEvent</span><span class="op">&lt;</span><span class="ident">PowerLevelsEventContent</span><span class="op">&gt;</span>,
     ) {
     }
-    <span class="doccomment">/// Fires when `Client` receives a `AnyStrippedStateEvent::StrippedRoomJoinRules` event.</span>
+    <span class="doccomment">/// Fires when `Client` receives a</span>
+    <span class="doccomment">/// `AnyStrippedStateEvent::StrippedRoomJoinRules` event.</span>
     <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">on_stripped_state_join_rules</span>(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         <span class="kw">_</span>: <span class="ident">Room</span>,
@@ -1478,30 +1385,32 @@
     <span class="doccomment">/// Fires when `Client` receives a `NonRoomEvent::RoomAliases` event.</span>
     <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">on_presence_event</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="kw">_</span>: <span class="kw-2">&amp;</span><span class="ident">PresenceEvent</span>) {}
 
-    <span class="doccomment">/// Fires when `Client` receives a `Event::Custom` event or if deserialization fails</span>
-    <span class="doccomment">/// because the event was unknown to ruma.</span>
+    <span class="doccomment">/// Fires when `Client` receives a `Event::Custom` event or if</span>
+    <span class="doccomment">/// deserialization fails because the event was unknown to ruma.</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// The only guarantee this method can give about the event is that it is valid JSON.</span>
+    <span class="doccomment">/// The only guarantee this method can give about the event is that it is</span>
+    <span class="doccomment">/// valid JSON.</span>
     <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">on_unrecognized_event</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="kw">_</span>: <span class="ident">Room</span>, <span class="kw">_</span>: <span class="kw-2">&amp;</span><span class="ident">RawJsonValue</span>) {}
 
-    <span class="doccomment">/// Fires when `Client` receives a `Event::Custom` event or if deserialization fails</span>
-    <span class="doccomment">/// because the event was unknown to ruma.</span>
+    <span class="doccomment">/// Fires when `Client` receives a `Event::Custom` event or if</span>
+    <span class="doccomment">/// deserialization fails because the event was unknown to ruma.</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// The only guarantee this method can give about the event is that it is in the</span>
-    <span class="doccomment">/// shape of a valid matrix event.</span>
+    <span class="doccomment">/// The only guarantee this method can give about the event is that it is in</span>
+    <span class="doccomment">/// the shape of a valid matrix event.</span>
     <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">on_custom_event</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="kw">_</span>: <span class="ident">Room</span>, <span class="kw">_</span>: <span class="kw-2">&amp;</span><span class="ident">CustomEvent</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) {}
 }
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
 <span class="kw">mod</span> <span class="ident">test</span> {
-    <span class="kw">use</span> <span class="kw">super</span>::<span class="kw-2">*</span>;
+    <span class="kw">use</span> <span class="ident">std</span>::{<span class="ident">sync::Arc</span>, <span class="ident">time::Duration</span>};
+
     <span class="kw">use</span> <span class="ident">matrix_sdk_common</span>::{<span class="ident">async_trait</span>, <span class="ident">locks::Mutex</span>};
     <span class="kw">use</span> <span class="ident">matrix_sdk_test</span>::{<span class="ident">async_test</span>, <span class="ident">test_json</span>};
     <span class="kw">use</span> <span class="ident">mockito</span>::{<span class="ident">mock</span>, <span class="ident">Matcher</span>};
-    <span class="kw">use</span> <span class="ident">std</span>::{<span class="ident">sync::Arc</span>, <span class="ident">time::Duration</span>};
-
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">target_arch</span> <span class="op">=</span> <span class="string">&quot;wasm32&quot;</span>)]</span>
     <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">wasm_bindgen_test</span>::<span class="kw-2">*</span>;
+
+    <span class="kw">use</span> <span class="kw">super</span>::<span class="kw-2">*</span>;
 
     <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>)]</span>
     <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">EvHandlerTest</span>(<span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">Mutex</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span>);
@@ -1595,56 +1504,50 @@
         }
 
         <span class="comment">// `AnyStrippedStateEvent`s</span>
-        <span class="doccomment">/// Fires when `Client` receives a `AnyStrippedStateEvent::StrippedRoomMember` event.</span>
+        <span class="doccomment">/// Fires when `Client` receives a</span>
+        <span class="doccomment">/// `AnyStrippedStateEvent::StrippedRoomMember` event.</span>
         <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">on_stripped_state_member</span>(
             <span class="kw-2">&amp;</span><span class="self">self</span>,
             <span class="kw">_</span>: <span class="ident">Room</span>,
             <span class="kw">_</span>: <span class="kw-2">&amp;</span><span class="ident">StrippedStateEvent</span><span class="op">&lt;</span><span class="ident">MemberEventContent</span><span class="op">&gt;</span>,
             <span class="kw">_</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">MemberEventContent</span><span class="op">&gt;</span>,
         ) {
-            <span class="self">self</span>.<span class="number">0</span>
-                .<span class="ident">lock</span>()
-                .<span class="kw">await</span>
-                .<span class="ident">push</span>(<span class="string">&quot;stripped state member&quot;</span>.<span class="ident">to_string</span>())
+            <span class="self">self</span>.<span class="number">0</span>.<span class="ident">lock</span>().<span class="kw">await</span>.<span class="ident">push</span>(<span class="string">&quot;stripped state member&quot;</span>.<span class="ident">to_string</span>())
         }
-        <span class="doccomment">/// Fires when `Client` receives a `AnyStrippedStateEvent::StrippedRoomName` event.</span>
+        <span class="doccomment">/// Fires when `Client` receives a</span>
+        <span class="doccomment">/// `AnyStrippedStateEvent::StrippedRoomName` event.</span>
         <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">on_stripped_state_name</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="kw">_</span>: <span class="ident">Room</span>, <span class="kw">_</span>: <span class="kw-2">&amp;</span><span class="ident">StrippedStateEvent</span><span class="op">&lt;</span><span class="ident">NameEventContent</span><span class="op">&gt;</span>) {
             <span class="self">self</span>.<span class="number">0</span>.<span class="ident">lock</span>().<span class="kw">await</span>.<span class="ident">push</span>(<span class="string">&quot;stripped state name&quot;</span>.<span class="ident">to_string</span>())
         }
-        <span class="doccomment">/// Fires when `Client` receives a `AnyStrippedStateEvent::StrippedRoomCanonicalAlias` event.</span>
+        <span class="doccomment">/// Fires when `Client` receives a</span>
+        <span class="doccomment">/// `AnyStrippedStateEvent::StrippedRoomCanonicalAlias` event.</span>
         <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">on_stripped_state_canonical_alias</span>(
             <span class="kw-2">&amp;</span><span class="self">self</span>,
             <span class="kw">_</span>: <span class="ident">Room</span>,
             <span class="kw">_</span>: <span class="kw-2">&amp;</span><span class="ident">StrippedStateEvent</span><span class="op">&lt;</span><span class="ident">CanonicalAliasEventContent</span><span class="op">&gt;</span>,
         ) {
-            <span class="self">self</span>.<span class="number">0</span>
-                .<span class="ident">lock</span>()
-                .<span class="kw">await</span>
-                .<span class="ident">push</span>(<span class="string">&quot;stripped state canonical&quot;</span>.<span class="ident">to_string</span>())
+            <span class="self">self</span>.<span class="number">0</span>.<span class="ident">lock</span>().<span class="kw">await</span>.<span class="ident">push</span>(<span class="string">&quot;stripped state canonical&quot;</span>.<span class="ident">to_string</span>())
         }
-        <span class="doccomment">/// Fires when `Client` receives a `AnyStrippedStateEvent::StrippedRoomAliases` event.</span>
+        <span class="doccomment">/// Fires when `Client` receives a</span>
+        <span class="doccomment">/// `AnyStrippedStateEvent::StrippedRoomAliases` event.</span>
         <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">on_stripped_state_aliases</span>(
             <span class="kw-2">&amp;</span><span class="self">self</span>,
             <span class="kw">_</span>: <span class="ident">Room</span>,
             <span class="kw">_</span>: <span class="kw-2">&amp;</span><span class="ident">StrippedStateEvent</span><span class="op">&lt;</span><span class="ident">AliasesEventContent</span><span class="op">&gt;</span>,
         ) {
-            <span class="self">self</span>.<span class="number">0</span>
-                .<span class="ident">lock</span>()
-                .<span class="kw">await</span>
-                .<span class="ident">push</span>(<span class="string">&quot;stripped state aliases&quot;</span>.<span class="ident">to_string</span>())
+            <span class="self">self</span>.<span class="number">0</span>.<span class="ident">lock</span>().<span class="kw">await</span>.<span class="ident">push</span>(<span class="string">&quot;stripped state aliases&quot;</span>.<span class="ident">to_string</span>())
         }
-        <span class="doccomment">/// Fires when `Client` receives a `AnyStrippedStateEvent::StrippedRoomAvatar` event.</span>
+        <span class="doccomment">/// Fires when `Client` receives a</span>
+        <span class="doccomment">/// `AnyStrippedStateEvent::StrippedRoomAvatar` event.</span>
         <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">on_stripped_state_avatar</span>(
             <span class="kw-2">&amp;</span><span class="self">self</span>,
             <span class="kw">_</span>: <span class="ident">Room</span>,
             <span class="kw">_</span>: <span class="kw-2">&amp;</span><span class="ident">StrippedStateEvent</span><span class="op">&lt;</span><span class="ident">AvatarEventContent</span><span class="op">&gt;</span>,
         ) {
-            <span class="self">self</span>.<span class="number">0</span>
-                .<span class="ident">lock</span>()
-                .<span class="kw">await</span>
-                .<span class="ident">push</span>(<span class="string">&quot;stripped state avatar&quot;</span>.<span class="ident">to_string</span>())
+            <span class="self">self</span>.<span class="number">0</span>.<span class="ident">lock</span>().<span class="kw">await</span>.<span class="ident">push</span>(<span class="string">&quot;stripped state avatar&quot;</span>.<span class="ident">to_string</span>())
         }
-        <span class="doccomment">/// Fires when `Client` receives a `AnyStrippedStateEvent::StrippedRoomPowerLevels` event.</span>
+        <span class="doccomment">/// Fires when `Client` receives a</span>
+        <span class="doccomment">/// `AnyStrippedStateEvent::StrippedRoomPowerLevels` event.</span>
         <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">on_stripped_state_power_levels</span>(
             <span class="kw-2">&amp;</span><span class="self">self</span>,
             <span class="kw">_</span>: <span class="ident">Room</span>,
@@ -1652,7 +1555,8 @@
         ) {
             <span class="self">self</span>.<span class="number">0</span>.<span class="ident">lock</span>().<span class="kw">await</span>.<span class="ident">push</span>(<span class="string">&quot;stripped state power&quot;</span>.<span class="ident">to_string</span>())
         }
-        <span class="doccomment">/// Fires when `Client` receives a `AnyStrippedStateEvent::StrippedRoomJoinRules` event.</span>
+        <span class="doccomment">/// Fires when `Client` receives a</span>
+        <span class="doccomment">/// `AnyStrippedStateEvent::StrippedRoomJoinRules` event.</span>
         <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">on_stripped_state_join_rules</span>(
             <span class="kw-2">&amp;</span><span class="self">self</span>,
             <span class="kw">_</span>: <span class="ident">Room</span>,
@@ -1723,14 +1627,11 @@
     }
 
     <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">mock_sync</span>(<span class="ident">client</span>: <span class="kw-2">&amp;</span><span class="ident">Client</span>, <span class="ident">response</span>: <span class="ident">String</span>) {
-        <span class="kw">let</span> <span class="ident">_m</span> <span class="op">=</span> <span class="ident">mock</span>(
-            <span class="string">&quot;GET&quot;</span>,
-            <span class="ident">Matcher::Regex</span>(<span class="string">r&quot;^/_matrix/client/r0/sync\?.*$&quot;</span>.<span class="ident">to_string</span>()),
-        )
-        .<span class="ident">with_status</span>(<span class="number">200</span>)
-        .<span class="ident">match_header</span>(<span class="string">&quot;authorization&quot;</span>, <span class="string">&quot;Bearer 1234&quot;</span>)
-        .<span class="ident">with_body</span>(<span class="ident">response</span>)
-        .<span class="ident">create</span>();
+        <span class="kw">let</span> <span class="ident">_m</span> <span class="op">=</span> <span class="ident">mock</span>(<span class="string">&quot;GET&quot;</span>, <span class="ident">Matcher::Regex</span>(<span class="string">r&quot;^/_matrix/client/r0/sync\?.*$&quot;</span>.<span class="ident">to_string</span>()))
+            .<span class="ident">with_status</span>(<span class="number">200</span>)
+            .<span class="ident">match_header</span>(<span class="string">&quot;authorization&quot;</span>, <span class="string">&quot;Bearer 1234&quot;</span>)
+            .<span class="ident">with_body</span>(<span class="ident">response</span>)
+            .<span class="ident">create</span>();
 
         <span class="kw">let</span> <span class="ident">sync_settings</span> <span class="op">=</span> <span class="ident">SyncSettings::new</span>().<span class="ident">timeout</span>(<span class="ident">Duration::from_millis</span>(<span class="number">3000</span>));
         <span class="kw">let</span> <span class="ident">_response</span> <span class="op">=</span> <span class="ident">client</span>.<span class="ident">sync_once</span>(<span class="ident">sync_settings</span>).<span class="kw">await</span>.<span class="ident">unwrap</span>();
@@ -1778,14 +1679,7 @@
         <span class="ident">mock_sync</span>(<span class="kw-2">&amp;</span><span class="ident">client</span>, <span class="ident">test_json::INVITE_SYNC</span>.<span class="ident">to_string</span>()).<span class="kw">await</span>;
 
         <span class="kw">let</span> <span class="ident">v</span> <span class="op">=</span> <span class="ident">test_vec</span>.<span class="ident">lock</span>().<span class="kw">await</span>;
-        <span class="macro">assert_eq!</span>(
-            <span class="ident">v</span>.<span class="ident">as_slice</span>(),
-            [
-                <span class="string">&quot;stripped state name&quot;</span>,
-                <span class="string">&quot;stripped state member&quot;</span>,
-                <span class="string">&quot;presence event&quot;</span>
-            ],
-        )
+        <span class="macro">assert_eq!</span>(<span class="ident">v</span>.<span class="ident">as_slice</span>(), [<span class="string">&quot;stripped state name&quot;</span>, <span class="string">&quot;stripped state member&quot;</span>, <span class="string">&quot;presence event&quot;</span>],)
     }
 
     <span class="attribute">#[<span class="ident">async_test</span>]</span>
@@ -1852,15 +1746,7 @@
         <span class="ident">mock_sync</span>(<span class="kw-2">&amp;</span><span class="ident">client</span>, <span class="ident">test_json::VOIP_SYNC</span>.<span class="ident">to_string</span>()).<span class="kw">await</span>;
 
         <span class="kw">let</span> <span class="ident">v</span> <span class="op">=</span> <span class="ident">test_vec</span>.<span class="ident">lock</span>().<span class="kw">await</span>;
-        <span class="macro">assert_eq!</span>(
-            <span class="ident">v</span>.<span class="ident">as_slice</span>(),
-            [
-                <span class="string">&quot;call invite&quot;</span>,
-                <span class="string">&quot;call answer&quot;</span>,
-                <span class="string">&quot;call candidates&quot;</span>,
-                <span class="string">&quot;call hangup&quot;</span>,
-            ],
-        )
+        <span class="macro">assert_eq!</span>(<span class="ident">v</span>.<span class="ident">as_slice</span>(), [<span class="string">&quot;call invite&quot;</span>, <span class="string">&quot;call answer&quot;</span>, <span class="string">&quot;call candidates&quot;</span>, <span class="string">&quot;call hangup&quot;</span>,],)
     }
 
     <span class="attribute">#[<span class="ident">async_test</span>]</span>
