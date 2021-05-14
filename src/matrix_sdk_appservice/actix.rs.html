@@ -232,11 +232,11 @@
     <span class="ident">request</span>: <span class="ident">IncomingRequest</span><span class="op">&lt;</span><span class="ident">api::event::push_events::v1::IncomingRequest</span><span class="op">&gt;</span>,
     <span class="ident">appservice</span>: <span class="ident">Data</span><span class="op">&lt;</span><span class="ident">Appservice</span><span class="op">&gt;</span>,
 ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">HttpResponse</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
-    <span class="kw">if</span> <span class="op">!</span><span class="ident">appservice</span>.<span class="ident">hs_token_matches</span>(<span class="ident">request</span>.<span class="ident">access_token</span>) {
+    <span class="kw">if</span> <span class="op">!</span><span class="ident">appservice</span>.<span class="ident">compare_hs_token</span>(<span class="ident">request</span>.<span class="ident">access_token</span>) {
         <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="ident">HttpResponse::Unauthorized</span>().<span class="ident">finish</span>());
     }
 
-    <span class="ident">appservice</span>.<span class="ident">client</span>().<span class="ident">receive_transaction</span>(<span class="ident">request</span>.<span class="ident">incoming</span>).<span class="kw">await</span>.<span class="ident">unwrap</span>();
+    <span class="ident">appservice</span>.<span class="ident">client</span>(<span class="prelude-val">None</span>).<span class="kw">await</span><span class="question-mark">?</span>.<span class="ident">receive_transaction</span>(<span class="ident">request</span>.<span class="ident">incoming</span>).<span class="kw">await</span><span class="question-mark">?</span>;
 
     <span class="prelude-val">Ok</span>(<span class="ident">HttpResponse::Ok</span>().<span class="ident">json</span>(<span class="string">&quot;{}&quot;</span>))
 }
@@ -247,7 +247,7 @@
     <span class="ident">request</span>: <span class="ident">IncomingRequest</span><span class="op">&lt;</span><span class="ident">api::query::query_user_id::v1::IncomingRequest</span><span class="op">&gt;</span>,
     <span class="ident">appservice</span>: <span class="ident">Data</span><span class="op">&lt;</span><span class="ident">Appservice</span><span class="op">&gt;</span>,
 ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">HttpResponse</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
-    <span class="kw">if</span> <span class="op">!</span><span class="ident">appservice</span>.<span class="ident">hs_token_matches</span>(<span class="ident">request</span>.<span class="ident">access_token</span>) {
+    <span class="kw">if</span> <span class="op">!</span><span class="ident">appservice</span>.<span class="ident">compare_hs_token</span>(<span class="ident">request</span>.<span class="ident">access_token</span>) {
         <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="ident">HttpResponse::Unauthorized</span>().<span class="ident">finish</span>());
     }
 
@@ -260,7 +260,7 @@
     <span class="ident">request</span>: <span class="ident">IncomingRequest</span><span class="op">&lt;</span><span class="ident">api::query::query_room_alias::v1::IncomingRequest</span><span class="op">&gt;</span>,
     <span class="ident">appservice</span>: <span class="ident">Data</span><span class="op">&lt;</span><span class="ident">Appservice</span><span class="op">&gt;</span>,
 ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">HttpResponse</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
-    <span class="kw">if</span> <span class="op">!</span><span class="ident">appservice</span>.<span class="ident">hs_token_matches</span>(<span class="ident">request</span>.<span class="ident">access_token</span>) {
+    <span class="kw">if</span> <span class="op">!</span><span class="ident">appservice</span>.<span class="ident">compare_hs_token</span>(<span class="ident">request</span>.<span class="ident">access_token</span>) {
         <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="ident">HttpResponse::Unauthorized</span>().<span class="ident">finish</span>());
     }
 
