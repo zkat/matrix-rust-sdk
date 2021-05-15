@@ -30,7 +30,7 @@ structs, for this event we will use a <code>SyncMessageEvent</code> struct but a
 would work.</p>
 
 <div class="example-wrap"><pre class="rust rust-example-rendered">
-<span class="kw">use</span> <span class="ident">ruma_events</span>::{<span class="ident">macros::MessageEventContent</span>, <span class="ident">SyncMessageEvent</span>};
+<span class="kw">use</span> <span class="ident">ruma_events</span>::{<span class="ident">macros::EventContent</span>, <span class="ident">SyncMessageEvent</span>};
 <span class="kw">use</span> <span class="ident">ruma_identifiers::EventId</span>;
 <span class="kw">use</span> <span class="ident">serde</span>::{<span class="ident">Deserialize</span>, <span class="ident">Serialize</span>};
 
@@ -52,8 +52,8 @@ would work.</p>
 }
 
 <span class="doccomment">/// The payload for our reaction event.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>, <span class="ident">MessageEventContent</span>)]</span>
-<span class="attribute">#[<span class="ident">ruma_event</span>(<span class="kw">type</span> <span class="op">=</span> <span class="string">&quot;m.reaction&quot;</span>)]</span>
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>, <span class="ident">EventContent</span>)]</span>
+<span class="attribute">#[<span class="ident">ruma_event</span>(<span class="kw">type</span> <span class="op">=</span> <span class="string">&quot;m.reaction&quot;</span>, <span class="ident">kind</span> <span class="op">=</span> <span class="ident">Message</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">ReactionEventContent</span> {
     <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">rename</span> <span class="op">=</span> <span class="string">&quot;m.relates_to&quot;</span>)]</span>
     <span class="kw">pub</span> <span class="ident">relates_to</span>: <span class="ident">RelatesTo</span>,
@@ -76,8 +76,8 @@ would work.</p>
     }
 });
 
-<span class="comment">// The downside of this event is we cannot use it with event enums, but could be deserialized</span>
-<span class="comment">// from a `Raw&lt;_&gt;` that has failed to deserialize.</span>
+<span class="comment">// The downside of this event is we cannot use it with event enums,</span>
+<span class="comment">// but could be deserialized from a `Raw&lt;_&gt;` that has failed to deserialize.</span>
 <span class="macro">matches::assert_matches!</span>(
     <span class="ident">serde_json::from_value</span>::<span class="op">&lt;</span><span class="ident">SyncMessageEvent</span><span class="op">&lt;</span><span class="ident">ReactionEventContent</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="ident">json</span>),
     <span class="prelude-val">Ok</span>(<span class="ident">SyncMessageEvent</span> {
@@ -136,8 +136,6 @@ event structure, if needed.</p>
 </td></tr><tr class="module-item"><td><a class="struct" href="struct.RedactedStrippedStateEvent.html" title="matrix_sdk_base::events::RedactedStrippedStateEvent struct">RedactedStrippedStateEvent</a></td><td class="docblock-short"><p>A stripped-down redacted state event.</p>
 </td></tr><tr class="module-item"><td><a class="struct" href="struct.RedactedSyncMessageEvent.html" title="matrix_sdk_base::events::RedactedSyncMessageEvent struct">RedactedSyncMessageEvent</a></td><td class="docblock-short"><p>A redacted message event without a <code>room_id</code>.</p>
 </td></tr><tr class="module-item"><td><a class="struct" href="struct.RedactedSyncStateEvent.html" title="matrix_sdk_base::events::RedactedSyncStateEvent struct">RedactedSyncStateEvent</a></td><td class="docblock-short"><p>A redacted state event without a <code>room_id</code>.</p>
-</td></tr><tr class="module-item"><td><a class="struct" href="struct.RedactedSyncUnsigned.html" title="matrix_sdk_base::events::RedactedSyncUnsigned struct">RedactedSyncUnsigned</a></td><td class="docblock-short"><p>Extra information about a redacted sync event that is not incorporated into the sync event’s
-hash.</p>
 </td></tr><tr class="module-item"><td><a class="struct" href="struct.RedactedUnsigned.html" title="matrix_sdk_base::events::RedactedUnsigned struct">RedactedUnsigned</a></td><td class="docblock-short"><p>Extra information about a redacted event that is not incorporated into the event’s
 hash.</p>
 </td></tr><tr class="module-item"><td><a class="struct" href="struct.Relations.html" title="matrix_sdk_base::events::Relations struct">Relations</a></td><td class="docblock-short"><p>Precompiled list of relations to this event grouped by relation type.</p>
@@ -165,9 +163,13 @@ hash.</p>
 </td></tr><tr class="module-item"><td><a class="enum" href="enum.AnyPossiblyRedactedSyncMessageEvent.html" title="matrix_sdk_base::events::AnyPossiblyRedactedSyncMessageEvent enum">AnyPossiblyRedactedSyncMessageEvent</a></td><td class="docblock-short"><p>An enum that holds either regular un-redacted events or redacted events.</p>
 </td></tr><tr class="module-item"><td><a class="enum" href="enum.AnyPossiblyRedactedSyncStateEvent.html" title="matrix_sdk_base::events::AnyPossiblyRedactedSyncStateEvent enum">AnyPossiblyRedactedSyncStateEvent</a></td><td class="docblock-short"><p>An enum that holds either regular un-redacted events or redacted events.</p>
 </td></tr><tr class="module-item"><td><a class="enum" href="enum.AnyRedactedMessageEvent.html" title="matrix_sdk_base::events::AnyRedactedMessageEvent enum">AnyRedactedMessageEvent</a></td><td class="docblock-short"><p>Any message event.</p>
+</td></tr><tr class="module-item"><td><a class="enum" href="enum.AnyRedactedMessageEventContent.html" title="matrix_sdk_base::events::AnyRedactedMessageEventContent enum">AnyRedactedMessageEventContent</a></td><td class="docblock-short"><p>Any message event.</p>
+</td></tr><tr class="module-item"><td><a class="enum" href="enum.AnyRedactedRoomEvent.html" title="matrix_sdk_base::events::AnyRedactedRoomEvent enum">AnyRedactedRoomEvent</a></td><td class="docblock-short"><p>Any redacted room event.</p>
 </td></tr><tr class="module-item"><td><a class="enum" href="enum.AnyRedactedStateEvent.html" title="matrix_sdk_base::events::AnyRedactedStateEvent enum">AnyRedactedStateEvent</a></td><td class="docblock-short"><p>Any state event.</p>
+</td></tr><tr class="module-item"><td><a class="enum" href="enum.AnyRedactedStateEventContent.html" title="matrix_sdk_base::events::AnyRedactedStateEventContent enum">AnyRedactedStateEventContent</a></td><td class="docblock-short"><p>Any state event.</p>
 </td></tr><tr class="module-item"><td><a class="enum" href="enum.AnyRedactedStrippedStateEvent.html" title="matrix_sdk_base::events::AnyRedactedStrippedStateEvent enum">AnyRedactedStrippedStateEvent</a></td><td class="docblock-short"><p>Any state event.</p>
 </td></tr><tr class="module-item"><td><a class="enum" href="enum.AnyRedactedSyncMessageEvent.html" title="matrix_sdk_base::events::AnyRedactedSyncMessageEvent enum">AnyRedactedSyncMessageEvent</a></td><td class="docblock-short"><p>Any message event.</p>
+</td></tr><tr class="module-item"><td><a class="enum" href="enum.AnyRedactedSyncRoomEvent.html" title="matrix_sdk_base::events::AnyRedactedSyncRoomEvent enum">AnyRedactedSyncRoomEvent</a></td><td class="docblock-short"><p>Any redacted sync room event (room event without a <code>room_id</code>, as returned in <code>/sync</code> responses)</p>
 </td></tr><tr class="module-item"><td><a class="enum" href="enum.AnyRedactedSyncStateEvent.html" title="matrix_sdk_base::events::AnyRedactedSyncStateEvent enum">AnyRedactedSyncStateEvent</a></td><td class="docblock-short"><p>Any state event.</p>
 </td></tr><tr class="module-item"><td><a class="enum" href="enum.AnyRoomAccountDataEvent.html" title="matrix_sdk_base::events::AnyRoomAccountDataEvent enum">AnyRoomAccountDataEvent</a></td><td class="docblock-short"><p>Any room account data event.</p>
 </td></tr><tr class="module-item"><td><a class="enum" href="enum.AnyRoomAccountDataEventContent.html" title="matrix_sdk_base::events::AnyRoomAccountDataEventContent enum">AnyRoomAccountDataEventContent</a></td><td class="docblock-short"><p>Any room account data event.</p>
@@ -181,17 +183,27 @@ hash.</p>
 </td></tr><tr class="module-item"><td><a class="enum" href="enum.AnySyncStateEvent.html" title="matrix_sdk_base::events::AnySyncStateEvent enum">AnySyncStateEvent</a></td><td class="docblock-short"><p>Any state event.</p>
 </td></tr><tr class="module-item"><td><a class="enum" href="enum.AnyToDeviceEvent.html" title="matrix_sdk_base::events::AnyToDeviceEvent enum">AnyToDeviceEvent</a></td><td class="docblock-short"><p>Any to-device event.</p>
 </td></tr><tr class="module-item"><td><a class="enum" href="enum.AnyToDeviceEventContent.html" title="matrix_sdk_base::events::AnyToDeviceEventContent enum">AnyToDeviceEventContent</a></td><td class="docblock-short"><p>Any to-device event.</p>
-</td></tr><tr class="module-item"><td><a class="enum" href="enum.EventType.html" title="matrix_sdk_base::events::EventType enum">EventType</a></td><td class="docblock-short"><p>The type of an event.</p>
+</td></tr><tr class="module-item"><td><a class="enum" href="enum.EphemeralRoomEventType.html" title="matrix_sdk_base::events::EphemeralRoomEventType enum">EphemeralRoomEventType</a></td><td class="docblock-short"><p>The type of <code>EphemeralRoomEventType</code> this is.</p>
+</td></tr><tr class="module-item"><td><a class="enum" href="enum.EventType.html" title="matrix_sdk_base::events::EventType enum">EventType</a></td><td class="docblock-short"><p>The type of <code>EventType</code> this is.</p>
+</td></tr><tr class="module-item"><td><a class="enum" href="enum.GlobalAccountDataEventType.html" title="matrix_sdk_base::events::GlobalAccountDataEventType enum">GlobalAccountDataEventType</a></td><td class="docblock-short"><p>The type of <code>GlobalAccountDataEventType</code> this is.</p>
+</td></tr><tr class="module-item"><td><a class="enum" href="enum.MessageEventType.html" title="matrix_sdk_base::events::MessageEventType enum">MessageEventType</a></td><td class="docblock-short"><p>The type of <code>MessageEventType</code> this is.</p>
+</td></tr><tr class="module-item"><td><a class="enum" href="enum.RoomAccountDataEventType.html" title="matrix_sdk_base::events::RoomAccountDataEventType enum">RoomAccountDataEventType</a></td><td class="docblock-short"><p>The type of <code>RoomAccountDataEventType</code> this is.</p>
+</td></tr><tr class="module-item"><td><a class="enum" href="enum.RoomEventType.html" title="matrix_sdk_base::events::RoomEventType enum">RoomEventType</a></td><td class="docblock-short"><p>The type of <code>RoomEventType</code> this is.</p>
+</td></tr><tr class="module-item"><td><a class="enum" href="enum.StateEventType.html" title="matrix_sdk_base::events::StateEventType enum">StateEventType</a></td><td class="docblock-short"><p>The type of <code>StateEventType</code> this is.</p>
+</td></tr><tr class="module-item"><td><a class="enum" href="enum.ToDeviceEventType.html" title="matrix_sdk_base::events::ToDeviceEventType enum">ToDeviceEventType</a></td><td class="docblock-short"><p>The type of <code>ToDeviceEventType</code> this is.</p>
 </td></tr></table><h2 id="traits" class="section-header"><a href="#traits">Traits</a></h2>
-<table><tr class="module-item"><td><a class="trait" href="trait.BasicEventContent.html" title="matrix_sdk_base::events::BasicEventContent trait">BasicEventContent</a></td><td class="docblock-short"><p>Marker trait for the content of a basic event.</p>
-</td></tr><tr class="module-item"><td><a class="trait" href="trait.EphemeralRoomEventContent.html" title="matrix_sdk_base::events::EphemeralRoomEventContent trait">EphemeralRoomEventContent</a></td><td class="docblock-short"><p>Marker trait for the content of an ephemeral room event.</p>
+<table><tr class="module-item"><td><a class="trait" href="trait.EphemeralRoomEventContent.html" title="matrix_sdk_base::events::EphemeralRoomEventContent trait">EphemeralRoomEventContent</a></td><td class="docblock-short"><p>Marker trait for the content of an ephemeral room event.</p>
 </td></tr><tr class="module-item"><td><a class="trait" href="trait.EventContent.html" title="matrix_sdk_base::events::EventContent trait">EventContent</a></td><td class="docblock-short"><p>The base trait that all event content types implement.</p>
+</td></tr><tr class="module-item"><td><a class="trait" href="trait.GlobalAccountDataEventContent.html" title="matrix_sdk_base::events::GlobalAccountDataEventContent trait">GlobalAccountDataEventContent</a></td><td class="docblock-short"><p>Marker trait for the content of a global account data event.</p>
 </td></tr><tr class="module-item"><td><a class="trait" href="trait.MessageEventContent.html" title="matrix_sdk_base::events::MessageEventContent trait">MessageEventContent</a></td><td class="docblock-short"><p>Marker trait for the content of a message event.</p>
-</td></tr><tr class="module-item"><td><a class="trait" href="trait.RawExt.html" title="matrix_sdk_base::events::RawExt trait">RawExt</a></td><td class="docblock-short"><p>Extension trait for Raw<EventContent></p>
+</td></tr><tr class="module-item"><td><a class="trait" href="trait.RawExt.html" title="matrix_sdk_base::events::RawExt trait">RawExt</a></td><td class="docblock-short"><p>Extension trait for [<code>Raw&lt;_&gt;</code>][ruma_serde::Raw].</p>
+</td></tr><tr class="module-item"><td><a class="trait" href="trait.Redact.html" title="matrix_sdk_base::events::Redact trait">Redact</a></td><td class="docblock-short"><p>Trait to define the behavior of redacting an event.</p>
+</td></tr><tr class="module-item"><td><a class="trait" href="trait.RedactContent.html" title="matrix_sdk_base::events::RedactContent trait">RedactContent</a></td><td class="docblock-short"><p>Trait to define the behavior of redact an event’s content object.</p>
 </td></tr><tr class="module-item"><td><a class="trait" href="trait.RedactedEventContent.html" title="matrix_sdk_base::events::RedactedEventContent trait">RedactedEventContent</a></td><td class="docblock-short"><p>The base trait that all redacted event content types implement.</p>
 </td></tr><tr class="module-item"><td><a class="trait" href="trait.RedactedMessageEventContent.html" title="matrix_sdk_base::events::RedactedMessageEventContent trait">RedactedMessageEventContent</a></td><td class="docblock-short"><p>Marker trait for the content of a redacted message event.</p>
 </td></tr><tr class="module-item"><td><a class="trait" href="trait.RedactedStateEventContent.html" title="matrix_sdk_base::events::RedactedStateEventContent trait">RedactedStateEventContent</a></td><td class="docblock-short"><p>Marker trait for the content of a redacted state event.</p>
-</td></tr><tr class="module-item"><td><a class="trait" href="trait.RoomEventContent.html" title="matrix_sdk_base::events::RoomEventContent trait">RoomEventContent</a></td><td class="docblock-short"><p>Marker trait for the content of a room event.</p>
+</td></tr><tr class="module-item"><td><a class="trait" href="trait.RoomAccountDataEventContent.html" title="matrix_sdk_base::events::RoomAccountDataEventContent trait">RoomAccountDataEventContent</a></td><td class="docblock-short"><p>Marker trait for the content of a room account data event.</p>
 </td></tr><tr class="module-item"><td><a class="trait" href="trait.StateEventContent.html" title="matrix_sdk_base::events::StateEventContent trait">StateEventContent</a></td><td class="docblock-short"><p>Marker trait for the content of a state event.</p>
+</td></tr><tr class="module-item"><td><a class="trait" href="trait.ToDeviceEventContent.html" title="matrix_sdk_base::events::ToDeviceEventContent trait">ToDeviceEventContent</a></td><td class="docblock-short"><p>Marker trait for the content of a to device event.</p>
 </td></tr></table></section><section id="search" class="content hidden"></section><div id="rustdoc-vars" data-root-path="../../" data-current-crate="matrix_sdk_base" data-search-index-js="../../search-index.js" data-search-js="../../search.js"></div>
     <script src="../../main.js"></script></body></html>

@@ -1,1 +1,1 @@
-initSidebarItems({"struct":[["RedactedRoomKeyToDeviceEventContent","The payload for a redacted `RoomKeyToDeviceEventContent`"],["RoomKeyToDeviceEventContent","The payload for `RoomKeyEvent`."]]});
+initSidebarItems({"struct":[["RoomKeyToDeviceEventContent","The payload for `RoomKeyEvent`."]]});

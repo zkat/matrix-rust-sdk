@@ -412,17 +412,6 @@
 <span id="409">409</span>
 <span id="410">410</span>
 <span id="411">411</span>
-<span id="412">412</span>
-<span id="413">413</span>
-<span id="414">414</span>
-<span id="415">415</span>
-<span id="416">416</span>
-<span id="417">417</span>
-<span id="418">418</span>
-<span id="419">419</span>
-<span id="420">420</span>
-<span id="421">421</span>
-<span id="422">422</span>
 </pre><pre class="rust">
 <span class="comment">// Copyright 2020 The Matrix.org Foundation C.I.C.</span>
 <span class="comment">//</span>
@@ -438,12 +427,7 @@
 <span class="comment">// See the License for the specific language governing permissions and</span>
 <span class="comment">// limitations under the License.</span>
 
-<span class="kw">use</span> <span class="ident">std</span>::{
-    <span class="ident">collections::BTreeMap</span>,
-    <span class="ident">convert</span>::{<span class="ident">TryFrom</span>, <span class="ident">TryInto</span>},
-    <span class="ident">fmt</span>, <span class="ident">mem</span>,
-    <span class="ident">sync::Arc</span>,
-};
+<span class="kw">use</span> <span class="ident">std</span>::{<span class="ident">collections::BTreeMap</span>, <span class="ident">convert::TryFrom</span>, <span class="ident">fmt</span>, <span class="ident">mem</span>, <span class="ident">sync::Arc</span>};
 
 <span class="kw">use</span> <span class="ident">matrix_sdk_common</span>::{
     <span class="ident">events</span>::{
@@ -736,13 +720,7 @@
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">decrypted_value</span> <span class="op">=</span> <span class="ident">serde_json::from_str</span>::<span class="op">&lt;</span><span class="ident">Value</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="ident">plaintext</span>)<span class="question-mark">?</span>;
         <span class="kw">let</span> <span class="ident">decrypted_object</span> <span class="op">=</span> <span class="ident">decrypted_value</span>.<span class="ident">as_object_mut</span>().<span class="ident">ok_or</span>(<span class="ident">EventError::NotAnObject</span>)<span class="question-mark">?</span>;
 
-        <span class="comment">// TODO better number conversion here.</span>
-        <span class="kw">let</span> <span class="ident">server_ts</span> <span class="op">=</span> <span class="ident">event</span>
-            .<span class="ident">origin_server_ts</span>
-            .<span class="ident">duration_since</span>(<span class="ident">std::time::SystemTime::UNIX_EPOCH</span>)
-            .<span class="ident">unwrap_or_default</span>()
-            .<span class="ident">as_millis</span>();
-        <span class="kw">let</span> <span class="ident">server_ts</span>: <span class="ident">i64</span> <span class="op">=</span> <span class="ident">server_ts</span>.<span class="ident">try_into</span>().<span class="ident">unwrap_or_default</span>();
+        <span class="kw">let</span> <span class="ident">server_ts</span>: <span class="ident">i64</span> <span class="op">=</span> <span class="ident">event</span>.<span class="ident">origin_server_ts</span>.<span class="number">0</span>.<span class="ident">into</span>();
 
         <span class="ident">decrypted_object</span>.<span class="ident">insert</span>(<span class="string">&quot;sender&quot;</span>.<span class="ident">to_owned</span>(), <span class="ident">event</span>.<span class="ident">sender</span>.<span class="ident">to_string</span>().<span class="ident">into</span>());
         <span class="ident">decrypted_object</span>.<span class="ident">insert</span>(<span class="string">&quot;event_id&quot;</span>.<span class="ident">to_owned</span>(), <span class="ident">event</span>.<span class="ident">event_id</span>.<span class="ident">to_string</span>().<span class="ident">into</span>());

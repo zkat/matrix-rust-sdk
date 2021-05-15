@@ -1,1 +1,1 @@
-initSidebarItems({"struct":[["PresenceEvent","Presence event."],["PresenceEventContent","Informs the room of members presence."],["RedactedPresenceEventContent","The payload for a redacted `PresenceEventContent`"]]});
+initSidebarItems({"struct":[["PresenceEvent","Presence event."],["PresenceEventContent","Informs the room of members presence."]]});

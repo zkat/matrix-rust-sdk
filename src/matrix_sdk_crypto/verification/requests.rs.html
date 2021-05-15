@@ -582,6 +582,7 @@
 <span id="579">579</span>
 <span id="580">580</span>
 <span id="581">581</span>
+<span id="582">582</span>
 </pre><pre class="rust">
 <span class="comment">// Copyright 2020 The Matrix.org Foundation C.I.C.</span>
 <span class="comment">//</span>
@@ -1021,12 +1022,13 @@
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
 <span class="kw">mod</span> <span class="ident">test</span> {
-    <span class="kw">use</span> <span class="ident">std</span>::{<span class="ident">convert::TryFrom</span>, <span class="ident">time::SystemTime</span>};
+    <span class="kw">use</span> <span class="ident">std::convert::TryFrom</span>;
 
     <span class="kw">use</span> <span class="ident">matrix_sdk_common</span>::{
         <span class="ident">api::r0::message::send_message_event::Response</span> <span class="kw">as</span> <span class="ident">RoomMessageResponse</span>,
         <span class="ident">events</span>::{<span class="ident">SyncMessageEvent</span>, <span class="ident">Unsigned</span>},
         <span class="ident">identifiers</span>::{<span class="ident">event_id</span>, <span class="ident">room_id</span>, <span class="ident">DeviceIdBox</span>, <span class="ident">UserId</span>},
+        <span class="ident">MilliSecondsSinceUnixEpoch</span>,
     };
     <span class="kw">use</span> <span class="ident">matrix_sdk_test::async_test</span>;
 
@@ -1151,7 +1153,7 @@
                 <span class="ident">content</span>: <span class="ident">c</span>,
                 <span class="ident">event_id</span>: <span class="ident">event_id</span>.<span class="ident">clone</span>(),
                 <span class="ident">sender</span>: <span class="ident">bob_id</span>(),
-                <span class="ident">origin_server_ts</span>: <span class="ident">SystemTime::now</span>(),
+                <span class="ident">origin_server_ts</span>: <span class="ident">MilliSecondsSinceUnixEpoch::now</span>(),
                 <span class="ident">unsigned</span>: <span class="ident">Unsigned::default</span>(),
             }
         } <span class="kw">else</span> {

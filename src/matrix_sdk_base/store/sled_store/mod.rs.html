@@ -807,7 +807,7 @@
     <span class="ident">convert::TryFrom</span>,
     <span class="ident">path</span>::{<span class="ident">Path</span>, <span class="ident">PathBuf</span>},
     <span class="ident">sync::Arc</span>,
-    <span class="ident">time::SystemTime</span>,
+    <span class="ident">time::Instant</span>,
 };
 
 <span class="kw">use</span> <span class="ident">futures</span>::{
@@ -1074,7 +1074,7 @@
     }
 
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">save_changes</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">changes</span>: <span class="kw-2">&amp;</span><span class="ident">StateChanges</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">now</span> <span class="op">=</span> <span class="ident">SystemTime::now</span>();
+        <span class="kw">let</span> <span class="ident">now</span> <span class="op">=</span> <span class="ident">Instant::now</span>();
 
         <span class="kw">let</span> <span class="ident">ret</span>: <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">TransactionError</span><span class="op">&lt;</span><span class="ident">SerializationError</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="op">=</span> (
             <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">session</span>,
@@ -1469,7 +1469,7 @@
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
 <span class="kw">mod</span> <span class="ident">test</span> {
-    <span class="kw">use</span> <span class="ident">std</span>::{<span class="ident">convert::TryFrom</span>, <span class="ident">time::SystemTime</span>};
+    <span class="kw">use</span> <span class="ident">std::convert::TryFrom</span>;
 
     <span class="kw">use</span> <span class="ident">matrix_sdk_common</span>::{
         <span class="ident">events</span>::{
@@ -1480,7 +1480,7 @@
             <span class="ident">AnySyncStateEvent</span>, <span class="ident">EventType</span>, <span class="ident">Unsigned</span>,
         },
         <span class="ident">identifiers</span>::{<span class="ident">room_id</span>, <span class="ident">user_id</span>, <span class="ident">EventId</span>, <span class="ident">UserId</span>},
-        <span class="ident">Raw</span>,
+        <span class="ident">MilliSecondsSinceUnixEpoch</span>, <span class="ident">Raw</span>,
     };
     <span class="kw">use</span> <span class="ident">matrix_sdk_test::async_test</span>;
     <span class="kw">use</span> <span class="ident">serde_json::json</span>;
@@ -1521,7 +1521,7 @@
             <span class="ident">event_id</span>: <span class="ident">EventId::try_from</span>(<span class="string">&quot;$h29iv0s8:example.com&quot;</span>).<span class="ident">unwrap</span>(),
             <span class="ident">content</span>,
             <span class="ident">sender</span>: <span class="ident">user_id</span>(),
-            <span class="ident">origin_server_ts</span>: <span class="ident">SystemTime::now</span>(),
+            <span class="ident">origin_server_ts</span>: <span class="ident">MilliSecondsSinceUnixEpoch::now</span>(),
             <span class="ident">state_key</span>: <span class="ident">user_id</span>(),
             <span class="ident">prev_content</span>: <span class="prelude-val">None</span>,
             <span class="ident">unsigned</span>: <span class="ident">Unsigned::default</span>(),
