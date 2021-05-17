@@ -2470,12 +2470,12 @@
         <span class="kw">let</span> (<span class="ident">account</span>, <span class="ident">store</span>, <span class="ident">_dir</span>) <span class="op">=</span> <span class="ident">get_loaded_store</span>().<span class="kw">await</span>;
 
         <span class="kw">let</span> <span class="ident">id</span> <span class="op">=</span> <span class="ident">Uuid::new_v4</span>();
-        <span class="kw">let</span> <span class="ident">info</span> <span class="op">=</span> <span class="ident">RequestedKeyInfo</span> {
-            <span class="ident">algorithm</span>: <span class="ident">EventEncryptionAlgorithm::MegolmV1AesSha2</span>,
-            <span class="ident">room_id</span>: <span class="macro">room_id!</span>(<span class="string">&quot;!test:localhost&quot;</span>),
-            <span class="ident">sender_key</span>: <span class="string">&quot;test_sender_key&quot;</span>.<span class="ident">to_string</span>(),
-            <span class="ident">session_id</span>: <span class="string">&quot;test_session_id&quot;</span>.<span class="ident">to_string</span>(),
-        };
+        <span class="kw">let</span> <span class="ident">info</span> <span class="op">=</span> <span class="ident">RequestedKeyInfo::new</span>(
+            <span class="ident">EventEncryptionAlgorithm::MegolmV1AesSha2</span>,
+            <span class="macro">room_id!</span>(<span class="string">&quot;!test:localhost&quot;</span>),
+            <span class="string">&quot;test_sender_key&quot;</span>.<span class="ident">to_string</span>(),
+            <span class="string">&quot;test_session_id&quot;</span>.<span class="ident">to_string</span>(),
+        );
 
         <span class="kw">let</span> <span class="ident">request</span> <span class="op">=</span> <span class="ident">OutgoingKeyRequest</span> {
             <span class="ident">request_recipient</span>: <span class="ident">account</span>.<span class="ident">user_id</span>().<span class="ident">to_owned</span>(),

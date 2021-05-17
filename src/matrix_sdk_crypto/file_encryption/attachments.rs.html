@@ -362,7 +362,7 @@
 };
 <span class="kw">use</span> <span class="ident">base64::DecodeError</span>;
 <span class="kw">use</span> <span class="ident">getrandom::getrandom</span>;
-<span class="kw">use</span> <span class="ident">matrix_sdk_common::events::room::JsonWebKey</span>;
+<span class="kw">use</span> <span class="ident">matrix_sdk_common::events::room</span>::{<span class="ident">JsonWebKey</span>, <span class="ident">JsonWebKeyInit</span>};
 <span class="kw">use</span> <span class="ident">serde</span>::{<span class="ident">Deserialize</span>, <span class="ident">Serialize</span>};
 <span class="kw">use</span> <span class="ident">sha2</span>::{<span class="ident">Digest</span>, <span class="ident">Sha256</span>};
 <span class="kw">use</span> <span class="ident">thiserror::Error</span>;
@@ -540,13 +540,13 @@
         <span class="comment">// initialized.</span>
         <span class="ident">getrandom</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">iv</span>[<span class="number">0</span>..<span class="number">8</span>]).<span class="ident">expect</span>(<span class="string">&quot;Can&#39;t generate randomness&quot;</span>);
 
-        <span class="kw">let</span> <span class="ident">web_key</span> <span class="op">=</span> <span class="ident">JsonWebKey</span> {
+        <span class="kw">let</span> <span class="ident">web_key</span> <span class="op">=</span> <span class="ident">JsonWebKey::from</span>(<span class="ident">JsonWebKeyInit</span> {
             <span class="ident">kty</span>: <span class="string">&quot;oct&quot;</span>.<span class="ident">to_owned</span>(),
             <span class="ident">key_ops</span>: <span class="macro">vec!</span>[<span class="string">&quot;encrypt&quot;</span>.<span class="ident">to_owned</span>(), <span class="string">&quot;decrypt&quot;</span>.<span class="ident">to_owned</span>()],
             <span class="ident">alg</span>: <span class="string">&quot;A256CTR&quot;</span>.<span class="ident">to_owned</span>(),
             <span class="ident">k</span>: <span class="ident">encode_url_safe</span>(<span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="ident">key</span>),
             <span class="ident">ext</span>: <span class="bool-val">true</span>,
-        };
+        });
         <span class="kw">let</span> <span class="ident">encoded_iv</span> <span class="op">=</span> <span class="ident">encode</span>(<span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="ident">iv</span>);
 
         <span class="kw">let</span> <span class="ident">aes</span> <span class="op">=</span> <span class="ident">Aes256Ctr::new_var</span>(<span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="ident">key</span>, <span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="ident">iv</span>).<span class="ident">expect</span>(<span class="string">&quot;Cannot create AES encryption object.&quot;</span>);

@@ -851,17 +851,17 @@
     }
 
     <span class="kw">fn</span> <span class="ident">as_content</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">KeyVerificationRequestEventContent</span> {
-        <span class="ident">KeyVerificationRequestEventContent</span> {
-            <span class="ident">body</span>: <span class="macro">format!</span>(
+        <span class="ident">KeyVerificationRequestEventContent::new</span>(
+            <span class="macro">format!</span>(
                 <span class="string">&quot;{} is requesting to verify your key, but your client does not \
                 support in-chat key verification. You will need to use legacy \
                 key verification to verify keys.&quot;</span>,
                 <span class="self">self</span>.<span class="ident">own_user_id</span>
             ),
-            <span class="ident">methods</span>: <span class="ident">SUPPORTED_METHODS</span>.<span class="ident">to_vec</span>(),
-            <span class="ident">from_device</span>: <span class="self">self</span>.<span class="ident">own_device_id</span>.<span class="ident">clone</span>(),
-            <span class="ident">to</span>: <span class="self">self</span>.<span class="ident">other_user_id</span>.<span class="ident">clone</span>(),
-        }
+            <span class="ident">SUPPORTED_METHODS</span>.<span class="ident">to_vec</span>(),
+            <span class="self">self</span>.<span class="ident">own_device_id</span>.<span class="ident">clone</span>(),
+            <span class="self">self</span>.<span class="ident">other_user_id</span>.<span class="ident">clone</span>(),
+        )
     }
 
     <span class="kw">fn</span> <span class="ident">into_sent</span>(<span class="self">self</span>, <span class="ident">response</span>: <span class="kw-2">&amp;</span><span class="ident">RoomMessageResponse</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">RequestState</span><span class="op">&lt;</span><span class="ident">Sent</span><span class="op">&gt;</span> {
@@ -946,11 +946,11 @@
             },
         };
 
-        <span class="kw">let</span> <span class="ident">content</span> <span class="op">=</span> <span class="ident">ReadyEventContent</span> {
-            <span class="ident">from_device</span>: <span class="self">self</span>.<span class="ident">own_device_id</span>,
-            <span class="ident">methods</span>: <span class="self">self</span>.<span class="ident">state</span>.<span class="ident">methods</span>,
-            <span class="ident">relation</span>: <span class="ident">Relation</span> { <span class="ident">event_id</span>: <span class="self">self</span>.<span class="ident">state</span>.<span class="ident">flow_id</span> },
-        };
+        <span class="kw">let</span> <span class="ident">content</span> <span class="op">=</span> <span class="ident">ReadyEventContent::new</span>(
+            <span class="self">self</span>.<span class="ident">own_device_id</span>,
+            <span class="self">self</span>.<span class="ident">state</span>.<span class="ident">methods</span>,
+            <span class="ident">Relation::new</span>(<span class="self">self</span>.<span class="ident">state</span>.<span class="ident">flow_id</span>),
+        );
 
         (<span class="ident">state</span>, <span class="ident">content</span>)
     }

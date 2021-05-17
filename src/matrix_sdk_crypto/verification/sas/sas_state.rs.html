@@ -1365,10 +1365,6 @@
 <span id="1362">1362</span>
 <span id="1363">1363</span>
 <span id="1364">1364</span>
-<span id="1365">1365</span>
-<span id="1366">1366</span>
-<span id="1367">1367</span>
-<span id="1368">1368</span>
 </pre><pre class="rust">
 <span class="comment">// Copyright 2020 The Matrix.org Foundation C.I.C.</span>
 <span class="comment">//</span>
@@ -1395,13 +1391,13 @@
     <span class="ident">events::key::verification</span>::{
         <span class="ident">accept</span>::{
             <span class="ident">AcceptEventContent</span>, <span class="ident">AcceptMethod</span>, <span class="ident">AcceptToDeviceEventContent</span>,
-            <span class="ident">MSasV1Content</span> <span class="kw">as</span> <span class="ident">AcceptV1Content</span>, <span class="ident">MSasV1ContentInit</span> <span class="kw">as</span> <span class="ident">AcceptV1ContentInit</span>,
+            <span class="ident">SasV1Content</span> <span class="kw">as</span> <span class="ident">AcceptV1Content</span>, <span class="ident">SasV1ContentInit</span> <span class="kw">as</span> <span class="ident">AcceptV1ContentInit</span>,
         },
         <span class="ident">cancel</span>::{<span class="ident">CancelCode</span>, <span class="ident">CancelEventContent</span>, <span class="ident">CancelToDeviceEventContent</span>},
         <span class="ident">done::DoneEventContent</span>,
         <span class="ident">key</span>::{<span class="ident">KeyEventContent</span>, <span class="ident">KeyToDeviceEventContent</span>},
         <span class="ident">start</span>::{
-            <span class="ident">MSasV1Content</span>, <span class="ident">MSasV1ContentInit</span>, <span class="ident">StartEventContent</span>, <span class="ident">StartMethod</span>,
+            <span class="ident">SasV1Content</span>, <span class="ident">SasV1ContentInit</span>, <span class="ident">StartEventContent</span>, <span class="ident">StartMethod</span>,
             <span class="ident">StartToDeviceEventContent</span>,
         },
         <span class="ident">HashAlgorithm</span>, <span class="ident">KeyAgreementProtocol</span>, <span class="ident">MessageAuthenticationCode</span>, <span class="ident">Relation</span>,
@@ -1559,14 +1555,14 @@
 <span class="doccomment">/// The initial SAS state.</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Created</span> {
-    <span class="ident">protocol_definitions</span>: <span class="ident">MSasV1ContentInit</span>,
+    <span class="ident">protocol_definitions</span>: <span class="ident">SasV1ContentInit</span>,
 }
 
 <span class="doccomment">/// The initial SAS state if the other side started the SAS verification.</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Started</span> {
     <span class="ident">commitment</span>: <span class="ident">String</span>,
-    <span class="ident">protocol_definitions</span>: <span class="ident">MSasV1Content</span>,
+    <span class="ident">protocol_definitions</span>: <span class="ident">SasV1Content</span>,
 }
 
 <span class="doccomment">/// The SAS state we&#39;re going to be in after the other side accepted our</span>
@@ -1747,7 +1743,7 @@
             <span class="ident">last_event_time</span>: <span class="ident">Arc::new</span>(<span class="ident">Instant::now</span>()),
 
             <span class="ident">state</span>: <span class="ident">Arc::new</span>(<span class="ident">Created</span> {
-                <span class="ident">protocol_definitions</span>: <span class="ident">MSasV1ContentInit</span> {
+                <span class="ident">protocol_definitions</span>: <span class="ident">SasV1ContentInit</span> {
                     <span class="ident">short_authentication_string</span>: <span class="ident">STRINGS</span>.<span class="ident">to_vec</span>(),
                     <span class="ident">key_agreement_protocols</span>: <span class="ident">KEY_AGREEMENT_PROTOCOLS</span>.<span class="ident">to_vec</span>(),
                     <span class="ident">message_authentication_codes</span>: <span class="ident">MACS</span>.<span class="ident">to_vec</span>(),
@@ -1759,24 +1755,24 @@
 
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">as_content</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">StartContent</span> {
         <span class="kw">match</span> <span class="self">self</span>.<span class="ident">verification_flow_id</span>.<span class="ident">as_ref</span>() {
-            <span class="ident">FlowId::ToDevice</span>(<span class="ident">s</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">StartContent::ToDevice</span>(<span class="ident">StartToDeviceEventContent</span> {
-                <span class="ident">transaction_id</span>: <span class="ident">s</span>.<span class="ident">to_string</span>(),
-                <span class="ident">from_device</span>: <span class="self">self</span>.<span class="ident">device_id</span>().<span class="ident">into</span>(),
-                <span class="ident">method</span>: <span class="ident">StartMethod::MSasV1</span>(
-                    <span class="ident">MSasV1Content::new</span>(<span class="self">self</span>.<span class="ident">state</span>.<span class="ident">protocol_definitions</span>.<span class="ident">clone</span>())
+            <span class="ident">FlowId::ToDevice</span>(<span class="ident">s</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">StartContent::ToDevice</span>(<span class="ident">StartToDeviceEventContent::new</span>(
+                <span class="self">self</span>.<span class="ident">device_id</span>().<span class="ident">into</span>(),
+                <span class="ident">s</span>.<span class="ident">to_string</span>(),
+                <span class="ident">StartMethod::SasV1</span>(
+                    <span class="ident">SasV1Content::new</span>(<span class="self">self</span>.<span class="ident">state</span>.<span class="ident">protocol_definitions</span>.<span class="ident">clone</span>())
                         .<span class="ident">expect</span>(<span class="string">&quot;Invalid initial protocol definitions.&quot;</span>),
                 ),
-            }),
+            )),
             <span class="ident">FlowId::InRoom</span>(<span class="ident">r</span>, <span class="ident">e</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">StartContent::Room</span>(
                 <span class="ident">r</span>.<span class="ident">clone</span>(),
-                <span class="ident">StartEventContent</span> {
-                    <span class="ident">from_device</span>: <span class="self">self</span>.<span class="ident">device_id</span>().<span class="ident">into</span>(),
-                    <span class="ident">method</span>: <span class="ident">StartMethod::MSasV1</span>(
-                        <span class="ident">MSasV1Content::new</span>(<span class="self">self</span>.<span class="ident">state</span>.<span class="ident">protocol_definitions</span>.<span class="ident">clone</span>())
+                <span class="ident">StartEventContent::new</span>(
+                    <span class="self">self</span>.<span class="ident">device_id</span>().<span class="ident">into</span>(),
+                    <span class="ident">StartMethod::SasV1</span>(
+                        <span class="ident">SasV1Content::new</span>(<span class="self">self</span>.<span class="ident">state</span>.<span class="ident">protocol_definitions</span>.<span class="ident">clone</span>())
                             .<span class="ident">expect</span>(<span class="string">&quot;Invalid initial protocol definitions.&quot;</span>),
                     ),
-                    <span class="ident">relation</span>: <span class="ident">Relation</span> { <span class="ident">event_id</span>: <span class="ident">e</span>.<span class="ident">clone</span>() },
-                },
+                    <span class="ident">Relation::new</span>(<span class="ident">e</span>.<span class="ident">clone</span>()),
+                ),
             ),
         }
     }
@@ -1850,7 +1846,7 @@
         <span class="ident">other_identity</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">UserIdentities</span><span class="op">&gt;</span>,
         <span class="ident">content</span>: <span class="kw-2">&amp;</span><span class="ident">StartContent</span>,
     ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">SasState</span><span class="op">&lt;</span><span class="ident">Started</span><span class="op">&gt;</span>, <span class="ident">SasState</span><span class="op">&lt;</span><span class="ident">Canceled</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="kw">if</span> <span class="kw">let</span> <span class="ident">StartMethod::MSasV1</span>(<span class="ident">method_content</span>) <span class="op">=</span> <span class="ident">content</span>.<span class="ident">method</span>() {
+        <span class="kw">if</span> <span class="kw">let</span> <span class="ident">StartMethod::SasV1</span>(<span class="ident">method_content</span>) <span class="op">=</span> <span class="ident">content</span>.<span class="ident">method</span>() {
             <span class="kw">let</span> <span class="ident">sas</span> <span class="op">=</span> <span class="ident">OlmSas::new</span>();
 
             <span class="kw">let</span> <span class="ident">pubkey</span> <span class="op">=</span> <span class="ident">sas</span>.<span class="ident">public_key</span>();
@@ -1936,14 +1932,10 @@
         );
 
         <span class="kw">match</span> <span class="self">self</span>.<span class="ident">verification_flow_id</span>.<span class="ident">as_ref</span>() {
-            <span class="ident">FlowId::ToDevice</span>(<span class="ident">s</span>) <span class="op">=</span><span class="op">&gt;</span> {
-                <span class="ident">AcceptToDeviceEventContent</span> { <span class="ident">transaction_id</span>: <span class="ident">s</span>.<span class="ident">to_string</span>(), <span class="ident">method</span> }.<span class="ident">into</span>()
+            <span class="ident">FlowId::ToDevice</span>(<span class="ident">s</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">AcceptToDeviceEventContent::new</span>(<span class="ident">s</span>.<span class="ident">to_string</span>(), <span class="ident">method</span>).<span class="ident">into</span>(),
+            <span class="ident">FlowId::InRoom</span>(<span class="ident">r</span>, <span class="ident">e</span>) <span class="op">=</span><span class="op">&gt;</span> {
+                (<span class="ident">r</span>.<span class="ident">clone</span>(), <span class="ident">AcceptEventContent::new</span>(<span class="ident">method</span>, <span class="ident">Relation::new</span>(<span class="ident">e</span>.<span class="ident">clone</span>()))).<span class="ident">into</span>()
             }
-            <span class="ident">FlowId::InRoom</span>(<span class="ident">r</span>, <span class="ident">e</span>) <span class="op">=</span><span class="op">&gt;</span> (
-                <span class="ident">r</span>.<span class="ident">clone</span>(),
-                <span class="ident">AcceptEventContent</span> { <span class="ident">method</span>, <span class="ident">relation</span>: <span class="ident">Relation</span> { <span class="ident">event_id</span>: <span class="ident">e</span>.<span class="ident">clone</span>() } },
-            )
-                .<span class="ident">into</span>(),
         }
     }
 
@@ -2050,10 +2042,10 @@
             .<span class="ident">into</span>(),
             <span class="ident">FlowId::InRoom</span>(<span class="ident">r</span>, <span class="ident">e</span>) <span class="op">=</span><span class="op">&gt;</span> (
                 <span class="ident">r</span>.<span class="ident">clone</span>(),
-                <span class="ident">KeyEventContent</span> {
-                    <span class="ident">key</span>: <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">lock</span>().<span class="ident">unwrap</span>().<span class="ident">public_key</span>(),
-                    <span class="ident">relation</span>: <span class="ident">Relation</span> { <span class="ident">event_id</span>: <span class="ident">e</span>.<span class="ident">clone</span>() },
-                },
+                <span class="ident">KeyEventContent::new</span>(
+                    <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">lock</span>().<span class="ident">unwrap</span>().<span class="ident">public_key</span>(),
+                    <span class="ident">Relation::new</span>(<span class="ident">e</span>.<span class="ident">clone</span>()),
+                ),
             )
                 .<span class="ident">into</span>(),
         }
@@ -2074,10 +2066,10 @@
             .<span class="ident">into</span>(),
             <span class="ident">FlowId::InRoom</span>(<span class="ident">r</span>, <span class="ident">e</span>) <span class="op">=</span><span class="op">&gt;</span> (
                 <span class="ident">r</span>.<span class="ident">clone</span>(),
-                <span class="ident">KeyEventContent</span> {
-                    <span class="ident">key</span>: <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">lock</span>().<span class="ident">unwrap</span>().<span class="ident">public_key</span>(),
-                    <span class="ident">relation</span>: <span class="ident">Relation</span> { <span class="ident">event_id</span>: <span class="ident">e</span>.<span class="ident">clone</span>() },
-                },
+                <span class="ident">KeyEventContent::new</span>(
+                    <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">lock</span>().<span class="ident">unwrap</span>().<span class="ident">public_key</span>(),
+                    <span class="ident">Relation::new</span>(<span class="ident">e</span>.<span class="ident">clone</span>()),
+                ),
             )
                 .<span class="ident">into</span>(),
         }
@@ -2372,7 +2364,7 @@
                 <span class="macro">unreachable!</span>(<span class="string">&quot;The done content isn&#39;t supported yet for to-device verifications&quot;</span>)
             }
             <span class="ident">FlowId::InRoom</span>(<span class="ident">r</span>, <span class="ident">e</span>) <span class="op">=</span><span class="op">&gt;</span> {
-                (<span class="ident">r</span>.<span class="ident">clone</span>(), <span class="ident">DoneEventContent</span> { <span class="ident">relation</span>: <span class="ident">Relation</span> { <span class="ident">event_id</span>: <span class="ident">e</span>.<span class="ident">clone</span>() } }).<span class="ident">into</span>()
+                (<span class="ident">r</span>.<span class="ident">clone</span>(), <span class="ident">DoneEventContent::new</span>(<span class="ident">Relation::new</span>(<span class="ident">e</span>.<span class="ident">clone</span>()))).<span class="ident">into</span>()
             }
         }
     }
@@ -2424,7 +2416,7 @@
                 <span class="macro">unreachable!</span>(<span class="string">&quot;The done content isn&#39;t supported yet for to-device verifications&quot;</span>)
             }
             <span class="ident">FlowId::InRoom</span>(<span class="ident">r</span>, <span class="ident">e</span>) <span class="op">=</span><span class="op">&gt;</span> {
-                (<span class="ident">r</span>.<span class="ident">clone</span>(), <span class="ident">DoneEventContent</span> { <span class="ident">relation</span>: <span class="ident">Relation</span> { <span class="ident">event_id</span>: <span class="ident">e</span>.<span class="ident">clone</span>() } }).<span class="ident">into</span>()
+                (<span class="ident">r</span>.<span class="ident">clone</span>(), <span class="ident">DoneEventContent::new</span>(<span class="ident">Relation::new</span>(<span class="ident">e</span>.<span class="ident">clone</span>()))).<span class="ident">into</span>()
             }
         }
     }
@@ -2468,20 +2460,20 @@
 <span class="kw">impl</span> <span class="ident">SasState</span><span class="op">&lt;</span><span class="ident">Canceled</span><span class="op">&gt;</span> {
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">as_content</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">CancelContent</span> {
         <span class="kw">match</span> <span class="self">self</span>.<span class="ident">verification_flow_id</span>.<span class="ident">as_ref</span>() {
-            <span class="ident">FlowId::ToDevice</span>(<span class="ident">s</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">CancelToDeviceEventContent</span> {
-                <span class="ident">transaction_id</span>: <span class="ident">s</span>.<span class="ident">clone</span>(),
-                <span class="ident">reason</span>: <span class="self">self</span>.<span class="ident">state</span>.<span class="ident">reason</span>.<span class="ident">to_string</span>(),
-                <span class="ident">code</span>: <span class="self">self</span>.<span class="ident">state</span>.<span class="ident">cancel_code</span>.<span class="ident">clone</span>(),
-            }
+            <span class="ident">FlowId::ToDevice</span>(<span class="ident">s</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">CancelToDeviceEventContent::new</span>(
+                <span class="ident">s</span>.<span class="ident">clone</span>(),
+                <span class="self">self</span>.<span class="ident">state</span>.<span class="ident">reason</span>.<span class="ident">to_string</span>(),
+                <span class="self">self</span>.<span class="ident">state</span>.<span class="ident">cancel_code</span>.<span class="ident">clone</span>(),
+            )
             .<span class="ident">into</span>(),
 
             <span class="ident">FlowId::InRoom</span>(<span class="ident">r</span>, <span class="ident">e</span>) <span class="op">=</span><span class="op">&gt;</span> (
                 <span class="ident">r</span>.<span class="ident">clone</span>(),
-                <span class="ident">CancelEventContent</span> {
-                    <span class="ident">reason</span>: <span class="self">self</span>.<span class="ident">state</span>.<span class="ident">reason</span>.<span class="ident">to_string</span>(),
-                    <span class="ident">code</span>: <span class="self">self</span>.<span class="ident">state</span>.<span class="ident">cancel_code</span>.<span class="ident">clone</span>(),
-                    <span class="ident">relation</span>: <span class="ident">Relation</span> { <span class="ident">event_id</span>: <span class="ident">e</span>.<span class="ident">clone</span>() },
-                },
+                <span class="ident">CancelEventContent::new</span>(
+                    <span class="self">self</span>.<span class="ident">state</span>.<span class="ident">reason</span>.<span class="ident">to_string</span>(),
+                    <span class="self">self</span>.<span class="ident">state</span>.<span class="ident">cancel_code</span>.<span class="ident">clone</span>(),
+                    <span class="ident">Relation::new</span>(<span class="ident">e</span>.<span class="ident">clone</span>()),
+                ),
             )
                 .<span class="ident">into</span>(),
         }
@@ -2708,7 +2700,7 @@
         };
 
         <span class="kw">match</span> <span class="ident">method</span> {
-            <span class="ident">StartMethod::MSasV1</span>(<span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="ident">c</span>) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">StartMethod::SasV1</span>(<span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="ident">c</span>) <span class="op">=</span><span class="op">&gt;</span> {
                 <span class="ident">c</span>.<span class="ident">message_authentication_codes</span> <span class="op">=</span> <span class="macro">vec!</span>[];
             }
             <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">panic!</span>(<span class="string">&quot;Unknown SAS start method&quot;</span>),
