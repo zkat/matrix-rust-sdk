@@ -162,6 +162,11 @@
 <span id="159">159</span>
 <span id="160">160</span>
 <span id="161">161</span>
+<span id="162">162</span>
+<span id="163">163</span>
+<span id="164">164</span>
+<span id="165">165</span>
+<span id="166">166</span>
 </pre><pre class="rust">
 <span class="comment">// Copyright 2020 The Matrix.org Foundation C.I.C.</span>
 <span class="comment">//</span>
@@ -196,6 +201,7 @@
 <span class="kw">use</span> <span class="ident">reqwest::Error</span> <span class="kw">as</span> <span class="ident">ReqwestError</span>;
 <span class="kw">use</span> <span class="ident">serde_json::Error</span> <span class="kw">as</span> <span class="ident">JsonError</span>;
 <span class="kw">use</span> <span class="ident">thiserror::Error</span>;
+<span class="kw">use</span> <span class="ident">url::ParseError</span> <span class="kw">as</span> <span class="ident">UrlParseError</span>;
 
 <span class="doccomment">/// Result type of the rust-sdk.</span>
 <span class="kw">pub</span> <span class="kw">type</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">std::result::Result</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">Error</span><span class="op">&gt;</span>;
@@ -293,6 +299,10 @@
     <span class="doccomment">/// An error encountered when trying to parse an identifier.</span>
     <span class="attribute">#[<span class="ident">error</span>(<span class="ident">transparent</span>)]</span>
     <span class="ident">Identifier</span>(<span class="attribute">#[<span class="ident">from</span>]</span> <span class="ident">IdentifierError</span>),
+
+    <span class="doccomment">/// An error encountered when trying to parse a url.</span>
+    <span class="attribute">#[<span class="ident">error</span>(<span class="ident">transparent</span>)]</span>
+    <span class="ident">Url</span>(<span class="attribute">#[<span class="ident">from</span>]</span> <span class="ident">UrlParseError</span>),
 }
 
 <span class="kw">impl</span> <span class="ident">Error</span> {
