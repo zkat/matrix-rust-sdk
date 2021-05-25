@@ -3541,6 +3541,20 @@
 <span id="3538">3538</span>
 <span id="3539">3539</span>
 <span id="3540">3540</span>
+<span id="3541">3541</span>
+<span id="3542">3542</span>
+<span id="3543">3543</span>
+<span id="3544">3544</span>
+<span id="3545">3545</span>
+<span id="3546">3546</span>
+<span id="3547">3547</span>
+<span id="3548">3548</span>
+<span id="3549">3549</span>
+<span id="3550">3550</span>
+<span id="3551">3551</span>
+<span id="3552">3552</span>
+<span id="3553">3553</span>
+<span id="3554">3554</span>
 </pre><pre class="rust">
 <span class="comment">// Copyright 2020 Damir Jelić</span>
 <span class="comment">// Copyright 2020 The Matrix.org Foundation C.I.C.</span>
@@ -6965,6 +6979,7 @@
             .<span class="ident">with_status</span>(<span class="number">200</span>)
             .<span class="ident">match_header</span>(<span class="string">&quot;authorization&quot;</span>, <span class="string">&quot;Bearer 1234&quot;</span>)
             .<span class="ident">with_body</span>(<span class="ident">test_json::SYNC</span>.<span class="ident">to_string</span>())
+            .<span class="ident">expect_at_least</span>(<span class="number">1</span>)
             .<span class="ident">create</span>();
 
         <span class="kw">let</span> <span class="ident">sync_settings</span> <span class="op">=</span> <span class="ident">SyncSettings::new</span>().<span class="ident">timeout</span>(<span class="ident">Duration::from_millis</span>(<span class="number">3000</span>));
@@ -6974,6 +6989,19 @@
         <span class="kw">let</span> <span class="ident">room</span> <span class="op">=</span> <span class="ident">client</span>.<span class="ident">get_joined_room</span>(<span class="kw-2">&amp;</span><span class="macro">room_id!</span>(<span class="string">&quot;!SVkFJHzfwvuaIEawgC:localhost&quot;</span>)).<span class="ident">unwrap</span>();
 
         <span class="macro">assert_eq!</span>(<span class="string">&quot;tutorial&quot;</span>.<span class="ident">to_string</span>(), <span class="ident">room</span>.<span class="ident">display_name</span>().<span class="kw">await</span>.<span class="ident">unwrap</span>());
+
+        <span class="kw">let</span> <span class="ident">_m</span> <span class="op">=</span> <span class="ident">mock</span>(<span class="string">&quot;GET&quot;</span>, <span class="ident">Matcher::Regex</span>(<span class="string">r&quot;^/_matrix/client/r0/sync\?.*$&quot;</span>.<span class="ident">to_string</span>()))
+            .<span class="ident">with_status</span>(<span class="number">200</span>)
+            .<span class="ident">match_header</span>(<span class="string">&quot;authorization&quot;</span>, <span class="string">&quot;Bearer 1234&quot;</span>)
+            .<span class="ident">with_body</span>(<span class="ident">test_json::INVITE_SYNC</span>.<span class="ident">to_string</span>())
+            .<span class="ident">expect_at_least</span>(<span class="number">1</span>)
+            .<span class="ident">create</span>();
+
+        <span class="kw">let</span> <span class="ident">_response</span> <span class="op">=</span> <span class="ident">client</span>.<span class="ident">sync_once</span>(<span class="ident">SyncSettings::new</span>()).<span class="kw">await</span>.<span class="ident">unwrap</span>();
+
+        <span class="kw">let</span> <span class="ident">invited_room</span> <span class="op">=</span> <span class="ident">client</span>.<span class="ident">get_invited_room</span>(<span class="kw-2">&amp;</span><span class="macro">room_id!</span>(<span class="string">&quot;!696r7674:example.com&quot;</span>)).<span class="ident">unwrap</span>();
+
+        <span class="macro">assert_eq!</span>(<span class="string">&quot;My Room Name&quot;</span>.<span class="ident">to_string</span>(), <span class="ident">invited_room</span>.<span class="ident">display_name</span>().<span class="kw">await</span>.<span class="ident">unwrap</span>());
     }
 
     <span class="attribute">#[<span class="ident">tokio::test</span>]</span>
