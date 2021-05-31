@@ -336,6 +336,12 @@
 <span id="333">333</span>
 <span id="334">334</span>
 <span id="335">335</span>
+<span id="336">336</span>
+<span id="337">337</span>
+<span id="338">338</span>
+<span id="339">339</span>
+<span id="340">340</span>
+<span id="341">341</span>
 </pre><pre class="rust">
 <span class="comment">// Copyright 2020 The Matrix.org Foundation C.I.C.</span>
 <span class="comment">//</span>
@@ -362,7 +368,7 @@
 };
 <span class="kw">use</span> <span class="ident">base64::DecodeError</span>;
 <span class="kw">use</span> <span class="ident">getrandom::getrandom</span>;
-<span class="kw">use</span> <span class="ident">matrix_sdk_common::events::room</span>::{<span class="ident">JsonWebKey</span>, <span class="ident">JsonWebKeyInit</span>};
+<span class="kw">use</span> <span class="ident">matrix_sdk_common::events::room</span>::{<span class="ident">EncryptedFile</span>, <span class="ident">JsonWebKey</span>, <span class="ident">JsonWebKeyInit</span>};
 <span class="kw">use</span> <span class="ident">serde</span>::{<span class="ident">Deserialize</span>, <span class="ident">Serialize</span>};
 <span class="kw">use</span> <span class="ident">sha2</span>::{<span class="ident">Digest</span>, <span class="ident">Sha256</span>};
 <span class="kw">use</span> <span class="ident">thiserror::Error</span>;
@@ -589,6 +595,12 @@
     <span class="kw">pub</span> <span class="ident">iv</span>: <span class="ident">String</span>,
     <span class="doccomment">/// The hashes that can be used to check the validity of the file.</span>
     <span class="kw">pub</span> <span class="ident">hashes</span>: <span class="ident">BTreeMap</span><span class="op">&lt;</span><span class="ident">String</span>, <span class="ident">String</span><span class="op">&gt;</span>,
+}
+
+<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">EncryptedFile</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">EncryptionInfo</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">file</span>: <span class="ident">EncryptedFile</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+        <span class="self">Self</span> { <span class="ident">version</span>: <span class="ident">file</span>.<span class="ident">v</span>, <span class="ident">web_key</span>: <span class="ident">file</span>.<span class="ident">key</span>, <span class="ident">iv</span>: <span class="ident">file</span>.<span class="ident">iv</span>, <span class="ident">hashes</span>: <span class="ident">file</span>.<span class="ident">hashes</span> }
+    }
 }
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
