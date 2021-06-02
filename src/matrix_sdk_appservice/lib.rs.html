@@ -422,6 +422,21 @@
 <span id="419">419</span>
 <span id="420">420</span>
 <span id="421">421</span>
+<span id="422">422</span>
+<span id="423">423</span>
+<span id="424">424</span>
+<span id="425">425</span>
+<span id="426">426</span>
+<span id="427">427</span>
+<span id="428">428</span>
+<span id="429">429</span>
+<span id="430">430</span>
+<span id="431">431</span>
+<span id="432">432</span>
+<span id="433">433</span>
+<span id="434">434</span>
+<span id="435">435</span>
+<span id="436">436</span>
 </pre><pre class="rust">
 <span class="comment">// Copyright 2021 Famedly GmbH</span>
 <span class="comment">//</span>
@@ -602,12 +617,20 @@
 
 <span class="kw">type</span> <span class="ident">Localpart</span> <span class="op">=</span> <span class="ident">String</span>;
 
-<span class="doccomment">/// The main appservice user is the `sender_localpart` from the given</span>
-<span class="doccomment">/// [`AppserviceRegistration`]</span>
+<span class="doccomment">/// The `localpart` of the user associated with the application service via</span>
+<span class="doccomment">/// `sender_localpart` in [`AppserviceRegistration`].</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// Dummy type for shared documentation</span>
 <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">dead_code</span>)]</span>
-<span class="kw">pub</span> <span class="kw">type</span> <span class="ident">MainAppserviceUser</span> <span class="op">=</span> ();
+<span class="kw">pub</span> <span class="kw">type</span> <span class="ident">MainUser</span> <span class="op">=</span> ();
+
+<span class="doccomment">/// The application service may specify the virtual user to act as through use</span>
+<span class="doccomment">/// of a user_id query string parameter on the request. The user specified in</span>
+<span class="doccomment">/// the query string must be covered by one of the [`AppserviceRegistration`]&#39;s</span>
+<span class="doccomment">/// `users` namespaces.</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// Dummy type for shared documentation</span>
+<span class="kw">pub</span> <span class="kw">type</span> <span class="ident">VirtualUser</span> <span class="op">=</span> ();
 
 <span class="doccomment">/// Appservice</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>)]</span>
@@ -621,9 +644,9 @@
 <span class="kw">impl</span> <span class="ident">Appservice</span> {
     <span class="doccomment">/// Create new Appservice</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// Also creates and caches a [`Client`] with the [`MainAppserviceUser`].</span>
+    <span class="doccomment">/// Also creates and caches a [`Client`] for the [`MainUser`].</span>
     <span class="doccomment">/// The default [`ClientConfig`] is used, if you want to customize it</span>
-    <span class="doccomment">/// use [`Self::new_with_client_config()`] instead.</span>
+    <span class="doccomment">/// use [`Self::new_with_config()`] instead.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// # Arguments</span>
     <span class="doccomment">///</span>
@@ -639,7 +662,7 @@
         <span class="ident">server_name</span>: <span class="kw">impl</span> <span class="ident">TryInto</span><span class="op">&lt;</span><span class="ident">ServerNameBox</span>, <span class="ident">Error</span> <span class="op">=</span> <span class="ident">identifiers::Error</span><span class="op">&gt;</span>,
         <span class="ident">registration</span>: <span class="ident">AppserviceRegistration</span>,
     ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">appservice</span> <span class="op">=</span> <span class="self">Self</span><span class="ident">::new_with_client_config</span>(
+        <span class="kw">let</span> <span class="ident">appservice</span> <span class="op">=</span> <span class="self">Self</span><span class="ident">::new_with_config</span>(
             <span class="ident">homeserver_url</span>,
             <span class="ident">server_name</span>,
             <span class="ident">registration</span>,
@@ -652,7 +675,7 @@
 
     <span class="doccomment">/// Same as [`Self::new()`] but lets you provide a [`ClientConfig`] for the</span>
     <span class="doccomment">/// [`Client`]</span>
-    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">new_with_client_config</span>(
+    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">new_with_config</span>(
         <span class="ident">homeserver_url</span>: <span class="kw">impl</span> <span class="ident">TryInto</span><span class="op">&lt;</span><span class="ident">Url</span>, <span class="ident">Error</span> <span class="op">=</span> <span class="ident">url::ParseError</span><span class="op">&gt;</span>,
         <span class="ident">server_name</span>: <span class="kw">impl</span> <span class="ident">TryInto</span><span class="op">&lt;</span><span class="ident">ServerNameBox</span>, <span class="ident">Error</span> <span class="op">=</span> <span class="ident">identifiers::Error</span><span class="op">&gt;</span>,
         <span class="ident">registration</span>: <span class="ident">AppserviceRegistration</span>,
@@ -662,23 +685,26 @@
         <span class="kw">let</span> <span class="ident">server_name</span> <span class="op">=</span> <span class="ident">server_name</span>.<span class="ident">try_into</span>()<span class="question-mark">?</span>;
         <span class="kw">let</span> <span class="ident">registration</span> <span class="op">=</span> <span class="ident">Arc::new</span>(<span class="ident">registration</span>);
         <span class="kw">let</span> <span class="ident">clients</span> <span class="op">=</span> <span class="ident">Arc::new</span>(<span class="ident">DashMap::new</span>());
+        <span class="kw">let</span> <span class="ident">sender_localpart</span> <span class="op">=</span> <span class="ident">registration</span>.<span class="ident">sender_localpart</span>.<span class="ident">clone</span>();
 
         <span class="kw">let</span> <span class="ident">appservice</span> <span class="op">=</span> <span class="ident">Appservice</span> { <span class="ident">homeserver_url</span>, <span class="ident">server_name</span>, <span class="ident">registration</span>, <span class="ident">clients</span> };
 
-        <span class="comment">// we cache the [`MainAppserviceUser`] by default</span>
-        <span class="ident">appservice</span>.<span class="ident">client_with_config</span>(<span class="prelude-val">None</span>, <span class="ident">client_config</span>).<span class="kw">await</span><span class="question-mark">?</span>;
+        <span class="comment">// we cache the [`MainUser`] by default</span>
+        <span class="ident">appservice</span>.<span class="ident">virtual_user_with_config</span>(<span class="ident">sender_localpart</span>, <span class="ident">client_config</span>).<span class="kw">await</span><span class="question-mark">?</span>;
 
         <span class="prelude-val">Ok</span>(<span class="ident">appservice</span>)
     }
 
-    <span class="doccomment">/// Create a [`Client`]</span>
+    <span class="doccomment">/// Create a [`Client`] for the given [`VirtualUser`]&#39;s `localpart`</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// Will create and return a [`Client`] that&#39;s configured to [assert the</span>
     <span class="doccomment">/// identity] on all outgoing homeserver requests if `localpart` is</span>
-    <span class="doccomment">/// given. If not given the [`Client`] will use the [`MainAppserviceUser`].</span>
+    <span class="doccomment">/// given.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// This method is a singleton that saves the client internally for re-use</span>
-    <span class="doccomment">/// based on the `localpart`.</span>
+    <span class="doccomment">/// based on the `localpart`. The cached [`Client`] can be retrieved either</span>
+    <span class="doccomment">/// by calling this method again or by calling [`Self::get_cached_client()`]</span>
+    <span class="doccomment">/// which is non-async convenience wrapper.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// # Arguments</span>
     <span class="doccomment">///</span>
@@ -686,30 +712,31 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// [registration]: https://matrix.org/docs/spec/application_service/r0.1.2#registration</span>
     <span class="doccomment">/// [assert the identity]: https://matrix.org/docs/spec/application_service/r0.1.2#identity-assertion</span>
-    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">client</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">localpart</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Client</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">client</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">client_with_config</span>(<span class="ident">localpart</span>, <span class="ident">ClientConfig::default</span>()).<span class="kw">await</span><span class="question-mark">?</span>;
+    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">virtual_user</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">localpart</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">str</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Client</span><span class="op">&gt;</span> {
+        <span class="kw">let</span> <span class="ident">client</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">virtual_user_with_config</span>(<span class="ident">localpart</span>, <span class="ident">ClientConfig::default</span>()).<span class="kw">await</span><span class="question-mark">?</span>;
 
         <span class="prelude-val">Ok</span>(<span class="ident">client</span>)
     }
 
-    <span class="doccomment">/// Same as [`Self::client`] but with the ability to pass in a</span>
+    <span class="doccomment">/// Same as [`Self::virtual_user()`] but with the ability to pass in a</span>
     <span class="doccomment">/// [`ClientConfig`]</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// Since this method is a singleton follow-up calls with different</span>
     <span class="doccomment">/// [`ClientConfig`]s will be ignored.</span>
-    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">client_with_config</span>(
+    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">virtual_user_with_config</span>(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
-        <span class="ident">localpart</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span>,
+        <span class="ident">localpart</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">str</span><span class="op">&gt;</span>,
         <span class="ident">config</span>: <span class="ident">ClientConfig</span>,
     ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Client</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">localpart</span> <span class="op">=</span> <span class="ident">localpart</span>.<span class="ident">unwrap_or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="self">self</span>.<span class="ident">registration</span>.<span class="ident">sender_localpart</span>.<span class="ident">as_ref</span>());
+        <span class="comment">// TODO: check if localpart is covered by namespace?</span>
+        <span class="kw">let</span> <span class="ident">localpart</span> <span class="op">=</span> <span class="ident">localpart</span>.<span class="ident">as_ref</span>();
 
         <span class="kw">let</span> <span class="ident">client</span> <span class="op">=</span> <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">client</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">clients</span>.<span class="ident">get</span>(<span class="ident">localpart</span>) {
             <span class="ident">client</span>.<span class="ident">clone</span>()
         } <span class="kw">else</span> {
             <span class="kw">let</span> <span class="ident">user_id</span> <span class="op">=</span> <span class="ident">UserId::parse_with_server_name</span>(<span class="ident">localpart</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">server_name</span>)<span class="question-mark">?</span>;
 
-            <span class="comment">// The `as_token` in the `Session` maps to the [`MainAppserviceUser`]</span>
+            <span class="comment">// The `as_token` in the `Session` maps to the [`MainUser`]</span>
             <span class="comment">// (`sender_localpart`) by default, so we don&#39;t need to assert identity</span>
             <span class="comment">// in that case</span>
             <span class="kw">if</span> <span class="ident">localpart</span> <span class="op">!</span><span class="op">=</span> <span class="self">self</span>.<span class="ident">registration</span>.<span class="ident">sender_localpart</span> {
@@ -737,8 +764,11 @@
     <span class="doccomment">/// Get cached [`Client`]</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// Will return the client for the given `localpart` if previously</span>
-    <span class="doccomment">/// constructed with [`Self::client()`] or [`Self::client_with_config()`].</span>
-    <span class="doccomment">/// If no client for the `localpart` is found it will return an Error.</span>
+    <span class="doccomment">/// constructed with [`Self::virtual_user()`] or</span>
+    <span class="doccomment">/// [`Self::virtual_user_with_config()`].</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// If no `localpart` is given it assumes the [`MainUser`]&#39;s `localpart`. If</span>
+    <span class="doccomment">/// no client for `localpart` is found it will return an Error.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_cached_client</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">localpart</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Client</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">localpart</span> <span class="op">=</span> <span class="ident">localpart</span>.<span class="ident">unwrap_or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="self">self</span>.<span class="ident">registration</span>.<span class="ident">sender_localpart</span>.<span class="ident">as_ref</span>());
 
@@ -749,10 +779,9 @@
 
     <span class="doccomment">/// Convenience wrapper around [`Client::set_event_handler()`]</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// Attaches the event handler to [`Self::client()`] with `None` as</span>
-    <span class="doccomment">/// `localpart`</span>
+    <span class="doccomment">/// Attaches the event handler to the [`MainUser`]&#39;s [`Client`]</span>
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">set_event_handler</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">handler</span>: <span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">EventHandler</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">client</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">client</span>(<span class="prelude-val">None</span>).<span class="kw">await</span><span class="question-mark">?</span>;
+        <span class="kw">let</span> <span class="ident">client</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">get_cached_client</span>(<span class="prelude-val">None</span>)<span class="question-mark">?</span>;
 
         <span class="ident">client</span>.<span class="ident">set_event_handler</span>(<span class="ident">handler</span>).<span class="kw">await</span>;
 
@@ -772,7 +801,7 @@
             <span class="ident">login_type</span>: <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="ident">LoginType::ApplicationService</span>),
         });
 
-        <span class="kw">let</span> <span class="ident">client</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">client</span>(<span class="prelude-val">None</span>).<span class="kw">await</span><span class="question-mark">?</span>;
+        <span class="kw">let</span> <span class="ident">client</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">get_cached_client</span>(<span class="prelude-val">None</span>)<span class="question-mark">?</span>;
         <span class="kw">match</span> <span class="ident">client</span>.<span class="ident">register</span>(<span class="ident">request</span>).<span class="kw">await</span> {
             <span class="prelude-val">Ok</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> (),
             <span class="prelude-val">Err</span>(<span class="ident">error</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="kw">match</span> <span class="ident">error</span> {
@@ -808,7 +837,8 @@
         <span class="self">self</span>.<span class="ident">registration</span>.<span class="ident">hs_token</span> <span class="op">=</span><span class="op">=</span> <span class="ident">hs_token</span>.<span class="ident">as_ref</span>()
     }
 
-    <span class="doccomment">/// Check if given `user_id` is in any of the registration user namespaces</span>
+    <span class="doccomment">/// Check if given `user_id` is in any of the [`AppserviceRegistration`]&#39;s</span>
+    <span class="doccomment">/// `users` namespaces</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">user_id_is_in_namespace</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">user_id</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">str</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">bool</span><span class="op">&gt;</span> {
         <span class="kw">for</span> <span class="ident">user</span> <span class="kw">in</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">registration</span>.<span class="ident">namespaces</span>.<span class="ident">users</span> {
             <span class="comment">// TODO: precompile on Appservice construction</span>
