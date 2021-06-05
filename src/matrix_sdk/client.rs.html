@@ -3847,7 +3847,6 @@
 <span id="3844">3844</span>
 <span id="3845">3845</span>
 <span id="3846">3846</span>
-<span id="3847">3847</span>
 </pre><pre class="rust">
 <span class="comment">// Copyright 2020 Damir Jelić</span>
 <span class="comment">// Copyright 2020 The Matrix.org Foundation C.I.C.</span>
@@ -3934,14 +3933,11 @@
 }
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;encryption&quot;</span>)]</span>
-<span class="kw">use</span> <span class="ident">matrix_sdk_common</span>::{
-    <span class="ident">api::r0</span>::{
-        <span class="ident">keys</span>::{<span class="ident">get_keys</span>, <span class="ident">upload_keys</span>, <span class="ident">upload_signing_keys::Request</span> <span class="kw">as</span> <span class="ident">UploadSigningKeysRequest</span>},
-        <span class="ident">to_device::send_event_to_device</span>::{
-            <span class="ident">Request</span> <span class="kw">as</span> <span class="ident">RumaToDeviceRequest</span>, <span class="ident">Response</span> <span class="kw">as</span> <span class="ident">ToDeviceResponse</span>,
-        },
+<span class="kw">use</span> <span class="ident">matrix_sdk_common::api::r0</span>::{
+    <span class="ident">keys</span>::{<span class="ident">get_keys</span>, <span class="ident">upload_keys</span>, <span class="ident">upload_signing_keys::Request</span> <span class="kw">as</span> <span class="ident">UploadSigningKeysRequest</span>},
+    <span class="ident">to_device::send_event_to_device</span>::{
+        <span class="ident">Request</span> <span class="kw">as</span> <span class="ident">RumaToDeviceRequest</span>, <span class="ident">Response</span> <span class="kw">as</span> <span class="ident">ToDeviceResponse</span>,
     },
-    <span class="ident">identifiers::EventId</span>,
 };
 <span class="kw">use</span> <span class="ident">matrix_sdk_common</span>::{
     <span class="ident">api</span>::{
@@ -6034,12 +6030,14 @@
     <span class="doccomment">/// Get a `VerificationRequest` object with the given flow id.</span>
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;encryption&quot;</span>)]</span>
     <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;docs&quot;</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">encryption</span>)))]</span>
-    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">get_verification_request</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">flow_id</span>: <span class="kw-2">&amp;</span><span class="ident">EventId</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">VerificationRequest</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">get_verification_request</span>(
+        <span class="kw-2">&amp;</span><span class="self">self</span>,
+        <span class="ident">flow_id</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">str</span><span class="op">&gt;</span>,
+    ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">VerificationRequest</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">olm</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">base_client</span>.<span class="ident">olm_machine</span>().<span class="kw">await</span><span class="question-mark">?</span>;
 
-        <span class="ident">olm</span>.<span class="ident">get_verification_request</span>(<span class="ident">flow_id</span>).<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">r</span><span class="op">|</span> {
-            <span class="self">self</span>.<span class="ident">get_joined_room</span>(<span class="ident">r</span>.<span class="ident">room_id</span>()).<span class="ident">map</span>(<span class="op">|</span><span class="ident">room</span><span class="op">|</span> <span class="ident">VerificationRequest</span> { <span class="ident">inner</span>: <span class="ident">r</span>, <span class="ident">room</span> })
-        })
+        <span class="ident">olm</span>.<span class="ident">get_verification_request</span>(<span class="ident">flow_id</span>)
+            .<span class="ident">map</span>(<span class="op">|</span><span class="ident">r</span><span class="op">|</span> <span class="ident">VerificationRequest</span> { <span class="ident">inner</span>: <span class="ident">r</span>, <span class="ident">client</span>: <span class="self">self</span>.<span class="ident">clone</span>() })
     }
 
     <span class="doccomment">/// Get a specific device of a user.</span>
@@ -7697,5 +7695,4 @@
     }
 }
 </pre></div>
-</section><section id="search" class="content hidden"></section><div id="rustdoc-vars" data-root-path="../../" data-current-crate="matrix_sdk" data-search-index-js="../../search-index.js" data-search-js="../../search.js"></div>
-    <script src="../../main.js"></script><script src="../../source-script.js"></script><script src="../../source-files.js"></script></body></html>
+</section><section id="search" class="content hidden"></section><div id="rustdoc-vars" data-root-path="../../" data-current-crate="matrix_sdk" data-search-index-js="../../search-index.js" data-search-js="../../search.js"></div><script src="../../main.js"></script><script src="../../source-script.js"></script><script src="../../source-files.js"></script></body></html>

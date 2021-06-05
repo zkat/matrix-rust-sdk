@@ -39,6 +39,17 @@
 <span id="36">36</span>
 <span id="37">37</span>
 <span id="38">38</span>
+<span id="39">39</span>
+<span id="40">40</span>
+<span id="41">41</span>
+<span id="42">42</span>
+<span id="43">43</span>
+<span id="44">44</span>
+<span id="45">45</span>
+<span id="46">46</span>
+<span id="47">47</span>
+<span id="48">48</span>
+<span id="49">49</span>
 </pre><pre class="rust">
 <span class="comment">// Copyright 2020 The Matrix.org Foundation C.I.C.</span>
 <span class="comment">//</span>
@@ -54,30 +65,40 @@
 <span class="comment">// See the License for the specific language governing permissions and</span>
 <span class="comment">// limitations under the License.</span>
 
-<span class="kw">use</span> <span class="ident">matrix_sdk_base</span>::{
-    <span class="ident">crypto::VerificationRequest</span> <span class="kw">as</span> <span class="ident">BaseVerificationRequest</span>, <span class="ident">events::AnyMessageEventContent</span>,
+<span class="kw">use</span> <span class="ident">matrix_sdk_base::crypto</span>::{
+    <span class="ident">OutgoingVerificationRequest</span>, <span class="ident">VerificationRequest</span> <span class="kw">as</span> <span class="ident">BaseVerificationRequest</span>,
 };
 
-<span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">room::Joined</span>, <span class="prelude-ty">Result</span>};
+<span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">Client</span>, <span class="prelude-ty">Result</span>};
 
 <span class="doccomment">/// An object controlling the interactive verification flow.</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">VerificationRequest</span> {
     <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">inner</span>: <span class="ident">BaseVerificationRequest</span>,
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">room</span>: <span class="ident">Joined</span>,
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">client</span>: <span class="ident">Client</span>,
 }
 
 <span class="kw">impl</span> <span class="ident">VerificationRequest</span> {
-    <span class="doccomment">/// Accept the interactive verification flow.</span>
+    <span class="doccomment">/// Accept the verification request</span>
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">accept</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">content</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">accept</span>() {
-            <span class="kw">let</span> <span class="ident">content</span> <span class="op">=</span> <span class="ident">AnyMessageEventContent::KeyVerificationReady</span>(<span class="ident">content</span>);
-            <span class="self">self</span>.<span class="ident">room</span>.<span class="ident">send</span>(<span class="ident">content</span>, <span class="prelude-val">None</span>).<span class="kw">await</span><span class="question-mark">?</span>;
+        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">request</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">accept</span>() {
+            <span class="kw">match</span> <span class="ident">request</span> {
+                <span class="ident">OutgoingVerificationRequest::ToDevice</span>(<span class="ident">r</span>) <span class="op">=</span><span class="op">&gt;</span> {
+                    <span class="self">self</span>.<span class="ident">client</span>.<span class="ident">send_to_device</span>(<span class="kw-2">&amp;</span><span class="ident">r</span>).<span class="kw">await</span><span class="question-mark">?</span>;
+                }
+                <span class="ident">OutgoingVerificationRequest::InRoom</span>(<span class="ident">r</span>) <span class="op">=</span><span class="op">&gt;</span> {
+                    <span class="self">self</span>.<span class="ident">client</span>.<span class="ident">room_send_helper</span>(<span class="kw-2">&amp;</span><span class="ident">r</span>).<span class="kw">await</span><span class="question-mark">?</span>;
+                }
+            };
         }
 
         <span class="prelude-val">Ok</span>(())
     }
+
+    <span class="doccomment">/// Cancel the verification request</span>
+    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">cancel</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+        <span class="macro">todo!</span>()
+    }
 }
 </pre></div>
-</section><section id="search" class="content hidden"></section><div id="rustdoc-vars" data-root-path="../../" data-current-crate="matrix_sdk" data-search-index-js="../../search-index.js" data-search-js="../../search.js"></div>
-    <script src="../../main.js"></script><script src="../../source-script.js"></script><script src="../../source-files.js"></script></body></html>
+</section><section id="search" class="content hidden"></section><div id="rustdoc-vars" data-root-path="../../" data-current-crate="matrix_sdk" data-search-index-js="../../search-index.js" data-search-js="../../search.js"></div><script src="../../main.js"></script><script src="../../source-script.js"></script><script src="../../source-files.js"></script></body></html>
