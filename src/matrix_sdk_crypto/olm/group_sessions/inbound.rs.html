@@ -457,9 +457,9 @@
 <span class="kw">use</span> <span class="kw">super</span>::{<span class="ident">ExportedGroupSessionKey</span>, <span class="ident">ExportedRoomKey</span>, <span class="ident">GroupSessionKey</span>};
 <span class="kw">use</span> <span class="kw">crate</span><span class="ident">::error</span>::{<span class="ident">EventError</span>, <span class="ident">MegolmResult</span>};
 
-<span class="comment">// TODO add creation times to the inbound grop sessions so we can export</span>
+<span class="comment">// TODO add creation times to the inbound group sessions so we can export</span>
 <span class="comment">// sessions that were created between some time period, this should only be set</span>
-<span class="comment">// for non-imported sessoins.</span>
+<span class="comment">// for non-imported sessions.</span>
 
 <span class="doccomment">/// Inbound group session.</span>
 <span class="doccomment">///</span>
@@ -587,7 +587,7 @@
             <span class="ident">sender_key</span>: <span class="self">self</span>.<span class="ident">sender_key</span>.<span class="ident">to_string</span>(),
             <span class="ident">signing_key</span>: (<span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="self">self</span>.<span class="ident">signing_keys</span>).<span class="ident">clone</span>(),
             <span class="ident">room_id</span>: (<span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="self">self</span>.<span class="ident">room_id</span>).<span class="ident">clone</span>(),
-            <span class="ident">forwarding_chains</span>: <span class="self">self</span>.<span class="ident">forwading_key_chain</span>().<span class="ident">to_vec</span>(),
+            <span class="ident">forwarding_chains</span>: <span class="self">self</span>.<span class="ident">forwarding_key_chain</span>().<span class="ident">to_vec</span>(),
             <span class="ident">imported</span>: <span class="kw-2">*</span><span class="self">self</span>.<span class="ident">imported</span>,
             <span class="ident">history_visibility</span>: <span class="self">self</span>.<span class="ident">history_visibility</span>.<span class="ident">as_ref</span>().<span class="ident">clone</span>(),
         }
@@ -616,7 +616,7 @@
     <span class="doccomment">/// Each ed25519 key represents a single device. If device A forwards the</span>
     <span class="doccomment">/// session to device B and device B to C this list will contain the ed25519</span>
     <span class="doccomment">/// keys of A and B.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">forwading_key_chain</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span>[<span class="ident">String</span>] {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">forwarding_key_chain</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span>[<span class="ident">String</span>] {
         <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">forwarding_chains</span>
     }
 
@@ -633,7 +633,7 @@
             <span class="ident">room_id</span>: (<span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="self">self</span>.<span class="ident">room_id</span>).<span class="ident">clone</span>(),
             <span class="ident">sender_key</span>: (<span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="self">self</span>.<span class="ident">sender_key</span>).<span class="ident">to_owned</span>(),
             <span class="ident">session_id</span>: <span class="self">self</span>.<span class="ident">session_id</span>().<span class="ident">to_owned</span>(),
-            <span class="ident">forwarding_curve25519_key_chain</span>: <span class="self">self</span>.<span class="ident">forwading_key_chain</span>().<span class="ident">to_vec</span>(),
+            <span class="ident">forwarding_curve25519_key_chain</span>: <span class="self">self</span>.<span class="ident">forwarding_key_chain</span>().<span class="ident">to_vec</span>(),
             <span class="ident">sender_claimed_keys</span>: (<span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="self">self</span>.<span class="ident">signing_keys</span>).<span class="ident">clone</span>(),
             <span class="ident">session_key</span>,
         }
@@ -776,10 +776,10 @@
     <span class="doccomment">/// The id of the room that the session is used in.</span>
     <span class="kw">pub</span> <span class="ident">room_id</span>: <span class="ident">RoomId</span>,
     <span class="doccomment">/// The list of claimed ed25519 that forwarded us this key. Will be None if</span>
-    <span class="doccomment">/// we dirrectly received this session.</span>
+    <span class="doccomment">/// we directly received this session.</span>
     <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">default</span>)]</span>
     <span class="kw">pub</span> <span class="ident">forwarding_chains</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
-    <span class="doccomment">/// Flag remembering if the session was dirrectly sent to us by the sender</span>
+    <span class="doccomment">/// Flag remembering if the session was directly sent to us by the sender</span>
     <span class="doccomment">/// or if it was imported.</span>
     <span class="kw">pub</span> <span class="ident">imported</span>: <span class="ident">bool</span>,
     <span class="doccomment">/// History visibility of the room when the session was created.</span>
