@@ -1,7 +1,7 @@
 <!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `matrix_sdk_crypto/src/identities/manager.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>manager.rs - source</title><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled ><script id="default-settings"></script><script src="../../../storage.js"></script><script src="../../../crates.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="icon" type="image/svg+xml" href="../../../favicon.svg">
 <link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png">
-<link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><style type="text/css">#crate-search{background-image:url("../../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu" role="button">&#9776;</div><a href='../../../matrix_sdk_crypto/index.html'><div class='logo-container rust-logo'><img src='../../../rust-logo.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu"><img src="../../../brush.svg" width="18" height="18" alt="Pick another theme!"></button><div id="theme-choices" role="menu"></div></div><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" disabled autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><button type="button" id="help-button">?</button>
-                <a id="settings-menu" href="../../../settings.html"><img src="../../../wheel.svg" width="18" height="18" alt="Change settings"></a></div></form></nav><section id="main" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">  1</span>
+<link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><style type="text/css">#crate-search{background-image:url("../../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu" role="button">&#9776;</div><a href='../../../matrix_sdk_crypto/index.html'><div class='logo-container rust-logo'><img src='../../../rust-logo.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu" title="themes"><img src="../../../brush.svg" width="18" height="18" alt="Pick another theme!"></button><div id="theme-choices" role="menu"></div></div><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" disabled autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><button type="button" id="help-button" title="help">?</button>
+                <a id="settings-menu" href="../../../settings.html" title="settings"><img src="../../../wheel.svg" width="18" height="18" alt="Change settings"></a></div></form></nav><section id="main" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">  1</span>
 <span id="2">  2</span>
 <span id="3">  3</span>
 <span id="4">  4</span>
@@ -647,10 +647,6 @@
 <span id="644">644</span>
 <span id="645">645</span>
 <span id="646">646</span>
-<span id="647">647</span>
-<span id="648">648</span>
-<span id="649">649</span>
-<span id="650">650</span>
 </pre><pre class="rust">
 <span class="comment">// Copyright 2020 The Matrix.org Foundation C.I.C.</span>
 <span class="comment">//</span>
@@ -677,7 +673,7 @@
     <span class="ident">api::r0::keys::get_keys::Response</span> <span class="kw">as</span> <span class="ident">KeysQueryResponse</span>,
     <span class="ident">encryption::DeviceKeys</span>,
     <span class="ident">executor::spawn</span>,
-    <span class="ident">identifiers</span>::{<span class="ident">DeviceIdBox</span>, <span class="ident">UserId</span>},
+    <span class="ident">identifiers</span>::{<span class="ident">DeviceId</span>, <span class="ident">DeviceIdBox</span>, <span class="ident">UserId</span>},
 };
 <span class="kw">use</span> <span class="ident">tracing</span>::{<span class="ident">trace</span>, <span class="ident">warn</span>};
 
@@ -700,14 +696,14 @@
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>)]</span>
 <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct</span> <span class="ident">IdentityManager</span> {
     <span class="ident">user_id</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">UserId</span><span class="op">&gt;</span>,
-    <span class="ident">device_id</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">DeviceIdBox</span><span class="op">&gt;</span>,
+    <span class="ident">device_id</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">DeviceId</span><span class="op">&gt;</span>,
     <span class="ident">store</span>: <span class="ident">Store</span>,
 }
 
 <span class="kw">impl</span> <span class="ident">IdentityManager</span> {
     <span class="kw">const</span> <span class="ident">MAX_KEY_QUERY_USERS</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="number">250</span>;
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">user_id</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">UserId</span><span class="op">&gt;</span>, <span class="ident">device_id</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">DeviceIdBox</span><span class="op">&gt;</span>, <span class="ident">store</span>: <span class="ident">Store</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">user_id</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">UserId</span><span class="op">&gt;</span>, <span class="ident">device_id</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">DeviceId</span><span class="op">&gt;</span>, <span class="ident">store</span>: <span class="ident">Store</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
         <span class="ident">IdentityManager</span> { <span class="ident">user_id</span>, <span class="ident">device_id</span>, <span class="ident">store</span> }
     }
 
@@ -788,7 +784,7 @@
     <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">update_user_devices</span>(
         <span class="ident">store</span>: <span class="ident">Store</span>,
         <span class="ident">own_user_id</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">UserId</span><span class="op">&gt;</span>,
-        <span class="ident">own_device_id</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">DeviceIdBox</span><span class="op">&gt;</span>,
+        <span class="ident">own_device_id</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">DeviceId</span><span class="op">&gt;</span>,
         <span class="ident">user_id</span>: <span class="ident">UserId</span>,
         <span class="ident">device_map</span>: <span class="ident">BTreeMap</span><span class="op">&lt;</span><span class="ident">DeviceIdBox</span>, <span class="ident">DeviceKeys</span><span class="op">&gt;</span>,
     ) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">StoreResult</span><span class="op">&lt;</span><span class="ident">DeviceChanges</span><span class="op">&gt;</span> {
@@ -798,7 +794,7 @@
 
         <span class="kw">let</span> <span class="ident">tasks</span> <span class="op">=</span> <span class="ident">device_map</span>.<span class="ident">into_iter</span>().<span class="ident">filter_map</span>(<span class="op">|</span>(<span class="ident">device_id</span>, <span class="ident">device_keys</span>)<span class="op">|</span> {
             <span class="comment">// We don&#39;t need our own device in the device store.</span>
-            <span class="kw">if</span> <span class="ident">user_id</span> <span class="op">=</span><span class="op">=</span> <span class="kw-2">*</span><span class="ident">own_user_id</span> <span class="op">&amp;&amp;</span> <span class="ident">device_id</span> <span class="op">=</span><span class="op">=</span> <span class="kw-2">*</span><span class="ident">own_device_id</span> {
+            <span class="kw">if</span> <span class="ident">user_id</span> <span class="op">=</span><span class="op">=</span> <span class="kw-2">*</span><span class="ident">own_user_id</span> <span class="op">&amp;&amp;</span> <span class="kw-2">*</span><span class="ident">device_id</span> <span class="op">=</span><span class="op">=</span> <span class="kw-2">*</span><span class="ident">own_device_id</span> {
                 <span class="prelude-val">None</span>
             } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">user_id</span> <span class="op">!</span><span class="op">=</span> <span class="ident">device_keys</span>.<span class="ident">user_id</span> <span class="op">|</span><span class="op">|</span> <span class="ident">device_id</span> <span class="op">!</span><span class="op">=</span> <span class="ident">device_keys</span>.<span class="ident">device_id</span> {
                 <span class="macro">warn!</span>(
@@ -1077,15 +1073,11 @@
         <span class="kw">let</span> <span class="ident">identity</span> <span class="op">=</span> <span class="ident">Arc::new</span>(<span class="ident">Mutex::new</span>(<span class="ident">PrivateCrossSigningIdentity::empty</span>(<span class="ident">user_id</span>())));
         <span class="kw">let</span> <span class="ident">user_id</span> <span class="op">=</span> <span class="ident">Arc::new</span>(<span class="ident">user_id</span>());
         <span class="kw">let</span> <span class="ident">account</span> <span class="op">=</span> <span class="ident">ReadOnlyAccount::new</span>(<span class="kw-2">&amp;</span><span class="ident">user_id</span>, <span class="kw-2">&amp;</span><span class="ident">device_id</span>());
-        <span class="kw">let</span> <span class="ident">store</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">CryptoStore</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">Arc::new</span>(<span class="ident">Box::new</span>(<span class="ident">MemoryStore::new</span>()));
+        <span class="kw">let</span> <span class="ident">store</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">CryptoStore</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">Arc::new</span>(<span class="ident">MemoryStore::new</span>());
         <span class="kw">let</span> <span class="ident">verification</span> <span class="op">=</span> <span class="ident">VerificationMachine::new</span>(<span class="ident">account</span>, <span class="ident">identity</span>.<span class="ident">clone</span>(), <span class="ident">store</span>);
-        <span class="kw">let</span> <span class="ident">store</span> <span class="op">=</span> <span class="ident">Store::new</span>(
-            <span class="ident">user_id</span>.<span class="ident">clone</span>(),
-            <span class="ident">identity</span>,
-            <span class="ident">Arc::new</span>(<span class="ident">Box::new</span>(<span class="ident">MemoryStore::new</span>())),
-            <span class="ident">verification</span>,
-        );
-        <span class="ident">IdentityManager::new</span>(<span class="ident">user_id</span>, <span class="ident">Arc::new</span>(<span class="ident">device_id</span>()), <span class="ident">store</span>)
+        <span class="kw">let</span> <span class="ident">store</span> <span class="op">=</span>
+            <span class="ident">Store::new</span>(<span class="ident">user_id</span>.<span class="ident">clone</span>(), <span class="ident">identity</span>, <span class="ident">Arc::new</span>(<span class="ident">MemoryStore::new</span>()), <span class="ident">verification</span>);
+        <span class="ident">IdentityManager::new</span>(<span class="ident">user_id</span>, <span class="ident">device_id</span>().<span class="ident">into</span>(), <span class="ident">store</span>)
     }
 
     <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">other_key_query</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident">KeyQueryResponse</span> {
