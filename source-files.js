@@ -1,4 +1,5 @@
 var N = null;var sourcesIndex = {};
+sourcesIndex["matrix_qrcode"] = {"name":"","files":["error.rs","lib.rs","types.rs","utils.rs"]};
 sourcesIndex["matrix_sdk"] = {"name":"","dirs":[{"name":"event_handler","files":["mod.rs"]},{"name":"room","files":["common.rs","invited.rs","joined.rs","left.rs","mod.rs"]}],"files":["client.rs","device.rs","error.rs","http_client.rs","lib.rs","room_member.rs","sas.rs","verification_request.rs"]};
 sourcesIndex["matrix_sdk_appservice"] = {"name":"","files":["actix.rs","error.rs","lib.rs"]};
 sourcesIndex["matrix_sdk_base"] = {"name":"","dirs":[{"name":"rooms","files":["members.rs","mod.rs","normal.rs"]},{"name":"store","dirs":[{"name":"sled_store","files":["mod.rs","store_key.rs"]}],"files":["ambiguity_map.rs","memory_store.rs","mod.rs"]}],"files":["client.rs","error.rs","lib.rs","media.rs","session.rs"]};
