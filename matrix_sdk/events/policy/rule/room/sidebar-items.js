@@ -1,1 +1,0 @@
-initSidebarItems({"struct":[["RedactedRoomEventContent","The payload for a redacted `RoomEventContent`"],["RoomEventContent","The payload for `RoomEvent`."]],"type":[["RoomEvent","This event type is used to apply rules to room entities."]]});

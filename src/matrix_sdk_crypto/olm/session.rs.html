@@ -277,7 +277,6 @@
 <span id="275">275</span>
 <span id="276">276</span>
 <span id="277">277</span>
-<span id="278">278</span>
 </pre><pre class="rust">
 <span class="comment">// Copyright 2020 The Matrix.org Foundation C.I.C.</span>
 <span class="comment">//</span>
@@ -295,7 +294,13 @@
 
 <span class="kw">use</span> <span class="ident">std</span>::{<span class="ident">collections::BTreeMap</span>, <span class="ident">fmt</span>, <span class="ident">sync::Arc</span>};
 
-<span class="kw">use</span> <span class="ident">matrix_sdk_common</span>::{
+<span class="kw">use</span> <span class="ident">matrix_sdk_common</span>::{<span class="ident">instant::Instant</span>, <span class="ident">locks::Mutex</span>};
+<span class="kw">use</span> <span class="ident">olm_rs</span>::{<span class="ident">errors::OlmSessionError</span>, <span class="ident">session::OlmSession</span>, <span class="ident">PicklingMode</span>};
+<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">olm_rs</span>::{
+    <span class="ident">session</span>::{<span class="ident">OlmMessage</span>, <span class="ident">PreKeyMessage</span>},
+    <span class="ident">utility::OlmUtility</span>,
+};
+<span class="kw">use</span> <span class="ident">ruma</span>::{
     <span class="ident">events</span>::{
         <span class="ident">room::encrypted</span>::{
             <span class="ident">CiphertextInfo</span>, <span class="ident">EncryptedEventContent</span>, <span class="ident">EncryptedEventScheme</span>,
@@ -304,13 +309,6 @@
         <span class="ident">EventType</span>,
     },
     <span class="ident">identifiers</span>::{<span class="ident">DeviceId</span>, <span class="ident">DeviceKeyAlgorithm</span>, <span class="ident">UserId</span>},
-    <span class="ident">instant::Instant</span>,
-    <span class="ident">locks::Mutex</span>,
-};
-<span class="kw">use</span> <span class="ident">olm_rs</span>::{<span class="ident">errors::OlmSessionError</span>, <span class="ident">session::OlmSession</span>, <span class="ident">PicklingMode</span>};
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">olm_rs</span>::{
-    <span class="ident">session</span>::{<span class="ident">OlmMessage</span>, <span class="ident">PreKeyMessage</span>},
-    <span class="ident">utility::OlmUtility</span>,
 };
 <span class="kw">use</span> <span class="ident">serde</span>::{<span class="ident">Deserialize</span>, <span class="ident">Serialize</span>};
 <span class="kw">use</span> <span class="ident">serde_json</span>::{<span class="ident">json</span>, <span class="ident">Value</span>};

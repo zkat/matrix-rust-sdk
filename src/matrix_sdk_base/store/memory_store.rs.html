@@ -711,8 +711,6 @@
 <span id="709">709</span>
 <span id="710">710</span>
 <span id="711">711</span>
-<span id="712">712</span>
-<span id="713">713</span>
 </pre><pre class="rust">
 <span class="comment">// Copyright 2021 The Matrix.org Foundation C.I.C.</span>
 <span class="comment">//</span>
@@ -735,8 +733,8 @@
 
 <span class="kw">use</span> <span class="ident">dashmap</span>::{<span class="ident">DashMap</span>, <span class="ident">DashSet</span>};
 <span class="kw">use</span> <span class="ident">lru::LruCache</span>;
-<span class="kw">use</span> <span class="ident">matrix_sdk_common</span>::{
-    <span class="ident">async_trait</span>,
+<span class="kw">use</span> <span class="ident">matrix_sdk_common</span>::{<span class="ident">async_trait</span>, <span class="ident">instant::Instant</span>, <span class="ident">locks::Mutex</span>};
+<span class="kw">use</span> <span class="ident">ruma</span>::{
     <span class="ident">events</span>::{
         <span class="ident">presence::PresenceEvent</span>,
         <span class="ident">receipt::Receipt</span>,
@@ -745,10 +743,8 @@
         <span class="ident">AnySyncStateEvent</span>, <span class="ident">EventType</span>,
     },
     <span class="ident">identifiers</span>::{<span class="ident">EventId</span>, <span class="ident">MxcUri</span>, <span class="ident">RoomId</span>, <span class="ident">UserId</span>},
-    <span class="ident">instant::Instant</span>,
-    <span class="ident">locks::Mutex</span>,
     <span class="ident">receipt::ReceiptType</span>,
-    <span class="ident">Raw</span>,
+    <span class="ident">serde::Raw</span>,
 };
 <span class="kw">use</span> <span class="ident">tracing::info</span>;
 
@@ -1279,7 +1275,7 @@
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;sled_state_store&quot;</span>))]</span>
 <span class="kw">mod</span> <span class="ident">test</span> {
     <span class="kw">use</span> <span class="ident">matrix_sdk_common</span>::{
-        <span class="ident">api::r0::media::get_content_thumbnail::Method</span>,
+        <span class="ident">api::client::r0::media::get_content_thumbnail::Method</span>,
         <span class="ident">identifiers</span>::{<span class="ident">event_id</span>, <span class="ident">mxc_uri</span>, <span class="ident">room_id</span>, <span class="ident">user_id</span>, <span class="ident">UserId</span>},
         <span class="ident">receipt::ReceiptType</span>,
         <span class="ident">uint</span>,

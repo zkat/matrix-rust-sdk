@@ -436,6 +436,7 @@
 <span id="434">434</span>
 <span id="435">435</span>
 <span id="436">436</span>
+<span id="437">437</span>
 </pre><pre class="rust">
 <span class="comment">// Copyright 2021 Famedly GmbH</span>
 <span class="comment">//</span>
@@ -526,23 +527,24 @@
 
 <span class="kw">use</span> <span class="ident">dashmap::DashMap</span>;
 <span class="kw">use</span> <span class="ident">http::Uri</span>;
-<span class="attribute">#[<span class="ident">doc</span>(<span class="ident">inline</span>)]</span>
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">matrix_sdk::api_appservice</span> <span class="kw">as</span> <span class="ident">api</span>;
-<span class="kw">use</span> <span class="ident">matrix_sdk</span>::{
-    <span class="ident">api</span>::{
-        <span class="ident">error::ErrorKind</span>,
-        <span class="ident">r0</span>::{
-            <span class="ident">account::register</span>::{<span class="ident">LoginType</span>, <span class="ident">Request</span> <span class="kw">as</span> <span class="ident">RegistrationRequest</span>},
-            <span class="ident">uiaa::UiaaResponse</span>,
-        },
-    },
-    <span class="ident">api_appservice::Registration</span>,
-    <span class="ident">assign</span>,
-    <span class="ident">identifiers</span>::{<span class="self">self</span>, <span class="ident">DeviceId</span>, <span class="ident">ServerNameBox</span>, <span class="ident">UserId</span>},
-    <span class="ident">reqwest::Url</span>,
-    <span class="ident">Client</span>, <span class="ident">ClientConfig</span>, <span class="ident">EventHandler</span>, <span class="ident">FromHttpResponseError</span>, <span class="ident">HttpError</span>, <span class="ident">ServerError</span>, <span class="ident">Session</span>,
-};
+<span class="kw">use</span> <span class="ident">matrix_sdk</span>::{<span class="ident">reqwest::Url</span>, <span class="ident">Client</span>, <span class="ident">ClientConfig</span>, <span class="ident">EventHandler</span>, <span class="ident">HttpError</span>, <span class="ident">Session</span>};
 <span class="kw">use</span> <span class="ident">regex::Regex</span>;
+<span class="attribute">#[<span class="ident">doc</span>(<span class="ident">inline</span>)]</span>
+<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">ruma::api::appservice</span> <span class="kw">as</span> <span class="ident">api</span>;
+<span class="kw">use</span> <span class="ident">ruma</span>::{
+    <span class="ident">api</span>::{
+        <span class="ident">appservice::Registration</span>,
+        <span class="ident">client</span>::{
+            <span class="ident">error::ErrorKind</span>,
+            <span class="ident">r0</span>::{
+                <span class="ident">account::register</span>::{<span class="ident">LoginType</span>, <span class="ident">Request</span> <span class="kw">as</span> <span class="ident">RegistrationRequest</span>},
+                <span class="ident">uiaa::UiaaResponse</span>,
+            },
+        },
+        <span class="ident">error</span>::{<span class="ident">FromHttpResponseError</span>, <span class="ident">ServerError</span>},
+    },
+    <span class="ident">assign</span>, <span class="ident">identifiers</span>, <span class="ident">DeviceId</span>, <span class="ident">ServerNameBox</span>, <span class="ident">UserId</span>,
+};
 <span class="kw">use</span> <span class="ident">tracing::warn</span>;
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;actix&quot;</span>)]</span>

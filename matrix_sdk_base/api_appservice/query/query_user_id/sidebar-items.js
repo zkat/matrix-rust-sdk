@@ -1,1 +1,0 @@
-initSidebarItems({"mod":[["v1","GET /_matrix/app/v1/users/{userId}"]]});

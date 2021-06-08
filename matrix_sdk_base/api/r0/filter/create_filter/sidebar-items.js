@@ -1,1 +1,0 @@
-initSidebarItems({"constant":[["METADATA","Metadata for the `create_filter` API endpoint."]],"struct":[["IncomingRequest","‘Incoming’ variant of Request."],["Request","Data for a request to the `create_filter` API endpoint."],["Response","Data in the response from the `create_filter` API endpoint."]]});

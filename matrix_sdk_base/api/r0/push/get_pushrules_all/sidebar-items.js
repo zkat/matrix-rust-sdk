@@ -1,1 +1,0 @@
-initSidebarItems({"constant":[["METADATA","Metadata for the `get_pushrules_all` API endpoint."]],"struct":[["Request","Data for a request to the `get_pushrules_all` API endpoint."],["Response","Data in the response from the `get_pushrules_all` API endpoint."]]});

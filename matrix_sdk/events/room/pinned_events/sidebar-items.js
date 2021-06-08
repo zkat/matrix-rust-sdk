@@ -1,1 +1,0 @@
-initSidebarItems({"struct":[["PinnedEventsEventContent","The payload for `PinnedEventsEvent`."],["RedactedPinnedEventsEventContent","The payload for a redacted `PinnedEventsEventContent`"]],"type":[["PinnedEventsEvent","Used to “pin” particular events in a room for other participants to review later."]]});

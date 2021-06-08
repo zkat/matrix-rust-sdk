@@ -1,1 +1,0 @@
-initSidebarItems({"constant":[["METADATA","Metadata for the `turn_server_info` API endpoint."]],"struct":[["Request","Data for a request to the `turn_server_info` API endpoint."],["Response","Data in the response from the `turn_server_info` API endpoint."]]});

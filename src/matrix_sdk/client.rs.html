@@ -3846,6 +3846,19 @@
 <span id="3844">3844</span>
 <span id="3845">3845</span>
 <span id="3846">3846</span>
+<span id="3847">3847</span>
+<span id="3848">3848</span>
+<span id="3849">3849</span>
+<span id="3850">3850</span>
+<span id="3851">3851</span>
+<span id="3852">3852</span>
+<span id="3853">3853</span>
+<span id="3854">3854</span>
+<span id="3855">3855</span>
+<span id="3856">3856</span>
+<span id="3857">3857</span>
+<span id="3858">3858</span>
+<span id="3859">3859</span>
 </pre><pre class="rust">
 <span class="comment">// Copyright 2020 Damir Jelić</span>
 <span class="comment">// Copyright 2020 The Matrix.org Foundation C.I.C.</span>
@@ -3895,15 +3908,14 @@
 };
 <span class="kw">use</span> <span class="ident">matrix_sdk_base</span>::{
     <span class="ident">deserialized_responses::SyncResponse</span>,
-    <span class="ident">events::AnyMessageEventContent</span>,
-    <span class="ident">identifiers::MxcUri</span>,
     <span class="ident">media</span>::{<span class="ident">MediaEventContent</span>, <span class="ident">MediaFormat</span>, <span class="ident">MediaRequest</span>, <span class="ident">MediaThumbnailSize</span>, <span class="ident">MediaType</span>},
-    <span class="ident">BaseClient</span>, <span class="ident">BaseClientConfig</span>, <span class="ident">SendAccessToken</span>, <span class="ident">Session</span>, <span class="ident">Store</span>,
+    <span class="ident">BaseClient</span>, <span class="ident">BaseClientConfig</span>, <span class="ident">Session</span>, <span class="ident">Store</span>,
 };
 <span class="kw">use</span> <span class="ident">mime</span>::{<span class="self">self</span>, <span class="ident">Mime</span>};
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;sso_login&quot;</span>)]</span>
 <span class="kw">use</span> <span class="ident">rand</span>::{<span class="ident">thread_rng</span>, <span class="ident">Rng</span>};
 <span class="kw">use</span> <span class="ident">reqwest::header::InvalidHeaderValue</span>;
+<span class="kw">use</span> <span class="ident">ruma</span>::{<span class="ident">api::SendAccessToken</span>, <span class="ident">events::AnyMessageEventContent</span>, <span class="ident">identifiers::MxcUri</span>};
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;sso_login&quot;</span>)]</span>
 <span class="kw">use</span> <span class="ident">tokio</span>::{<span class="ident">net::TcpListener</span>, <span class="ident">sync::oneshot</span>};
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;sso_login&quot;</span>)]</span>
@@ -3931,44 +3943,51 @@
     <span class="ident">Break</span>,
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;encryption&quot;</span>)]</span>
-<span class="kw">use</span> <span class="ident">matrix_sdk_common::api::r0</span>::{
-    <span class="ident">keys</span>::{<span class="ident">get_keys</span>, <span class="ident">upload_keys</span>, <span class="ident">upload_signing_keys::Request</span> <span class="kw">as</span> <span class="ident">UploadSigningKeysRequest</span>},
-    <span class="ident">to_device::send_event_to_device</span>::{
-        <span class="ident">Request</span> <span class="kw">as</span> <span class="ident">RumaToDeviceRequest</span>, <span class="ident">Response</span> <span class="kw">as</span> <span class="ident">ToDeviceResponse</span>,
-    },
-};
 <span class="kw">use</span> <span class="ident">matrix_sdk_common</span>::{
-    <span class="ident">api</span>::{
-        <span class="ident">r0</span>::{
-            <span class="ident">account::register</span>,
-            <span class="ident">device</span>::{<span class="ident">delete_devices</span>, <span class="ident">get_devices</span>},
-            <span class="ident">directory</span>::{<span class="ident">get_public_rooms</span>, <span class="ident">get_public_rooms_filtered</span>},
-            <span class="ident">filter</span>::{<span class="ident">create_filter::Request</span> <span class="kw">as</span> <span class="ident">FilterUploadRequest</span>, <span class="ident">FilterDefinition</span>},
-            <span class="ident">media</span>::{<span class="ident">create_content</span>, <span class="ident">get_content</span>, <span class="ident">get_content_thumbnail</span>},
-            <span class="ident">membership</span>::{<span class="ident">join_room_by_id</span>, <span class="ident">join_room_by_id_or_alias</span>},
-            <span class="ident">message::send_message_event</span>,
-            <span class="ident">profile</span>::{<span class="ident">get_avatar_url</span>, <span class="ident">get_display_name</span>, <span class="ident">set_avatar_url</span>, <span class="ident">set_display_name</span>},
-            <span class="ident">room::create_room</span>,
-            <span class="ident">session</span>::{<span class="ident">get_login_types</span>, <span class="ident">login</span>, <span class="ident">sso_login</span>},
-            <span class="ident">sync::sync_events</span>,
-            <span class="ident">uiaa::AuthData</span>,
-        },
-        <span class="ident">unversioned</span>::{<span class="ident">discover_homeserver</span>, <span class="ident">get_supported_versions</span>},
-    },
-    <span class="ident">assign</span>,
-    <span class="ident">identifiers</span>::{<span class="ident">DeviceIdBox</span>, <span class="ident">RoomId</span>, <span class="ident">RoomIdOrAliasId</span>, <span class="ident">ServerName</span>, <span class="ident">UserId</span>},
     <span class="ident">instant</span>::{<span class="ident">Duration</span>, <span class="ident">Instant</span>},
     <span class="ident">locks</span>::{<span class="ident">Mutex</span>, <span class="ident">RwLock</span>},
-    <span class="ident">presence::PresenceState</span>,
     <span class="ident">uuid::Uuid</span>,
-    <span class="ident">FromHttpResponseError</span>, <span class="ident">UInt</span>,
+};
+<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;encryption&quot;</span>)]</span>
+<span class="kw">use</span> <span class="ident">ruma</span>::{
+    <span class="ident">api::client::r0</span>::{
+        <span class="ident">keys</span>::{<span class="ident">get_keys</span>, <span class="ident">upload_keys</span>, <span class="ident">upload_signing_keys::Request</span> <span class="kw">as</span> <span class="ident">UploadSigningKeysRequest</span>},
+        <span class="ident">to_device::send_event_to_device</span>::{
+            <span class="ident">Request</span> <span class="kw">as</span> <span class="ident">RumaToDeviceRequest</span>, <span class="ident">Response</span> <span class="kw">as</span> <span class="ident">ToDeviceResponse</span>,
+        },
+    },
+    <span class="ident">DeviceId</span>,
+};
+<span class="kw">use</span> <span class="ident">ruma</span>::{
+    <span class="ident">api</span>::{
+        <span class="ident">client</span>::{
+            <span class="ident">r0</span>::{
+                <span class="ident">account::register</span>,
+                <span class="ident">device</span>::{<span class="ident">delete_devices</span>, <span class="ident">get_devices</span>},
+                <span class="ident">directory</span>::{<span class="ident">get_public_rooms</span>, <span class="ident">get_public_rooms_filtered</span>},
+                <span class="ident">filter</span>::{<span class="ident">create_filter::Request</span> <span class="kw">as</span> <span class="ident">FilterUploadRequest</span>, <span class="ident">FilterDefinition</span>},
+                <span class="ident">media</span>::{<span class="ident">create_content</span>, <span class="ident">get_content</span>, <span class="ident">get_content_thumbnail</span>},
+                <span class="ident">membership</span>::{<span class="ident">join_room_by_id</span>, <span class="ident">join_room_by_id_or_alias</span>},
+                <span class="ident">message::send_message_event</span>,
+                <span class="ident">profile</span>::{<span class="ident">get_avatar_url</span>, <span class="ident">get_display_name</span>, <span class="ident">set_avatar_url</span>, <span class="ident">set_display_name</span>},
+                <span class="ident">room::create_room</span>,
+                <span class="ident">session</span>::{<span class="ident">get_login_types</span>, <span class="ident">login</span>, <span class="ident">sso_login</span>},
+                <span class="ident">sync::sync_events</span>,
+                <span class="ident">uiaa::AuthData</span>,
+            },
+            <span class="ident">unversioned</span>::{<span class="ident">discover_homeserver</span>, <span class="ident">get_supported_versions</span>},
+        },
+        <span class="ident">error::FromHttpResponseError</span>,
+        <span class="ident">OutgoingRequest</span>,
+    },
+    <span class="ident">assign</span>,
+    <span class="ident">presence::PresenceState</span>,
+    <span class="ident">DeviceIdBox</span>, <span class="ident">RoomId</span>, <span class="ident">RoomIdOrAliasId</span>, <span class="ident">ServerName</span>, <span class="ident">UInt</span>, <span class="ident">UserId</span>,
 };
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;encryption&quot;</span>)]</span>
 <span class="kw">use</span> <span class="kw">crate</span>::{
     <span class="ident">device</span>::{<span class="ident">Device</span>, <span class="ident">UserDevices</span>},
-    <span class="ident">identifiers::DeviceId</span>,
     <span class="ident">sas::Sas</span>,
     <span class="ident">verification_request::VerificationRequest</span>,
 };
@@ -3976,7 +3995,7 @@
     <span class="ident">error::HttpError</span>,
     <span class="ident">event_handler::Handler</span>,
     <span class="ident">http_client</span>::{<span class="ident">client_with_config</span>, <span class="ident">HttpClient</span>, <span class="ident">HttpSend</span>},
-    <span class="ident">room</span>, <span class="ident">Error</span>, <span class="ident">EventHandler</span>, <span class="ident">OutgoingRequest</span>, <span class="prelude-ty">Result</span>,
+    <span class="ident">room</span>, <span class="ident">Error</span>, <span class="ident">EventHandler</span>, <span class="prelude-ty">Result</span>,
 };
 
 <span class="kw">const</span> <span class="ident">DEFAULT_REQUEST_TIMEOUT</span>: <span class="ident">Duration</span> <span class="op">=</span> <span class="ident">Duration::from_secs</span>(<span class="number">10</span>);
@@ -4486,7 +4505,7 @@
     <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;docs&quot;</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">appservice</span>)))]</span>
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">receive_transaction</span>(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
-        <span class="ident">incoming_transaction</span>: <span class="kw">crate</span><span class="ident">::api_appservice::event::push_events::v1::IncomingRequest</span>,
+        <span class="ident">incoming_transaction</span>: <span class="ident">ruma::api::appservice::event::push_events::v1::IncomingRequest</span>,
     ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">txn_id</span> <span class="op">=</span> <span class="ident">incoming_transaction</span>.<span class="ident">txn_id</span>.<span class="ident">clone</span>();
         <span class="kw">let</span> <span class="ident">response</span> <span class="op">=</span> <span class="ident">incoming_transaction</span>.<span class="ident">try_into_sync_response</span>(<span class="ident">txn_id</span>)<span class="question-mark">?</span>;
@@ -4843,7 +4862,7 @@
     <span class="doccomment">/// # use std::convert::TryFrom;</span>
     <span class="doccomment">/// # use matrix_sdk::Client;</span>
     <span class="doccomment">/// # use matrix_sdk::identifiers::DeviceId;</span>
-    <span class="doccomment">/// # use matrix_sdk_common::assign;</span>
+    <span class="doccomment">/// # use matrix_sdk::assign;</span>
     <span class="doccomment">/// # use futures::executor::block_on;</span>
     <span class="doccomment">/// # use url::Url;</span>
     <span class="doccomment">/// # let homeserver = Url::parse(&quot;http://example.com&quot;).unwrap();</span>
@@ -5102,7 +5121,7 @@
     <span class="doccomment">/// # use std::convert::TryFrom;</span>
     <span class="doccomment">/// # use matrix_sdk::Client;</span>
     <span class="doccomment">/// # use matrix_sdk::identifiers::DeviceId;</span>
-    <span class="doccomment">/// # use matrix_sdk_common::assign;</span>
+    <span class="doccomment">/// # use matrix_sdk::assign;</span>
     <span class="doccomment">/// # use futures::executor::block_on;</span>
     <span class="doccomment">/// # use url::Url;</span>
     <span class="doccomment">/// # let homeserver = Url::parse(&quot;https://example.com&quot;).unwrap();</span>
@@ -5184,7 +5203,7 @@
     <span class="doccomment">/// # use matrix_sdk::api::r0::account::register::{Request as RegistrationRequest, RegistrationKind};</span>
     <span class="doccomment">/// # use matrix_sdk::api::r0::uiaa::AuthData;</span>
     <span class="doccomment">/// # use matrix_sdk::identifiers::DeviceId;</span>
-    <span class="doccomment">/// # use matrix_sdk_common::assign;</span>
+    <span class="doccomment">/// # use matrix_sdk::assign;</span>
     <span class="doccomment">/// # use futures::executor::block_on;</span>
     <span class="doccomment">/// # use url::Url;</span>
     <span class="doccomment">/// # let homeserver = Url::parse(&quot;http://example.com&quot;).unwrap();</span>
@@ -5407,7 +5426,7 @@
     <span class="doccomment">/// # use matrix_sdk::Client;</span>
     <span class="doccomment">/// # use matrix_sdk::directory::{Filter, RoomNetwork};</span>
     <span class="doccomment">/// # use matrix_sdk::api::r0::directory::get_public_rooms_filtered::Request as PublicRoomsFilterRequest;</span>
-    <span class="doccomment">/// # use matrix_sdk_common::assign;</span>
+    <span class="doccomment">/// # use matrix_sdk::assign;</span>
     <span class="doccomment">/// # use url::Url;</span>
     <span class="doccomment">/// # use futures::executor::block_on;</span>
     <span class="doccomment">/// # let homeserver = Url::parse(&quot;http://example.com&quot;).unwrap();</span>
@@ -5882,15 +5901,15 @@
                             }
                         }
                         <span class="ident">OutgoingRequests::KeysUpload</span>(<span class="ident">request</span>) <span class="op">=</span><span class="op">&gt;</span> {
-                            <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Err</span>(<span class="ident">e</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">keys_upload</span>(<span class="kw-2">&amp;</span><span class="ident">r</span>.<span class="ident">request_id</span>(), <span class="ident">request</span>).<span class="kw">await</span> {
+                            <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Err</span>(<span class="ident">e</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">keys_upload</span>(<span class="ident">r</span>.<span class="ident">request_id</span>(), <span class="ident">request</span>).<span class="kw">await</span> {
                                 <span class="macro">warn!</span>(<span class="string">&quot;Error while querying device keys {:?}&quot;</span>, <span class="ident">e</span>);
                             }
                         }
                         <span class="ident">OutgoingRequests::ToDeviceRequest</span>(<span class="ident">request</span>) <span class="op">=</span><span class="op">&gt;</span> {
                             <span class="comment">// TODO remove this unwrap</span>
-                            <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Ok</span>(<span class="ident">resp</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">send_to_device</span>(<span class="kw-2">&amp;</span><span class="ident">request</span>).<span class="kw">await</span> {
+                            <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Ok</span>(<span class="ident">resp</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">send_to_device</span>(<span class="ident">request</span>).<span class="kw">await</span> {
                                 <span class="self">self</span>.<span class="ident">base_client</span>
-                                    .<span class="ident">mark_request_as_sent</span>(<span class="kw-2">&amp;</span><span class="ident">r</span>.<span class="ident">request_id</span>(), <span class="kw-2">&amp;</span><span class="ident">resp</span>)
+                                    .<span class="ident">mark_request_as_sent</span>(<span class="ident">r</span>.<span class="ident">request_id</span>(), <span class="kw-2">&amp;</span><span class="ident">resp</span>)
                                     .<span class="kw">await</span>
                                     .<span class="ident">unwrap</span>();
                             }
@@ -5899,7 +5918,7 @@
                             <span class="comment">// TODO remove this unwrap.</span>
                             <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Ok</span>(<span class="ident">resp</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">send</span>(<span class="ident">request</span>.<span class="ident">clone</span>(), <span class="prelude-val">None</span>).<span class="kw">await</span> {
                                 <span class="self">self</span>.<span class="ident">base_client</span>
-                                    .<span class="ident">mark_request_as_sent</span>(<span class="kw-2">&amp;</span><span class="ident">r</span>.<span class="ident">request_id</span>(), <span class="kw-2">&amp;</span><span class="ident">resp</span>)
+                                    .<span class="ident">mark_request_as_sent</span>(<span class="ident">r</span>.<span class="ident">request_id</span>(), <span class="kw-2">&amp;</span><span class="ident">resp</span>)
                                     .<span class="kw">await</span>
                                     .<span class="ident">unwrap</span>();
                             }
@@ -5907,7 +5926,7 @@
                         <span class="ident">OutgoingRequests::RoomMessage</span>(<span class="ident">request</span>) <span class="op">=</span><span class="op">&gt;</span> {
                             <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Ok</span>(<span class="ident">resp</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">room_send_helper</span>(<span class="ident">request</span>).<span class="kw">await</span> {
                                 <span class="self">self</span>.<span class="ident">base_client</span>
-                                    .<span class="ident">mark_request_as_sent</span>(<span class="kw-2">&amp;</span><span class="ident">r</span>.<span class="ident">request_id</span>(), <span class="kw-2">&amp;</span><span class="ident">resp</span>)
+                                    .<span class="ident">mark_request_as_sent</span>(<span class="ident">r</span>.<span class="ident">request_id</span>(), <span class="kw-2">&amp;</span><span class="ident">resp</span>)
                                     .<span class="kw">await</span>
                                     .<span class="ident">unwrap</span>();
                             }
@@ -6372,17 +6391,13 @@
                 <span class="ident">MediaType::Uri</span>(<span class="ident">uri</span>) <span class="op">=</span><span class="op">&gt;</span> {
                     <span class="kw">if</span> <span class="kw">let</span> <span class="ident">MediaFormat::Thumbnail</span>(<span class="ident">size</span>) <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">request</span>.<span class="ident">format</span> {
                         <span class="self">self</span>.<span class="ident">send</span>(
-                            <span class="ident">get_content_thumbnail::Request::from_url</span>(
-                                <span class="kw-2">&amp;</span><span class="ident">uri</span>,
-                                <span class="ident">size</span>.<span class="ident">width</span>,
-                                <span class="ident">size</span>.<span class="ident">height</span>,
-                            )<span class="question-mark">?</span>,
+                            <span class="ident">get_content_thumbnail::Request::from_url</span>(<span class="ident">uri</span>, <span class="ident">size</span>.<span class="ident">width</span>, <span class="ident">size</span>.<span class="ident">height</span>)<span class="question-mark">?</span>,
                             <span class="prelude-val">None</span>,
                         )
                         .<span class="kw">await</span><span class="question-mark">?</span>
                         .<span class="ident">file</span>
                     } <span class="kw">else</span> {
-                        <span class="self">self</span>.<span class="ident">send</span>(<span class="ident">get_content::Request::from_url</span>(<span class="kw-2">&amp;</span><span class="ident">uri</span>)<span class="question-mark">?</span>, <span class="prelude-val">None</span>).<span class="kw">await</span><span class="question-mark">?</span>.<span class="ident">file</span>
+                        <span class="self">self</span>.<span class="ident">send</span>(<span class="ident">get_content::Request::from_url</span>(<span class="ident">uri</span>)<span class="question-mark">?</span>, <span class="prelude-val">None</span>).<span class="kw">await</span><span class="question-mark">?</span>.<span class="ident">file</span>
                     }
                 }
             };
@@ -6411,7 +6426,7 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// * `uri` - The `MxcUri` of the files.</span>
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">remove_media_content_for_uri</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">uri</span>: <span class="kw-2">&amp;</span><span class="ident">MxcUri</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-        <span class="prelude-val">Ok</span>(<span class="self">self</span>.<span class="ident">base_client</span>.<span class="ident">store</span>().<span class="ident">remove_media_content_for_uri</span>(<span class="kw-2">&amp;</span><span class="ident">uri</span>).<span class="kw">await</span><span class="question-mark">?</span>)
+        <span class="prelude-val">Ok</span>(<span class="self">self</span>.<span class="ident">base_client</span>.<span class="ident">store</span>().<span class="ident">remove_media_content_for_uri</span>(<span class="ident">uri</span>).<span class="kw">await</span><span class="question-mark">?</span>)
     }
 
     <span class="doccomment">/// Get the file of the given media event content.</span>
@@ -6539,33 +6554,42 @@
         <span class="ident">time::Duration</span>,
     };
 
-    <span class="kw">use</span> <span class="ident">matrix_sdk_base</span>::{
-        <span class="ident">api::r0::media::get_content_thumbnail::Method</span>,
-        <span class="ident">events::room</span>::{<span class="ident">message::ImageMessageEventContent</span>, <span class="ident">ImageInfo</span>},
-        <span class="ident">identifiers::mxc_uri</span>,
-        <span class="ident">media</span>::{<span class="ident">MediaFormat</span>, <span class="ident">MediaRequest</span>, <span class="ident">MediaThumbnailSize</span>, <span class="ident">MediaType</span>},
-        <span class="ident">uint</span>,
-    };
-    <span class="kw">use</span> <span class="ident">matrix_sdk_common</span>::{
-        <span class="ident">api::r0</span>::{
-            <span class="ident">account::register::Request</span> <span class="kw">as</span> <span class="ident">RegistrationRequest</span>,
-            <span class="ident">directory::get_public_rooms_filtered::Request</span> <span class="kw">as</span> <span class="ident">PublicRoomsFilterRequest</span>,
-            <span class="ident">membership::Invite3pidInit</span>, <span class="ident">session::get_login_types::LoginType</span>, <span class="ident">uiaa::AuthData</span>,
+    <span class="kw">use</span> <span class="ident">matrix_sdk_base::media</span>::{<span class="ident">MediaFormat</span>, <span class="ident">MediaRequest</span>, <span class="ident">MediaThumbnailSize</span>, <span class="ident">MediaType</span>};
+    <span class="kw">use</span> <span class="ident">matrix_sdk_test</span>::{<span class="ident">test_json</span>, <span class="ident">EventBuilder</span>, <span class="ident">EventsJson</span>};
+    <span class="kw">use</span> <span class="ident">mockito</span>::{<span class="ident">mock</span>, <span class="ident">Matcher</span>};
+    <span class="kw">use</span> <span class="ident">ruma</span>::{
+        <span class="ident">api</span>::{
+            <span class="ident">client</span>::{
+                <span class="self">self</span> <span class="kw">as</span> <span class="ident">client_api</span>,
+                <span class="ident">r0</span>::{
+                    <span class="ident">account::register</span>::{<span class="ident">RegistrationKind</span>, <span class="ident">Request</span> <span class="kw">as</span> <span class="ident">RegistrationRequest</span>},
+                    <span class="ident">directory</span>::{
+                        <span class="ident">get_public_rooms</span>,
+                        <span class="ident">get_public_rooms_filtered</span>::{<span class="self">self</span>, <span class="ident">Request</span> <span class="kw">as</span> <span class="ident">PublicRoomsFilterRequest</span>},
+                    },
+                    <span class="ident">media::get_content_thumbnail::Method</span>,
+                    <span class="ident">membership::Invite3pidInit</span>,
+                    <span class="ident">session::get_login_types::LoginType</span>,
+                    <span class="ident">uiaa</span>::{<span class="ident">AuthData</span>, <span class="ident">UiaaResponse</span>},
+                },
+            },
+            <span class="ident">error</span>::{<span class="ident">FromHttpResponseError</span>, <span class="ident">ServerError</span>},
         },
         <span class="ident">assign</span>,
         <span class="ident">directory::Filter</span>,
-        <span class="ident">events</span>::{<span class="ident">room::message::MessageEventContent</span>, <span class="ident">AnyMessageEventContent</span>},
-        <span class="ident">identifiers</span>::{<span class="ident">event_id</span>, <span class="ident">room_id</span>, <span class="ident">user_id</span>, <span class="ident">UserId</span>},
-        <span class="ident">thirdparty</span>,
+        <span class="ident">event_id</span>,
+        <span class="ident">events</span>::{
+            <span class="ident">room</span>::{
+                <span class="ident">message</span>::{<span class="ident">ImageMessageEventContent</span>, <span class="ident">MessageEventContent</span>},
+                <span class="ident">ImageInfo</span>,
+            },
+            <span class="ident">AnyMessageEventContent</span>,
+        },
+        <span class="ident">mxc_uri</span>, <span class="ident">room_id</span>, <span class="ident">thirdparty</span>, <span class="ident">uint</span>, <span class="ident">user_id</span>, <span class="ident">UserId</span>,
     };
-    <span class="kw">use</span> <span class="ident">matrix_sdk_test</span>::{<span class="ident">test_json</span>, <span class="ident">EventBuilder</span>, <span class="ident">EventsJson</span>};
-    <span class="kw">use</span> <span class="ident">mockito</span>::{<span class="ident">mock</span>, <span class="ident">Matcher</span>};
     <span class="kw">use</span> <span class="ident">serde_json::json</span>;
 
-    <span class="kw">use</span> <span class="kw">super</span>::{
-        <span class="ident">get_public_rooms</span>, <span class="ident">get_public_rooms_filtered</span>, <span class="ident">register::RegistrationKind</span>, <span class="ident">Client</span>, <span class="ident">Session</span>,
-        <span class="ident">SyncSettings</span>, <span class="ident">Url</span>,
-    };
+    <span class="kw">use</span> <span class="kw">super</span>::{<span class="ident">Client</span>, <span class="ident">Session</span>, <span class="ident">SyncSettings</span>, <span class="ident">Url</span>};
     <span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">ClientConfig</span>, <span class="ident">HttpError</span>, <span class="ident">RequestConfig</span>, <span class="ident">RoomMember</span>};
 
     <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">logged_in_client</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Client</span> {
@@ -6855,11 +6879,11 @@
             .<span class="ident">create</span>();
 
         <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Err</span>(<span class="ident">err</span>) <span class="op">=</span> <span class="ident">client</span>.<span class="ident">login</span>(<span class="string">&quot;example&quot;</span>, <span class="string">&quot;wordpass&quot;</span>, <span class="prelude-val">None</span>, <span class="prelude-val">None</span>).<span class="kw">await</span> {
-            <span class="kw">if</span> <span class="kw">let</span> <span class="kw">crate</span><span class="ident">::Error::Http</span>(<span class="ident">HttpError::ClientApi</span>(<span class="kw">crate</span><span class="ident">::FromHttpResponseError::Http</span>(
-                <span class="kw">crate</span><span class="ident">::ServerError::Known</span>(<span class="kw">crate</span><span class="ident">::api::Error</span> { <span class="ident">kind</span>, <span class="ident">message</span>, <span class="ident">status_code</span> }),
+            <span class="kw">if</span> <span class="kw">let</span> <span class="kw">crate</span><span class="ident">::Error::Http</span>(<span class="ident">HttpError::ClientApi</span>(<span class="ident">FromHttpResponseError::Http</span>(
+                <span class="ident">ServerError::Known</span>(<span class="ident">client_api::Error</span> { <span class="ident">kind</span>, <span class="ident">message</span>, <span class="ident">status_code</span> }),
             ))) <span class="op">=</span> <span class="ident">err</span>
             {
-                <span class="kw">if</span> <span class="kw">let</span> <span class="kw">crate</span><span class="ident">::api::error::ErrorKind::Forbidden</span> <span class="op">=</span> <span class="ident">kind</span> {
+                <span class="kw">if</span> <span class="kw">let</span> <span class="ident">client_api::error::ErrorKind::Forbidden</span> <span class="op">=</span> <span class="ident">kind</span> {
                 } <span class="kw">else</span> {
                     <span class="macro">panic!</span>(<span class="string">&quot;found the wrong `ErrorKind` {:?}, expected `Forbidden&quot;</span>, <span class="ident">kind</span>);
                 }
@@ -6891,13 +6915,15 @@
         });
 
         <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Err</span>(<span class="ident">err</span>) <span class="op">=</span> <span class="ident">client</span>.<span class="ident">register</span>(<span class="ident">user</span>).<span class="kw">await</span> {
-            <span class="kw">if</span> <span class="kw">let</span> <span class="kw">crate</span><span class="ident">::Error::Http</span>(<span class="ident">HttpError::UiaaError</span>(<span class="kw">crate</span><span class="ident">::FromHttpResponseError::Http</span>(
-                <span class="kw">crate</span><span class="ident">::ServerError::Known</span>(<span class="kw">crate</span><span class="ident">::api::r0::uiaa::UiaaResponse::MatrixError</span>(
-                    <span class="kw">crate</span><span class="ident">::api::Error</span> { <span class="ident">kind</span>, <span class="ident">message</span>, <span class="ident">status_code</span> },
-                )),
+            <span class="kw">if</span> <span class="kw">let</span> <span class="kw">crate</span><span class="ident">::Error::Http</span>(<span class="ident">HttpError::UiaaError</span>(<span class="ident">FromHttpResponseError::Http</span>(
+                <span class="ident">ServerError::Known</span>(<span class="ident">UiaaResponse::MatrixError</span>(<span class="ident">client_api::Error</span> {
+                    <span class="ident">kind</span>,
+                    <span class="ident">message</span>,
+                    <span class="ident">status_code</span>,
+                })),
             ))) <span class="op">=</span> <span class="ident">err</span>
             {
-                <span class="kw">if</span> <span class="kw">let</span> <span class="kw">crate</span><span class="ident">::api::error::ErrorKind::Forbidden</span> <span class="op">=</span> <span class="ident">kind</span> {
+                <span class="kw">if</span> <span class="kw">let</span> <span class="ident">client_api::error::ErrorKind::Forbidden</span> <span class="op">=</span> <span class="ident">kind</span> {
                 } <span class="kw">else</span> {
                     <span class="macro">panic!</span>(<span class="string">&quot;found the wrong `ErrorKind` {:?}, expected `Forbidden&quot;</span>, <span class="ident">kind</span>);
                 }
@@ -7240,7 +7266,7 @@
 
     <span class="attribute">#[<span class="ident">tokio::test</span>]</span>
     <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">room_state_event_send</span>() {
-        <span class="kw">use</span> <span class="kw">crate</span><span class="ident">::events</span>::{
+        <span class="kw">use</span> <span class="ident">ruma::events</span>::{
             <span class="ident">room::member</span>::{<span class="ident">MemberEventContent</span>, <span class="ident">MembershipState</span>},
             <span class="ident">AnyStateEventContent</span>,
         };

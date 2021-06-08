@@ -1,1 +1,0 @@
-initSidebarItems({"enum":[["ErrorKind","An enum for the error kind. Items may contain additional information."]],"struct":[["Error","A Matrix Error"],["ErrorBody","A Matrix Error without a status code"]]});

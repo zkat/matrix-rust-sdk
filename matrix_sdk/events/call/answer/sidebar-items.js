@@ -1,1 +1,0 @@
-initSidebarItems({"struct":[["AnswerEventContent","The payload for `AnswerEvent`."],["RedactedAnswerEventContent","The payload for a redacted `AnswerEventContent`"]],"type":[["AnswerEvent","This event is sent by the callee when they wish to answer the call."]]});

@@ -171,6 +171,8 @@
 <span id="169">169</span>
 <span id="170">170</span>
 <span id="171">171</span>
+<span id="172">172</span>
+<span id="173">173</span>
 </pre><pre class="rust">
 <span class="comment">// Copyright 2020 The Matrix.org Foundation C.I.C.</span>
 <span class="comment">//</span>
@@ -194,15 +196,17 @@
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;encryption&quot;</span>)]</span>
 <span class="kw">use</span> <span class="ident">matrix_sdk_base::crypto</span>::{<span class="ident">store::CryptoStoreError</span>, <span class="ident">DecryptorError</span>};
 <span class="kw">use</span> <span class="ident">matrix_sdk_base</span>::{<span class="ident">Error</span> <span class="kw">as</span> <span class="ident">MatrixError</span>, <span class="ident">StoreError</span>};
-<span class="kw">use</span> <span class="ident">matrix_sdk_common</span>::{
+<span class="kw">use</span> <span class="ident">reqwest::Error</span> <span class="kw">as</span> <span class="ident">ReqwestError</span>;
+<span class="kw">use</span> <span class="ident">ruma</span>::{
     <span class="ident">api</span>::{
-        <span class="ident">r0::uiaa</span>::{<span class="ident">UiaaInfo</span>, <span class="ident">UiaaResponse</span> <span class="kw">as</span> <span class="ident">UiaaError</span>},
-        <span class="ident">Error</span> <span class="kw">as</span> <span class="ident">RumaClientApiError</span>,
+        <span class="ident">client</span>::{
+            <span class="ident">r0::uiaa</span>::{<span class="ident">UiaaInfo</span>, <span class="ident">UiaaResponse</span> <span class="kw">as</span> <span class="ident">UiaaError</span>},
+            <span class="ident">Error</span> <span class="kw">as</span> <span class="ident">RumaClientApiError</span>,
+        },
+        <span class="ident">error</span>::{<span class="ident">FromHttpResponseError</span>, <span class="ident">IntoHttpError</span>, <span class="ident">MatrixError</span> <span class="kw">as</span> <span class="ident">RumaApiError</span>, <span class="ident">ServerError</span>},
     },
     <span class="ident">identifiers::Error</span> <span class="kw">as</span> <span class="ident">IdentifierError</span>,
-    <span class="ident">FromHttpResponseError</span>, <span class="ident">IntoHttpError</span>, <span class="ident">MatrixError</span> <span class="kw">as</span> <span class="ident">RumaApiError</span>, <span class="ident">ServerError</span>,
 };
-<span class="kw">use</span> <span class="ident">reqwest::Error</span> <span class="kw">as</span> <span class="ident">ReqwestError</span>;
 <span class="kw">use</span> <span class="ident">serde_json::Error</span> <span class="kw">as</span> <span class="ident">JsonError</span>;
 <span class="kw">use</span> <span class="ident">thiserror::Error</span>;
 <span class="kw">use</span> <span class="ident">url::ParseError</span> <span class="kw">as</span> <span class="ident">UrlParseError</span>;

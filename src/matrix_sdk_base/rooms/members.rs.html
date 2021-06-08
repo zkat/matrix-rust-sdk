@@ -126,13 +126,13 @@
 
 <span class="kw">use</span> <span class="ident">std::sync::Arc</span>;
 
-<span class="kw">use</span> <span class="ident">matrix_sdk_common</span>::{
+<span class="kw">use</span> <span class="ident">ruma</span>::{
     <span class="ident">events</span>::{
         <span class="ident">presence::PresenceEvent</span>,
         <span class="ident">room</span>::{<span class="ident">member::MemberEventContent</span>, <span class="ident">power_levels::PowerLevelsEventContent</span>},
         <span class="ident">SyncStateEvent</span>,
     },
-    <span class="ident">identifiers</span>::{<span class="ident">MxcUri</span>, <span class="ident">UserId</span>},
+    <span class="ident">MxcUri</span>, <span class="ident">UserId</span>,
 };
 
 <span class="kw">use</span> <span class="kw">crate</span><span class="ident">::deserialized_responses::MemberEvent</span>;
@@ -204,7 +204,7 @@
             .<span class="ident">map</span>(<span class="op">|</span><span class="ident">e</span><span class="op">|</span> {
                 <span class="ident">e</span>.<span class="ident">content</span>
                     .<span class="ident">users</span>
-                    .<span class="ident">get</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">user_id</span>())
+                    .<span class="ident">get</span>(<span class="self">self</span>.<span class="ident">user_id</span>())
                     .<span class="ident">map</span>(<span class="op">|</span><span class="ident">p</span><span class="op">|</span> (<span class="kw-2">*</span><span class="ident">p</span>).<span class="ident">into</span>())
                     .<span class="ident">unwrap_or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">e</span>.<span class="ident">content</span>.<span class="ident">users_default</span>.<span class="ident">into</span>())
             })

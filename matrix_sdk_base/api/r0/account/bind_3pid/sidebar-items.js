@@ -1,1 +1,0 @@
-initSidebarItems({"constant":[["METADATA","Metadata for the `bind_3pid` API endpoint."]],"struct":[["IncomingRequest","‘Incoming’ variant of Request."],["Request","Data for a request to the `bind_3pid` API endpoint."],["Response","Data in the response from the `bind_3pid` API endpoint."]]});

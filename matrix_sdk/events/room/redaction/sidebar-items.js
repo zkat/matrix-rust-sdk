@@ -1,1 +1,0 @@
-initSidebarItems({"struct":[["RedactedRedactionEventContent","The payload for a redacted `RedactionEventContent`"],["RedactionEvent","Redaction event."],["RedactionEventContent","A redaction of an event."],["SyncRedactionEvent","Redaction event without a `room_id`."]]});

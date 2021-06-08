@@ -534,9 +534,6 @@
 <span id="532">532</span>
 <span id="533">533</span>
 <span id="534">534</span>
-<span id="535">535</span>
-<span id="536">536</span>
-<span id="537">537</span>
 </pre><pre class="rust">
 <span class="comment">// Copyright 2020 The Matrix.org Foundation C.I.C.</span>
 <span class="comment">//</span>
@@ -562,13 +559,13 @@
     },
 };
 
-<span class="kw">use</span> <span class="ident">matrix_sdk_common</span>::{
-    <span class="ident">api::r0::keys</span>::{<span class="ident">upload_signatures::Request</span> <span class="kw">as</span> <span class="ident">SignatureUploadRequest</span>, <span class="ident">KeyUsage</span>},
-    <span class="ident">encryption::DeviceKeys</span>,
-    <span class="ident">identifiers</span>::{<span class="ident">DeviceKeyAlgorithm</span>, <span class="ident">DeviceKeyId</span>, <span class="ident">UserId</span>},
-    <span class="ident">locks::Mutex</span>,
-};
+<span class="kw">use</span> <span class="ident">matrix_sdk_common::locks::Mutex</span>;
 <span class="kw">use</span> <span class="ident">pk_signing</span>::{<span class="ident">MasterSigning</span>, <span class="ident">PickledSignings</span>, <span class="ident">SelfSigning</span>, <span class="ident">Signing</span>, <span class="ident">SigningError</span>, <span class="ident">UserSigning</span>};
+<span class="kw">use</span> <span class="ident">ruma</span>::{
+    <span class="ident">api::client::r0::keys</span>::{<span class="ident">upload_signatures::Request</span> <span class="kw">as</span> <span class="ident">SignatureUploadRequest</span>, <span class="ident">KeyUsage</span>},
+    <span class="ident">encryption::DeviceKeys</span>,
+    <span class="ident">DeviceKeyAlgorithm</span>, <span class="ident">DeviceKeyId</span>, <span class="ident">UserId</span>,
+};
 <span class="kw">use</span> <span class="ident">serde</span>::{<span class="ident">Deserialize</span>, <span class="ident">Serialize</span>};
 <span class="kw">use</span> <span class="ident">serde_json::Error</span> <span class="kw">as</span> <span class="ident">JsonError</span>;
 
@@ -684,7 +681,7 @@
             .<span class="kw">await</span>
             .<span class="ident">as_ref</span>()
             .<span class="ident">ok_or</span>(<span class="ident">SignatureError::MissingSigningKey</span>)<span class="question-mark">?</span>
-            .<span class="ident">sign_user</span>(<span class="kw-2">&amp;</span><span class="ident">user_identity</span>)
+            .<span class="ident">sign_user</span>(<span class="ident">user_identity</span>)
             .<span class="kw">await</span><span class="question-mark">?</span>;
 
         <span class="prelude-val">Ok</span>(<span class="ident">SignatureUploadRequest::new</span>(<span class="ident">signed_keys</span>))
@@ -927,11 +924,8 @@
 <span class="kw">mod</span> <span class="ident">test</span> {
     <span class="kw">use</span> <span class="ident">std</span>::{<span class="ident">collections::BTreeMap</span>, <span class="ident">sync::Arc</span>};
 
-    <span class="kw">use</span> <span class="ident">matrix_sdk_common</span>::{
-        <span class="ident">api::r0::keys::CrossSigningKey</span>,
-        <span class="ident">identifiers</span>::{<span class="ident">user_id</span>, <span class="ident">UserId</span>},
-    };
     <span class="kw">use</span> <span class="ident">matrix_sdk_test::async_test</span>;
+    <span class="kw">use</span> <span class="ident">ruma</span>::{<span class="ident">api::client::r0::keys::CrossSigningKey</span>, <span class="ident">user_id</span>, <span class="ident">UserId</span>};
 
     <span class="kw">use</span> <span class="kw">super</span>::{<span class="ident">PrivateCrossSigningIdentity</span>, <span class="ident">Signing</span>};
     <span class="kw">use</span> <span class="kw">crate</span>::{

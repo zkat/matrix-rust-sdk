@@ -540,7 +540,6 @@
 <span id="538">538</span>
 <span id="539">539</span>
 <span id="540">540</span>
-<span id="541">541</span>
 </pre><pre class="rust">
 <span class="comment">// Copyright 2021 The Matrix.org Foundation C.I.C.</span>
 <span class="comment">//</span>
@@ -565,9 +564,9 @@
 };
 
 <span class="kw">use</span> <span class="ident">dashmap::DashMap</span>;
-<span class="kw">use</span> <span class="ident">matrix_sdk_common</span>::{
-    <span class="ident">api::r0::push::get_notifications::Notification</span>,
-    <span class="ident">async_trait</span>,
+<span class="kw">use</span> <span class="ident">matrix_sdk_common</span>::{<span class="ident">async_trait</span>, <span class="ident">locks::RwLock</span>, <span class="ident">AsyncTraitDeps</span>};
+<span class="kw">use</span> <span class="ident">ruma</span>::{
+    <span class="ident">api::client::r0::push::get_notifications::Notification</span>,
     <span class="ident">events</span>::{
         <span class="ident">presence::PresenceEvent</span>,
         <span class="ident">receipt</span>::{<span class="ident">Receipt</span>, <span class="ident">ReceiptEventContent</span>},
@@ -575,10 +574,9 @@
         <span class="ident">AnyGlobalAccountDataEvent</span>, <span class="ident">AnyRoomAccountDataEvent</span>, <span class="ident">AnyStrippedStateEvent</span>,
         <span class="ident">AnySyncStateEvent</span>, <span class="ident">EventContent</span>, <span class="ident">EventType</span>,
     },
-    <span class="ident">identifiers</span>::{<span class="ident">EventId</span>, <span class="ident">MxcUri</span>, <span class="ident">RoomId</span>, <span class="ident">UserId</span>},
-    <span class="ident">locks::RwLock</span>,
     <span class="ident">receipt::ReceiptType</span>,
-    <span class="ident">AsyncTraitDeps</span>, <span class="ident">Raw</span>,
+    <span class="ident">serde::Raw</span>,
+    <span class="ident">EventId</span>, <span class="ident">MxcUri</span>, <span class="ident">RoomId</span>, <span class="ident">UserId</span>,
 };
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;sled_state_store&quot;</span>)]</span>
 <span class="kw">use</span> <span class="ident">sled::Db</span>;
@@ -613,7 +611,7 @@
     <span class="doccomment">/// An error happened while deserializing a Matrix identifier, e.g. an user</span>
     <span class="doccomment">/// id.</span>
     <span class="attribute">#[<span class="ident">error</span>(<span class="ident">transparent</span>)]</span>
-    <span class="ident">Identifier</span>(<span class="attribute">#[<span class="ident">from</span>]</span> <span class="ident">matrix_sdk_common::identifiers::Error</span>),
+    <span class="ident">Identifier</span>(<span class="attribute">#[<span class="ident">from</span>]</span> <span class="ident">ruma::identifiers::Error</span>),
     <span class="doccomment">/// The store is locked with a passphrase and an incorrect passphrase was</span>
     <span class="doccomment">/// given.</span>
     <span class="attribute">#[<span class="ident">error</span>(<span class="string">&quot;The store failed to be unlocked&quot;</span>)]</span>

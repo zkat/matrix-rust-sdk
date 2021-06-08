@@ -656,8 +656,10 @@
 
 <span class="kw">use</span> <span class="ident">std</span>::{<span class="ident">collections::BTreeMap</span>, <span class="ident">convert::TryInto</span>};
 
-<span class="kw">use</span> <span class="ident">matrix_sdk_common</span>::{
-    <span class="ident">api::r0::to_device::DeviceIdOrAllDevices</span>,
+<span class="kw">use</span> <span class="ident">matrix_sdk_common::uuid::Uuid</span>;
+<span class="kw">use</span> <span class="ident">olm_rs::sas::OlmSas</span>;
+<span class="kw">use</span> <span class="ident">ruma</span>::{
+    <span class="ident">api::client::r0::to_device::DeviceIdOrAllDevices</span>,
     <span class="ident">events</span>::{
         <span class="ident">key::verification</span>::{
             <span class="ident">cancel::CancelCode</span>,
@@ -666,10 +668,8 @@
         },
         <span class="ident">AnyMessageEventContent</span>, <span class="ident">AnyToDeviceEventContent</span>, <span class="ident">EventType</span>,
     },
-    <span class="ident">identifiers</span>::{<span class="ident">DeviceKeyAlgorithm</span>, <span class="ident">DeviceKeyId</span>, <span class="ident">UserId</span>},
-    <span class="ident">uuid::Uuid</span>,
+    <span class="ident">DeviceKeyAlgorithm</span>, <span class="ident">DeviceKeyId</span>, <span class="ident">UserId</span>,
 };
-<span class="kw">use</span> <span class="ident">olm_rs::sas::OlmSas</span>;
 <span class="kw">use</span> <span class="ident">sha2</span>::{<span class="ident">Digest</span>, <span class="ident">Sha256</span>};
 <span class="kw">use</span> <span class="ident">tracing</span>::{<span class="ident">trace</span>, <span class="ident">warn</span>};
 
@@ -830,7 +830,7 @@
     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">verified_devices</span> <span class="op">=</span> <span class="ident">Vec::new</span>();
     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">verified_identities</span> <span class="op">=</span> <span class="ident">Vec::new</span>();
 
-    <span class="kw">let</span> <span class="ident">info</span> <span class="op">=</span> <span class="ident">extra_mac_info_receive</span>(<span class="kw-2">&amp;</span><span class="ident">ids</span>, <span class="ident">flow_id</span>);
+    <span class="kw">let</span> <span class="ident">info</span> <span class="op">=</span> <span class="ident">extra_mac_info_receive</span>(<span class="ident">ids</span>, <span class="ident">flow_id</span>);
 
     <span class="macro">trace!</span>(
         <span class="string">&quot;Received a key.verification.mac event from {} {}&quot;</span>,
@@ -1037,7 +1037,7 @@
 ) <span class="op">-</span><span class="op">&gt;</span> [(<span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>, <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>); <span class="number">7</span>] {
     <span class="kw">let</span> <span class="ident">bytes</span> <span class="op">=</span> <span class="ident">sas</span>
         .<span class="ident">generate_bytes</span>(
-            <span class="kw-2">&amp;</span><span class="ident">extra_info_sas</span>(<span class="kw-2">&amp;</span><span class="ident">ids</span>, <span class="kw-2">&amp;</span><span class="ident">sas</span>.<span class="ident">public_key</span>(), <span class="ident">their_pubkey</span>, <span class="kw-2">&amp;</span><span class="ident">flow_id</span>, <span class="ident">we_started</span>),
+            <span class="kw-2">&amp;</span><span class="ident">extra_info_sas</span>(<span class="ident">ids</span>, <span class="kw-2">&amp;</span><span class="ident">sas</span>.<span class="ident">public_key</span>(), <span class="ident">their_pubkey</span>, <span class="ident">flow_id</span>, <span class="ident">we_started</span>),
             <span class="number">6</span>,
         )
         .<span class="ident">expect</span>(<span class="string">&quot;Can&#39;t generate bytes&quot;</span>);
@@ -1074,7 +1074,7 @@
 ) <span class="op">-</span><span class="op">&gt;</span> [<span class="ident">u8</span>; <span class="number">7</span>] {
     <span class="kw">let</span> <span class="ident">bytes</span> <span class="op">=</span> <span class="ident">sas</span>
         .<span class="ident">generate_bytes</span>(
-            <span class="kw-2">&amp;</span><span class="ident">extra_info_sas</span>(<span class="kw-2">&amp;</span><span class="ident">ids</span>, <span class="kw-2">&amp;</span><span class="ident">sas</span>.<span class="ident">public_key</span>(), <span class="ident">their_pubkey</span>, <span class="kw-2">&amp;</span><span class="ident">flow_id</span>, <span class="ident">we_started</span>),
+            <span class="kw-2">&amp;</span><span class="ident">extra_info_sas</span>(<span class="ident">ids</span>, <span class="kw-2">&amp;</span><span class="ident">sas</span>.<span class="ident">public_key</span>(), <span class="ident">their_pubkey</span>, <span class="ident">flow_id</span>, <span class="ident">we_started</span>),
             <span class="number">6</span>,
         )
         .<span class="ident">expect</span>(<span class="string">&quot;Can&#39;t generate bytes&quot;</span>);
@@ -1149,7 +1149,7 @@
 ) <span class="op">-</span><span class="op">&gt;</span> (<span class="ident">u16</span>, <span class="ident">u16</span>, <span class="ident">u16</span>) {
     <span class="kw">let</span> <span class="ident">bytes</span> <span class="op">=</span> <span class="ident">sas</span>
         .<span class="ident">generate_bytes</span>(
-            <span class="kw-2">&amp;</span><span class="ident">extra_info_sas</span>(<span class="kw-2">&amp;</span><span class="ident">ids</span>, <span class="kw-2">&amp;</span><span class="ident">sas</span>.<span class="ident">public_key</span>(), <span class="ident">their_pubkey</span>, <span class="kw-2">&amp;</span><span class="ident">flow_id</span>, <span class="ident">we_started</span>),
+            <span class="kw-2">&amp;</span><span class="ident">extra_info_sas</span>(<span class="ident">ids</span>, <span class="kw-2">&amp;</span><span class="ident">sas</span>.<span class="ident">public_key</span>(), <span class="ident">their_pubkey</span>, <span class="ident">flow_id</span>, <span class="ident">we_started</span>),
             <span class="number">5</span>,
         )
         .<span class="ident">expect</span>(<span class="string">&quot;Can&#39;t generate bytes&quot;</span>);
@@ -1199,8 +1199,8 @@
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
 <span class="kw">mod</span> <span class="ident">test</span> {
-    <span class="kw">use</span> <span class="ident">matrix_sdk_common::events::key::verification::start::StartToDeviceEventContent</span>;
     <span class="kw">use</span> <span class="ident">proptest::prelude</span>::<span class="kw-2">*</span>;
+    <span class="kw">use</span> <span class="ident">ruma::events::key::verification::start::StartToDeviceEventContent</span>;
     <span class="kw">use</span> <span class="ident">serde_json::json</span>;
 
     <span class="kw">use</span> <span class="kw">super</span>::{

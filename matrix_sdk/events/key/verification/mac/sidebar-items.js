@@ -1,1 +1,0 @@
-initSidebarItems({"struct":[["MacEventContent","The payload for an in-room `MacEvent`."],["MacToDeviceEventContent","The payload for a to-device `MacEvent`."],["RedactedMacEventContent","The payload for a redacted `MacEventContent`"]],"type":[["MacEvent","Sends the MAC of a device’s key to the partner device."]]});

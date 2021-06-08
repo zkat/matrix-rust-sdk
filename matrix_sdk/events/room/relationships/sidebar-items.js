@@ -1,1 +1,0 @@
-initSidebarItems({"struct":[["Annotation","An annotation for an event."],["InReplyTo","Information about the event a “rich reply” is replying to."],["Reference","A reference to another event."],["Replacement","An event replacing another event."]]});

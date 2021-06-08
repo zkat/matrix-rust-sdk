@@ -322,6 +322,7 @@
 <span id="320">320</span>
 <span id="321">321</span>
 <span id="322">322</span>
+<span id="323">323</span>
 </pre><pre class="rust">
 <span class="comment">// Copyright 2020 The Matrix.org Foundation C.I.C.</span>
 <span class="comment">//</span>
@@ -341,8 +342,9 @@
 
 <span class="kw">use</span> <span class="ident">std</span>::{<span class="ident">collections::BTreeMap</span>, <span class="ident">sync::Arc</span>, <span class="ident">time::Duration</span>};
 
-<span class="kw">use</span> <span class="ident">matrix_sdk_common</span>::{
-    <span class="ident">api::r0</span>::{
+<span class="kw">use</span> <span class="ident">matrix_sdk_common::uuid::Uuid</span>;
+<span class="kw">use</span> <span class="ident">ruma</span>::{
+    <span class="ident">api::client::r0</span>::{
         <span class="ident">keys</span>::{
             <span class="ident">claim_keys::Response</span> <span class="kw">as</span> <span class="ident">KeysClaimResponse</span>,
             <span class="ident">get_keys::Response</span> <span class="kw">as</span> <span class="ident">KeysQueryResponse</span>,
@@ -357,15 +359,14 @@
         <span class="ident">to_device</span>::{<span class="ident">send_event_to_device::Response</span> <span class="kw">as</span> <span class="ident">ToDeviceResponse</span>, <span class="ident">DeviceIdOrAllDevices</span>},
     },
     <span class="ident">events</span>::{<span class="ident">AnyMessageEventContent</span>, <span class="ident">EventType</span>},
-    <span class="ident">identifiers</span>::{<span class="ident">DeviceIdBox</span>, <span class="ident">RoomId</span>, <span class="ident">UserId</span>},
-    <span class="ident">uuid::Uuid</span>,
+    <span class="ident">DeviceIdBox</span>, <span class="ident">RoomId</span>, <span class="ident">UserId</span>,
 };
 <span class="kw">use</span> <span class="ident">serde</span>::{<span class="ident">Deserialize</span>, <span class="ident">Serialize</span>};
 <span class="kw">use</span> <span class="ident">serde_json::value::RawValue</span> <span class="kw">as</span> <span class="ident">RawJsonValue</span>;
 
 <span class="doccomment">/// Customized version of</span>
-<span class="doccomment">/// `ruma_client_api::r0::to_device::send_event_to_device::Request`, using a</span>
-<span class="doccomment">/// UUID for the transaction ID.</span>
+<span class="doccomment">/// `ruma_client_api::r0::to_device::send_event_to_device::Request`,</span>
+<span class="doccomment">/// using a UUID for the transaction ID.</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">ToDeviceRequest</span> {
     <span class="doccomment">/// Type of event being sent to each device.</span>
@@ -416,8 +417,9 @@
     <span class="kw">pub</span> <span class="ident">user_signing_key</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">CrossSigningKey</span><span class="op">&gt;</span>,
 }
 
-<span class="doccomment">/// Customized version of `ruma_client_api::r0::keys::get_keys::Request`,</span>
-<span class="doccomment">/// without any references.</span>
+<span class="doccomment">/// Customized version of</span>
+<span class="doccomment">/// `ruma_client_api::r0::keys::get_keys::Request`, without any</span>
+<span class="doccomment">/// references.</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">KeysQueryRequest</span> {
     <span class="doccomment">/// The time (in milliseconds) to wait when downloading keys from remote</span>

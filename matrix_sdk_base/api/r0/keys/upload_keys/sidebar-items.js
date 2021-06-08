@@ -1,1 +1,0 @@
-initSidebarItems({"constant":[["METADATA","Metadata for the `upload_keys` API endpoint."]],"struct":[["Request","Data for a request to the `upload_keys` API endpoint."],["Response","Data in the response from the `upload_keys` API endpoint."]]});

@@ -1,1 +1,0 @@
-initSidebarItems({"enum":[["FeedbackType","A type of feedback."]],"struct":[["FeedbackEventContent","The payload for `FeedbackEvent`."],["RedactedFeedbackEventContent","The payload for a redacted `FeedbackEventContent`"]],"type":[["FeedbackEvent","An acknowledgement of a message."]]});

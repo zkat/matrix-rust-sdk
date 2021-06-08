@@ -1,1 +1,0 @@
-initSidebarItems({"constant":[["METADATA","Metadata for the `kick_user` API endpoint."]],"struct":[["IncomingRequest","‘Incoming’ variant of Request."],["Request","Data for a request to the `kick_user` API endpoint."],["Response","Data in the response from the `kick_user` API endpoint."]]});

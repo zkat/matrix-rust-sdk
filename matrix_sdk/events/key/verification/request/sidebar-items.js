@@ -1,1 +1,0 @@
-initSidebarItems({"struct":[["RequestToDeviceEventContent","The payload for `RequestEvent`."]]});

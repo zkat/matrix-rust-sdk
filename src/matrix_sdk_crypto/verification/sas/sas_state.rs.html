@@ -1377,7 +1377,9 @@
     <span class="ident">time</span>::{<span class="ident">Duration</span>, <span class="ident">Instant</span>},
 };
 
-<span class="kw">use</span> <span class="ident">matrix_sdk_common</span>::{
+<span class="kw">use</span> <span class="ident">matrix_sdk_common::uuid::Uuid</span>;
+<span class="kw">use</span> <span class="ident">olm_rs::sas::OlmSas</span>;
+<span class="kw">use</span> <span class="ident">ruma</span>::{
     <span class="ident">events</span>::{
         <span class="ident">key::verification</span>::{
             <span class="ident">accept</span>::{
@@ -1396,10 +1398,8 @@
         },
         <span class="ident">AnyMessageEventContent</span>, <span class="ident">AnyToDeviceEventContent</span>,
     },
-    <span class="ident">identifiers</span>::{<span class="ident">DeviceId</span>, <span class="ident">EventId</span>, <span class="ident">RoomId</span>, <span class="ident">UserId</span>},
-    <span class="ident">uuid::Uuid</span>,
+    <span class="ident">DeviceId</span>, <span class="ident">EventId</span>, <span class="ident">RoomId</span>, <span class="ident">UserId</span>,
 };
-<span class="kw">use</span> <span class="ident">olm_rs::sas::OlmSas</span>;
 <span class="kw">use</span> <span class="ident">tracing::info</span>;
 
 <span class="kw">use</span> <span class="kw">super</span>::{
@@ -1643,12 +1643,12 @@
     <span class="doccomment">/// Get our own user id.</span>
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">user_id</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="ident">UserId</span> {
-        <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">ids</span>.<span class="ident">account</span>.<span class="ident">user_id</span>()
+        <span class="self">self</span>.<span class="ident">ids</span>.<span class="ident">account</span>.<span class="ident">user_id</span>()
     }
 
     <span class="doccomment">/// Get our own device id.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">device_id</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="ident">DeviceId</span> {
-        <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">ids</span>.<span class="ident">account</span>.<span class="ident">device_id</span>()
+        <span class="self">self</span>.<span class="ident">ids</span>.<span class="ident">account</span>.<span class="ident">device_id</span>()
     }
 
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
@@ -1806,7 +1806,7 @@
         <span class="ident">sender</span>: <span class="kw-2">&amp;</span><span class="ident">UserId</span>,
         <span class="ident">content</span>: <span class="kw-2">&amp;</span><span class="ident">AcceptContent</span>,
     ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">SasState</span><span class="op">&lt;</span><span class="ident">Accepted</span><span class="op">&gt;</span>, <span class="ident">SasState</span><span class="op">&lt;</span><span class="ident">Cancelled</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">check_event</span>(<span class="kw-2">&amp;</span><span class="ident">sender</span>, <span class="ident">content</span>.<span class="ident">flow_id</span>()).<span class="ident">map_err</span>(<span class="op">|</span><span class="ident">c</span><span class="op">|</span> <span class="self">self</span>.<span class="ident">clone</span>().<span class="ident">cancel</span>(<span class="ident">c</span>))<span class="question-mark">?</span>;
+        <span class="self">self</span>.<span class="ident">check_event</span>(<span class="ident">sender</span>, <span class="ident">content</span>.<span class="ident">flow_id</span>()).<span class="ident">map_err</span>(<span class="op">|</span><span class="ident">c</span><span class="op">|</span> <span class="self">self</span>.<span class="ident">clone</span>().<span class="ident">cancel</span>(<span class="ident">c</span>))<span class="question-mark">?</span>;
 
         <span class="kw">if</span> <span class="kw">let</span> <span class="ident">AcceptMethod::MSasV1</span>(<span class="ident">content</span>) <span class="op">=</span> <span class="ident">content</span>.<span class="ident">method</span>() {
             <span class="kw">let</span> <span class="ident">accepted_protocols</span> <span class="op">=</span>
@@ -1962,7 +1962,7 @@
         <span class="ident">sender</span>: <span class="kw-2">&amp;</span><span class="ident">UserId</span>,
         <span class="ident">content</span>: <span class="kw-2">&amp;</span><span class="ident">KeyContent</span>,
     ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">SasState</span><span class="op">&lt;</span><span class="ident">KeyReceived</span><span class="op">&gt;</span>, <span class="ident">SasState</span><span class="op">&lt;</span><span class="ident">Cancelled</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">check_event</span>(<span class="kw-2">&amp;</span><span class="ident">sender</span>, <span class="kw-2">&amp;</span><span class="ident">content</span>.<span class="ident">flow_id</span>()).<span class="ident">map_err</span>(<span class="op">|</span><span class="ident">c</span><span class="op">|</span> <span class="self">self</span>.<span class="ident">clone</span>().<span class="ident">cancel</span>(<span class="ident">c</span>))<span class="question-mark">?</span>;
+        <span class="self">self</span>.<span class="ident">check_event</span>(<span class="ident">sender</span>, <span class="ident">content</span>.<span class="ident">flow_id</span>()).<span class="ident">map_err</span>(<span class="op">|</span><span class="ident">c</span><span class="op">|</span> <span class="self">self</span>.<span class="ident">clone</span>().<span class="ident">cancel</span>(<span class="ident">c</span>))<span class="question-mark">?</span>;
 
         <span class="kw">let</span> <span class="ident">their_pubkey</span> <span class="op">=</span> <span class="ident">content</span>.<span class="ident">public_key</span>().<span class="ident">to_owned</span>();
 
@@ -2002,7 +2002,7 @@
         <span class="ident">sender</span>: <span class="kw-2">&amp;</span><span class="ident">UserId</span>,
         <span class="ident">content</span>: <span class="kw-2">&amp;</span><span class="ident">KeyContent</span>,
     ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">SasState</span><span class="op">&lt;</span><span class="ident">KeyReceived</span><span class="op">&gt;</span>, <span class="ident">SasState</span><span class="op">&lt;</span><span class="ident">Cancelled</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">check_event</span>(<span class="kw-2">&amp;</span><span class="ident">sender</span>, <span class="ident">content</span>.<span class="ident">flow_id</span>()).<span class="ident">map_err</span>(<span class="op">|</span><span class="ident">c</span><span class="op">|</span> <span class="self">self</span>.<span class="ident">clone</span>().<span class="ident">cancel</span>(<span class="ident">c</span>))<span class="question-mark">?</span>;
+        <span class="self">self</span>.<span class="ident">check_event</span>(<span class="ident">sender</span>, <span class="ident">content</span>.<span class="ident">flow_id</span>()).<span class="ident">map_err</span>(<span class="op">|</span><span class="ident">c</span><span class="op">|</span> <span class="self">self</span>.<span class="ident">clone</span>().<span class="ident">cancel</span>(<span class="ident">c</span>))<span class="question-mark">?</span>;
 
         <span class="kw">let</span> <span class="ident">commitment</span> <span class="op">=</span> <span class="ident">calculate_commitment</span>(
             <span class="ident">content</span>.<span class="ident">public_key</span>(),
@@ -2139,14 +2139,14 @@
         <span class="ident">sender</span>: <span class="kw-2">&amp;</span><span class="ident">UserId</span>,
         <span class="ident">content</span>: <span class="kw-2">&amp;</span><span class="ident">MacContent</span>,
     ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">SasState</span><span class="op">&lt;</span><span class="ident">MacReceived</span><span class="op">&gt;</span>, <span class="ident">SasState</span><span class="op">&lt;</span><span class="ident">Cancelled</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">check_event</span>(<span class="kw-2">&amp;</span><span class="ident">sender</span>, <span class="ident">content</span>.<span class="ident">flow_id</span>()).<span class="ident">map_err</span>(<span class="op">|</span><span class="ident">c</span><span class="op">|</span> <span class="self">self</span>.<span class="ident">clone</span>().<span class="ident">cancel</span>(<span class="ident">c</span>))<span class="question-mark">?</span>;
+        <span class="self">self</span>.<span class="ident">check_event</span>(<span class="ident">sender</span>, <span class="ident">content</span>.<span class="ident">flow_id</span>()).<span class="ident">map_err</span>(<span class="op">|</span><span class="ident">c</span><span class="op">|</span> <span class="self">self</span>.<span class="ident">clone</span>().<span class="ident">cancel</span>(<span class="ident">c</span>))<span class="question-mark">?</span>;
 
         <span class="kw">let</span> (<span class="ident">devices</span>, <span class="ident">master_keys</span>) <span class="op">=</span> <span class="ident">receive_mac_event</span>(
             <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">lock</span>().<span class="ident">unwrap</span>(),
             <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">ids</span>,
             <span class="self">self</span>.<span class="ident">verification_flow_id</span>.<span class="ident">as_str</span>(),
             <span class="ident">sender</span>,
-            <span class="kw-2">&amp;</span><span class="ident">content</span>,
+            <span class="ident">content</span>,
         )
         .<span class="ident">map_err</span>(<span class="op">|</span><span class="ident">c</span><span class="op">|</span> <span class="self">self</span>.<span class="ident">clone</span>().<span class="ident">cancel</span>(<span class="ident">c</span>))<span class="question-mark">?</span>;
 
@@ -2204,9 +2204,9 @@
         <span class="kw">let</span> (<span class="ident">devices</span>, <span class="ident">master_keys</span>) <span class="op">=</span> <span class="ident">receive_mac_event</span>(
             <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">lock</span>().<span class="ident">unwrap</span>(),
             <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">ids</span>,
-            <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">verification_flow_id</span>.<span class="ident">as_str</span>(),
+            <span class="self">self</span>.<span class="ident">verification_flow_id</span>.<span class="ident">as_str</span>(),
             <span class="ident">sender</span>,
-            <span class="kw-2">&amp;</span><span class="ident">content</span>,
+            <span class="ident">content</span>,
         )
         .<span class="ident">map_err</span>(<span class="op">|</span><span class="ident">c</span><span class="op">|</span> <span class="self">self</span>.<span class="ident">clone</span>().<span class="ident">cancel</span>(<span class="ident">c</span>))<span class="question-mark">?</span>;
 
@@ -2239,14 +2239,14 @@
         <span class="ident">sender</span>: <span class="kw-2">&amp;</span><span class="ident">UserId</span>,
         <span class="ident">content</span>: <span class="kw-2">&amp;</span><span class="ident">MacContent</span>,
     ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">SasState</span><span class="op">&lt;</span><span class="ident">WaitingForDone</span><span class="op">&gt;</span>, <span class="ident">SasState</span><span class="op">&lt;</span><span class="ident">Cancelled</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">check_event</span>(<span class="kw-2">&amp;</span><span class="ident">sender</span>, <span class="kw-2">&amp;</span><span class="ident">content</span>.<span class="ident">flow_id</span>()).<span class="ident">map_err</span>(<span class="op">|</span><span class="ident">c</span><span class="op">|</span> <span class="self">self</span>.<span class="ident">clone</span>().<span class="ident">cancel</span>(<span class="ident">c</span>))<span class="question-mark">?</span>;
+        <span class="self">self</span>.<span class="ident">check_event</span>(<span class="ident">sender</span>, <span class="ident">content</span>.<span class="ident">flow_id</span>()).<span class="ident">map_err</span>(<span class="op">|</span><span class="ident">c</span><span class="op">|</span> <span class="self">self</span>.<span class="ident">clone</span>().<span class="ident">cancel</span>(<span class="ident">c</span>))<span class="question-mark">?</span>;
 
         <span class="kw">let</span> (<span class="ident">devices</span>, <span class="ident">master_keys</span>) <span class="op">=</span> <span class="ident">receive_mac_event</span>(
             <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">lock</span>().<span class="ident">unwrap</span>(),
             <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">ids</span>,
-            <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">verification_flow_id</span>.<span class="ident">as_str</span>(),
+            <span class="self">self</span>.<span class="ident">verification_flow_id</span>.<span class="ident">as_str</span>(),
             <span class="ident">sender</span>,
-            <span class="kw-2">&amp;</span><span class="ident">content</span>,
+            <span class="ident">content</span>,
         )
         .<span class="ident">map_err</span>(<span class="op">|</span><span class="ident">c</span><span class="op">|</span> <span class="self">self</span>.<span class="ident">clone</span>().<span class="ident">cancel</span>(<span class="ident">c</span>))<span class="question-mark">?</span>;
 
@@ -2323,7 +2323,7 @@
             <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">lock</span>().<span class="ident">unwrap</span>(),
             <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">ids</span>,
             <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">state</span>.<span class="ident">their_pubkey</span>,
-            <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">verification_flow_id</span>.<span class="ident">as_str</span>(),
+            <span class="self">self</span>.<span class="ident">verification_flow_id</span>.<span class="ident">as_str</span>(),
             <span class="self">self</span>.<span class="ident">state</span>.<span class="ident">we_started</span>,
         )
     }
@@ -2351,7 +2351,7 @@
             <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">lock</span>().<span class="ident">unwrap</span>(),
             <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">ids</span>,
             <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">state</span>.<span class="ident">their_pubkey</span>,
-            <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">verification_flow_id</span>.<span class="ident">as_str</span>(),
+            <span class="self">self</span>.<span class="ident">verification_flow_id</span>.<span class="ident">as_str</span>(),
             <span class="self">self</span>.<span class="ident">state</span>.<span class="ident">we_started</span>,
         )
     }
@@ -2394,7 +2394,7 @@
         <span class="ident">sender</span>: <span class="kw-2">&amp;</span><span class="ident">UserId</span>,
         <span class="ident">content</span>: <span class="kw-2">&amp;</span><span class="ident">DoneContent</span>,
     ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">SasState</span><span class="op">&lt;</span><span class="ident">Done</span><span class="op">&gt;</span>, <span class="ident">SasState</span><span class="op">&lt;</span><span class="ident">Cancelled</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">check_event</span>(<span class="kw-2">&amp;</span><span class="ident">sender</span>, <span class="ident">content</span>.<span class="ident">flow_id</span>()).<span class="ident">map_err</span>(<span class="op">|</span><span class="ident">c</span><span class="op">|</span> <span class="self">self</span>.<span class="ident">clone</span>().<span class="ident">cancel</span>(<span class="ident">c</span>))<span class="question-mark">?</span>;
+        <span class="self">self</span>.<span class="ident">check_event</span>(<span class="ident">sender</span>, <span class="ident">content</span>.<span class="ident">flow_id</span>()).<span class="ident">map_err</span>(<span class="op">|</span><span class="ident">c</span><span class="op">|</span> <span class="self">self</span>.<span class="ident">clone</span>().<span class="ident">cancel</span>(<span class="ident">c</span>))<span class="question-mark">?</span>;
 
         <span class="prelude-val">Ok</span>(<span class="ident">SasState</span> {
             <span class="ident">inner</span>: <span class="self">self</span>.<span class="ident">inner</span>,
@@ -2446,12 +2446,12 @@
 <span class="kw">mod</span> <span class="ident">test</span> {
     <span class="kw">use</span> <span class="ident">std::convert::TryFrom</span>;
 
-    <span class="kw">use</span> <span class="ident">matrix_sdk_common</span>::{
+    <span class="kw">use</span> <span class="ident">ruma</span>::{
         <span class="ident">events::key::verification</span>::{
             <span class="ident">accept</span>::{<span class="ident">AcceptMethod</span>, <span class="ident">CustomContent</span>},
             <span class="ident">start</span>::{<span class="ident">CustomContent</span> <span class="kw">as</span> <span class="ident">CustomStartContent</span>, <span class="ident">StartMethod</span>},
         },
-        <span class="ident">identifiers</span>::{<span class="ident">DeviceId</span>, <span class="ident">UserId</span>},
+        <span class="ident">DeviceId</span>, <span class="ident">UserId</span>,
     };
 
     <span class="kw">use</span> <span class="kw">super</span>::{<span class="ident">Accepted</span>, <span class="ident">Created</span>, <span class="ident">SasState</span>, <span class="ident">Started</span>};

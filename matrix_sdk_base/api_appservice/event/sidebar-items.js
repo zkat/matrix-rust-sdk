@@ -1,1 +1,0 @@
-initSidebarItems({"mod":[["push_events","Endpoint to push an event (or batch of events) to the application service."]]});

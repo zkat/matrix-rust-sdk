@@ -372,7 +372,6 @@
 <span id="370">370</span>
 <span id="371">371</span>
 <span id="372">372</span>
-<span id="373">373</span>
 </pre><pre class="rust">
 <span class="comment">// Copyright 2020 The Matrix.org Foundation C.I.C.</span>
 <span class="comment">//</span>
@@ -397,17 +396,16 @@
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">not</span>(<span class="ident">target_arch</span> <span class="op">=</span> <span class="string">&quot;wasm32&quot;</span>)))]</span>
 <span class="kw">use</span> <span class="ident">http::StatusCode</span>;
 <span class="kw">use</span> <span class="ident">http</span>::{<span class="ident">HeaderValue</span>, <span class="ident">Response</span> <span class="kw">as</span> <span class="ident">HttpResponse</span>};
-<span class="kw">use</span> <span class="ident">matrix_sdk_common</span>::{
-    <span class="ident">api::r0::media::create_content</span>, <span class="ident">async_trait</span>, <span class="ident">locks::RwLock</span>, <span class="ident">AsyncTraitDeps</span>, <span class="ident">AuthScheme</span>,
-    <span class="ident">FromHttpResponseError</span>, <span class="ident">IncomingResponse</span>, <span class="ident">SendAccessToken</span>,
-};
+<span class="kw">use</span> <span class="ident">matrix_sdk_common</span>::{<span class="ident">async_trait</span>, <span class="ident">locks::RwLock</span>, <span class="ident">AsyncTraitDeps</span>};
 <span class="kw">use</span> <span class="ident">reqwest</span>::{<span class="ident">Client</span>, <span class="ident">Response</span>};
+<span class="kw">use</span> <span class="ident">ruma::api</span>::{
+    <span class="ident">client::r0::media::create_content</span>, <span class="ident">error::FromHttpResponseError</span>, <span class="ident">AuthScheme</span>, <span class="ident">IncomingResponse</span>,
+    <span class="ident">OutgoingRequest</span>, <span class="ident">SendAccessToken</span>,
+};
 <span class="kw">use</span> <span class="ident">tracing::trace</span>;
 <span class="kw">use</span> <span class="ident">url::Url</span>;
 
-<span class="kw">use</span> <span class="kw">crate</span>::{
-    <span class="ident">error::HttpError</span>, <span class="ident">Bytes</span>, <span class="ident">BytesMut</span>, <span class="ident">ClientConfig</span>, <span class="ident">OutgoingRequest</span>, <span class="ident">RequestConfig</span>, <span class="ident">Session</span>,
-};
+<span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">error::HttpError</span>, <span class="ident">Bytes</span>, <span class="ident">BytesMut</span>, <span class="ident">ClientConfig</span>, <span class="ident">RequestConfig</span>, <span class="ident">Session</span>};
 
 <span class="doccomment">/// Abstraction around the http layer. The allows implementors to use different</span>
 <span class="doccomment">/// http libraries.</span>
@@ -479,7 +477,7 @@
 }
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;appservice&quot;</span>)]</span>
-<span class="kw">use</span> <span class="kw">crate</span><span class="ident">::OutgoingRequestAppserviceExt</span>;
+<span class="kw">use</span> <span class="ident">ruma::api::OutgoingRequestAppserviceExt</span>;
 
 <span class="kw">impl</span> <span class="ident">HttpClient</span> {
     <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">new</span>(
@@ -744,7 +742,7 @@
         <span class="ident">request</span>: <span class="ident">http::Request</span><span class="op">&lt;</span><span class="ident">Bytes</span><span class="op">&gt;</span>,
         <span class="ident">config</span>: <span class="ident">RequestConfig</span>,
     ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">http::Response</span><span class="op">&lt;</span><span class="ident">Bytes</span><span class="op">&gt;</span>, <span class="ident">HttpError</span><span class="op">&gt;</span> {
-        <span class="ident">send_request</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">request</span>, <span class="ident">config</span>).<span class="kw">await</span>
+        <span class="ident">send_request</span>(<span class="self">self</span>, <span class="ident">request</span>, <span class="ident">config</span>).<span class="kw">await</span>
     }
 }
 </pre></div>
