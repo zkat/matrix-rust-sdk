@@ -3859,6 +3859,12 @@
 <span id="3857">3857</span>
 <span id="3858">3858</span>
 <span id="3859">3859</span>
+<span id="3860">3860</span>
+<span id="3861">3861</span>
+<span id="3862">3862</span>
+<span id="3863">3863</span>
+<span id="3864">3864</span>
+<span id="3865">3865</span>
 </pre><pre class="rust">
 <span class="comment">// Copyright 2020 Damir Jelić</span>
 <span class="comment">// Copyright 2020 The Matrix.org Foundation C.I.C.</span>
@@ -4342,8 +4348,8 @@
 
     <span class="doccomment">/// Force sending authorization even if the endpoint does not require it.</span>
     <span class="doccomment">/// Default is only sending authorization if it is required</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;require_auth_for_profile_requests&quot;</span>)]</span>
-    <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;docs&quot;</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">require_auth_for_profile_requests</span>)))]</span>
+    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">any</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;require_auth_for_profile_requests&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;appservice&quot;</span>))]</span>
+    <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;docs&quot;</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">any</span>(<span class="ident">require_auth_for_profile_requests</span>, <span class="ident">appservice</span>))))]</span>
     <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">force_auth</span>(<span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
         <span class="self">self</span>.<span class="ident">force_auth</span> <span class="op">=</span> <span class="bool-val">true</span>;
         <span class="self">self</span>
@@ -5225,8 +5231,14 @@
     ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">register::Response</span><span class="op">&gt;</span> {
         <span class="macro">info!</span>(<span class="string">&quot;Registering to {}&quot;</span>, <span class="self">self</span>.<span class="ident">homeserver</span>().<span class="kw">await</span>);
 
+        <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;appservice&quot;</span>))]</span>
+        <span class="kw">let</span> <span class="ident">config</span> <span class="op">=</span> <span class="prelude-val">None</span>;
+
+        <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;appservice&quot;</span>)]</span>
+        <span class="kw">let</span> <span class="ident">config</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="self">self</span>.<span class="ident">http_client</span>.<span class="ident">request_config</span>.<span class="ident">force_auth</span>());
+
         <span class="kw">let</span> <span class="ident">request</span> <span class="op">=</span> <span class="ident">registration</span>.<span class="ident">into</span>();
-        <span class="self">self</span>.<span class="ident">send</span>(<span class="ident">request</span>, <span class="prelude-val">None</span>).<span class="kw">await</span>
+        <span class="self">self</span>.<span class="ident">send</span>(<span class="ident">request</span>, <span class="ident">config</span>).<span class="kw">await</span>
     }
 
     <span class="doccomment">/// Get or upload a sync filter.</span>

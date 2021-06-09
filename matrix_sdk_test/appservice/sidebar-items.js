@@ -1,0 +1,1 @@
+initSidebarItems({"fn":[["value_with_room_id","Clones the given [`Value`] and adds a `room_id` to it"]],"struct":[["TransactionBuilder","The `TransactionBuilder` struct can be used to easily generate valid incoming appservice transactions in json value format for testing."]]});
