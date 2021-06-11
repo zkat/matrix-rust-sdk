@@ -3877,6 +3877,27 @@
 <span id="3875">3875</span>
 <span id="3876">3876</span>
 <span id="3877">3877</span>
+<span id="3878">3878</span>
+<span id="3879">3879</span>
+<span id="3880">3880</span>
+<span id="3881">3881</span>
+<span id="3882">3882</span>
+<span id="3883">3883</span>
+<span id="3884">3884</span>
+<span id="3885">3885</span>
+<span id="3886">3886</span>
+<span id="3887">3887</span>
+<span id="3888">3888</span>
+<span id="3889">3889</span>
+<span id="3890">3890</span>
+<span id="3891">3891</span>
+<span id="3892">3892</span>
+<span id="3893">3893</span>
+<span id="3894">3894</span>
+<span id="3895">3895</span>
+<span id="3896">3896</span>
+<span id="3897">3897</span>
+<span id="3898">3898</span>
 </pre><pre class="rust">
 <span class="comment">// Copyright 2020 Damir Jelić</span>
 <span class="comment">// Copyright 2020 The Matrix.org Foundation C.I.C.</span>
@@ -3980,7 +4001,7 @@
     <span class="ident">api</span>::{
         <span class="ident">client</span>::{
             <span class="ident">r0</span>::{
-                <span class="ident">account::register</span>,
+                <span class="ident">account</span>::{<span class="ident">register</span>, <span class="ident">whoami</span>},
                 <span class="ident">device</span>::{<span class="ident">delete_devices</span>, <span class="ident">get_devices</span>},
                 <span class="ident">directory</span>::{<span class="ident">get_public_rooms</span>, <span class="ident">get_public_rooms_filtered</span>},
                 <span class="ident">filter</span>::{<span class="ident">create_filter::Request</span> <span class="kw">as</span> <span class="ident">FilterUploadRequest</span>, <span class="ident">FilterDefinition</span>},
@@ -6578,6 +6599,12 @@
 
         <span class="prelude-val">Ok</span>(())
     }
+
+    <span class="doccomment">/// Gets information about the owner of a given access token.</span>
+    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">whoami</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">whoami::Response</span><span class="op">&gt;</span> {
+        <span class="kw">let</span> <span class="ident">request</span> <span class="op">=</span> <span class="ident">whoami::Request::new</span>();
+        <span class="self">self</span>.<span class="ident">send</span>(<span class="ident">request</span>, <span class="prelude-val">None</span>).<span class="kw">await</span>
+    }
 }
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
@@ -7753,6 +7780,21 @@
             .<span class="kw">await</span>
             .<span class="ident">is_ok</span>());
         <span class="ident">m</span>.<span class="ident">assert</span>();
+    }
+
+    <span class="attribute">#[<span class="ident">tokio::test</span>]</span>
+    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">whoami</span>() {
+        <span class="kw">let</span> <span class="ident">client</span> <span class="op">=</span> <span class="ident">logged_in_client</span>().<span class="kw">await</span>;
+
+        <span class="kw">let</span> <span class="ident">_m</span> <span class="op">=</span> <span class="ident">mock</span>(<span class="string">&quot;GET&quot;</span>, <span class="string">&quot;/_matrix/client/r0/account/whoami&quot;</span>)
+            .<span class="ident">with_status</span>(<span class="number">200</span>)
+            .<span class="ident">with_body</span>(<span class="ident">test_json::WHOAMI</span>.<span class="ident">to_string</span>())
+            .<span class="ident">match_header</span>(<span class="string">&quot;authorization&quot;</span>, <span class="string">&quot;Bearer 1234&quot;</span>)
+            .<span class="ident">create</span>();
+
+        <span class="kw">let</span> <span class="ident">user_id</span> <span class="op">=</span> <span class="macro">user_id!</span>(<span class="string">&quot;@joe:example.org&quot;</span>);
+
+        <span class="macro">assert_eq!</span>(<span class="ident">client</span>.<span class="ident">whoami</span>().<span class="kw">await</span>.<span class="ident">unwrap</span>().<span class="ident">user_id</span>, <span class="ident">user_id</span>);
     }
 }
 </pre></div>
