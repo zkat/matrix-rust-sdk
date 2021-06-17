@@ -1,0 +1,1 @@
+initSidebarItems({"enum":[["Verification","An enum over the different verification types the SDK supports."]],"struct":[["QrVerification","An object controlling QR code style key verification flows."],["SasVerification","An object controlling the interactive verification flow."],["VerificationRequest","An object controlling the interactive verification flow."]]});

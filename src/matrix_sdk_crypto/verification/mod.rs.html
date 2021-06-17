@@ -545,6 +545,85 @@
 <span id="543">543</span>
 <span id="544">544</span>
 <span id="545">545</span>
+<span id="546">546</span>
+<span id="547">547</span>
+<span id="548">548</span>
+<span id="549">549</span>
+<span id="550">550</span>
+<span id="551">551</span>
+<span id="552">552</span>
+<span id="553">553</span>
+<span id="554">554</span>
+<span id="555">555</span>
+<span id="556">556</span>
+<span id="557">557</span>
+<span id="558">558</span>
+<span id="559">559</span>
+<span id="560">560</span>
+<span id="561">561</span>
+<span id="562">562</span>
+<span id="563">563</span>
+<span id="564">564</span>
+<span id="565">565</span>
+<span id="566">566</span>
+<span id="567">567</span>
+<span id="568">568</span>
+<span id="569">569</span>
+<span id="570">570</span>
+<span id="571">571</span>
+<span id="572">572</span>
+<span id="573">573</span>
+<span id="574">574</span>
+<span id="575">575</span>
+<span id="576">576</span>
+<span id="577">577</span>
+<span id="578">578</span>
+<span id="579">579</span>
+<span id="580">580</span>
+<span id="581">581</span>
+<span id="582">582</span>
+<span id="583">583</span>
+<span id="584">584</span>
+<span id="585">585</span>
+<span id="586">586</span>
+<span id="587">587</span>
+<span id="588">588</span>
+<span id="589">589</span>
+<span id="590">590</span>
+<span id="591">591</span>
+<span id="592">592</span>
+<span id="593">593</span>
+<span id="594">594</span>
+<span id="595">595</span>
+<span id="596">596</span>
+<span id="597">597</span>
+<span id="598">598</span>
+<span id="599">599</span>
+<span id="600">600</span>
+<span id="601">601</span>
+<span id="602">602</span>
+<span id="603">603</span>
+<span id="604">604</span>
+<span id="605">605</span>
+<span id="606">606</span>
+<span id="607">607</span>
+<span id="608">608</span>
+<span id="609">609</span>
+<span id="610">610</span>
+<span id="611">611</span>
+<span id="612">612</span>
+<span id="613">613</span>
+<span id="614">614</span>
+<span id="615">615</span>
+<span id="616">616</span>
+<span id="617">617</span>
+<span id="618">618</span>
+<span id="619">619</span>
+<span id="620">620</span>
+<span id="621">621</span>
+<span id="622">622</span>
+<span id="623">623</span>
+<span id="624">624</span>
 </pre><pre class="rust">
 <span class="comment">// Copyright 2020 The Matrix.org Foundation C.I.C.</span>
 <span class="comment">//</span>
@@ -563,6 +642,7 @@
 <span class="kw">mod</span> <span class="ident">cache</span>;
 <span class="kw">mod</span> <span class="ident">event_enums</span>;
 <span class="kw">mod</span> <span class="ident">machine</span>;
+<span class="kw">mod</span> <span class="ident">qrcode</span>;
 <span class="kw">mod</span> <span class="ident">requests</span>;
 <span class="kw">mod</span> <span class="ident">sas</span>;
 
@@ -570,6 +650,7 @@
 
 <span class="kw">use</span> <span class="ident">event_enums::OutgoingContent</span>;
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">machine::VerificationMachine</span>;
+<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">qrcode::QrVerification</span>;
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">requests::VerificationRequest</span>;
 <span class="kw">use</span> <span class="ident">ruma</span>::{
     <span class="ident">api::client::r0::keys::upload_signatures::Request</span> <span class="kw">as</span> <span class="ident">SignatureUploadRequest</span>,
@@ -589,25 +670,83 @@
 <span class="kw">use</span> <span class="kw">crate</span>::{
     <span class="ident">error::SignatureError</span>,
     <span class="ident">olm::PrivateCrossSigningIdentity</span>,
-    <span class="ident">store</span>::{<span class="ident">Changes</span>, <span class="ident">CryptoStore</span>, <span class="ident">DeviceChanges</span>},
+    <span class="ident">store</span>::{<span class="ident">Changes</span>, <span class="ident">CryptoStore</span>},
     <span class="ident">CryptoStoreError</span>, <span class="ident">LocalTrust</span>, <span class="ident">ReadOnlyDevice</span>, <span class="ident">UserIdentities</span>,
 };
 
+<span class="doccomment">/// An enum over the different verification types the SDK supports.</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>)]</span>
 <span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">Verification</span> {
+    <span class="doccomment">/// The `m.sas.v1` verification variant.</span>
     <span class="ident">SasV1</span>(<span class="ident">Sas</span>),
+    <span class="doccomment">/// The `m.qr_code.*.v1` verification variant.</span>
+    <span class="ident">QrV1</span>(<span class="ident">QrVerification</span>),
 }
 
 <span class="kw">impl</span> <span class="ident">Verification</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_done</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
-        <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">Verification::SasV1</span>(<span class="ident">s</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">s</span>.<span class="ident">is_done</span>(),
+    <span class="doccomment">/// Try to deconstruct this verification enum into a SAS verification.</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">sas_v1</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Sas</span><span class="op">&gt;</span> {
+        <span class="kw">if</span> <span class="kw">let</span> <span class="ident">Verification::SasV1</span>(<span class="ident">sas</span>) <span class="op">=</span> <span class="self">self</span> {
+            <span class="prelude-val">Some</span>(<span class="ident">sas</span>)
+        } <span class="kw">else</span> {
+            <span class="prelude-val">None</span>
         }
     }
 
+    <span class="doccomment">/// Try to deconstruct this verification enum into a QR code verification.</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">qr_v1</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">QrVerification</span><span class="op">&gt;</span> {
+        <span class="kw">if</span> <span class="kw">let</span> <span class="ident">Verification::QrV1</span>(<span class="ident">qr</span>) <span class="op">=</span> <span class="self">self</span> {
+            <span class="prelude-val">Some</span>(<span class="ident">qr</span>)
+        } <span class="kw">else</span> {
+            <span class="prelude-val">None</span>
+        }
+    }
+
+    <span class="doccomment">/// Has this verification finished.</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_done</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+        <span class="kw">match</span> <span class="self">self</span> {
+            <span class="ident">Verification::SasV1</span>(<span class="ident">s</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">s</span>.<span class="ident">is_done</span>(),
+            <span class="ident">Verification::QrV1</span>(<span class="ident">qr</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">qr</span>.<span class="ident">is_done</span>(),
+        }
+    }
+
+    <span class="doccomment">/// Get the ID that uniquely identifies this verification flow.</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">flow_id</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="ident">str</span> {
+        <span class="kw">match</span> <span class="self">self</span> {
+            <span class="ident">Verification::SasV1</span>(<span class="ident">s</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">s</span>.<span class="ident">flow_id</span>().<span class="ident">as_str</span>(),
+            <span class="ident">Verification::QrV1</span>(<span class="ident">qr</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">qr</span>.<span class="ident">flow_id</span>().<span class="ident">as_str</span>(),
+        }
+    }
+
+    <span class="doccomment">/// Has the verification been cancelled.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_cancelled</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
         <span class="kw">match</span> <span class="self">self</span> {
             <span class="ident">Verification::SasV1</span>(<span class="ident">s</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">s</span>.<span class="ident">is_cancelled</span>(),
+            <span class="ident">Verification::QrV1</span>(<span class="ident">qr</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">qr</span>.<span class="ident">is_cancelled</span>(),
+        }
+    }
+
+    <span class="doccomment">/// Get our own user id that is participating in this verification.</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">user_id</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="ident">UserId</span> {
+        <span class="kw">match</span> <span class="self">self</span> {
+            <span class="ident">Verification::SasV1</span>(<span class="ident">v</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">v</span>.<span class="ident">user_id</span>(),
+            <span class="ident">Verification::QrV1</span>(<span class="ident">v</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">v</span>.<span class="ident">user_id</span>(),
+        }
+    }
+
+    <span class="doccomment">/// Get the other user id that is participating in this verification.</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">other_user</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="ident">UserId</span> {
+        <span class="kw">match</span> <span class="self">self</span> {
+            <span class="ident">Verification::SasV1</span>(<span class="ident">s</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">s</span>.<span class="ident">other_user_id</span>(),
+            <span class="ident">Verification::QrV1</span>(<span class="ident">qr</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">qr</span>.<span class="ident">other_user_id</span>(),
+        }
+    }
+
+    <span class="doccomment">/// Is this a verification verifying a device that belongs to us.</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_self_verification</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+        <span class="kw">match</span> <span class="self">self</span> {
+            <span class="ident">Verification::SasV1</span>(<span class="ident">v</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">v</span>.<span class="ident">is_self_verification</span>(),
+            <span class="ident">Verification::QrV1</span>(<span class="ident">v</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">v</span>.<span class="ident">is_self_verification</span>(),
         }
     }
 }
@@ -615,6 +754,12 @@
 <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">Sas</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Verification</span> {
     <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">sas</span>: <span class="ident">Sas</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
         <span class="self">Self</span><span class="ident">::SasV1</span>(<span class="ident">sas</span>)
+    }
+}
+
+<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">QrVerification</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Verification</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">qr</span>: <span class="ident">QrVerification</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+        <span class="self">Self</span><span class="ident">::QrV1</span>(<span class="ident">qr</span>)
     }
 }
 
@@ -762,8 +907,16 @@
 }
 
 <span class="kw">impl</span> <span class="ident">IdentitiesBeingVerified</span> {
+    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">can_sign_devices</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+        <span class="self">self</span>.<span class="ident">private_identity</span>.<span class="ident">can_sign_devices</span>().<span class="kw">await</span>
+    }
+
     <span class="kw">fn</span> <span class="ident">user_id</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="ident">UserId</span> {
         <span class="self">self</span>.<span class="ident">private_identity</span>.<span class="ident">user_id</span>()
+    }
+
+    <span class="kw">fn</span> <span class="ident">is_self_verification</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+        <span class="self">self</span>.<span class="ident">user_id</span>() <span class="op">=</span><span class="op">=</span> <span class="self">self</span>.<span class="ident">other_user_id</span>()
     }
 
     <span class="kw">fn</span> <span class="ident">other_user_id</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="ident">UserId</span> {
@@ -783,9 +936,18 @@
         <span class="ident">verified_devices</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span>[<span class="ident">ReadOnlyDevice</span>]<span class="op">&gt;</span>,
         <span class="ident">verified_identities</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span>[<span class="ident">UserIdentities</span>]<span class="op">&gt;</span>,
     ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">VerificationResult</span>, <span class="ident">CryptoStoreError</span><span class="op">&gt;</span> {
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">device</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">mark_device_as_verified</span>(<span class="ident">verified_devices</span>).<span class="kw">await</span><span class="question-mark">?</span> {
-            <span class="kw">let</span> <span class="ident">identity</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">mark_identity_as_verified</span>(<span class="ident">verified_identities</span>).<span class="kw">await</span><span class="question-mark">?</span>;
+        <span class="kw">let</span> <span class="ident">device</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">mark_device_as_verified</span>(<span class="ident">verified_devices</span>).<span class="kw">await</span><span class="question-mark">?</span>;
+        <span class="kw">let</span> <span class="ident">identity</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">mark_identity_as_verified</span>(<span class="ident">verified_identities</span>).<span class="kw">await</span><span class="question-mark">?</span>;
 
+        <span class="kw">if</span> <span class="ident">device</span>.<span class="ident">is_none</span>() <span class="op">&amp;&amp;</span> <span class="ident">identity</span>.<span class="ident">is_none</span>() {
+            <span class="comment">// Something wen&#39;t wrong if nothing was verified, we use key</span>
+            <span class="comment">// mismatch here, since it&#39;s the closest to nothing was verified</span>
+            <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="ident">VerificationResult::Cancel</span>(<span class="ident">CancelCode::KeyMismatch</span>));
+        }
+
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">changes</span> <span class="op">=</span> <span class="ident">Changes::default</span>();
+
+        <span class="kw">let</span> <span class="ident">signature_request</span> <span class="op">=</span> <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">device</span>) <span class="op">=</span> <span class="ident">device</span> {
             <span class="comment">// We only sign devices of our own user here.</span>
             <span class="kw">let</span> <span class="ident">signature_request</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">device</span>.<span class="ident">user_id</span>() <span class="op">=</span><span class="op">=</span> <span class="self">self</span>.<span class="ident">user_id</span>() {
                 <span class="kw">match</span> <span class="self">self</span>.<span class="ident">private_identity</span>.<span class="ident">sign_device</span>(<span class="kw-2">&amp;</span><span class="ident">device</span>).<span class="kw">await</span> {
@@ -814,69 +976,67 @@
                 <span class="prelude-val">None</span>
             };
 
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">changes</span> <span class="op">=</span> <span class="ident">Changes</span> {
-                <span class="ident">devices</span>: <span class="ident">DeviceChanges</span> { <span class="ident">changed</span>: <span class="macro">vec!</span>[<span class="ident">device</span>], ..<span class="ident">Default::default</span>() },
-                ..<span class="ident">Default::default</span>()
-            };
+            <span class="ident">changes</span>.<span class="ident">devices</span>.<span class="ident">changed</span>.<span class="ident">push</span>(<span class="ident">device</span>);
+            <span class="ident">signature_request</span>
+        } <span class="kw">else</span> {
+            <span class="prelude-val">None</span>
+        };
 
-            <span class="kw">let</span> <span class="ident">identity_signature_request</span> <span class="op">=</span> <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">i</span>) <span class="op">=</span> <span class="ident">identity</span> {
-                <span class="comment">// We only sign other users here.</span>
-                <span class="kw">let</span> <span class="ident">request</span> <span class="op">=</span> <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">i</span>) <span class="op">=</span> <span class="ident">i</span>.<span class="ident">other</span>() {
-                    <span class="comment">// Signing can fail if the user signing key is missing.</span>
-                    <span class="kw">match</span> <span class="self">self</span>.<span class="ident">private_identity</span>.<span class="ident">sign_user</span>(<span class="ident">i</span>).<span class="kw">await</span> {
-                        <span class="prelude-val">Ok</span>(<span class="ident">r</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="ident">r</span>),
-                        <span class="prelude-val">Err</span>(<span class="ident">SignatureError::MissingSigningKey</span>) <span class="op">=</span><span class="op">&gt;</span> {
-                            <span class="macro">warn!</span>(
-                                <span class="string">&quot;Can&#39;t sign the public cross signing keys for {}, \
-                                  no private user signing key found&quot;</span>,
-                                <span class="ident">i</span>.<span class="ident">user_id</span>()
-                            );
-                            <span class="prelude-val">None</span>
-                        }
-                        <span class="prelude-val">Err</span>(<span class="ident">e</span>) <span class="op">=</span><span class="op">&gt;</span> {
-                            <span class="macro">error!</span>(
-                                <span class="string">&quot;Error signing the public cross signing keys for {} {:?}&quot;</span>,
-                                <span class="ident">i</span>.<span class="ident">user_id</span>(),
-                                <span class="ident">e</span>
-                            );
-                            <span class="prelude-val">None</span>
-                        }
+        <span class="kw">let</span> <span class="ident">identity_signature_request</span> <span class="op">=</span> <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">i</span>) <span class="op">=</span> <span class="ident">identity</span> {
+            <span class="comment">// We only sign other users here.</span>
+            <span class="kw">let</span> <span class="ident">request</span> <span class="op">=</span> <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">i</span>) <span class="op">=</span> <span class="ident">i</span>.<span class="ident">other</span>() {
+                <span class="comment">// Signing can fail if the user signing key is missing.</span>
+                <span class="kw">match</span> <span class="self">self</span>.<span class="ident">private_identity</span>.<span class="ident">sign_user</span>(<span class="ident">i</span>).<span class="kw">await</span> {
+                    <span class="prelude-val">Ok</span>(<span class="ident">r</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="ident">r</span>),
+                    <span class="prelude-val">Err</span>(<span class="ident">SignatureError::MissingSigningKey</span>) <span class="op">=</span><span class="op">&gt;</span> {
+                        <span class="macro">warn!</span>(
+                            <span class="string">&quot;Can&#39;t sign the public cross signing keys for {}, \
+                              no private user signing key found&quot;</span>,
+                            <span class="ident">i</span>.<span class="ident">user_id</span>()
+                        );
+                        <span class="prelude-val">None</span>
                     }
-                } <span class="kw">else</span> {
-                    <span class="prelude-val">None</span>
-                };
-
-                <span class="ident">changes</span>.<span class="ident">identities</span>.<span class="ident">changed</span>.<span class="ident">push</span>(<span class="ident">i</span>);
-
-                <span class="ident">request</span>
+                    <span class="prelude-val">Err</span>(<span class="ident">e</span>) <span class="op">=</span><span class="op">&gt;</span> {
+                        <span class="macro">error!</span>(
+                            <span class="string">&quot;Error signing the public cross signing keys for {} {:?}&quot;</span>,
+                            <span class="ident">i</span>.<span class="ident">user_id</span>(),
+                            <span class="ident">e</span>
+                        );
+                        <span class="prelude-val">None</span>
+                    }
+                }
             } <span class="kw">else</span> {
                 <span class="prelude-val">None</span>
             };
 
-            <span class="comment">// If there are two signature upload requests, merge them. Otherwise</span>
-            <span class="comment">// use the one we have or None.</span>
-            <span class="comment">//</span>
-            <span class="comment">// Realistically at most one request will be used but let&#39;s make</span>
-            <span class="comment">// this future proof.</span>
-            <span class="kw">let</span> <span class="ident">merged_request</span> <span class="op">=</span> <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="kw-2">mut</span> <span class="ident">r</span>) <span class="op">=</span> <span class="ident">signature_request</span> {
-                <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">user_request</span>) <span class="op">=</span> <span class="ident">identity_signature_request</span> {
-                    <span class="ident">r</span>.<span class="ident">signed_keys</span>.<span class="ident">extend</span>(<span class="ident">user_request</span>.<span class="ident">signed_keys</span>);
-                    <span class="prelude-val">Some</span>(<span class="ident">r</span>)
-                } <span class="kw">else</span> {
-                    <span class="prelude-val">Some</span>(<span class="ident">r</span>)
-                }
-            } <span class="kw">else</span> {
-                <span class="ident">identity_signature_request</span>
-            };
-
-            <span class="comment">// TODO store the signature upload request as well.</span>
-            <span class="self">self</span>.<span class="ident">store</span>.<span class="ident">save_changes</span>(<span class="ident">changes</span>).<span class="kw">await</span><span class="question-mark">?</span>;
-            <span class="prelude-val">Ok</span>(<span class="ident">merged_request</span>
-                .<span class="ident">map</span>(<span class="ident">VerificationResult::SignatureUpload</span>)
-                .<span class="ident">unwrap_or</span>(<span class="ident">VerificationResult::Ok</span>))
+            <span class="ident">changes</span>.<span class="ident">identities</span>.<span class="ident">changed</span>.<span class="ident">push</span>(<span class="ident">i</span>);
+            <span class="ident">request</span>
         } <span class="kw">else</span> {
-            <span class="prelude-val">Ok</span>(<span class="ident">VerificationResult::Cancel</span>(<span class="ident">CancelCode::UserMismatch</span>))
-        }
+            <span class="prelude-val">None</span>
+        };
+
+        <span class="comment">// If there are two signature upload requests, merge them. Otherwise</span>
+        <span class="comment">// use the one we have or None.</span>
+        <span class="comment">//</span>
+        <span class="comment">// Realistically at most one request will be used but let&#39;s make</span>
+        <span class="comment">// this future proof.</span>
+        <span class="kw">let</span> <span class="ident">merged_request</span> <span class="op">=</span> <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="kw-2">mut</span> <span class="ident">r</span>) <span class="op">=</span> <span class="ident">signature_request</span> {
+            <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">user_request</span>) <span class="op">=</span> <span class="ident">identity_signature_request</span> {
+                <span class="ident">r</span>.<span class="ident">signed_keys</span>.<span class="ident">extend</span>(<span class="ident">user_request</span>.<span class="ident">signed_keys</span>);
+                <span class="prelude-val">Some</span>(<span class="ident">r</span>)
+            } <span class="kw">else</span> {
+                <span class="prelude-val">Some</span>(<span class="ident">r</span>)
+            }
+        } <span class="kw">else</span> {
+            <span class="ident">identity_signature_request</span>
+        };
+
+        <span class="comment">// TODO store the signature upload request as well.</span>
+        <span class="self">self</span>.<span class="ident">store</span>.<span class="ident">save_changes</span>(<span class="ident">changes</span>).<span class="kw">await</span><span class="question-mark">?</span>;
+
+        <span class="prelude-val">Ok</span>(<span class="ident">merged_request</span>
+            .<span class="ident">map</span>(<span class="ident">VerificationResult::SignatureUpload</span>)
+            .<span class="ident">unwrap_or</span>(<span class="ident">VerificationResult::Ok</span>))
     }
 
     <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">mark_identity_as_verified</span>(
@@ -889,8 +1049,6 @@
             <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="prelude-val">None</span>);
         }
 
-        <span class="comment">// TODO signal an error, e.g. when the identity got deleted so we don&#39;t</span>
-        <span class="comment">// verify/save the device either.</span>
         <span class="kw">let</span> <span class="ident">identity</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">store</span>.<span class="ident">get_user_identity</span>(<span class="self">self</span>.<span class="ident">other_user_id</span>()).<span class="kw">await</span><span class="question-mark">?</span>;
 
         <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">identity</span>) <span class="op">=</span> <span class="ident">identity</span> {

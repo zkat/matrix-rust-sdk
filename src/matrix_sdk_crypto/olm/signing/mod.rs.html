@@ -534,6 +534,21 @@
 <span id="532">532</span>
 <span id="533">533</span>
 <span id="534">534</span>
+<span id="535">535</span>
+<span id="536">536</span>
+<span id="537">537</span>
+<span id="538">538</span>
+<span id="539">539</span>
+<span id="540">540</span>
+<span id="541">541</span>
+<span id="542">542</span>
+<span id="543">543</span>
+<span id="544">544</span>
+<span id="545">545</span>
+<span id="546">546</span>
+<span id="547">547</span>
+<span id="548">548</span>
+<span id="549">549</span>
 </pre><pre class="rust">
 <span class="comment">// Copyright 2020 The Matrix.org Foundation C.I.C.</span>
 <span class="comment">//</span>
@@ -570,8 +585,8 @@
 <span class="kw">use</span> <span class="ident">serde_json::Error</span> <span class="kw">as</span> <span class="ident">JsonError</span>;
 
 <span class="kw">use</span> <span class="kw">crate</span>::{
-    <span class="ident">error::SignatureError</span>, <span class="ident">requests::UploadSigningKeysRequest</span>, <span class="ident">OwnUserIdentity</span>, <span class="ident">ReadOnlyAccount</span>,
-    <span class="ident">ReadOnlyDevice</span>, <span class="ident">UserIdentity</span>,
+    <span class="ident">error::SignatureError</span>, <span class="ident">identities::MasterPubkey</span>, <span class="ident">requests::UploadSigningKeysRequest</span>,
+    <span class="ident">OwnUserIdentity</span>, <span class="ident">ReadOnlyAccount</span>, <span class="ident">ReadOnlyDevice</span>, <span class="ident">UserIdentity</span>,
 };
 
 <span class="doccomment">/// Private cross signing identity.</span>
@@ -628,6 +643,21 @@
         <span class="op">!</span>(<span class="ident">has_master</span> <span class="op">&amp;&amp;</span> <span class="ident">has_user</span> <span class="op">&amp;&amp;</span> <span class="ident">has_self</span>)
     }
 
+    <span class="doccomment">/// Can we sign our own devices, i.e. do we have a self signing key.</span>
+    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">can_sign_devices</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+        <span class="self">self</span>.<span class="ident">self_signing_key</span>.<span class="ident">lock</span>().<span class="kw">await</span>.<span class="ident">is_some</span>()
+    }
+
+    <span class="doccomment">/// Do we have the master key.</span>
+    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">has_master_key</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+        <span class="self">self</span>.<span class="ident">master_key</span>.<span class="ident">lock</span>().<span class="kw">await</span>.<span class="ident">is_some</span>()
+    }
+
+    <span class="doccomment">/// Get the public part of the master key, if we have one.</span>
+    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">master_public_key</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">MasterPubkey</span><span class="op">&gt;</span> {
+        <span class="self">self</span>.<span class="ident">master_key</span>.<span class="ident">lock</span>().<span class="kw">await</span>.<span class="ident">as_ref</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">m</span><span class="op">|</span> <span class="ident">m</span>.<span class="ident">public_key</span>.<span class="ident">to_owned</span>())
+    }
+
     <span class="doccomment">/// Create a new empty identity.</span>
     <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">empty</span>(<span class="ident">user_id</span>: <span class="ident">UserId</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
         <span class="self">Self</span> {
@@ -639,7 +669,7 @@
         }
     }
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">as_public_identity</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">OwnUserIdentity</span>, <span class="ident">SignatureError</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">to_public_identity</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">OwnUserIdentity</span>, <span class="ident">SignatureError</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">master</span> <span class="op">=</span> <span class="self">self</span>
             .<span class="ident">master_key</span>
             .<span class="ident">lock</span>()

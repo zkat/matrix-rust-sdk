@@ -368,6 +368,20 @@
 <span id="366">366</span>
 <span id="367">367</span>
 <span id="368">368</span>
+<span id="369">369</span>
+<span id="370">370</span>
+<span id="371">371</span>
+<span id="372">372</span>
+<span id="373">373</span>
+<span id="374">374</span>
+<span id="375">375</span>
+<span id="376">376</span>
+<span id="377">377</span>
+<span id="378">378</span>
+<span id="379">379</span>
+<span id="380">380</span>
+<span id="381">381</span>
+<span id="382">382</span>
 </pre><pre class="rust">
 <span class="comment">// Copyright 2020 The Matrix.org Foundation C.I.C.</span>
 <span class="comment">//</span>
@@ -430,6 +444,20 @@
         <span class="kw">let</span> <span class="ident">sas</span> <span class="op">=</span> <span class="ident">SasState</span>::<span class="op">&lt;</span><span class="ident">Created</span><span class="op">&gt;</span><span class="ident">::new</span>(<span class="ident">account</span>, <span class="ident">other_device</span>, <span class="ident">other_identity</span>, <span class="ident">transaction_id</span>);
         <span class="kw">let</span> <span class="ident">content</span> <span class="op">=</span> <span class="ident">sas</span>.<span class="ident">as_content</span>();
         (<span class="ident">InnerSas::Created</span>(<span class="ident">sas</span>), <span class="ident">content</span>.<span class="ident">into</span>())
+    }
+
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">started_from_request</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+        <span class="kw">match</span> <span class="self">self</span> {
+            <span class="ident">InnerSas::Created</span>(<span class="ident">s</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">s</span>.<span class="ident">started_from_request</span>,
+            <span class="ident">InnerSas::Started</span>(<span class="ident">s</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">s</span>.<span class="ident">started_from_request</span>,
+            <span class="ident">InnerSas::Accepted</span>(<span class="ident">s</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">s</span>.<span class="ident">started_from_request</span>,
+            <span class="ident">InnerSas::KeyReceived</span>(<span class="ident">s</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">s</span>.<span class="ident">started_from_request</span>,
+            <span class="ident">InnerSas::Confirmed</span>(<span class="ident">s</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">s</span>.<span class="ident">started_from_request</span>,
+            <span class="ident">InnerSas::MacReceived</span>(<span class="ident">s</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">s</span>.<span class="ident">started_from_request</span>,
+            <span class="ident">InnerSas::WaitingForDone</span>(<span class="ident">s</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">s</span>.<span class="ident">started_from_request</span>,
+            <span class="ident">InnerSas::Done</span>(<span class="ident">s</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">s</span>.<span class="ident">started_from_request</span>,
+            <span class="ident">InnerSas::Cancelled</span>(<span class="ident">s</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">s</span>.<span class="ident">started_from_request</span>,
+        }
     }
 
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">supports_emoji</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {

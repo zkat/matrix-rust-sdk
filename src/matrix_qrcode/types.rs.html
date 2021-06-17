@@ -708,7 +708,7 @@
 
 <span class="doccomment">/// An enum representing the different modes a QR verification can be in.</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">PartialEq</span>)]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">QrVerification</span> {
+<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">QrVerificationData</span> {
     <span class="doccomment">/// The QR verification is verifying another user</span>
     <span class="ident">Verification</span>(<span class="ident">VerificationData</span>),
     <span class="doccomment">/// The QR verification is self-verifying and the current device trusts or</span>
@@ -721,7 +721,7 @@
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;decode_image&quot;</span>)]</span>
 <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;docs&quot;</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">decode_image</span>)))]</span>
-<span class="kw">impl</span> <span class="ident">TryFrom</span><span class="op">&lt;</span><span class="ident">DynamicImage</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">QrVerification</span> {
+<span class="kw">impl</span> <span class="ident">TryFrom</span><span class="op">&lt;</span><span class="ident">DynamicImage</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">QrVerificationData</span> {
     <span class="kw">type</span> <span class="ident">Error</span> <span class="op">=</span> <span class="ident">DecodingError</span>;
 
     <span class="kw">fn</span> <span class="ident">try_from</span>(<span class="ident">image</span>: <span class="ident">DynamicImage</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="self">Self</span><span class="ident">::Error</span><span class="op">&gt;</span> {
@@ -731,7 +731,7 @@
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;decode_image&quot;</span>)]</span>
 <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;docs&quot;</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">decode_image</span>)))]</span>
-<span class="kw">impl</span> <span class="ident">TryFrom</span><span class="op">&lt;</span><span class="ident">ImageBuffer</span><span class="op">&lt;</span><span class="ident">Luma</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>, <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">QrVerification</span> {
+<span class="kw">impl</span> <span class="ident">TryFrom</span><span class="op">&lt;</span><span class="ident">ImageBuffer</span><span class="op">&lt;</span><span class="ident">Luma</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>, <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">QrVerificationData</span> {
     <span class="kw">type</span> <span class="ident">Error</span> <span class="op">=</span> <span class="ident">DecodingError</span>;
 
     <span class="kw">fn</span> <span class="ident">try_from</span>(<span class="ident">image</span>: <span class="ident">ImageBuffer</span><span class="op">&lt;</span><span class="ident">Luma</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>, <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="self">Self</span><span class="ident">::Error</span><span class="op">&gt;</span> {
@@ -739,7 +739,7 @@
     }
 }
 
-<span class="kw">impl</span> <span class="ident">TryFrom</span><span class="op">&lt;</span><span class="kw-2">&amp;</span>[<span class="ident">u8</span>]<span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">QrVerification</span> {
+<span class="kw">impl</span> <span class="ident">TryFrom</span><span class="op">&lt;</span><span class="kw-2">&amp;</span>[<span class="ident">u8</span>]<span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">QrVerificationData</span> {
     <span class="kw">type</span> <span class="ident">Error</span> <span class="op">=</span> <span class="ident">DecodingError</span>;
 
     <span class="kw">fn</span> <span class="ident">try_from</span>(<span class="ident">value</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="self">Self</span><span class="ident">::Error</span><span class="op">&gt;</span> {
@@ -747,7 +747,7 @@
     }
 }
 
-<span class="kw">impl</span> <span class="ident">TryFrom</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">QrVerification</span> {
+<span class="kw">impl</span> <span class="ident">TryFrom</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">QrVerificationData</span> {
     <span class="kw">type</span> <span class="ident">Error</span> <span class="op">=</span> <span class="ident">DecodingError</span>;
 
     <span class="kw">fn</span> <span class="ident">try_from</span>(<span class="ident">value</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="self">Self</span><span class="ident">::Error</span><span class="op">&gt;</span> {
@@ -755,8 +755,8 @@
     }
 }
 
-<span class="kw">impl</span> <span class="ident">QrVerification</span> {
-    <span class="doccomment">/// Decode and parse an image of a QR code into a `QrVerification`</span>
+<span class="kw">impl</span> <span class="ident">QrVerificationData</span> {
+    <span class="doccomment">/// Decode and parse an image of a QR code into a `QrVerificationData`</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// The image will be converted into a grey scale image before decoding is</span>
     <span class="doccomment">/// attempted</span>
@@ -767,12 +767,12 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// # Example</span>
     <span class="doccomment">/// ```no_run</span>
-    <span class="doccomment">/// # use matrix_qrcode::{QrVerification, DecodingError};</span>
+    <span class="doccomment">/// # use matrix_qrcode::{QrVerificationData, DecodingError};</span>
     <span class="doccomment">/// # fn main() -&gt; Result&lt;(), DecodingError&gt; {</span>
     <span class="doccomment">/// use image;</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// let image = image::open(&quot;/path/to/my/image.png&quot;).unwrap();</span>
-    <span class="doccomment">/// let result = QrVerification::from_image(image)?;</span>
+    <span class="doccomment">/// let result = QrVerificationData::from_image(image)?;</span>
     <span class="doccomment">/// # Ok(())</span>
     <span class="doccomment">/// # }</span>
     <span class="doccomment">/// ```</span>
@@ -784,7 +784,7 @@
     }
 
     <span class="doccomment">/// Decode and parse an grey scale image of a QR code into a</span>
-    <span class="doccomment">/// `QrVerification`</span>
+    <span class="doccomment">/// `QrVerificationData`</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// # Arguments</span>
     <span class="doccomment">///</span>
@@ -792,13 +792,13 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// # Example</span>
     <span class="doccomment">/// ```no_run</span>
-    <span class="doccomment">/// # use matrix_qrcode::{QrVerification, DecodingError};</span>
+    <span class="doccomment">/// # use matrix_qrcode::{QrVerificationData, DecodingError};</span>
     <span class="doccomment">/// # fn main() -&gt; Result&lt;(), DecodingError&gt; {</span>
     <span class="doccomment">/// use image;</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// let image = image::open(&quot;/path/to/my/image.png&quot;).unwrap();</span>
     <span class="doccomment">/// let image = image.to_luma8();</span>
-    <span class="doccomment">/// let result = QrVerification::from_luma(image)?;</span>
+    <span class="doccomment">/// let result = QrVerificationData::from_luma(image)?;</span>
     <span class="doccomment">/// # Ok(())</span>
     <span class="doccomment">/// # }</span>
     <span class="doccomment">/// ```</span>
@@ -809,7 +809,7 @@
     }
 
     <span class="doccomment">/// Parse the decoded payload of a QR code in byte slice form as a</span>
-    <span class="doccomment">/// `QrVerification`</span>
+    <span class="doccomment">/// `QrVerificationData`</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// This method is useful if you would like to do your own custom QR code</span>
     <span class="doccomment">/// decoding.</span>
@@ -820,7 +820,7 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// # Example</span>
     <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// # use matrix_qrcode::{QrVerification, DecodingError};</span>
+    <span class="doccomment">/// # use matrix_qrcode::{QrVerificationData, DecodingError};</span>
     <span class="doccomment">/// # fn main() -&gt; Result&lt;(), DecodingError&gt; {</span>
     <span class="doccomment">/// let data = b&quot;MATRIX\</span>
     <span class="doccomment">///              \x02\x02\x00\x07\</span>
@@ -829,7 +829,7 @@
     <span class="doccomment">///              BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB\</span>
     <span class="doccomment">///              SHARED_SECRET&quot;;</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// let result = QrVerification::from_bytes(data)?;</span>
+    <span class="doccomment">/// let result = QrVerificationData::from_bytes(data)?;</span>
     <span class="doccomment">/// # Ok(())</span>
     <span class="doccomment">/// # }</span>
     <span class="doccomment">/// ```</span>
@@ -837,9 +837,9 @@
         <span class="self">Self</span><span class="ident">::decode_bytes</span>(<span class="ident">bytes</span>)
     }
 
-    <span class="doccomment">/// Encode the `QrVerification` into a `QrCode`.</span>
+    <span class="doccomment">/// Encode the `QrVerificationData` into a `QrCode`.</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// This method turns the `QrVerification` into a QR code that can be</span>
+    <span class="doccomment">/// This method turns the `QrVerificationData` into a QR code that can be</span>
     <span class="doccomment">/// rendered and presented to be scanned.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// The encoding can fail if the data doesn&#39;t fit into a QR code or if the</span>
@@ -848,7 +848,7 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// # Example</span>
     <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// # use matrix_qrcode::{QrVerification, DecodingError};</span>
+    <span class="doccomment">/// # use matrix_qrcode::{QrVerificationData, DecodingError};</span>
     <span class="doccomment">/// # fn main() -&gt; Result&lt;(), DecodingError&gt; {</span>
     <span class="doccomment">/// let data = b&quot;MATRIX\</span>
     <span class="doccomment">///              \x02\x02\x00\x07\</span>
@@ -857,28 +857,28 @@
     <span class="doccomment">///              BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB\</span>
     <span class="doccomment">///              SHARED_SECRET&quot;;</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// let result = QrVerification::from_bytes(data)?;</span>
+    <span class="doccomment">/// let result = QrVerificationData::from_bytes(data)?;</span>
     <span class="doccomment">/// let encoded = result.to_qr_code().unwrap();</span>
     <span class="doccomment">/// # Ok(())</span>
     <span class="doccomment">/// # }</span>
     <span class="doccomment">/// ```</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">to_qr_code</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">QrCode</span>, <span class="ident">EncodingError</span><span class="op">&gt;</span> {
         <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">QrVerification::Verification</span>(<span class="ident">v</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">v</span>.<span class="ident">to_qr_code</span>(),
-            <span class="ident">QrVerification::SelfVerification</span>(<span class="ident">v</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">v</span>.<span class="ident">to_qr_code</span>(),
-            <span class="ident">QrVerification::SelfVerificationNoMasterKey</span>(<span class="ident">v</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">v</span>.<span class="ident">to_qr_code</span>(),
+            <span class="ident">QrVerificationData::Verification</span>(<span class="ident">v</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">v</span>.<span class="ident">to_qr_code</span>(),
+            <span class="ident">QrVerificationData::SelfVerification</span>(<span class="ident">v</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">v</span>.<span class="ident">to_qr_code</span>(),
+            <span class="ident">QrVerificationData::SelfVerificationNoMasterKey</span>(<span class="ident">v</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">v</span>.<span class="ident">to_qr_code</span>(),
         }
     }
 
-    <span class="doccomment">/// Encode the `QrVerification` into a vector of bytes that can be encoded</span>
-    <span class="doccomment">/// as a QR code.</span>
+    <span class="doccomment">/// Encode the `QrVerificationData` into a vector of bytes that can be</span>
+    <span class="doccomment">/// encoded as a QR code.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// The encoding can fail if the identity keys that should be encoded are</span>
     <span class="doccomment">/// not valid base64.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// # Example</span>
     <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// # use matrix_qrcode::{QrVerification, DecodingError};</span>
+    <span class="doccomment">/// # use matrix_qrcode::{QrVerificationData, DecodingError};</span>
     <span class="doccomment">/// # fn main() -&gt; Result&lt;(), DecodingError&gt; {</span>
     <span class="doccomment">/// let data = b&quot;MATRIX\</span>
     <span class="doccomment">///              \x02\x02\x00\x07\</span>
@@ -887,7 +887,7 @@
     <span class="doccomment">///              BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB\</span>
     <span class="doccomment">///              SHARED_SECRET&quot;;</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// let result = QrVerification::from_bytes(data)?;</span>
+    <span class="doccomment">/// let result = QrVerificationData::from_bytes(data)?;</span>
     <span class="doccomment">/// let encoded = result.to_bytes().unwrap();</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// assert_eq!(data.as_ref(), encoded.as_slice());</span>
@@ -896,9 +896,9 @@
     <span class="doccomment">/// ```</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">to_bytes</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>, <span class="ident">EncodingError</span><span class="op">&gt;</span> {
         <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">QrVerification::Verification</span>(<span class="ident">v</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">v</span>.<span class="ident">to_bytes</span>(),
-            <span class="ident">QrVerification::SelfVerification</span>(<span class="ident">v</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">v</span>.<span class="ident">to_bytes</span>(),
-            <span class="ident">QrVerification::SelfVerificationNoMasterKey</span>(<span class="ident">v</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">v</span>.<span class="ident">to_bytes</span>(),
+            <span class="ident">QrVerificationData::Verification</span>(<span class="ident">v</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">v</span>.<span class="ident">to_bytes</span>(),
+            <span class="ident">QrVerificationData::SelfVerification</span>(<span class="ident">v</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">v</span>.<span class="ident">to_bytes</span>(),
+            <span class="ident">QrVerificationData::SelfVerificationNoMasterKey</span>(<span class="ident">v</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">v</span>.<span class="ident">to_bytes</span>(),
         }
     }
 
@@ -964,13 +964,13 @@
             <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">DecodingError::SharedSecret</span>(<span class="ident">shared_secret</span>.<span class="ident">len</span>()));
         }
 
-        <span class="ident">QrVerification::new</span>(<span class="ident">mode</span>, <span class="ident">flow_id</span>, <span class="ident">first_key</span>, <span class="ident">second_key</span>, <span class="ident">shared_secret</span>)
+        <span class="ident">QrVerificationData::new</span>(<span class="ident">mode</span>, <span class="ident">flow_id</span>, <span class="ident">first_key</span>, <span class="ident">second_key</span>, <span class="ident">shared_secret</span>)
     }
 
     <span class="doccomment">/// Decode the given image of an QR code and if we find a valid code, try to</span>
     <span class="doccomment">/// decode it as a `QrVerification`.</span>
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;decode_image&quot;</span>)]</span>
-    <span class="kw">fn</span> <span class="ident">decode</span>(<span class="ident">image</span>: <span class="ident">ImageBuffer</span><span class="op">&lt;</span><span class="ident">Luma</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>, <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">QrVerification</span>, <span class="ident">DecodingError</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">decode</span>(<span class="ident">image</span>: <span class="ident">ImageBuffer</span><span class="op">&lt;</span><span class="ident">Luma</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>, <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">QrVerificationData</span>, <span class="ident">DecodingError</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">decoded</span> <span class="op">=</span> <span class="ident">decode_qr</span>(<span class="ident">image</span>)<span class="question-mark">?</span>;
         <span class="self">Self</span><span class="ident">::decode_bytes</span>(<span class="ident">decoded</span>)
     }
@@ -1003,41 +1003,41 @@
         }
     }
 
-    <span class="doccomment">/// Get the flow id for this `QrVerification`.</span>
+    <span class="doccomment">/// Get the flow id for this `QrVerificationData`.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// This represents the ID as a string even if it is a `EventId`.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">flow_id</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="ident">str</span> {
         <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">QrVerification::Verification</span>(<span class="ident">v</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">v</span>.<span class="ident">event_id</span>.<span class="ident">as_str</span>(),
-            <span class="ident">QrVerification::SelfVerification</span>(<span class="ident">v</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="ident">v</span>.<span class="ident">transaction_id</span>,
-            <span class="ident">QrVerification::SelfVerificationNoMasterKey</span>(<span class="ident">v</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="ident">v</span>.<span class="ident">transaction_id</span>,
+            <span class="ident">QrVerificationData::Verification</span>(<span class="ident">v</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">v</span>.<span class="ident">event_id</span>.<span class="ident">as_str</span>(),
+            <span class="ident">QrVerificationData::SelfVerification</span>(<span class="ident">v</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="ident">v</span>.<span class="ident">transaction_id</span>,
+            <span class="ident">QrVerificationData::SelfVerificationNoMasterKey</span>(<span class="ident">v</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="ident">v</span>.<span class="ident">transaction_id</span>,
         }
     }
 
-    <span class="doccomment">/// Get the first key of this `QrVerification`.</span>
+    <span class="doccomment">/// Get the first key of this `QrVerificationData`.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">first_key</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="ident">str</span> {
         <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">QrVerification::Verification</span>(<span class="ident">v</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="ident">v</span>.<span class="ident">first_master_key</span>,
-            <span class="ident">QrVerification::SelfVerification</span>(<span class="ident">v</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="ident">v</span>.<span class="ident">master_key</span>,
-            <span class="ident">QrVerification::SelfVerificationNoMasterKey</span>(<span class="ident">v</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="ident">v</span>.<span class="ident">device_key</span>,
+            <span class="ident">QrVerificationData::Verification</span>(<span class="ident">v</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="ident">v</span>.<span class="ident">first_master_key</span>,
+            <span class="ident">QrVerificationData::SelfVerification</span>(<span class="ident">v</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="ident">v</span>.<span class="ident">master_key</span>,
+            <span class="ident">QrVerificationData::SelfVerificationNoMasterKey</span>(<span class="ident">v</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="ident">v</span>.<span class="ident">device_key</span>,
         }
     }
 
-    <span class="doccomment">/// Get the second key of this `QrVerification`.</span>
+    <span class="doccomment">/// Get the second key of this `QrVerificationData`.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">second_key</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="ident">str</span> {
         <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">QrVerification::Verification</span>(<span class="ident">v</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="ident">v</span>.<span class="ident">second_master_key</span>,
-            <span class="ident">QrVerification::SelfVerification</span>(<span class="ident">v</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="ident">v</span>.<span class="ident">device_key</span>,
-            <span class="ident">QrVerification::SelfVerificationNoMasterKey</span>(<span class="ident">v</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="ident">v</span>.<span class="ident">master_key</span>,
+            <span class="ident">QrVerificationData::Verification</span>(<span class="ident">v</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="ident">v</span>.<span class="ident">second_master_key</span>,
+            <span class="ident">QrVerificationData::SelfVerification</span>(<span class="ident">v</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="ident">v</span>.<span class="ident">device_key</span>,
+            <span class="ident">QrVerificationData::SelfVerificationNoMasterKey</span>(<span class="ident">v</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="ident">v</span>.<span class="ident">master_key</span>,
         }
     }
 
-    <span class="doccomment">/// Get the secret of this `QrVerification`.</span>
+    <span class="doccomment">/// Get the secret of this `QrVerificationData`.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">secret</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="ident">str</span> {
         <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">QrVerification::Verification</span>(<span class="ident">v</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="ident">v</span>.<span class="ident">shared_secret</span>,
-            <span class="ident">QrVerification::SelfVerification</span>(<span class="ident">v</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="ident">v</span>.<span class="ident">shared_secret</span>,
-            <span class="ident">QrVerification::SelfVerificationNoMasterKey</span>(<span class="ident">v</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="ident">v</span>.<span class="ident">shared_secret</span>,
+            <span class="ident">QrVerificationData::Verification</span>(<span class="ident">v</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="ident">v</span>.<span class="ident">shared_secret</span>,
+            <span class="ident">QrVerificationData::SelfVerification</span>(<span class="ident">v</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="ident">v</span>.<span class="ident">shared_secret</span>,
+            <span class="ident">QrVerificationData::SelfVerificationNoMasterKey</span>(<span class="ident">v</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="ident">v</span>.<span class="ident">shared_secret</span>,
         }
     }
 }
@@ -1087,7 +1087,7 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// # Example</span>
     <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// # use matrix_qrcode::{QrVerification, DecodingError};</span>
+    <span class="doccomment">/// # use matrix_qrcode::{QrVerificationData, DecodingError};</span>
     <span class="doccomment">/// # fn main() -&gt; Result&lt;(), DecodingError&gt; {</span>
     <span class="doccomment">/// let data = b&quot;MATRIX\</span>
     <span class="doccomment">///              \x02\x00\x00\x0f\</span>
@@ -1096,8 +1096,8 @@
     <span class="doccomment">///              BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB\</span>
     <span class="doccomment">///              SHARED_SECRET&quot;;</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// let result = QrVerification::from_bytes(data)?;</span>
-    <span class="doccomment">/// if let QrVerification::Verification(decoded) = result {</span>
+    <span class="doccomment">/// let result = QrVerificationData::from_bytes(data)?;</span>
+    <span class="doccomment">/// if let QrVerificationData::Verification(decoded) = result {</span>
     <span class="doccomment">///     let encoded = decoded.to_bytes().unwrap();</span>
     <span class="doccomment">///     assert_eq!(data.as_ref(), encoded.as_slice());</span>
     <span class="doccomment">/// } else {</span>
@@ -1134,7 +1134,7 @@
     }
 }
 
-<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">VerificationData</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">QrVerification</span> {
+<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">VerificationData</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">QrVerificationData</span> {
     <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">data</span>: <span class="ident">VerificationData</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
         <span class="self">Self</span><span class="ident">::Verification</span>(<span class="ident">data</span>)
     }
@@ -1190,7 +1190,7 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// # Example</span>
     <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// # use matrix_qrcode::{QrVerification, DecodingError};</span>
+    <span class="doccomment">/// # use matrix_qrcode::{QrVerificationData, DecodingError};</span>
     <span class="doccomment">/// # fn main() -&gt; Result&lt;(), DecodingError&gt; {</span>
     <span class="doccomment">/// let data = b&quot;MATRIX\</span>
     <span class="doccomment">///              \x02\x01\x00\x06\</span>
@@ -1199,8 +1199,8 @@
     <span class="doccomment">///              BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB\</span>
     <span class="doccomment">///              SHARED_SECRET&quot;;</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// let result = QrVerification::from_bytes(data)?;</span>
-    <span class="doccomment">/// if let QrVerification::SelfVerification(decoded) = result {</span>
+    <span class="doccomment">/// let result = QrVerificationData::from_bytes(data)?;</span>
+    <span class="doccomment">/// if let QrVerificationData::SelfVerification(decoded) = result {</span>
     <span class="doccomment">///     let encoded = decoded.to_bytes().unwrap();</span>
     <span class="doccomment">///     assert_eq!(data.as_ref(), encoded.as_slice());</span>
     <span class="doccomment">/// } else {</span>
@@ -1237,7 +1237,7 @@
     }
 }
 
-<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">SelfVerificationData</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">QrVerification</span> {
+<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">SelfVerificationData</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">QrVerificationData</span> {
     <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">data</span>: <span class="ident">SelfVerificationData</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
         <span class="self">Self</span><span class="ident">::SelfVerification</span>(<span class="ident">data</span>)
     }
@@ -1293,7 +1293,7 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// # Example</span>
     <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// # use matrix_qrcode::{QrVerification, DecodingError};</span>
+    <span class="doccomment">/// # use matrix_qrcode::{QrVerificationData, DecodingError};</span>
     <span class="doccomment">/// # fn main() -&gt; Result&lt;(), DecodingError&gt; {</span>
     <span class="doccomment">/// let data = b&quot;MATRIX\</span>
     <span class="doccomment">///              \x02\x02\x00\x06\</span>
@@ -1302,8 +1302,8 @@
     <span class="doccomment">///              BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB\</span>
     <span class="doccomment">///              SHARED_SECRET&quot;;</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// let result = QrVerification::from_bytes(data)?;</span>
-    <span class="doccomment">/// if let QrVerification::SelfVerificationNoMasterKey(decoded) = result {</span>
+    <span class="doccomment">/// let result = QrVerificationData::from_bytes(data)?;</span>
+    <span class="doccomment">/// if let QrVerificationData::SelfVerificationNoMasterKey(decoded) = result {</span>
     <span class="doccomment">///     let encoded = decoded.to_bytes().unwrap();</span>
     <span class="doccomment">///     assert_eq!(data.as_ref(), encoded.as_slice());</span>
     <span class="doccomment">/// } else {</span>
@@ -1340,7 +1340,7 @@
     }
 }
 
-<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">SelfVerificationNoMasterKey</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">QrVerification</span> {
+<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">SelfVerificationNoMasterKey</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">QrVerificationData</span> {
     <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">data</span>: <span class="ident">SelfVerificationNoMasterKey</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
         <span class="self">Self</span><span class="ident">::SelfVerificationNoMasterKey</span>(<span class="ident">data</span>)
     }

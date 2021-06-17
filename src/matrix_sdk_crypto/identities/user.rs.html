@@ -824,6 +824,14 @@
 <span id="822">822</span>
 <span id="823">823</span>
 <span id="824">824</span>
+<span id="825">825</span>
+<span id="826">826</span>
+<span id="827">827</span>
+<span id="828">828</span>
+<span id="829">829</span>
+<span id="830">830</span>
+<span id="831">831</span>
+<span id="832">832</span>
 </pre><pre class="rust">
 <span class="comment">// Copyright 2020 The Matrix.org Foundation C.I.C.</span>
 <span class="comment">//</span>
@@ -1038,6 +1046,14 @@
     <span class="doccomment">/// * `key_id` - The id of the key that should be fetched.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_key</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">key_id</span>: <span class="kw-2">&amp;</span><span class="ident">DeviceKeyId</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="number">0</span>.<span class="ident">keys</span>.<span class="ident">get</span>(<span class="ident">key_id</span>.<span class="ident">as_str</span>()).<span class="ident">map</span>(<span class="op">|</span><span class="ident">k</span><span class="op">|</span> <span class="ident">k</span>.<span class="ident">as_str</span>())
+    }
+
+    <span class="doccomment">/// Get the first available master key.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// There&#39;s usually only a single master key so this will usually fetch the</span>
+    <span class="doccomment">/// only key.</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_first_key</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span> {
+        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">keys</span>.<span class="ident">values</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">k</span><span class="op">|</span> <span class="ident">k</span>.<span class="ident">as_str</span>()).<span class="ident">next</span>()
     }
 
     <span class="doccomment">/// Check if the given cross signing sub-key is signed by the master key.</span>
@@ -1630,7 +1646,7 @@
             <span class="ident">Arc::new</span>(<span class="ident">MemoryStore::new</span>()),
         );
 
-        <span class="kw">let</span> <span class="ident">public_identity</span> <span class="op">=</span> <span class="ident">identity</span>.<span class="ident">as_public_identity</span>().<span class="kw">await</span>.<span class="ident">unwrap</span>();
+        <span class="kw">let</span> <span class="ident">public_identity</span> <span class="op">=</span> <span class="ident">identity</span>.<span class="ident">to_public_identity</span>().<span class="kw">await</span>.<span class="ident">unwrap</span>();
 
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">device</span> <span class="op">=</span> <span class="ident">Device</span> {
             <span class="ident">inner</span>: <span class="ident">device</span>,
