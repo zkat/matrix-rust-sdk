@@ -178,10 +178,10 @@
 <span class="kw">use</span> <span class="ident">futures_util::TryStreamExt</span>;
 <span class="kw">use</span> <span class="ident">ruma::api::appservice</span> <span class="kw">as</span> <span class="ident">api</span>;
 
-<span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">error::Error</span>, <span class="ident">Appservice</span>};
+<span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">error::Error</span>, <span class="ident">AppService</span>};
 
 <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">run_server</span>(
-    <span class="ident">appservice</span>: <span class="ident">Appservice</span>,
+    <span class="ident">appservice</span>: <span class="ident">AppService</span>,
     <span class="ident">host</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
     <span class="ident">port</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">u16</span><span class="op">&gt;</span>,
 ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">Error</span><span class="op">&gt;</span> {
@@ -207,7 +207,7 @@
 <span class="attribute">#[<span class="ident">put</span>(<span class="string">&quot;/transactions/{txn_id}&quot;</span>)]</span>
 <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">push_transactions</span>(
     <span class="ident">request</span>: <span class="ident">IncomingRequest</span><span class="op">&lt;</span><span class="ident">api::event::push_events::v1::IncomingRequest</span><span class="op">&gt;</span>,
-    <span class="ident">appservice</span>: <span class="ident">Data</span><span class="op">&lt;</span><span class="ident">Appservice</span><span class="op">&gt;</span>,
+    <span class="ident">appservice</span>: <span class="ident">Data</span><span class="op">&lt;</span><span class="ident">AppService</span><span class="op">&gt;</span>,
 ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">HttpResponse</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
     <span class="kw">if</span> <span class="op">!</span><span class="ident">appservice</span>.<span class="ident">compare_hs_token</span>(<span class="ident">request</span>.<span class="ident">access_token</span>) {
         <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="ident">HttpResponse::Unauthorized</span>().<span class="ident">finish</span>());
@@ -222,7 +222,7 @@
 <span class="attribute">#[<span class="ident">get</span>(<span class="string">&quot;/users/{user_id}&quot;</span>)]</span>
 <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">query_user_id</span>(
     <span class="ident">request</span>: <span class="ident">IncomingRequest</span><span class="op">&lt;</span><span class="ident">api::query::query_user_id::v1::IncomingRequest</span><span class="op">&gt;</span>,
-    <span class="ident">appservice</span>: <span class="ident">Data</span><span class="op">&lt;</span><span class="ident">Appservice</span><span class="op">&gt;</span>,
+    <span class="ident">appservice</span>: <span class="ident">Data</span><span class="op">&lt;</span><span class="ident">AppService</span><span class="op">&gt;</span>,
 ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">HttpResponse</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
     <span class="kw">if</span> <span class="op">!</span><span class="ident">appservice</span>.<span class="ident">compare_hs_token</span>(<span class="ident">request</span>.<span class="ident">access_token</span>) {
         <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="ident">HttpResponse::Unauthorized</span>().<span class="ident">finish</span>());
@@ -235,7 +235,7 @@
 <span class="attribute">#[<span class="ident">get</span>(<span class="string">&quot;/rooms/{room_alias}&quot;</span>)]</span>
 <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">query_room_alias</span>(
     <span class="ident">request</span>: <span class="ident">IncomingRequest</span><span class="op">&lt;</span><span class="ident">api::query::query_room_alias::v1::IncomingRequest</span><span class="op">&gt;</span>,
-    <span class="ident">appservice</span>: <span class="ident">Data</span><span class="op">&lt;</span><span class="ident">Appservice</span><span class="op">&gt;</span>,
+    <span class="ident">appservice</span>: <span class="ident">Data</span><span class="op">&lt;</span><span class="ident">AppService</span><span class="op">&gt;</span>,
 ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">HttpResponse</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
     <span class="kw">if</span> <span class="op">!</span><span class="ident">appservice</span>.<span class="ident">compare_hs_token</span>(<span class="ident">request</span>.<span class="ident">access_token</span>) {
         <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="ident">HttpResponse::Unauthorized</span>().<span class="ident">finish</span>());

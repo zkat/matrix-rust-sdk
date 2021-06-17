@@ -232,10 +232,10 @@
 <span class="kw">use</span> <span class="ident">serde::Serialize</span>;
 <span class="kw">use</span> <span class="ident">warp</span>::{<span class="ident">filters::BoxedFilter</span>, <span class="ident">path::FullPath</span>, <span class="ident">Filter</span>, <span class="ident">Rejection</span>, <span class="ident">Reply</span>};
 
-<span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">Appservice</span>, <span class="ident">Error</span>, <span class="prelude-ty">Result</span>};
+<span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">AppService</span>, <span class="ident">Error</span>, <span class="prelude-ty">Result</span>};
 
 <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">run_server</span>(
-    <span class="ident">appservice</span>: <span class="ident">Appservice</span>,
+    <span class="ident">appservice</span>: <span class="ident">AppService</span>,
     <span class="ident">host</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
     <span class="ident">port</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">u16</span><span class="op">&gt;</span>,
 ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
@@ -250,7 +250,7 @@
     }
 }
 
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">warp_filter</span>(<span class="ident">appservice</span>: <span class="ident">Appservice</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">BoxedFilter</span><span class="op">&lt;</span>(<span class="kw">impl</span> <span class="ident">Reply</span>,)<span class="op">&gt;</span> {
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">warp_filter</span>(<span class="ident">appservice</span>: <span class="ident">AppService</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">BoxedFilter</span><span class="op">&lt;</span>(<span class="kw">impl</span> <span class="ident">Reply</span>,)<span class="op">&gt;</span> {
     <span class="comment">// TODO: try to use a struct instead of needlessly cloning appservice multiple</span>
     <span class="comment">// times on every request</span>
     <span class="ident">warp::any</span>()
@@ -264,7 +264,7 @@
 <span class="kw">mod</span> <span class="ident">filters</span> {
     <span class="kw">use</span> <span class="kw">super</span>::<span class="kw-2">*</span>;
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">users</span>(<span class="ident">appservice</span>: <span class="ident">Appservice</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">BoxedFilter</span><span class="op">&lt;</span>(<span class="kw">impl</span> <span class="ident">Reply</span>,)<span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">users</span>(<span class="ident">appservice</span>: <span class="ident">AppService</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">BoxedFilter</span><span class="op">&lt;</span>(<span class="kw">impl</span> <span class="ident">Reply</span>,)<span class="op">&gt;</span> {
         <span class="ident">warp::get</span>()
             .<span class="ident">and</span>(
                 <span class="macro">warp::path!</span>(<span class="string">&quot;_matrix&quot;</span> <span class="op">/</span> <span class="string">&quot;app&quot;</span> <span class="op">/</span> <span class="string">&quot;v1&quot;</span> <span class="op">/</span> <span class="string">&quot;users&quot;</span> <span class="op">/</span> <span class="ident">String</span>)
@@ -278,7 +278,7 @@
             .<span class="ident">boxed</span>()
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">rooms</span>(<span class="ident">appservice</span>: <span class="ident">Appservice</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">BoxedFilter</span><span class="op">&lt;</span>(<span class="kw">impl</span> <span class="ident">Reply</span>,)<span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">rooms</span>(<span class="ident">appservice</span>: <span class="ident">AppService</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">BoxedFilter</span><span class="op">&lt;</span>(<span class="kw">impl</span> <span class="ident">Reply</span>,)<span class="op">&gt;</span> {
         <span class="ident">warp::get</span>()
             .<span class="ident">and</span>(
                 <span class="macro">warp::path!</span>(<span class="string">&quot;_matrix&quot;</span> <span class="op">/</span> <span class="string">&quot;app&quot;</span> <span class="op">/</span> <span class="string">&quot;v1&quot;</span> <span class="op">/</span> <span class="string">&quot;rooms&quot;</span> <span class="op">/</span> <span class="ident">String</span>)
@@ -292,7 +292,7 @@
             .<span class="ident">boxed</span>()
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">transactions</span>(<span class="ident">appservice</span>: <span class="ident">Appservice</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">BoxedFilter</span><span class="op">&lt;</span>(<span class="kw">impl</span> <span class="ident">Reply</span>,)<span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">transactions</span>(<span class="ident">appservice</span>: <span class="ident">AppService</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">BoxedFilter</span><span class="op">&lt;</span>(<span class="kw">impl</span> <span class="ident">Reply</span>,)<span class="op">&gt;</span> {
         <span class="ident">warp::put</span>()
             .<span class="ident">and</span>(
                 <span class="macro">warp::path!</span>(<span class="string">&quot;_matrix&quot;</span> <span class="op">/</span> <span class="string">&quot;app&quot;</span> <span class="op">/</span> <span class="string">&quot;v1&quot;</span> <span class="op">/</span> <span class="string">&quot;transactions&quot;</span> <span class="op">/</span> <span class="ident">String</span>)
@@ -306,7 +306,7 @@
             .<span class="ident">boxed</span>()
     }
 
-    <span class="kw">fn</span> <span class="ident">common</span>(<span class="ident">appservice</span>: <span class="ident">Appservice</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">BoxedFilter</span><span class="op">&lt;</span>(<span class="ident">Appservice</span>, <span class="ident">http::Request</span><span class="op">&lt;</span><span class="ident">Bytes</span><span class="op">&gt;</span>)<span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">common</span>(<span class="ident">appservice</span>: <span class="ident">AppService</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">BoxedFilter</span><span class="op">&lt;</span>(<span class="ident">AppService</span>, <span class="ident">http::Request</span><span class="op">&lt;</span><span class="ident">Bytes</span><span class="op">&gt;</span>)<span class="op">&gt;</span> {
         <span class="ident">warp::any</span>()
             .<span class="ident">and</span>(<span class="ident">filters::valid_access_token</span>(<span class="ident">appservice</span>.<span class="ident">registration</span>().<span class="ident">hs_token</span>.<span class="ident">clone</span>()))
             .<span class="ident">map</span>(<span class="kw">move</span> <span class="op">|</span><span class="op">|</span> <span class="ident">appservice</span>.<span class="ident">clone</span>())
@@ -369,7 +369,7 @@
 
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">user</span>(
         <span class="ident">_user_id</span>: <span class="ident">String</span>,
-        <span class="ident">_appservice</span>: <span class="ident">Appservice</span>,
+        <span class="ident">_appservice</span>: <span class="ident">AppService</span>,
         <span class="ident">_request</span>: <span class="ident">http::Request</span><span class="op">&lt;</span><span class="ident">Bytes</span><span class="op">&gt;</span>,
     ) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">StdResult</span><span class="op">&lt;</span><span class="kw">impl</span> <span class="ident">warp::Reply</span>, <span class="ident">Rejection</span><span class="op">&gt;</span> {
         <span class="prelude-val">Ok</span>(<span class="ident">warp::reply::json</span>(<span class="kw-2">&amp;</span><span class="ident">String::from</span>(<span class="string">&quot;{}&quot;</span>)))
@@ -377,7 +377,7 @@
 
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">room</span>(
         <span class="ident">_room_id</span>: <span class="ident">String</span>,
-        <span class="ident">_appservice</span>: <span class="ident">Appservice</span>,
+        <span class="ident">_appservice</span>: <span class="ident">AppService</span>,
         <span class="ident">_request</span>: <span class="ident">http::Request</span><span class="op">&lt;</span><span class="ident">Bytes</span><span class="op">&gt;</span>,
     ) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">StdResult</span><span class="op">&lt;</span><span class="kw">impl</span> <span class="ident">warp::Reply</span>, <span class="ident">Rejection</span><span class="op">&gt;</span> {
         <span class="prelude-val">Ok</span>(<span class="ident">warp::reply::json</span>(<span class="kw-2">&amp;</span><span class="ident">String::from</span>(<span class="string">&quot;{}&quot;</span>)))
@@ -385,7 +385,7 @@
 
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">transaction</span>(
         <span class="ident">_txn_id</span>: <span class="ident">String</span>,
-        <span class="ident">appservice</span>: <span class="ident">Appservice</span>,
+        <span class="ident">appservice</span>: <span class="ident">AppService</span>,
         <span class="ident">request</span>: <span class="ident">http::Request</span><span class="op">&lt;</span><span class="ident">Bytes</span><span class="op">&gt;</span>,
     ) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">StdResult</span><span class="op">&lt;</span><span class="kw">impl</span> <span class="ident">warp::Reply</span>, <span class="ident">Rejection</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">incoming_transaction</span>: <span class="ident">matrix_sdk::api_appservice::event::push_events::v1::IncomingRequest</span> <span class="op">=</span>

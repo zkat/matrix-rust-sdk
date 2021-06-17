@@ -567,11 +567,11 @@
 <span class="doccomment">//! # #[async_trait]</span>
 <span class="doccomment">//! # impl EventHandler for MyEventHandler {}</span>
 <span class="doccomment">//! #</span>
-<span class="doccomment">//! use matrix_sdk_appservice::{Appservice, AppserviceRegistration};</span>
+<span class="doccomment">//! use matrix_sdk_appservice::{AppService, AppServiceRegistration};</span>
 <span class="doccomment">//!</span>
 <span class="doccomment">//! let homeserver_url = &quot;http://127.0.0.1:8008&quot;;</span>
 <span class="doccomment">//! let server_name = &quot;localhost&quot;;</span>
-<span class="doccomment">//! let registration = AppserviceRegistration::try_from_yaml_str(</span>
+<span class="doccomment">//! let registration = AppServiceRegistration::try_from_yaml_str(</span>
 <span class="doccomment">//!     r&quot;</span>
 <span class="doccomment">//!         id: appservice</span>
 <span class="doccomment">//!         url: http://127.0.0.1:9009</span>
@@ -584,7 +584,7 @@
 <span class="doccomment">//!             regex: &#39;@_appservice_.*&#39;</span>
 <span class="doccomment">//!     &quot;)?;</span>
 <span class="doccomment">//!</span>
-<span class="doccomment">//! let mut appservice = Appservice::new(homeserver_url, server_name, registration).await?;</span>
+<span class="doccomment">//! let mut appservice = AppService::new(homeserver_url, server_name, registration).await?;</span>
 <span class="doccomment">//! appservice.set_event_handler(Box::new(MyEventHandler)).await?;</span>
 <span class="doccomment">//!</span>
 <span class="doccomment">//! let (host, port) = appservice.registration().get_host_and_port()?;</span>
@@ -638,15 +638,15 @@
 <span class="kw">pub</span> <span class="kw">type</span> <span class="ident">Host</span> <span class="op">=</span> <span class="ident">String</span>;
 <span class="kw">pub</span> <span class="kw">type</span> <span class="ident">Port</span> <span class="op">=</span> <span class="ident">u16</span>;
 
-<span class="doccomment">/// Appservice Registration</span>
+<span class="doccomment">/// AppService Registration</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// Wrapper around [`Registration`]</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">AppserviceRegistration</span> {
+<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">AppServiceRegistration</span> {
     <span class="ident">inner</span>: <span class="ident">Registration</span>,
 }
 
-<span class="kw">impl</span> <span class="ident">AppserviceRegistration</span> {
+<span class="kw">impl</span> <span class="ident">AppServiceRegistration</span> {
     <span class="doccomment">/// Try to load registration from yaml string</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// See the fields of [`Registration`] for the required format</span>
@@ -684,13 +684,13 @@
     }
 }
 
-<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">Registration</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">AppserviceRegistration</span> {
+<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">Registration</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">AppServiceRegistration</span> {
     <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">value</span>: <span class="ident">Registration</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
         <span class="self">Self</span> { <span class="ident">inner</span>: <span class="ident">value</span> }
     }
 }
 
-<span class="kw">impl</span> <span class="ident">Deref</span> <span class="kw">for</span> <span class="ident">AppserviceRegistration</span> {
+<span class="kw">impl</span> <span class="ident">Deref</span> <span class="kw">for</span> <span class="ident">AppServiceRegistration</span> {
     <span class="kw">type</span> <span class="ident">Target</span> <span class="op">=</span> <span class="ident">Registration</span>;
 
     <span class="kw">fn</span> <span class="ident">deref</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="self">Self</span><span class="ident">::Target</span> {
@@ -701,7 +701,7 @@
 <span class="kw">type</span> <span class="ident">Localpart</span> <span class="op">=</span> <span class="ident">String</span>;
 
 <span class="doccomment">/// The `localpart` of the user associated with the application service via</span>
-<span class="doccomment">/// `sender_localpart` in [`AppserviceRegistration`].</span>
+<span class="doccomment">/// `sender_localpart` in [`AppServiceRegistration`].</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// Dummy type for shared documentation</span>
 <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">dead_code</span>)]</span>
@@ -709,23 +709,23 @@
 
 <span class="doccomment">/// The application service may specify the virtual user to act as through use</span>
 <span class="doccomment">/// of a user_id query string parameter on the request. The user specified in</span>
-<span class="doccomment">/// the query string must be covered by one of the [`AppserviceRegistration`]&#39;s</span>
+<span class="doccomment">/// the query string must be covered by one of the [`AppServiceRegistration`]&#39;s</span>
 <span class="doccomment">/// `users` namespaces.</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// Dummy type for shared documentation</span>
 <span class="kw">pub</span> <span class="kw">type</span> <span class="ident">VirtualUser</span> <span class="op">=</span> ();
 
-<span class="doccomment">/// Appservice</span>
+<span class="doccomment">/// AppService</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Appservice</span> {
+<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">AppService</span> {
     <span class="ident">homeserver_url</span>: <span class="ident">Url</span>,
     <span class="ident">server_name</span>: <span class="ident">ServerNameBox</span>,
-    <span class="ident">registration</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">AppserviceRegistration</span><span class="op">&gt;</span>,
+    <span class="ident">registration</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">AppServiceRegistration</span><span class="op">&gt;</span>,
     <span class="ident">clients</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">DashMap</span><span class="op">&lt;</span><span class="ident">Localpart</span>, <span class="ident">Client</span><span class="op">&gt;</span><span class="op">&gt;</span>,
 }
 
-<span class="kw">impl</span> <span class="ident">Appservice</span> {
-    <span class="doccomment">/// Create new Appservice</span>
+<span class="kw">impl</span> <span class="ident">AppService</span> {
+    <span class="doccomment">/// Create new AppService</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// Also creates and caches a [`Client`] for the [`MainUser`].</span>
     <span class="doccomment">/// The default [`ClientConfig`] is used, if you want to customize it</span>
@@ -736,14 +736,14 @@
     <span class="doccomment">/// * `homeserver_url` - The homeserver that the client should connect to.</span>
     <span class="doccomment">/// * `server_name` - The server name to use when constructing user ids from</span>
     <span class="doccomment">///   the localpart.</span>
-    <span class="doccomment">/// * `registration` - The [Appservice Registration] to use when interacting</span>
+    <span class="doccomment">/// * `registration` - The [AppService Registration] to use when interacting</span>
     <span class="doccomment">///   with the homeserver.</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// [Appservice Registration]: https://matrix.org/docs/spec/application_service/r0.1.2#registration</span>
+    <span class="doccomment">/// [AppService Registration]: https://matrix.org/docs/spec/application_service/r0.1.2#registration</span>
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">new</span>(
         <span class="ident">homeserver_url</span>: <span class="kw">impl</span> <span class="ident">TryInto</span><span class="op">&lt;</span><span class="ident">Url</span>, <span class="ident">Error</span> <span class="op">=</span> <span class="ident">url::ParseError</span><span class="op">&gt;</span>,
         <span class="ident">server_name</span>: <span class="kw">impl</span> <span class="ident">TryInto</span><span class="op">&lt;</span><span class="ident">ServerNameBox</span>, <span class="ident">Error</span> <span class="op">=</span> <span class="ident">identifiers::Error</span><span class="op">&gt;</span>,
-        <span class="ident">registration</span>: <span class="ident">AppserviceRegistration</span>,
+        <span class="ident">registration</span>: <span class="ident">AppServiceRegistration</span>,
     ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">appservice</span> <span class="op">=</span> <span class="self">Self</span><span class="ident">::new_with_config</span>(
             <span class="ident">homeserver_url</span>,
@@ -761,7 +761,7 @@
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">new_with_config</span>(
         <span class="ident">homeserver_url</span>: <span class="kw">impl</span> <span class="ident">TryInto</span><span class="op">&lt;</span><span class="ident">Url</span>, <span class="ident">Error</span> <span class="op">=</span> <span class="ident">url::ParseError</span><span class="op">&gt;</span>,
         <span class="ident">server_name</span>: <span class="kw">impl</span> <span class="ident">TryInto</span><span class="op">&lt;</span><span class="ident">ServerNameBox</span>, <span class="ident">Error</span> <span class="op">=</span> <span class="ident">identifiers::Error</span><span class="op">&gt;</span>,
-        <span class="ident">registration</span>: <span class="ident">AppserviceRegistration</span>,
+        <span class="ident">registration</span>: <span class="ident">AppServiceRegistration</span>,
         <span class="ident">client_config</span>: <span class="ident">ClientConfig</span>,
     ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">homeserver_url</span> <span class="op">=</span> <span class="ident">homeserver_url</span>.<span class="ident">try_into</span>()<span class="question-mark">?</span>;
@@ -770,7 +770,7 @@
         <span class="kw">let</span> <span class="ident">clients</span> <span class="op">=</span> <span class="ident">Arc::new</span>(<span class="ident">DashMap::new</span>());
         <span class="kw">let</span> <span class="ident">sender_localpart</span> <span class="op">=</span> <span class="ident">registration</span>.<span class="ident">sender_localpart</span>.<span class="ident">clone</span>();
 
-        <span class="kw">let</span> <span class="ident">appservice</span> <span class="op">=</span> <span class="ident">Appservice</span> { <span class="ident">homeserver_url</span>, <span class="ident">server_name</span>, <span class="ident">registration</span>, <span class="ident">clients</span> };
+        <span class="kw">let</span> <span class="ident">appservice</span> <span class="op">=</span> <span class="ident">AppService</span> { <span class="ident">homeserver_url</span>, <span class="ident">server_name</span>, <span class="ident">registration</span>, <span class="ident">clients</span> };
 
         <span class="comment">// we create and cache the [`MainUser`] by default</span>
         <span class="ident">appservice</span>.<span class="ident">create_and_cache_client</span>(<span class="kw-2">&amp;</span><span class="ident">sender_localpart</span>, <span class="ident">client_config</span>).<span class="kw">await</span><span class="question-mark">?</span>;
@@ -880,12 +880,12 @@
     <span class="doccomment">/// Convenience wrapper around [`Client::set_event_handler()`] that attaches</span>
     <span class="doccomment">/// the event handler to the [`MainUser`]&#39;s [`Client`]</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// Note that the event handler in the [`Appservice`] context only triggers</span>
+    <span class="doccomment">/// Note that the event handler in the [`AppService`] context only triggers</span>
     <span class="doccomment">/// [`join` room `timeline` events], so no state events or events from the</span>
     <span class="doccomment">/// `invite`, `knock` or `leave` scope. The rationale behind that is</span>
-    <span class="doccomment">/// that incoming Appservice transactions from the homeserver are not</span>
+    <span class="doccomment">/// that incoming AppService transactions from the homeserver are not</span>
     <span class="doccomment">/// necessarily bound to a specific user but can cover a multitude of</span>
-    <span class="doccomment">/// namespaces, and as such the Appservice basically only &quot;observes</span>
+    <span class="doccomment">/// namespaces, and as such the AppService basically only &quot;observes</span>
     <span class="doccomment">/// joined rooms&quot;. Also currently homeservers only push PDUs to appservices,</span>
     <span class="doccomment">/// no EDUs. There&#39;s the open [MSC2409] regarding supporting EDUs in the</span>
     <span class="doccomment">/// future, though it seems to be planned to put EDUs into a different</span>
@@ -936,10 +936,10 @@
         <span class="prelude-val">Ok</span>(())
     }
 
-    <span class="doccomment">/// Get the Appservice [registration]</span>
+    <span class="doccomment">/// Get the AppService [registration]</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// [registration]: https://matrix.org/docs/spec/application_service/r0.1.2#registration</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">registration</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="ident">AppserviceRegistration</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">registration</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="ident">AppServiceRegistration</span> {
         <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">registration</span>
     }
 
@@ -950,11 +950,11 @@
         <span class="self">self</span>.<span class="ident">registration</span>.<span class="ident">hs_token</span> <span class="op">=</span><span class="op">=</span> <span class="ident">hs_token</span>.<span class="ident">as_ref</span>()
     }
 
-    <span class="doccomment">/// Check if given `user_id` is in any of the [`AppserviceRegistration`]&#39;s</span>
+    <span class="doccomment">/// Check if given `user_id` is in any of the [`AppServiceRegistration`]&#39;s</span>
     <span class="doccomment">/// `users` namespaces</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">user_id_is_in_namespace</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">user_id</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">str</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">bool</span><span class="op">&gt;</span> {
         <span class="kw">for</span> <span class="ident">user</span> <span class="kw">in</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">registration</span>.<span class="ident">namespaces</span>.<span class="ident">users</span> {
-            <span class="comment">// TODO: precompile on Appservice construction</span>
+            <span class="comment">// TODO: precompile on AppService construction</span>
             <span class="kw">let</span> <span class="ident">re</span> <span class="op">=</span> <span class="ident">Regex::new</span>(<span class="kw-2">&amp;</span><span class="ident">user</span>.<span class="ident">regex</span>)<span class="question-mark">?</span>;
             <span class="kw">if</span> <span class="ident">re</span>.<span class="ident">is_match</span>(<span class="ident">user_id</span>.<span class="ident">as_ref</span>()) {
                 <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="bool-val">true</span>);
@@ -1003,7 +1003,7 @@
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">run</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">host</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>, <span class="ident">port</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">u16</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">host</span> <span class="op">=</span> <span class="ident">host</span>.<span class="ident">into</span>();
         <span class="kw">let</span> <span class="ident">port</span> <span class="op">=</span> <span class="ident">port</span>.<span class="ident">into</span>();
-        <span class="macro">info!</span>(<span class="string">&quot;Starting Appservice on {}:{}&quot;</span>, <span class="kw-2">&amp;</span><span class="ident">host</span>, <span class="kw-2">&amp;</span><span class="ident">port</span>);
+        <span class="macro">info!</span>(<span class="string">&quot;Starting AppService on {}:{}&quot;</span>, <span class="kw-2">&amp;</span><span class="ident">host</span>, <span class="kw-2">&amp;</span><span class="ident">port</span>);
 
         <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;actix&quot;</span>)]</span>
         {
