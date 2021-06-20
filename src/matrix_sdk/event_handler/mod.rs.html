@@ -887,6 +887,10 @@
 <span id="885">885</span>
 <span id="886">886</span>
 <span id="887">887</span>
+<span id="888">888</span>
+<span id="889">889</span>
+<span id="890">890</span>
+<span id="891">891</span>
 </pre><pre class="rust">
 <span class="comment">// Copyright 2020 Damir Jelić</span>
 <span class="comment">// Copyright 2020 The Matrix.org Foundation C.I.C.</span>
@@ -917,6 +921,7 @@
         <span class="ident">ignored_user_list::IgnoredUserListEventContent</span>,
         <span class="ident">presence::PresenceEvent</span>,
         <span class="ident">push_rules::PushRulesEventContent</span>,
+        <span class="ident">reaction::ReactionEventContent</span>,
         <span class="ident">receipt::ReceiptEventContent</span>,
         <span class="ident">room</span>::{
             <span class="ident">aliases::AliasesEventContent</span>,
@@ -1057,6 +1062,7 @@
                     <span class="self">self</span>.<span class="ident">on_room_message_feedback</span>(<span class="ident">room</span>, <span class="ident">e</span>).<span class="kw">await</span>
                 }
                 <span class="ident">AnySyncMessageEvent::RoomRedaction</span>(<span class="ident">e</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="self">self</span>.<span class="ident">on_room_redaction</span>(<span class="ident">room</span>, <span class="ident">e</span>).<span class="kw">await</span>,
+                <span class="ident">AnySyncMessageEvent::Reaction</span>(<span class="ident">e</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="self">self</span>.<span class="ident">on_room_reaction</span>(<span class="ident">room</span>, <span class="ident">e</span>).<span class="kw">await</span>,
                 <span class="ident">AnySyncMessageEvent::Custom</span>(<span class="ident">e</span>) <span class="op">=</span><span class="op">&gt;</span> {
                     <span class="self">self</span>.<span class="ident">on_custom_event</span>(<span class="ident">room</span>, <span class="kw-2">&amp;</span><span class="ident">CustomEvent::Message</span>(<span class="ident">e</span>)).<span class="kw">await</span>
                 }
@@ -1248,6 +1254,8 @@
     <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">on_room_message</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="kw">_</span>: <span class="ident">Room</span>, <span class="kw">_</span>: <span class="kw-2">&amp;</span><span class="ident">SyncMessageEvent</span><span class="op">&lt;</span><span class="ident">MsgEventContent</span><span class="op">&gt;</span>) {}
     <span class="doccomment">/// Fires when `Client` receives a `RoomEvent::RoomMessageFeedback` event.</span>
     <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">on_room_message_feedback</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="kw">_</span>: <span class="ident">Room</span>, <span class="kw">_</span>: <span class="kw-2">&amp;</span><span class="ident">SyncMessageEvent</span><span class="op">&lt;</span><span class="ident">FeedbackEventContent</span><span class="op">&gt;</span>) {}
+    <span class="doccomment">/// Fires when `Client` receives a `RoomEvent::Reaction` event.</span>
+    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">on_room_reaction</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="kw">_</span>: <span class="ident">Room</span>, <span class="kw">_</span>: <span class="kw-2">&amp;</span><span class="ident">SyncMessageEvent</span><span class="op">&lt;</span><span class="ident">ReactionEventContent</span><span class="op">&gt;</span>) {}
     <span class="doccomment">/// Fires when `Client` receives a `RoomEvent::CallInvite` event</span>
     <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">on_room_call_invite</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="kw">_</span>: <span class="ident">Room</span>, <span class="kw">_</span>: <span class="kw-2">&amp;</span><span class="ident">SyncMessageEvent</span><span class="op">&lt;</span><span class="ident">InviteEventContent</span><span class="op">&gt;</span>) {}
     <span class="doccomment">/// Fires when `Client` receives a `RoomEvent::CallAnswer` event</span>
