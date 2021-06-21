@@ -314,6 +314,15 @@
 <span id="312">312</span>
 <span id="313">313</span>
 <span id="314">314</span>
+<span id="315">315</span>
+<span id="316">316</span>
+<span id="317">317</span>
+<span id="318">318</span>
+<span id="319">319</span>
+<span id="320">320</span>
+<span id="321">321</span>
+<span id="322">322</span>
+<span id="323">323</span>
 </pre><pre class="rust">
 <span class="comment">// Copyright 2020 The Matrix.org Foundation C.I.C.</span>
 <span class="comment">//</span>
@@ -331,9 +340,9 @@
 
 <span class="kw">use</span> <span class="ident">std::io</span>::{<span class="ident">Cursor</span>, <span class="ident">Read</span>, <span class="ident">Seek</span>, <span class="ident">SeekFrom</span>};
 
-<span class="kw">use</span> <span class="ident">aes_ctr</span>::{
-    <span class="ident">cipher</span>::{<span class="ident">NewStreamCipher</span>, <span class="ident">SyncStreamCipher</span>},
-    <span class="ident">Aes256Ctr</span>,
+<span class="kw">use</span> <span class="ident">aes</span>::{
+    <span class="ident">cipher</span>::{<span class="ident">generic_array::GenericArray</span>, <span class="ident">FromBlockCipher</span>, <span class="ident">NewBlockCipher</span>, <span class="ident">StreamCipher</span>},
+    <span class="ident">Aes256</span>, <span class="ident">Aes256Ctr</span>,
 };
 <span class="kw">use</span> <span class="ident">byteorder</span>::{<span class="ident">BigEndian</span>, <span class="ident">ReadBytesExt</span>};
 <span class="kw">use</span> <span class="ident">getrandom::getrandom</span>;
@@ -478,7 +487,12 @@
     <span class="ident">pbkdf2</span>::<span class="op">&lt;</span><span class="ident">Hmac</span><span class="op">&lt;</span><span class="ident">Sha512</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="ident">passphrase</span>.<span class="ident">as_bytes</span>(), <span class="kw-2">&amp;</span><span class="ident">salt</span>, <span class="ident">rounds</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">derived_keys</span>);
     <span class="kw">let</span> (<span class="ident">key</span>, <span class="ident">hmac_key</span>) <span class="op">=</span> <span class="ident">derived_keys</span>.<span class="ident">split_at</span>(<span class="ident">KEY_SIZE</span>);
 
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">aes</span> <span class="op">=</span> <span class="ident">Aes256Ctr::new_var</span>(<span class="ident">key</span>, <span class="kw-2">&amp;</span><span class="ident">iv</span>.<span class="ident">to_be_bytes</span>()).<span class="ident">expect</span>(<span class="string">&quot;Can&#39;t create AES object&quot;</span>);
+    <span class="kw">let</span> <span class="ident">key</span> <span class="op">=</span> <span class="ident">GenericArray::from_slice</span>(<span class="ident">key</span>);
+    <span class="kw">let</span> <span class="ident">iv</span> <span class="op">=</span> <span class="ident">iv</span>.<span class="ident">to_be_bytes</span>();
+    <span class="kw">let</span> <span class="ident">iv</span> <span class="op">=</span> <span class="ident">GenericArray::from_slice</span>(<span class="kw-2">&amp;</span><span class="ident">iv</span>);
+
+    <span class="kw">let</span> <span class="ident">aes</span> <span class="op">=</span> <span class="ident">Aes256::new</span>(<span class="ident">key</span>);
+    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">aes</span> <span class="op">=</span> <span class="ident">Aes256Ctr::from_block_cipher</span>(<span class="ident">aes</span>, <span class="ident">iv</span>);
 
     <span class="ident">aes</span>.<span class="ident">apply_keystream</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">plaintext</span>);
 
@@ -486,11 +500,11 @@
 
     <span class="ident">payload</span>.<span class="ident">extend</span>(<span class="kw-2">&amp;</span><span class="ident">VERSION</span>.<span class="ident">to_be_bytes</span>());
     <span class="ident">payload</span>.<span class="ident">extend</span>(<span class="kw-2">&amp;</span><span class="ident">salt</span>);
-    <span class="ident">payload</span>.<span class="ident">extend</span>(<span class="kw-2">&amp;</span><span class="ident">iv</span>.<span class="ident">to_be_bytes</span>());
+    <span class="ident">payload</span>.<span class="ident">extend</span>(<span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="ident">iv</span>);
     <span class="ident">payload</span>.<span class="ident">extend</span>(<span class="kw-2">&amp;</span><span class="ident">rounds</span>.<span class="ident">to_be_bytes</span>());
     <span class="ident">payload</span>.<span class="ident">extend_from_slice</span>(<span class="ident">plaintext</span>);
 
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">hmac</span> <span class="op">=</span> <span class="ident">Hmac</span>::<span class="op">&lt;</span><span class="ident">Sha256</span><span class="op">&gt;</span><span class="ident">::new_varkey</span>(<span class="ident">hmac_key</span>).<span class="ident">expect</span>(<span class="string">&quot;Can&#39;t create HMAC object&quot;</span>);
+    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">hmac</span> <span class="op">=</span> <span class="ident">Hmac</span>::<span class="op">&lt;</span><span class="ident">Sha256</span><span class="op">&gt;</span><span class="ident">::new_from_slice</span>(<span class="ident">hmac_key</span>).<span class="ident">expect</span>(<span class="string">&quot;Can&#39;t create HMAC object&quot;</span>);
     <span class="ident">hmac</span>.<span class="ident">update</span>(<span class="kw-2">&amp;</span><span class="ident">payload</span>);
     <span class="kw">let</span> <span class="ident">mac</span> <span class="op">=</span> <span class="ident">hmac</span>.<span class="ident">finalize</span>();
 
@@ -530,12 +544,16 @@
     <span class="ident">pbkdf2</span>::<span class="op">&lt;</span><span class="ident">Hmac</span><span class="op">&lt;</span><span class="ident">Sha512</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="ident">passphrase</span>.<span class="ident">as_bytes</span>(), <span class="kw-2">&amp;</span><span class="ident">salt</span>, <span class="ident">rounds</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">derived_keys</span>);
     <span class="kw">let</span> (<span class="ident">key</span>, <span class="ident">hmac_key</span>) <span class="op">=</span> <span class="ident">derived_keys</span>.<span class="ident">split_at</span>(<span class="ident">KEY_SIZE</span>);
 
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">hmac</span> <span class="op">=</span> <span class="ident">Hmac</span>::<span class="op">&lt;</span><span class="ident">Sha256</span><span class="op">&gt;</span><span class="ident">::new_varkey</span>(<span class="ident">hmac_key</span>).<span class="ident">expect</span>(<span class="string">&quot;Can&#39;t create an HMAC object&quot;</span>);
+    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">hmac</span> <span class="op">=</span> <span class="ident">Hmac</span>::<span class="op">&lt;</span><span class="ident">Sha256</span><span class="op">&gt;</span><span class="ident">::new_from_slice</span>(<span class="ident">hmac_key</span>).<span class="ident">expect</span>(<span class="string">&quot;Can&#39;t create an HMAC object&quot;</span>);
     <span class="ident">hmac</span>.<span class="ident">update</span>(<span class="kw-2">&amp;</span><span class="ident">decoded</span>[<span class="number">0</span>..<span class="ident">ciphertext_end</span>]);
     <span class="ident">hmac</span>.<span class="ident">verify</span>(<span class="kw-2">&amp;</span><span class="ident">mac</span>).<span class="ident">map_err</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="ident">KeyExportError::InvalidMac</span>)<span class="question-mark">?</span>;
 
+    <span class="kw">let</span> <span class="ident">key</span> <span class="op">=</span> <span class="ident">GenericArray::from_slice</span>(<span class="ident">key</span>);
+    <span class="kw">let</span> <span class="ident">iv</span> <span class="op">=</span> <span class="ident">GenericArray::from_slice</span>(<span class="kw-2">&amp;</span><span class="ident">iv</span>);
+
     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">ciphertext</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">decoded</span>[<span class="ident">ciphertext_start</span>..<span class="ident">ciphertext_end</span>];
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">aes</span> <span class="op">=</span> <span class="ident">Aes256Ctr::new_var</span>(<span class="ident">key</span>, <span class="kw-2">&amp;</span><span class="ident">iv</span>).<span class="ident">expect</span>(<span class="string">&quot;Can&#39;t create an AES object&quot;</span>);
+    <span class="kw">let</span> <span class="ident">aes</span> <span class="op">=</span> <span class="ident">Aes256::new</span>(<span class="ident">key</span>);
+    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">aes</span> <span class="op">=</span> <span class="ident">Aes256Ctr::from_block_cipher</span>(<span class="ident">aes</span>, <span class="ident">iv</span>);
     <span class="ident">aes</span>.<span class="ident">apply_keystream</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">ciphertext</span>);
 
     <span class="prelude-val">Ok</span>(<span class="ident">String::from_utf8</span>(<span class="ident">ciphertext</span>.<span class="ident">to_owned</span>())<span class="question-mark">?</span>)
