@@ -320,6 +320,23 @@
 <span id="318">318</span>
 <span id="319">319</span>
 <span id="320">320</span>
+<span id="321">321</span>
+<span id="322">322</span>
+<span id="323">323</span>
+<span id="324">324</span>
+<span id="325">325</span>
+<span id="326">326</span>
+<span id="327">327</span>
+<span id="328">328</span>
+<span id="329">329</span>
+<span id="330">330</span>
+<span id="331">331</span>
+<span id="332">332</span>
+<span id="333">333</span>
+<span id="334">334</span>
+<span id="335">335</span>
+<span id="336">336</span>
+<span id="337">337</span>
 </pre><pre class="rust">
 <span class="kw">use</span> <span class="ident">std</span>::{<span class="ident">ops::Deref</span>, <span class="ident">sync::Arc</span>};
 
@@ -330,11 +347,13 @@
         <span class="ident">membership</span>::{<span class="ident">get_member_events</span>, <span class="ident">join_room_by_id</span>, <span class="ident">leave_room</span>},
         <span class="ident">message::get_message_events</span>,
     },
+    <span class="ident">events::room::history_visibility::HistoryVisibility</span>,
     <span class="ident">UserId</span>,
 };
 
 <span class="kw">use</span> <span class="kw">crate</span>::{
     <span class="ident">media</span>::{<span class="ident">MediaFormat</span>, <span class="ident">MediaRequest</span>, <span class="ident">MediaType</span>},
+    <span class="ident">room::RoomType</span>,
     <span class="ident">BaseRoom</span>, <span class="ident">Client</span>, <span class="prelude-ty">Result</span>, <span class="ident">RoomMember</span>,
 };
 
@@ -492,11 +511,26 @@
     }
 
     <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">ensure_members</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+        <span class="kw">if</span> <span class="op">!</span><span class="self">self</span>.<span class="ident">are_events_visible</span>() {
+            <span class="kw">return</span> <span class="prelude-val">Ok</span>(());
+        }
+
         <span class="kw">if</span> <span class="op">!</span><span class="self">self</span>.<span class="ident">are_members_synced</span>() {
             <span class="self">self</span>.<span class="ident">request_members</span>().<span class="kw">await</span><span class="question-mark">?</span>;
         }
 
         <span class="prelude-val">Ok</span>(())
+    }
+
+    <span class="kw">fn</span> <span class="ident">are_events_visible</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+        <span class="kw">if</span> <span class="kw">let</span> <span class="ident">RoomType::Invited</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">room_type</span>() {
+            <span class="kw">return</span> <span class="macro">matches!</span>(
+                <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">history_visibility</span>(),
+                <span class="ident">HistoryVisibility::WorldReadable</span> <span class="op">|</span> <span class="ident">HistoryVisibility::Invited</span>
+            );
+        }
+
+        <span class="bool-val">true</span>
     }
 
     <span class="doccomment">/// Sync the member list with the server.</span>
