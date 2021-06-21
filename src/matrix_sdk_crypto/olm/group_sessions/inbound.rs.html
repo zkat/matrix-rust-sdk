@@ -409,8 +409,6 @@
 <span id="407">407</span>
 <span id="408">408</span>
 <span id="409">409</span>
-<span id="410">410</span>
-<span id="411">411</span>
 </pre><pre class="rust">
 <span class="comment">// Copyright 2020 The Matrix.org Foundation C.I.C.</span>
 <span class="comment">//</span>
@@ -734,11 +732,9 @@
             <span class="ident">decrypted_object</span>.<span class="ident">get_mut</span>(<span class="string">&quot;content&quot;</span>).<span class="ident">map</span>(<span class="op">|</span><span class="ident">c</span><span class="op">|</span> <span class="ident">c</span>.<span class="ident">as_object_mut</span>()).<span class="ident">flatten</span>()
         {
             <span class="kw">if</span> <span class="op">!</span><span class="ident">decrypted_content</span>.<span class="ident">contains_key</span>(<span class="string">&quot;m.relates_to&quot;</span>) {
-                <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">relation</span>) <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">event</span>.<span class="ident">content</span>.<span class="ident">relates_to</span> {
-                    <span class="ident">decrypted_content</span>.<span class="ident">insert</span>(
-                        <span class="string">&quot;m.relates_to&quot;</span>.<span class="ident">to_owned</span>(),
-                        <span class="ident">serde_json::to_value</span>(<span class="ident">relation</span>).<span class="ident">unwrap_or_default</span>(),
-                    );
+                <span class="kw">let</span> <span class="ident">content</span> <span class="op">=</span> <span class="ident">serde_json::to_value</span>(<span class="kw-2">&amp;</span><span class="ident">event</span>.<span class="ident">content</span>)<span class="question-mark">?</span>;
+                <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">relation</span>) <span class="op">=</span> <span class="ident">content</span>.<span class="ident">as_object</span>().<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">o</span><span class="op">|</span> <span class="ident">o</span>.<span class="ident">get</span>(<span class="string">&quot;m.relates_to&quot;</span>)) {
+                    <span class="ident">decrypted_content</span>.<span class="ident">insert</span>(<span class="string">&quot;m.relates_to&quot;</span>.<span class="ident">to_owned</span>(), <span class="ident">relation</span>.<span class="ident">to_owned</span>());
                 }
             }
         }

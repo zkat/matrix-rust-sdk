@@ -1460,7 +1460,7 @@
             <span class="prelude-val">Err</span>(<span class="ident">CancelCode::UnknownMethod</span>)
         } <span class="kw">else</span> {
             <span class="prelude-val">Ok</span>(<span class="self">Self</span> {
-                <span class="ident">method</span>: <span class="ident">VerificationMethod::MSasV1</span>,
+                <span class="ident">method</span>: <span class="ident">VerificationMethod::SasV1</span>,
                 <span class="ident">hash</span>: <span class="ident">content</span>.<span class="ident">hash</span>,
                 <span class="ident">key_agreement_protocol</span>: <span class="ident">content</span>.<span class="ident">key_agreement_protocol</span>,
                 <span class="ident">message_auth_code</span>: <span class="ident">content</span>.<span class="ident">message_authentication_code</span>,
@@ -1507,7 +1507,7 @@
             }
 
             <span class="prelude-val">Ok</span>(<span class="self">Self</span> {
-                <span class="ident">method</span>: <span class="ident">VerificationMethod::MSasV1</span>,
+                <span class="ident">method</span>: <span class="ident">VerificationMethod::SasV1</span>,
                 <span class="ident">hash</span>: <span class="ident">HashAlgorithm::Sha256</span>,
                 <span class="ident">key_agreement_protocol</span>: <span class="ident">KeyAgreementProtocol::Curve25519HkdfSha256</span>,
                 <span class="ident">message_auth_code</span>: <span class="ident">MessageAuthenticationCode::HkdfHmacSha256</span>,
@@ -1521,7 +1521,7 @@
 <span class="kw">impl</span> <span class="ident">Default</span> <span class="kw">for</span> <span class="ident">AcceptedProtocols</span> {
     <span class="kw">fn</span> <span class="ident">default</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
         <span class="ident">AcceptedProtocols</span> {
-            <span class="ident">method</span>: <span class="ident">VerificationMethod::MSasV1</span>,
+            <span class="ident">method</span>: <span class="ident">VerificationMethod::SasV1</span>,
             <span class="ident">hash</span>: <span class="ident">HashAlgorithm::Sha256</span>,
             <span class="ident">key_agreement_protocol</span>: <span class="ident">KeyAgreementProtocol::Curve25519HkdfSha256</span>,
             <span class="ident">message_auth_code</span>: <span class="ident">MessageAuthenticationCode::HkdfHmacSha256</span>,
@@ -1808,7 +1808,7 @@
     ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">SasState</span><span class="op">&lt;</span><span class="ident">Accepted</span><span class="op">&gt;</span>, <span class="ident">SasState</span><span class="op">&lt;</span><span class="ident">Cancelled</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">check_event</span>(<span class="ident">sender</span>, <span class="ident">content</span>.<span class="ident">flow_id</span>()).<span class="ident">map_err</span>(<span class="op">|</span><span class="ident">c</span><span class="op">|</span> <span class="self">self</span>.<span class="ident">clone</span>().<span class="ident">cancel</span>(<span class="ident">c</span>))<span class="question-mark">?</span>;
 
-        <span class="kw">if</span> <span class="kw">let</span> <span class="ident">AcceptMethod::MSasV1</span>(<span class="ident">content</span>) <span class="op">=</span> <span class="ident">content</span>.<span class="ident">method</span>() {
+        <span class="kw">if</span> <span class="kw">let</span> <span class="ident">AcceptMethod::SasV1</span>(<span class="ident">content</span>) <span class="op">=</span> <span class="ident">content</span>.<span class="ident">method</span>() {
             <span class="kw">let</span> <span class="ident">accepted_protocols</span> <span class="op">=</span>
                 <span class="ident">AcceptedProtocols::try_from</span>(<span class="ident">content</span>.<span class="ident">clone</span>()).<span class="ident">map_err</span>(<span class="op">|</span><span class="ident">c</span><span class="op">|</span> <span class="self">self</span>.<span class="ident">clone</span>().<span class="ident">cancel</span>(<span class="ident">c</span>))<span class="question-mark">?</span>;
 
@@ -1918,7 +1918,7 @@
     <span class="doccomment">/// been started because of a</span>
     <span class="doccomment">/// m.key.verification.request -&gt; m.key.verification.ready flow.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">as_content</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">OwnedAcceptContent</span> {
-        <span class="kw">let</span> <span class="ident">method</span> <span class="op">=</span> <span class="ident">AcceptMethod::MSasV1</span>(
+        <span class="kw">let</span> <span class="ident">method</span> <span class="op">=</span> <span class="ident">AcceptMethod::SasV1</span>(
             <span class="ident">AcceptV1ContentInit</span> {
                 <span class="ident">commitment</span>: <span class="self">self</span>.<span class="ident">state</span>.<span class="ident">commitment</span>.<span class="ident">clone</span>(),
                 <span class="ident">hash</span>: <span class="self">self</span>.<span class="ident">state</span>.<span class="ident">accepted_protocols</span>.<span class="ident">hash</span>.<span class="ident">clone</span>(),
@@ -2042,10 +2042,10 @@
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">as_content</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">OutgoingContent</span> {
         <span class="kw">match</span> <span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="self">self</span>.<span class="ident">verification_flow_id</span> {
             <span class="ident">FlowId::ToDevice</span>(<span class="ident">s</span>) <span class="op">=</span><span class="op">&gt;</span> {
-                <span class="ident">AnyToDeviceEventContent::KeyVerificationKey</span>(<span class="ident">KeyToDeviceEventContent</span> {
-                    <span class="ident">transaction_id</span>: <span class="ident">s</span>.<span class="ident">to_string</span>(),
-                    <span class="ident">key</span>: <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">lock</span>().<span class="ident">unwrap</span>().<span class="ident">public_key</span>(),
-                })
+                <span class="ident">AnyToDeviceEventContent::KeyVerificationKey</span>(<span class="ident">KeyToDeviceEventContent::new</span>(
+                    <span class="ident">s</span>.<span class="ident">to_string</span>(),
+                    <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">lock</span>().<span class="ident">unwrap</span>().<span class="ident">public_key</span>(),
+                ))
                 .<span class="ident">into</span>()
             }
             <span class="ident">FlowId::InRoom</span>(<span class="ident">r</span>, <span class="ident">e</span>) <span class="op">=</span><span class="op">&gt;</span> (
@@ -2068,10 +2068,10 @@
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">as_content</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">OutgoingContent</span> {
         <span class="kw">match</span> <span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="self">self</span>.<span class="ident">verification_flow_id</span> {
             <span class="ident">FlowId::ToDevice</span>(<span class="ident">s</span>) <span class="op">=</span><span class="op">&gt;</span> {
-                <span class="ident">AnyToDeviceEventContent::KeyVerificationKey</span>(<span class="ident">KeyToDeviceEventContent</span> {
-                    <span class="ident">transaction_id</span>: <span class="ident">s</span>.<span class="ident">to_string</span>(),
-                    <span class="ident">key</span>: <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">lock</span>().<span class="ident">unwrap</span>().<span class="ident">public_key</span>(),
-                })
+                <span class="ident">AnyToDeviceEventContent::KeyVerificationKey</span>(<span class="ident">KeyToDeviceEventContent::new</span>(
+                    <span class="ident">s</span>.<span class="ident">to_string</span>(),
+                    <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">lock</span>().<span class="ident">unwrap</span>().<span class="ident">public_key</span>(),
+                ))
                 .<span class="ident">into</span>()
             }
             <span class="ident">FlowId::InRoom</span>(<span class="ident">r</span>, <span class="ident">e</span>) <span class="op">=</span><span class="op">&gt;</span> (
@@ -2448,11 +2448,12 @@
 
     <span class="kw">use</span> <span class="ident">ruma</span>::{
         <span class="ident">events::key::verification</span>::{
-            <span class="ident">accept</span>::{<span class="ident">AcceptMethod</span>, <span class="ident">CustomContent</span>},
-            <span class="ident">start</span>::{<span class="ident">CustomContent</span> <span class="kw">as</span> <span class="ident">CustomStartContent</span>, <span class="ident">StartMethod</span>},
+            <span class="ident">accept</span>::{<span class="ident">AcceptMethod</span>, <span class="ident">AcceptToDeviceEventContent</span>},
+            <span class="ident">start</span>::{<span class="ident">StartMethod</span>, <span class="ident">StartToDeviceEventContent</span>},
         },
         <span class="ident">DeviceId</span>, <span class="ident">UserId</span>,
     };
+    <span class="kw">use</span> <span class="ident">serde_json::json</span>;
 
     <span class="kw">use</span> <span class="kw">super</span>::{<span class="ident">Accepted</span>, <span class="ident">Created</span>, <span class="ident">SasState</span>, <span class="ident">Started</span>};
     <span class="kw">use</span> <span class="kw">crate</span>::{
@@ -2585,7 +2586,7 @@
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">method</span> <span class="op">=</span> <span class="ident">content</span>.<span class="ident">method_mut</span>();
 
         <span class="kw">match</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">method</span> {
-            <span class="ident">AcceptMethod::MSasV1</span>(<span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="ident">c</span>) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">AcceptMethod::SasV1</span>(<span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="ident">c</span>) <span class="op">=</span><span class="op">&gt;</span> {
                 <span class="ident">c</span>.<span class="ident">commitment</span> <span class="op">=</span> <span class="string">&quot;&quot;</span>.<span class="ident">to_string</span>();
             }
             <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">panic!</span>(<span class="string">&quot;Unknown accept event content&quot;</span>),
@@ -2624,7 +2625,7 @@
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">method</span> <span class="op">=</span> <span class="ident">content</span>.<span class="ident">method_mut</span>();
 
         <span class="kw">match</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">method</span> {
-            <span class="ident">AcceptMethod::MSasV1</span>(<span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="ident">c</span>) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">AcceptMethod::SasV1</span>(<span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="ident">c</span>) <span class="op">=</span><span class="op">&gt;</span> {
                 <span class="ident">c</span>.<span class="ident">short_authentication_string</span> <span class="op">=</span> <span class="macro">vec!</span>[];
             }
             <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">panic!</span>(<span class="string">&quot;Unknown accept event content&quot;</span>),
@@ -2641,14 +2642,13 @@
     <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">sas_unknown_method</span>() {
         <span class="kw">let</span> (<span class="ident">alice</span>, <span class="ident">bob</span>) <span class="op">=</span> <span class="ident">get_sas_pair</span>().<span class="kw">await</span>;
 
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">content</span> <span class="op">=</span> <span class="ident">bob</span>.<span class="ident">as_content</span>();
-        <span class="kw">let</span> <span class="ident">method</span> <span class="op">=</span> <span class="ident">content</span>.<span class="ident">method_mut</span>();
-
-        <span class="kw-2">*</span><span class="ident">method</span> <span class="op">=</span> <span class="ident">AcceptMethod::Custom</span>(<span class="ident">CustomContent</span> {
-            <span class="ident">method</span>: <span class="string">&quot;m.sas.custom&quot;</span>.<span class="ident">to_string</span>(),
-            <span class="ident">data</span>: <span class="ident">Default::default</span>(),
+        <span class="kw">let</span> <span class="ident">content</span> <span class="op">=</span> <span class="macro">json!</span>({
+            <span class="string">&quot;method&quot;</span>: <span class="string">&quot;m.sas.custom&quot;</span>,
+            <span class="string">&quot;method_data&quot;</span>: <span class="string">&quot;something&quot;</span>,
+            <span class="string">&quot;transaction_id&quot;</span>: <span class="string">&quot;some_id&quot;</span>,
         });
 
+        <span class="kw">let</span> <span class="ident">content</span>: <span class="ident">AcceptToDeviceEventContent</span> <span class="op">=</span> <span class="ident">serde_json::from_value</span>(<span class="ident">content</span>).<span class="ident">unwrap</span>();
         <span class="kw">let</span> <span class="ident">content</span> <span class="op">=</span> <span class="ident">AcceptContent::from</span>(<span class="kw-2">&amp;</span><span class="ident">content</span>);
 
         <span class="ident">alice</span>
@@ -2689,22 +2689,22 @@
         )
         .<span class="ident">expect_err</span>(<span class="string">&quot;Didn&#39;t cancel on invalid MAC method&quot;</span>);
 
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">start_content</span> <span class="op">=</span> <span class="ident">alice_sas</span>.<span class="ident">as_content</span>();
-        <span class="kw">let</span> <span class="ident">method</span> <span class="op">=</span> <span class="ident">start_content</span>.<span class="ident">method_mut</span>();
-
-        <span class="kw-2">*</span><span class="ident">method</span> <span class="op">=</span> <span class="ident">StartMethod::Custom</span>(<span class="ident">CustomStartContent</span> {
-            <span class="ident">method</span>: <span class="string">&quot;m.sas.custom&quot;</span>.<span class="ident">to_string</span>(),
-            <span class="ident">data</span>: <span class="ident">Default::default</span>(),
+        <span class="kw">let</span> <span class="ident">content</span> <span class="op">=</span> <span class="macro">json!</span>({
+            <span class="string">&quot;method&quot;</span>: <span class="string">&quot;m.sas.custom&quot;</span>,
+            <span class="string">&quot;from_device&quot;</span>: <span class="string">&quot;DEVICEID&quot;</span>,
+            <span class="string">&quot;method_data&quot;</span>: <span class="string">&quot;something&quot;</span>,
+            <span class="string">&quot;transaction_id&quot;</span>: <span class="string">&quot;some_id&quot;</span>,
         });
 
-        <span class="kw">let</span> <span class="ident">flow_id</span> <span class="op">=</span> <span class="ident">start_content</span>.<span class="ident">flow_id</span>();
-        <span class="kw">let</span> <span class="ident">content</span> <span class="op">=</span> <span class="ident">StartContent::from</span>(<span class="kw-2">&amp;</span><span class="ident">start_content</span>);
+        <span class="kw">let</span> <span class="ident">content</span>: <span class="ident">StartToDeviceEventContent</span> <span class="op">=</span> <span class="ident">serde_json::from_value</span>(<span class="ident">content</span>).<span class="ident">unwrap</span>();
+        <span class="kw">let</span> <span class="ident">content</span> <span class="op">=</span> <span class="ident">StartContent::from</span>(<span class="kw-2">&amp;</span><span class="ident">content</span>);
+        <span class="kw">let</span> <span class="ident">flow_id</span> <span class="op">=</span> <span class="ident">content</span>.<span class="ident">flow_id</span>().<span class="ident">to_owned</span>();
 
         <span class="ident">SasState</span>::<span class="op">&lt;</span><span class="ident">Started</span><span class="op">&gt;</span><span class="ident">::from_start_event</span>(
             <span class="ident">bob</span>.<span class="ident">clone</span>(),
             <span class="ident">alice_device</span>,
             <span class="prelude-val">None</span>,
-            <span class="ident">flow_id</span>,
+            <span class="ident">flow_id</span>.<span class="ident">into</span>(),
             <span class="kw-2">&amp;</span><span class="ident">content</span>,
             <span class="bool-val">false</span>,
         )

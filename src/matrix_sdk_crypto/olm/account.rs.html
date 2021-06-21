@@ -1050,6 +1050,7 @@
 <span id="1048">1048</span>
 <span id="1049">1049</span>
 <span id="1050">1050</span>
+<span id="1051">1051</span>
 </pre><pre class="rust">
 <span class="comment">// Copyright 2020 The Matrix.org Foundation C.I.C.</span>
 <span class="comment">//</span>
@@ -1083,13 +1084,9 @@
     <span class="ident">session</span>::{<span class="ident">OlmMessage</span>, <span class="ident">PreKeyMessage</span>},
     <span class="ident">PicklingMode</span>,
 };
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
-<span class="kw">use</span> <span class="ident">ruma::events::EventType</span>;
 <span class="kw">use</span> <span class="ident">ruma</span>::{
-    <span class="ident">api::client::r0::keys</span>::{
-        <span class="ident">upload_keys</span>, <span class="ident">upload_signatures::Request</span> <span class="kw">as</span> <span class="ident">SignatureUploadRequest</span>, <span class="ident">OneTimeKey</span>, <span class="ident">SignedKey</span>,
-    },
-    <span class="ident">encryption::DeviceKeys</span>,
+    <span class="ident">api::client::r0::keys</span>::{<span class="ident">upload_keys</span>, <span class="ident">upload_signatures::Request</span> <span class="kw">as</span> <span class="ident">SignatureUploadRequest</span>},
+    <span class="ident">encryption</span>::{<span class="ident">DeviceKeys</span>, <span class="ident">OneTimeKey</span>, <span class="ident">SignedKey</span>},
     <span class="ident">events</span>::{
         <span class="ident">room::encrypted</span>::{<span class="ident">EncryptedEventContent</span>, <span class="ident">EncryptedEventScheme</span>},
         <span class="ident">AnyToDeviceEvent</span>, <span class="ident">ToDeviceEvent</span>,
@@ -2046,6 +2043,8 @@
 
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
     <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">create_session_for</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">other</span>: <span class="kw-2">&amp;</span><span class="ident">ReadOnlyAccount</span>) <span class="op">-</span><span class="op">&gt;</span> (<span class="ident">Session</span>, <span class="ident">Session</span>) {
+        <span class="kw">use</span> <span class="ident">ruma::events</span>::{<span class="ident">dummy::DummyToDeviceEventContent</span>, <span class="ident">AnyToDeviceEventContent</span>};
+
         <span class="ident">other</span>.<span class="ident">generate_one_time_keys_helper</span>(<span class="number">1</span>).<span class="kw">await</span>;
         <span class="kw">let</span> <span class="ident">one_time</span> <span class="op">=</span> <span class="ident">other</span>.<span class="ident">signed_one_time_keys</span>().<span class="kw">await</span>.<span class="ident">unwrap</span>();
 
@@ -2056,7 +2055,10 @@
 
         <span class="ident">other</span>.<span class="ident">mark_keys_as_published</span>().<span class="kw">await</span>;
 
-        <span class="kw">let</span> <span class="ident">message</span> <span class="op">=</span> <span class="ident">our_session</span>.<span class="ident">encrypt</span>(<span class="kw-2">&amp;</span><span class="ident">device</span>, <span class="ident">EventType::Dummy</span>, <span class="macro">json!</span>({})).<span class="kw">await</span>.<span class="ident">unwrap</span>();
+        <span class="kw">let</span> <span class="ident">message</span> <span class="op">=</span> <span class="ident">our_session</span>
+            .<span class="ident">encrypt</span>(<span class="kw-2">&amp;</span><span class="ident">device</span>, <span class="ident">AnyToDeviceEventContent::Dummy</span>(<span class="ident">DummyToDeviceEventContent::new</span>()))
+            .<span class="kw">await</span>
+            .<span class="ident">unwrap</span>();
         <span class="kw">let</span> <span class="ident">content</span> <span class="op">=</span> <span class="kw">if</span> <span class="kw">let</span> <span class="ident">EncryptedEventScheme::OlmV1Curve25519AesSha2</span>(<span class="ident">c</span>) <span class="op">=</span> <span class="ident">message</span>.<span class="ident">scheme</span> {
             <span class="ident">c</span>
         } <span class="kw">else</span> {

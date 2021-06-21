@@ -357,6 +357,13 @@
 <span id="355">355</span>
 <span id="356">356</span>
 <span id="357">357</span>
+<span id="358">358</span>
+<span id="359">359</span>
+<span id="360">360</span>
+<span id="361">361</span>
+<span id="362">362</span>
+<span id="363">363</span>
+<span id="364">364</span>
 </pre><pre class="rust">
 <span class="comment">// Copyright 2020 The Matrix.org Foundation C.I.C.</span>
 <span class="comment">//</span>
@@ -385,16 +392,17 @@
                 <span class="ident">Request</span> <span class="kw">as</span> <span class="ident">SignatureUploadRequest</span>, <span class="ident">Response</span> <span class="kw">as</span> <span class="ident">SignatureUploadResponse</span>,
             },
             <span class="ident">upload_signing_keys::Response</span> <span class="kw">as</span> <span class="ident">SigningKeysUploadResponse</span>,
-            <span class="ident">CrossSigningKey</span>,
         },
         <span class="ident">message::send_message_event::Response</span> <span class="kw">as</span> <span class="ident">RoomMessageResponse</span>,
-        <span class="ident">to_device</span>::{<span class="ident">send_event_to_device::Response</span> <span class="kw">as</span> <span class="ident">ToDeviceResponse</span>, <span class="ident">DeviceIdOrAllDevices</span>},
+        <span class="ident">to_device::send_event_to_device::Response</span> <span class="kw">as</span> <span class="ident">ToDeviceResponse</span>,
     },
+    <span class="ident">encryption::CrossSigningKey</span>,
     <span class="ident">events</span>::{<span class="ident">AnyMessageEventContent</span>, <span class="ident">AnyToDeviceEventContent</span>, <span class="ident">EventContent</span>, <span class="ident">EventType</span>},
+    <span class="ident">serde::Raw</span>,
+    <span class="ident">to_device::DeviceIdOrAllDevices</span>,
     <span class="ident">DeviceIdBox</span>, <span class="ident">RoomId</span>, <span class="ident">UserId</span>,
 };
 <span class="kw">use</span> <span class="ident">serde</span>::{<span class="ident">Deserialize</span>, <span class="ident">Serialize</span>};
-<span class="kw">use</span> <span class="ident">serde_json::value::RawValue</span> <span class="kw">as</span> <span class="ident">RawJsonValue</span>;
 
 <span class="doccomment">/// Customized version of</span>
 <span class="doccomment">/// `ruma_client_api::r0::to_device::send_event_to_device::Request`,</span>
@@ -414,7 +422,7 @@
     <span class="doccomment">/// The content&#39;s type for this field will be updated in a future</span>
     <span class="doccomment">/// release, until then you can create a value using</span>
     <span class="doccomment">/// `serde_json::value::to_raw_value`.</span>
-    <span class="kw">pub</span> <span class="ident">messages</span>: <span class="ident">BTreeMap</span><span class="op">&lt;</span><span class="ident">UserId</span>, <span class="ident">BTreeMap</span><span class="op">&lt;</span><span class="ident">DeviceIdOrAllDevices</span>, <span class="ident">Box</span><span class="op">&lt;</span><span class="ident">RawJsonValue</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+    <span class="kw">pub</span> <span class="ident">messages</span>: <span class="ident">BTreeMap</span><span class="op">&lt;</span><span class="ident">UserId</span>, <span class="ident">BTreeMap</span><span class="op">&lt;</span><span class="ident">DeviceIdOrAllDevices</span>, <span class="ident">Raw</span><span class="op">&lt;</span><span class="ident">AnyToDeviceEventContent</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span>,
 }
 
 <span class="kw">impl</span> <span class="ident">ToDeviceRequest</span> {
@@ -434,17 +442,23 @@
         <span class="ident">recipient_device</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">DeviceIdOrAllDevices</span><span class="op">&gt;</span>,
         <span class="ident">content</span>: <span class="ident">AnyToDeviceEventContent</span>,
     ) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+        <span class="self">Self</span><span class="ident">::new_with_id</span>(<span class="ident">recipient</span>, <span class="ident">recipient_device</span>, <span class="ident">content</span>, <span class="ident">Uuid::new_v4</span>())
+    }
+
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">new_with_id</span>(
+        <span class="ident">recipient</span>: <span class="kw-2">&amp;</span><span class="ident">UserId</span>,
+        <span class="ident">recipient_device</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">DeviceIdOrAllDevices</span><span class="op">&gt;</span>,
+        <span class="ident">content</span>: <span class="ident">AnyToDeviceEventContent</span>,
+        <span class="ident">txn_id</span>: <span class="ident">Uuid</span>,
+    ) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">messages</span> <span class="op">=</span> <span class="ident">BTreeMap::new</span>();
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">user_messages</span> <span class="op">=</span> <span class="ident">BTreeMap::new</span>();
-
-        <span class="ident">user_messages</span>.<span class="ident">insert</span>(
-            <span class="ident">recipient_device</span>.<span class="ident">into</span>(),
-            <span class="ident">serde_json::value::to_raw_value</span>(<span class="kw-2">&amp;</span><span class="ident">content</span>).<span class="ident">expect</span>(<span class="string">&quot;Can&#39;t serialize to-device content&quot;</span>),
-        );
-        <span class="ident">messages</span>.<span class="ident">insert</span>(<span class="ident">recipient</span>.<span class="ident">clone</span>(), <span class="ident">user_messages</span>);
         <span class="kw">let</span> <span class="ident">event_type</span> <span class="op">=</span> <span class="ident">EventType::from</span>(<span class="ident">content</span>.<span class="ident">event_type</span>());
 
-        <span class="ident">ToDeviceRequest</span> { <span class="ident">txn_id</span>: <span class="ident">Uuid::new_v4</span>(), <span class="ident">event_type</span>, <span class="ident">messages</span> }
+        <span class="ident">user_messages</span>.<span class="ident">insert</span>(<span class="ident">recipient_device</span>.<span class="ident">into</span>(), <span class="ident">Raw::from</span>(<span class="ident">content</span>));
+        <span class="ident">messages</span>.<span class="ident">insert</span>(<span class="ident">recipient</span>.<span class="ident">clone</span>(), <span class="ident">user_messages</span>);
+
+        <span class="ident">ToDeviceRequest</span> { <span class="ident">event_type</span>, <span class="ident">txn_id</span>, <span class="ident">messages</span> }
     }
 
     <span class="doccomment">/// Gets the transaction ID as a string.</span>

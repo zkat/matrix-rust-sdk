@@ -590,12 +590,6 @@
 <span id="588">588</span>
 <span id="589">589</span>
 <span id="590">590</span>
-<span id="591">591</span>
-<span id="592">592</span>
-<span id="593">593</span>
-<span id="594">594</span>
-<span id="595">595</span>
-<span id="596">596</span>
 </pre><pre class="rust">
 <span class="comment">// Copyright 2020 The Matrix.org Foundation C.I.C.</span>
 <span class="comment">//</span>
@@ -633,20 +627,20 @@
     <span class="ident">errors::OlmGroupSessionError</span>, <span class="ident">outbound_group_session::OlmOutboundGroupSession</span>, <span class="ident">PicklingMode</span>,
 };
 <span class="kw">use</span> <span class="ident">ruma</span>::{
-    <span class="ident">api::client::r0::to_device::DeviceIdOrAllDevices</span>,
     <span class="ident">events</span>::{
         <span class="ident">room</span>::{
             <span class="ident">encrypted</span>::{<span class="ident">EncryptedEventContent</span>, <span class="ident">EncryptedEventScheme</span>, <span class="ident">MegolmV1AesSha2ContentInit</span>},
             <span class="ident">encryption::EncryptionEventContent</span>,
             <span class="ident">history_visibility::HistoryVisibility</span>,
-            <span class="ident">message::Relation</span>,
         },
-        <span class="ident">AnyMessageEventContent</span>, <span class="ident">EventContent</span>,
+        <span class="ident">room_key::RoomKeyToDeviceEventContent</span>,
+        <span class="ident">AnyMessageEventContent</span>, <span class="ident">AnyToDeviceEventContent</span>, <span class="ident">EventContent</span>,
     },
+    <span class="ident">to_device::DeviceIdOrAllDevices</span>,
     <span class="ident">DeviceId</span>, <span class="ident">DeviceIdBox</span>, <span class="ident">EventEncryptionAlgorithm</span>, <span class="ident">RoomId</span>, <span class="ident">UserId</span>,
 };
 <span class="kw">use</span> <span class="ident">serde</span>::{<span class="ident">Deserialize</span>, <span class="ident">Serialize</span>};
-<span class="kw">use</span> <span class="ident">serde_json</span>::{<span class="ident">json</span>, <span class="ident">Value</span>};
+<span class="kw">use</span> <span class="ident">serde_json::json</span>;
 <span class="kw">use</span> <span class="ident">tracing</span>::{<span class="ident">debug</span>, <span class="ident">error</span>, <span class="ident">trace</span>};
 
 <span class="kw">use</span> <span class="kw">super</span>::{
@@ -876,13 +870,8 @@
             <span class="string">&quot;type&quot;</span>: <span class="ident">content</span>.<span class="ident">event_type</span>(),
         });
 
-        <span class="kw">let</span> <span class="ident">relates_to</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Relation</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">json_content</span>
-            .<span class="ident">get</span>(<span class="string">&quot;content&quot;</span>)
-            .<span class="ident">map</span>(<span class="op">|</span><span class="ident">c</span><span class="op">|</span> <span class="ident">c</span>.<span class="ident">get</span>(<span class="string">&quot;m.relates_to&quot;</span>).<span class="ident">cloned</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">r</span><span class="op">|</span> <span class="ident">serde_json::from_value</span>(<span class="ident">r</span>).<span class="ident">ok</span>()))
-            .<span class="ident">flatten</span>()
-            .<span class="ident">flatten</span>();
-
         <span class="kw">let</span> <span class="ident">plaintext</span> <span class="op">=</span> <span class="ident">json_content</span>.<span class="ident">to_string</span>();
+        <span class="kw">let</span> <span class="ident">relation</span> <span class="op">=</span> <span class="ident">content</span>.<span class="ident">relation</span>();
 
         <span class="kw">let</span> <span class="ident">ciphertext</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">encrypt_helper</span>(<span class="ident">plaintext</span>).<span class="kw">await</span>;
 
@@ -896,7 +885,7 @@
 
         <span class="ident">EncryptedEventContent::new</span>(
             <span class="ident">EncryptedEventScheme::MegolmV1AesSha2</span>(<span class="ident">encrypted_content</span>),
-            <span class="ident">relates_to</span>,
+            <span class="ident">relation</span>,
         )
     }
 
@@ -960,16 +949,15 @@
         <span class="ident">session</span>.<span class="ident">session_message_index</span>()
     }
 
-    <span class="doccomment">/// Get the outbound group session key as a json value that can be sent as a</span>
-    <span class="doccomment">/// m.room_key.</span>
-    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">as_json</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Value</span> {
-        <span class="macro">json!</span>({
-            <span class="string">&quot;algorithm&quot;</span>: <span class="ident">EventEncryptionAlgorithm::MegolmV1AesSha2</span>,
-            <span class="string">&quot;room_id&quot;</span>: <span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="self">self</span>.<span class="ident">room_id</span>,
-            <span class="string">&quot;session_id&quot;</span>: <span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="self">self</span>.<span class="ident">session_id</span>,
-            <span class="string">&quot;session_key&quot;</span>: <span class="self">self</span>.<span class="ident">session_key</span>().<span class="kw">await</span>,
-            <span class="string">&quot;chain_index&quot;</span>: <span class="self">self</span>.<span class="ident">message_index</span>().<span class="kw">await</span>,
-        })
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">as_content</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">AnyToDeviceEventContent</span> {
+        <span class="kw">let</span> <span class="ident">session_key</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">session_key</span>().<span class="kw">await</span>;
+
+        <span class="ident">AnyToDeviceEventContent::RoomKey</span>(<span class="ident">RoomKeyToDeviceEventContent::new</span>(
+            <span class="ident">EventEncryptionAlgorithm::MegolmV1AesSha2</span>,
+            <span class="self">self</span>.<span class="ident">room_id</span>().<span class="ident">to_owned</span>(),
+            <span class="self">self</span>.<span class="ident">session_id</span>().<span class="ident">to_owned</span>(),
+            <span class="ident">session_key</span>.<span class="number">0</span>.<span class="ident">clone</span>(),
+        ))
     }
 
     <span class="doccomment">/// Has or will the session be shared with the given user/device pair.</span>

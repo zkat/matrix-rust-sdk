@@ -650,12 +650,6 @@
 <span id="648">648</span>
 <span id="649">649</span>
 <span id="650">650</span>
-<span id="651">651</span>
-<span id="652">652</span>
-<span id="653">653</span>
-<span id="654">654</span>
-<span id="655">655</span>
-<span id="656">656</span>
 </pre><pre class="rust">
 <span class="comment">// Copyright 2020 The Matrix.org Foundation C.I.C.</span>
 <span class="comment">//</span>
@@ -684,11 +678,10 @@
 <span class="kw">use</span> <span class="ident">atomic::Atomic</span>;
 <span class="kw">use</span> <span class="ident">matrix_sdk_common::locks::Mutex</span>;
 <span class="kw">use</span> <span class="ident">ruma</span>::{
-    <span class="ident">api::client::r0::keys::SignedKey</span>,
-    <span class="ident">encryption::DeviceKeys</span>,
+    <span class="ident">encryption</span>::{<span class="ident">DeviceKeys</span>, <span class="ident">SignedKey</span>},
     <span class="ident">events</span>::{
         <span class="ident">forwarded_room_key::ForwardedRoomKeyToDeviceEventContent</span>,
-        <span class="ident">room::encrypted::EncryptedEventContent</span>, <span class="ident">EventType</span>,
+        <span class="ident">room::encrypted::EncryptedEventContent</span>, <span class="ident">AnyToDeviceEventContent</span>,
     },
     <span class="ident">identifiers</span>::{
         <span class="ident">DeviceId</span>, <span class="ident">DeviceIdBox</span>, <span class="ident">DeviceKeyAlgorithm</span>, <span class="ident">DeviceKeyId</span>, <span class="ident">EventEncryptionAlgorithm</span>, <span class="ident">UserId</span>,
@@ -835,15 +828,12 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// # Arguments</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// * `event_type` - The type of the event.</span>
-    <span class="doccomment">///</span>
     <span class="doccomment">/// * `content` - The content of the event that should be encrypted.</span>
     <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">encrypt</span>(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
-        <span class="ident">event_type</span>: <span class="ident">EventType</span>,
-        <span class="ident">content</span>: <span class="ident">Value</span>,
+        <span class="ident">content</span>: <span class="ident">AnyToDeviceEventContent</span>,
     ) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">OlmResult</span><span class="op">&lt;</span>(<span class="ident">Session</span>, <span class="ident">EncryptedEventContent</span>)<span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">encrypt</span>(<span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="self">self</span>.<span class="ident">verification_machine</span>.<span class="ident">store</span>, <span class="ident">event_type</span>, <span class="ident">content</span>).<span class="kw">await</span>
+        <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">encrypt</span>(<span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="self">self</span>.<span class="ident">verification_machine</span>.<span class="ident">store</span>, <span class="ident">content</span>).<span class="kw">await</span>
     }
 
     <span class="doccomment">/// Encrypt the given inbound group session as a forwarded room key for this</span>
@@ -872,8 +862,7 @@
             );
         };
 
-        <span class="kw">let</span> <span class="ident">content</span> <span class="op">=</span> <span class="ident">serde_json::to_value</span>(<span class="ident">content</span>)<span class="question-mark">?</span>;
-        <span class="self">self</span>.<span class="ident">encrypt</span>(<span class="ident">EventType::ForwardedRoomKey</span>, <span class="ident">content</span>).<span class="kw">await</span>
+        <span class="self">self</span>.<span class="ident">encrypt</span>(<span class="ident">AnyToDeviceEventContent::ForwardedRoomKey</span>(<span class="ident">content</span>)).<span class="kw">await</span>
     }
 }
 
@@ -1080,8 +1069,7 @@
     <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">encrypt</span>(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         <span class="ident">store</span>: <span class="kw-2">&amp;</span><span class="kw">dyn</span> <span class="ident">CryptoStore</span>,
-        <span class="ident">event_type</span>: <span class="ident">EventType</span>,
-        <span class="ident">content</span>: <span class="ident">Value</span>,
+        <span class="ident">content</span>: <span class="ident">AnyToDeviceEventContent</span>,
     ) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">OlmResult</span><span class="op">&lt;</span>(<span class="ident">Session</span>, <span class="ident">EncryptedEventContent</span>)<span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">sender_key</span> <span class="op">=</span> <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">k</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">get_key</span>(<span class="ident">DeviceKeyAlgorithm::Curve25519</span>) {
             <span class="ident">k</span>
@@ -1114,7 +1102,7 @@
             <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">OlmError::MissingSession</span>);
         };
 
-        <span class="kw">let</span> <span class="ident">message</span> <span class="op">=</span> <span class="ident">session</span>.<span class="ident">encrypt</span>(<span class="self">self</span>, <span class="ident">event_type</span>, <span class="ident">content</span>).<span class="kw">await</span><span class="question-mark">?</span>;
+        <span class="kw">let</span> <span class="ident">message</span> <span class="op">=</span> <span class="ident">session</span>.<span class="ident">encrypt</span>(<span class="self">self</span>, <span class="ident">content</span>).<span class="kw">await</span><span class="question-mark">?</span>;
 
         <span class="prelude-val">Ok</span>((<span class="ident">session</span>, <span class="ident">message</span>))
     }
