@@ -226,7 +226,7 @@
 <span class="kw">use</span> <span class="ident">std</span>::{<span class="ident">net::ToSocketAddrs</span>, <span class="ident">result::Result</span> <span class="kw">as</span> <span class="ident">StdResult</span>};
 
 <span class="kw">use</span> <span class="ident">futures::TryFutureExt</span>;
-<span class="kw">use</span> <span class="ident">matrix_sdk::Bytes</span>;
+<span class="kw">use</span> <span class="ident">matrix_sdk</span>::{<span class="ident">bytes::Bytes</span>, <span class="ident">ruma</span>};
 <span class="kw">use</span> <span class="ident">serde::Serialize</span>;
 <span class="kw">use</span> <span class="ident">warp</span>::{<span class="ident">filters::BoxedFilter</span>, <span class="ident">path::FullPath</span>, <span class="ident">Filter</span>, <span class="ident">Rejection</span>, <span class="ident">Reply</span>};
 
@@ -321,7 +321,7 @@
             .<span class="ident">and</span>(<span class="ident">warp::query::raw</span>())
             .<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">token</span>: <span class="ident">String</span>, <span class="ident">query</span>: <span class="ident">String</span><span class="op">|</span> <span class="kw">async</span> <span class="kw">move</span> {
                 <span class="kw">let</span> <span class="ident">query</span>: <span class="ident">Vec</span><span class="op">&lt;</span>(<span class="ident">String</span>, <span class="ident">String</span>)<span class="op">&gt;</span> <span class="op">=</span>
-                    <span class="ident">matrix_sdk::urlencoded::from_str</span>(<span class="kw-2">&amp;</span><span class="ident">query</span>).<span class="ident">map_err</span>(<span class="ident">Error::from</span>)<span class="question-mark">?</span>;
+                    <span class="ident">ruma::serde::urlencoded::from_str</span>(<span class="kw-2">&amp;</span><span class="ident">query</span>).<span class="ident">map_err</span>(<span class="ident">Error::from</span>)<span class="question-mark">?</span>;
 
                 <span class="kw">if</span> <span class="ident">query</span>.<span class="ident">into_iter</span>().<span class="ident">any</span>(<span class="op">|</span>(<span class="ident">key</span>, <span class="ident">value</span>)<span class="op">|</span> <span class="ident">key</span> <span class="op">=</span><span class="op">=</span> <span class="string">&quot;access_token&quot;</span> <span class="op">&amp;&amp;</span> <span class="ident">value</span> <span class="op">=</span><span class="op">=</span> <span class="ident">token</span>) {
                     <span class="prelude-val">Ok</span>::<span class="op">&lt;</span>(), <span class="ident">Rejection</span><span class="op">&gt;</span>(())
@@ -386,8 +386,8 @@
         <span class="ident">appservice</span>: <span class="ident">AppService</span>,
         <span class="ident">request</span>: <span class="ident">http::Request</span><span class="op">&lt;</span><span class="ident">Bytes</span><span class="op">&gt;</span>,
     ) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">StdResult</span><span class="op">&lt;</span><span class="kw">impl</span> <span class="ident">warp::Reply</span>, <span class="ident">Rejection</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">incoming_transaction</span>: <span class="ident">matrix_sdk::api_appservice::event::push_events::v1::IncomingRequest</span> <span class="op">=</span>
-            <span class="ident">matrix_sdk::IncomingRequest::try_from_http_request</span>(<span class="ident">request</span>).<span class="ident">map_err</span>(<span class="ident">Error::from</span>)<span class="question-mark">?</span>;
+        <span class="kw">let</span> <span class="ident">incoming_transaction</span>: <span class="ident">ruma::api::appservice::event::push_events::v1::IncomingRequest</span> <span class="op">=</span>
+            <span class="ident">ruma::api::IncomingRequest::try_from_http_request</span>(<span class="ident">request</span>).<span class="ident">map_err</span>(<span class="ident">Error::from</span>)<span class="question-mark">?</span>;
 
         <span class="kw">let</span> <span class="ident">client</span> <span class="op">=</span> <span class="ident">appservice</span>.<span class="ident">get_cached_client</span>(<span class="prelude-val">None</span>)<span class="question-mark">?</span>;
         <span class="ident">client</span>.<span class="ident">receive_transaction</span>(<span class="ident">incoming_transaction</span>).<span class="ident">map_err</span>(<span class="ident">Error::from</span>).<span class="kw">await</span><span class="question-mark">?</span>;

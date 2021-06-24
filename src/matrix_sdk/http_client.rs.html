@@ -362,6 +362,8 @@
 <span id="362">362</span>
 <span id="363">363</span>
 <span id="364">364</span>
+<span id="365">365</span>
+<span id="366">366</span>
 </pre><pre class="rust">
 <span class="comment">// Copyright 2020 The Matrix.org Foundation C.I.C.</span>
 <span class="comment">//</span>
@@ -377,15 +379,10 @@
 <span class="comment">// See the License for the specific language governing permissions and</span>
 <span class="comment">// limitations under the License.</span>
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">not</span>(<span class="ident">target_arch</span> <span class="op">=</span> <span class="string">&quot;wasm32&quot;</span>)))]</span>
-<span class="kw">use</span> <span class="ident">std::sync::atomic</span>::{<span class="ident">AtomicU64</span>, <span class="ident">Ordering</span>};
 <span class="kw">use</span> <span class="ident">std</span>::{<span class="ident">convert::TryFrom</span>, <span class="ident">fmt::Debug</span>, <span class="ident">sync::Arc</span>};
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">not</span>(<span class="ident">target_arch</span> <span class="op">=</span> <span class="string">&quot;wasm32&quot;</span>)))]</span>
-<span class="kw">use</span> <span class="ident">backoff</span>::{<span class="ident">future::retry</span>, <span class="ident">Error</span> <span class="kw">as</span> <span class="ident">RetryError</span>, <span class="ident">ExponentialBackoff</span>};
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">not</span>(<span class="ident">target_arch</span> <span class="op">=</span> <span class="string">&quot;wasm32&quot;</span>)))]</span>
-<span class="kw">use</span> <span class="ident">http::StatusCode</span>;
-<span class="kw">use</span> <span class="ident">http</span>::{<span class="ident">HeaderValue</span>, <span class="ident">Response</span> <span class="kw">as</span> <span class="ident">HttpResponse</span>};
+<span class="kw">use</span> <span class="ident">bytes</span>::{<span class="ident">Bytes</span>, <span class="ident">BytesMut</span>};
+<span class="kw">use</span> <span class="ident">http::Response</span> <span class="kw">as</span> <span class="ident">HttpResponse</span>;
 <span class="kw">use</span> <span class="ident">matrix_sdk_common</span>::{<span class="ident">async_trait</span>, <span class="ident">locks::RwLock</span>, <span class="ident">AsyncTraitDeps</span>};
 <span class="kw">use</span> <span class="ident">reqwest</span>::{<span class="ident">Client</span>, <span class="ident">Response</span>};
 <span class="kw">use</span> <span class="ident">ruma::api</span>::{
@@ -395,7 +392,7 @@
 <span class="kw">use</span> <span class="ident">tracing::trace</span>;
 <span class="kw">use</span> <span class="ident">url::Url</span>;
 
-<span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">error::HttpError</span>, <span class="ident">Bytes</span>, <span class="ident">BytesMut</span>, <span class="ident">ClientConfig</span>, <span class="ident">RequestConfig</span>, <span class="ident">Session</span>};
+<span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">error::HttpError</span>, <span class="ident">ClientConfig</span>, <span class="ident">RequestConfig</span>, <span class="ident">Session</span>};
 
 <span class="doccomment">/// Abstraction around the http layer. The allows implementors to use different</span>
 <span class="doccomment">/// http libraries.</span>
@@ -419,7 +416,7 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// ```</span>
     <span class="doccomment">/// use std::convert::TryFrom;</span>
-    <span class="doccomment">/// use matrix_sdk::{HttpSend, async_trait, HttpError, RequestConfig, Bytes};</span>
+    <span class="doccomment">/// use matrix_sdk::{HttpSend, async_trait, HttpError, RequestConfig, bytes::Bytes};</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// #[derive(Debug)]</span>
     <span class="doccomment">/// struct Client(reqwest::Client);</span>
@@ -600,6 +597,8 @@
 
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">target_arch</span> <span class="op">=</span> <span class="string">&quot;wasm32&quot;</span>))]</span>
     <span class="kw">let</span> <span class="ident">http_client</span> <span class="op">=</span> {
+        <span class="kw">use</span> <span class="ident">http::HeaderValue</span>;
+
         <span class="kw">let</span> <span class="ident">http_client</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">config</span>.<span class="ident">disable_ssl_verification</span> {
             <span class="ident">http_client</span>.<span class="ident">danger_accept_invalid_certs</span>(<span class="bool-val">true</span>)
         } <span class="kw">else</span> {
@@ -668,6 +667,11 @@
     <span class="ident">request</span>: <span class="ident">http::Request</span><span class="op">&lt;</span><span class="ident">Bytes</span><span class="op">&gt;</span>,
     <span class="ident">config</span>: <span class="ident">RequestConfig</span>,
 ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">http::Response</span><span class="op">&lt;</span><span class="ident">Bytes</span><span class="op">&gt;</span>, <span class="ident">HttpError</span><span class="op">&gt;</span> {
+    <span class="kw">use</span> <span class="ident">std::sync::atomic</span>::{<span class="ident">AtomicU64</span>, <span class="ident">Ordering</span>};
+
+    <span class="kw">use</span> <span class="ident">backoff</span>::{<span class="ident">future::retry</span>, <span class="ident">Error</span> <span class="kw">as</span> <span class="ident">RetryError</span>, <span class="ident">ExponentialBackoff</span>};
+    <span class="kw">use</span> <span class="ident">http::StatusCode</span>;
+
     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">backoff</span> <span class="op">=</span> <span class="ident">ExponentialBackoff::default</span>();
     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">request</span> <span class="op">=</span> <span class="ident">reqwest::Request::try_from</span>(<span class="ident">request</span>)<span class="question-mark">?</span>;
     <span class="kw">let</span> <span class="ident">retry_limit</span> <span class="op">=</span> <span class="ident">config</span>.<span class="ident">retry_limit</span>;

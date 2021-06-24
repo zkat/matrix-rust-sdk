@@ -170,6 +170,33 @@
 <span id="170">170</span>
 <span id="171">171</span>
 <span id="172">172</span>
+<span id="173">173</span>
+<span id="174">174</span>
+<span id="175">175</span>
+<span id="176">176</span>
+<span id="177">177</span>
+<span id="178">178</span>
+<span id="179">179</span>
+<span id="180">180</span>
+<span id="181">181</span>
+<span id="182">182</span>
+<span id="183">183</span>
+<span id="184">184</span>
+<span id="185">185</span>
+<span id="186">186</span>
+<span id="187">187</span>
+<span id="188">188</span>
+<span id="189">189</span>
+<span id="190">190</span>
+<span id="191">191</span>
+<span id="192">192</span>
+<span id="193">193</span>
+<span id="194">194</span>
+<span id="195">195</span>
+<span id="196">196</span>
+<span id="197">197</span>
+<span id="198">198</span>
+<span id="199">199</span>
 </pre><pre class="rust">
 <span class="comment">// Copyright 2020 The Matrix.org Foundation C.I.C.</span>
 <span class="comment">//</span>
@@ -191,8 +218,8 @@
 
 <span class="kw">use</span> <span class="ident">http::StatusCode</span>;
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;encryption&quot;</span>)]</span>
-<span class="kw">use</span> <span class="ident">matrix_sdk_base::crypto</span>::{<span class="ident">store::CryptoStoreError</span>, <span class="ident">DecryptorError</span>};
-<span class="kw">use</span> <span class="ident">matrix_sdk_base</span>::{<span class="ident">Error</span> <span class="kw">as</span> <span class="ident">MatrixError</span>, <span class="ident">StoreError</span>};
+<span class="kw">use</span> <span class="ident">matrix_sdk_base::crypto</span>::{<span class="ident">CryptoStoreError</span>, <span class="ident">DecryptorError</span>, <span class="ident">MegolmError</span>, <span class="ident">OlmError</span>};
+<span class="kw">use</span> <span class="ident">matrix_sdk_base</span>::{<span class="ident">Error</span> <span class="kw">as</span> <span class="ident">SdkBaseError</span>, <span class="ident">StoreError</span>};
 <span class="kw">use</span> <span class="ident">reqwest::Error</span> <span class="kw">as</span> <span class="ident">ReqwestError</span>;
 <span class="kw">use</span> <span class="ident">ruma</span>::{
     <span class="ident">api</span>::{
@@ -287,17 +314,27 @@
     <span class="attribute">#[<span class="ident">error</span>(<span class="ident">transparent</span>)]</span>
     <span class="ident">Io</span>(<span class="attribute">#[<span class="ident">from</span>]</span> <span class="ident">IoError</span>),
 
-    <span class="doccomment">/// An error occurred in the Matrix client library.</span>
-    <span class="attribute">#[<span class="ident">error</span>(<span class="ident">transparent</span>)]</span>
-    <span class="ident">MatrixError</span>(<span class="attribute">#[<span class="ident">from</span>]</span> <span class="ident">MatrixError</span>),
-
     <span class="doccomment">/// An error occurred in the crypto store.</span>
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;encryption&quot;</span>)]</span>
+    <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;docs&quot;</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">encryption</span>)))]</span>
     <span class="attribute">#[<span class="ident">error</span>(<span class="ident">transparent</span>)]</span>
     <span class="ident">CryptoStoreError</span>(<span class="attribute">#[<span class="ident">from</span>]</span> <span class="ident">CryptoStoreError</span>),
 
+    <span class="doccomment">/// An error occurred during a E2EE operation.</span>
+    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;encryption&quot;</span>)]</span>
+    <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;docs&quot;</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">encryption</span>)))]</span>
+    <span class="attribute">#[<span class="ident">error</span>(<span class="ident">transparent</span>)]</span>
+    <span class="ident">OlmError</span>(<span class="attribute">#[<span class="ident">from</span>]</span> <span class="ident">OlmError</span>),
+
+    <span class="doccomment">/// An error occurred during a E2EE group operation.</span>
+    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;encryption&quot;</span>)]</span>
+    <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;docs&quot;</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">encryption</span>)))]</span>
+    <span class="attribute">#[<span class="ident">error</span>(<span class="ident">transparent</span>)]</span>
+    <span class="ident">MegolmError</span>(<span class="attribute">#[<span class="ident">from</span>]</span> <span class="ident">MegolmError</span>),
+
     <span class="doccomment">/// An error occurred during decryption.</span>
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;encryption&quot;</span>)]</span>
+    <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;docs&quot;</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">encryption</span>)))]</span>
     <span class="attribute">#[<span class="ident">error</span>(<span class="ident">transparent</span>)]</span>
     <span class="ident">DecryptorError</span>(<span class="attribute">#[<span class="ident">from</span>]</span> <span class="ident">DecryptorError</span>),
 
@@ -334,6 +371,23 @@
             <span class="prelude-val">Some</span>(<span class="ident">i</span>)
         } <span class="kw">else</span> {
             <span class="prelude-val">None</span>
+        }
+    }
+}
+
+<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">SdkBaseError</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Error</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">e</span>: <span class="ident">SdkBaseError</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+        <span class="kw">match</span> <span class="ident">e</span> {
+            <span class="ident">SdkBaseError::AuthenticationRequired</span> <span class="op">=</span><span class="op">&gt;</span> <span class="self">Self</span><span class="ident">::AuthenticationRequired</span>,
+            <span class="ident">SdkBaseError::StateStore</span>(<span class="ident">e</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="self">Self</span><span class="ident">::StateStore</span>(<span class="ident">e</span>),
+            <span class="ident">SdkBaseError::SerdeJson</span>(<span class="ident">e</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="self">Self</span><span class="ident">::SerdeJson</span>(<span class="ident">e</span>),
+            <span class="ident">SdkBaseError::IoError</span>(<span class="ident">e</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="self">Self</span><span class="ident">::Io</span>(<span class="ident">e</span>),
+            <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;encryption&quot;</span>)]</span>
+            <span class="ident">SdkBaseError::CryptoStore</span>(<span class="ident">e</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="self">Self</span><span class="ident">::CryptoStoreError</span>(<span class="ident">e</span>),
+            <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;encryption&quot;</span>)]</span>
+            <span class="ident">SdkBaseError::OlmError</span>(<span class="ident">e</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="self">Self</span><span class="ident">::OlmError</span>(<span class="ident">e</span>),
+            <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;encryption&quot;</span>)]</span>
+            <span class="ident">SdkBaseError::MegolmError</span>(<span class="ident">e</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="self">Self</span><span class="ident">::MegolmError</span>(<span class="ident">e</span>),
         }
     }
 }

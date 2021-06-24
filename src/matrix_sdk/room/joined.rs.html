@@ -614,7 +614,6 @@
 <span id="614">614</span>
 <span id="615">615</span>
 <span id="616">616</span>
-<span id="617">617</span>
 </pre><pre class="rust">
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;encryption&quot;</span>)]</span>
 <span class="kw">use</span> <span class="ident">std::sync::Arc</span>;
@@ -656,8 +655,8 @@
         },
         <span class="ident">AnyMessageEventContent</span>, <span class="ident">AnyStateEventContent</span>,
     },
-    <span class="ident">identifiers</span>::{<span class="ident">EventId</span>, <span class="ident">UserId</span>},
     <span class="ident">receipt::ReceiptType</span>,
+    <span class="ident">EventId</span>, <span class="ident">UserId</span>,
 };
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;encryption&quot;</span>)]</span>
 <span class="kw">use</span> <span class="ident">tracing::instrument</span>;
@@ -777,10 +776,10 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// ```no_run</span>
     <span class="doccomment">/// use std::time::Duration;</span>
-    <span class="doccomment">/// use matrix_sdk::api::r0::typing::create_typing_event::Typing;</span>
+    <span class="doccomment">/// use matrix_sdk::ruma::api::client::r0::typing::create_typing_event::Typing;</span>
     <span class="doccomment">/// # use matrix_sdk::{</span>
     <span class="doccomment">/// #     Client, SyncSettings,</span>
-    <span class="doccomment">/// #     identifiers::room_id,</span>
+    <span class="doccomment">/// #     ruma::room_id,</span>
     <span class="doccomment">/// # };</span>
     <span class="doccomment">/// # use futures::executor::block_on;</span>
     <span class="doccomment">/// # use url::Url;</span>
@@ -967,9 +966,9 @@
     <span class="doccomment">/// # use matrix_sdk::{Client, SyncSettings};</span>
     <span class="doccomment">/// # use url::Url;</span>
     <span class="doccomment">/// # use futures::executor::block_on;</span>
-    <span class="doccomment">/// # use matrix_sdk::identifiers::room_id;</span>
+    <span class="doccomment">/// # use matrix_sdk::ruma::room_id;</span>
     <span class="doccomment">/// # use std::convert::TryFrom;</span>
-    <span class="doccomment">/// use matrix_sdk::events::{</span>
+    <span class="doccomment">/// use matrix_sdk::ruma::events::{</span>
     <span class="doccomment">///     AnyMessageEventContent,</span>
     <span class="doccomment">///     room::message::{MessageEventContent, TextMessageEventContent},</span>
     <span class="doccomment">/// };</span>
@@ -1049,7 +1048,7 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// ```no_run</span>
     <span class="doccomment">/// # use std::{path::PathBuf, fs::File, io::Read};</span>
-    <span class="doccomment">/// # use matrix_sdk::{Client, identifiers::room_id};</span>
+    <span class="doccomment">/// # use matrix_sdk::{Client, ruma::room_id};</span>
     <span class="doccomment">/// # use url::Url;</span>
     <span class="doccomment">/// # use mime;</span>
     <span class="doccomment">/// # use futures::executor::block_on;</span>
@@ -1150,18 +1149,17 @@
     <span class="doccomment">/// # Example</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// ```no_run</span>
-    <span class="doccomment">/// use matrix_sdk::{</span>
+    <span class="doccomment">/// use matrix_sdk::ruma::{</span>
     <span class="doccomment">///     events::{</span>
     <span class="doccomment">///         AnyStateEventContent,</span>
     <span class="doccomment">///         room::member::{MemberEventContent, MembershipState},</span>
     <span class="doccomment">///     },</span>
-    <span class="doccomment">///     identifiers::mxc_uri,</span>
-    <span class="doccomment">///     assign,</span>
+    <span class="doccomment">///     assign, mxc_uri,</span>
     <span class="doccomment">/// };</span>
     <span class="doccomment">/// # futures::executor::block_on(async {</span>
     <span class="doccomment">/// # let homeserver = url::Url::parse(&quot;http://localhost:8080&quot;).unwrap();</span>
     <span class="doccomment">/// # let mut client = matrix_sdk::Client::new(homeserver).unwrap();</span>
-    <span class="doccomment">/// # let room_id = matrix_sdk::identifiers::room_id!(&quot;!test:localhost&quot;);</span>
+    <span class="doccomment">/// # let room_id = matrix_sdk::ruma::room_id!(&quot;!test:localhost&quot;);</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// let avatar_url = mxc_uri!(&quot;mxc://example.org/avatar&quot;);</span>
     <span class="doccomment">/// let member_event = assign!(MemberEventContent::new(MembershipState::Join), {</span>
@@ -1209,11 +1207,11 @@
     <span class="doccomment">/// # futures::executor::block_on(async {</span>
     <span class="doccomment">/// # let homeserver = url::Url::parse(&quot;http://localhost:8080&quot;).unwrap();</span>
     <span class="doccomment">/// # let mut client = matrix_sdk::Client::new(homeserver).unwrap();</span>
-    <span class="doccomment">/// # let room_id = matrix_sdk::identifiers::room_id!(&quot;!test:localhost&quot;);</span>
+    <span class="doccomment">/// # let room_id = matrix_sdk::ruma::room_id!(&quot;!test:localhost&quot;);</span>
     <span class="doccomment">/// # let room = client</span>
     <span class="doccomment">/// #   .get_joined_room(&amp;room_id)</span>
     <span class="doccomment">/// #   .unwrap();</span>
-    <span class="doccomment">/// let event_id = matrix_sdk::identifiers::event_id!(&quot;$xxxxxx:example.org&quot;);</span>
+    <span class="doccomment">/// let event_id = matrix_sdk::ruma::event_id!(&quot;$xxxxxx:example.org&quot;);</span>
     <span class="doccomment">/// let reason = Some(&quot;Indecent material&quot;);</span>
     <span class="doccomment">/// room.redact(&amp;event_id, reason, None).await.unwrap();</span>
     <span class="doccomment">/// # })</span>

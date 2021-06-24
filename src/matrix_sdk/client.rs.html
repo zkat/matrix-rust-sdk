@@ -3910,6 +3910,15 @@
 <span id="3910">3910</span>
 <span id="3911">3911</span>
 <span id="3912">3912</span>
+<span id="3913">3913</span>
+<span id="3914">3914</span>
+<span id="3915">3915</span>
+<span id="3916">3916</span>
+<span id="3917">3917</span>
+<span id="3918">3918</span>
+<span id="3919">3919</span>
+<span id="3920">3920</span>
+<span id="3921">3921</span>
 </pre><pre class="rust">
 <span class="comment">// Copyright 2020 Damir Jelić</span>
 <span class="comment">// Copyright 2020 The Matrix.org Foundation C.I.C.</span>
@@ -3926,11 +3935,12 @@
 <span class="comment">// See the License for the specific language governing permissions and</span>
 <span class="comment">// limitations under the License.</span>
 
+<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;encryption&quot;</span>, <span class="ident">not</span>(<span class="ident">target_arch</span> <span class="op">=</span> <span class="string">&quot;wasm32&quot;</span>)))]</span>
+<span class="kw">use</span> <span class="ident">std::path::PathBuf</span>;
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;encryption&quot;</span>)]</span>
 <span class="kw">use</span> <span class="ident">std</span>::{
     <span class="ident">collections::BTreeMap</span>,
     <span class="ident">io</span>::{<span class="ident">Cursor</span>, <span class="ident">Write</span>},
-    <span class="ident">path::PathBuf</span>,
 };
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;sso_login&quot;</span>)]</span>
 <span class="kw">use</span> <span class="ident">std</span>::{
@@ -3952,10 +3962,12 @@
 <span class="kw">use</span> <span class="ident">http::HeaderValue</span>;
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;sso_login&quot;</span>)]</span>
 <span class="kw">use</span> <span class="ident">http::Response</span>;
+<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;encryption&quot;</span>, <span class="ident">not</span>(<span class="ident">target_arch</span> <span class="op">=</span> <span class="string">&quot;wasm32&quot;</span>)))]</span>
+<span class="kw">use</span> <span class="ident">matrix_sdk_base::crypto</span>::{<span class="ident">decrypt_key_export</span>, <span class="ident">encrypt_key_export</span>, <span class="ident">olm::InboundGroupSession</span>};
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;encryption&quot;</span>)]</span>
 <span class="kw">use</span> <span class="ident">matrix_sdk_base::crypto</span>::{
-    <span class="ident">decrypt_key_export</span>, <span class="ident">encrypt_key_export</span>, <span class="ident">olm::InboundGroupSession</span>, <span class="ident">store::CryptoStoreError</span>,
-    <span class="ident">AttachmentDecryptor</span>, <span class="ident">OutgoingRequests</span>, <span class="ident">RoomMessageRequest</span>, <span class="ident">ToDeviceRequest</span>,
+    <span class="ident">store::CryptoStoreError</span>, <span class="ident">AttachmentDecryptor</span>, <span class="ident">OutgoingRequests</span>, <span class="ident">RoomMessageRequest</span>,
+    <span class="ident">ToDeviceRequest</span>,
 };
 <span class="kw">use</span> <span class="ident">matrix_sdk_base</span>::{
     <span class="ident">deserialized_responses::SyncResponse</span>,
@@ -3966,7 +3978,7 @@
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;sso_login&quot;</span>)]</span>
 <span class="kw">use</span> <span class="ident">rand</span>::{<span class="ident">thread_rng</span>, <span class="ident">Rng</span>};
 <span class="kw">use</span> <span class="ident">reqwest::header::InvalidHeaderValue</span>;
-<span class="kw">use</span> <span class="ident">ruma</span>::{<span class="ident">api::SendAccessToken</span>, <span class="ident">events::AnyMessageEventContent</span>, <span class="ident">identifiers::MxcUri</span>};
+<span class="kw">use</span> <span class="ident">ruma</span>::{<span class="ident">api::SendAccessToken</span>, <span class="ident">events::AnyMessageEventContent</span>, <span class="ident">MxcUri</span>};
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;sso_login&quot;</span>)]</span>
 <span class="kw">use</span> <span class="ident">tokio</span>::{<span class="ident">net::TcpListener</span>, <span class="ident">sync::oneshot</span>};
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;sso_login&quot;</span>)]</span>
@@ -3977,7 +3989,7 @@
 <span class="kw">use</span> <span class="ident">url::Url</span>;
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;sso_login&quot;</span>)]</span>
 <span class="kw">use</span> <span class="ident">warp::Filter</span>;
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;encryption&quot;</span>)]</span>
+<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;encryption&quot;</span>, <span class="ident">not</span>(<span class="ident">target_arch</span> <span class="op">=</span> <span class="string">&quot;wasm32&quot;</span>)))]</span>
 <span class="kw">use</span> <span class="ident">zeroize::Zeroizing</span>;
 
 <span class="doccomment">/// Enum controlling if a loop running callbacks should continue or abort.</span>
@@ -4484,7 +4496,7 @@
     <span class="doccomment">/// # Example</span>
     <span class="doccomment">/// ```no_run</span>
     <span class="doccomment">/// # use std::convert::TryFrom;</span>
-    <span class="doccomment">/// # use matrix_sdk::{Client, identifiers::UserId};</span>
+    <span class="doccomment">/// # use matrix_sdk::{Client, ruma::UserId};</span>
     <span class="doccomment">/// # use futures::executor::block_on;</span>
     <span class="doccomment">/// let alice = UserId::try_from(&quot;@alice:example.org&quot;).unwrap();</span>
     <span class="doccomment">/// # block_on(async {</span>
@@ -4705,7 +4717,7 @@
     <span class="doccomment">/// ```no_run</span>
     <span class="doccomment">/// # use futures::executor::block_on;</span>
     <span class="doccomment">/// # use matrix_sdk::Client;</span>
-    <span class="doccomment">/// # use matrix_sdk::identifiers::room_id;</span>
+    <span class="doccomment">/// # use matrix_sdk::ruma::room_id;</span>
     <span class="doccomment">/// # use matrix_sdk::media::MediaFormat;</span>
     <span class="doccomment">/// # use url::Url;</span>
     <span class="doccomment">/// # let homeserver = Url::parse(&quot;http://example.com&quot;).unwrap();</span>
@@ -4914,8 +4926,7 @@
     <span class="doccomment">/// ```no_run</span>
     <span class="doccomment">/// # use std::convert::TryFrom;</span>
     <span class="doccomment">/// # use matrix_sdk::Client;</span>
-    <span class="doccomment">/// # use matrix_sdk::identifiers::DeviceId;</span>
-    <span class="doccomment">/// # use matrix_sdk::assign;</span>
+    <span class="doccomment">/// # use matrix_sdk::ruma::{assign, DeviceId};</span>
     <span class="doccomment">/// # use futures::executor::block_on;</span>
     <span class="doccomment">/// # use url::Url;</span>
     <span class="doccomment">/// # let homeserver = Url::parse(&quot;http://example.com&quot;).unwrap();</span>
@@ -5173,8 +5184,7 @@
     <span class="doccomment">/// ```no_run</span>
     <span class="doccomment">/// # use std::convert::TryFrom;</span>
     <span class="doccomment">/// # use matrix_sdk::Client;</span>
-    <span class="doccomment">/// # use matrix_sdk::identifiers::DeviceId;</span>
-    <span class="doccomment">/// # use matrix_sdk::assign;</span>
+    <span class="doccomment">/// # use matrix_sdk::ruma::{assign, DeviceId};</span>
     <span class="doccomment">/// # use futures::executor::block_on;</span>
     <span class="doccomment">/// # use url::Url;</span>
     <span class="doccomment">/// # let homeserver = Url::parse(&quot;https://example.com&quot;).unwrap();</span>
@@ -5253,10 +5263,13 @@
     <span class="doccomment">/// ```no_run</span>
     <span class="doccomment">/// # use std::convert::TryFrom;</span>
     <span class="doccomment">/// # use matrix_sdk::Client;</span>
-    <span class="doccomment">/// # use matrix_sdk::api::r0::account::register::{Request as RegistrationRequest, RegistrationKind};</span>
-    <span class="doccomment">/// # use matrix_sdk::api::r0::uiaa::AuthData;</span>
-    <span class="doccomment">/// # use matrix_sdk::identifiers::DeviceId;</span>
-    <span class="doccomment">/// # use matrix_sdk::assign;</span>
+    <span class="doccomment">/// # use matrix_sdk::ruma::{</span>
+    <span class="doccomment">/// #     api::client::r0::{</span>
+    <span class="doccomment">/// #         account::register::{Request as RegistrationRequest, RegistrationKind},</span>
+    <span class="doccomment">/// #         uiaa::AuthData,</span>
+    <span class="doccomment">/// #     },</span>
+    <span class="doccomment">/// #     assign, DeviceId,</span>
+    <span class="doccomment">/// # };</span>
     <span class="doccomment">/// # use futures::executor::block_on;</span>
     <span class="doccomment">/// # use url::Url;</span>
     <span class="doccomment">/// # let homeserver = Url::parse(&quot;http://example.com&quot;).unwrap();</span>
@@ -5306,7 +5319,7 @@
     <span class="doccomment">/// ```no_run</span>
     <span class="doccomment">/// # use matrix_sdk::{</span>
     <span class="doccomment">/// #    Client, SyncSettings,</span>
-    <span class="doccomment">/// #    api::r0::{</span>
+    <span class="doccomment">/// #    ruma::api::client::r0::{</span>
     <span class="doccomment">/// #        filter::{</span>
     <span class="doccomment">/// #           FilterDefinition, LazyLoadOptions, RoomEventFilter, RoomFilter,</span>
     <span class="doccomment">/// #        },</span>
@@ -5450,7 +5463,10 @@
     <span class="doccomment">/// # Examples</span>
     <span class="doccomment">/// ```no_run</span>
     <span class="doccomment">/// use matrix_sdk::Client;</span>
-    <span class="doccomment">/// # use matrix_sdk::api::r0::room::{create_room::Request as CreateRoomRequest, Visibility};</span>
+    <span class="doccomment">/// # use matrix_sdk::ruma::api::client::r0::room::{</span>
+    <span class="doccomment">/// #     create_room::Request as CreateRoomRequest,</span>
+    <span class="doccomment">/// #     Visibility,</span>
+    <span class="doccomment">/// # };</span>
     <span class="doccomment">/// # use url::Url;</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// # let homeserver = Url::parse(&quot;http://example.com&quot;).unwrap();</span>
@@ -5483,9 +5499,11 @@
     <span class="doccomment">/// ```no_run</span>
     <span class="doccomment">/// # use std::convert::TryFrom;</span>
     <span class="doccomment">/// # use matrix_sdk::Client;</span>
-    <span class="doccomment">/// # use matrix_sdk::directory::{Filter, RoomNetwork};</span>
-    <span class="doccomment">/// # use matrix_sdk::api::r0::directory::get_public_rooms_filtered::Request as PublicRoomsFilterRequest;</span>
-    <span class="doccomment">/// # use matrix_sdk::assign;</span>
+    <span class="doccomment">/// # use matrix_sdk::ruma::{</span>
+    <span class="doccomment">/// #     api::client::r0::directory::get_public_rooms_filtered::Request as PublicRoomsFilterRequest,</span>
+    <span class="doccomment">/// #     directory::{Filter, RoomNetwork},</span>
+    <span class="doccomment">/// #     assign,</span>
+    <span class="doccomment">/// # };</span>
     <span class="doccomment">/// # use url::Url;</span>
     <span class="doccomment">/// # use futures::executor::block_on;</span>
     <span class="doccomment">/// # let homeserver = Url::parse(&quot;http://example.com&quot;).unwrap();</span>
@@ -5536,7 +5554,7 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// ```no_run</span>
     <span class="doccomment">/// # use std::{path::PathBuf, fs::File, io::Read};</span>
-    <span class="doccomment">/// # use matrix_sdk::{Client, identifiers::room_id};</span>
+    <span class="doccomment">/// # use matrix_sdk::{Client, ruma::room_id};</span>
     <span class="doccomment">/// # use url::Url;</span>
     <span class="doccomment">/// # use futures::executor::block_on;</span>
     <span class="doccomment">/// # use mime;</span>
@@ -5603,9 +5621,9 @@
     <span class="doccomment">/// # use matrix_sdk::{Client, SyncSettings};</span>
     <span class="doccomment">/// # use url::Url;</span>
     <span class="doccomment">/// # use futures::executor::block_on;</span>
-    <span class="doccomment">/// # use matrix_sdk::identifiers::room_id;</span>
+    <span class="doccomment">/// # use matrix_sdk::ruma::room_id;</span>
     <span class="doccomment">/// # use std::convert::TryFrom;</span>
-    <span class="doccomment">/// use matrix_sdk::events::{</span>
+    <span class="doccomment">/// use matrix_sdk::ruma::events::{</span>
     <span class="doccomment">///     AnyMessageEventContent,</span>
     <span class="doccomment">///     room::message::{MessageEventContent, TextMessageEventContent},</span>
     <span class="doccomment">/// };</span>
@@ -5665,8 +5683,7 @@
     <span class="doccomment">/// # block_on(async {</span>
     <span class="doccomment">/// # let homeserver = Url::parse(&quot;http://localhost:8080&quot;).unwrap();</span>
     <span class="doccomment">/// # let mut client = Client::new(homeserver).unwrap();</span>
-    <span class="doccomment">/// use matrix_sdk::api::r0::profile;</span>
-    <span class="doccomment">/// use matrix_sdk::identifiers::user_id;</span>
+    <span class="doccomment">/// use matrix_sdk::ruma::{api::client::r0::profile, user_id};</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// // First construct the request you want to make</span>
     <span class="doccomment">/// // See https://docs.rs/ruma-client-api/latest/ruma_client_api/index.html</span>
@@ -5752,8 +5769,11 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// ```no_run</span>
     <span class="doccomment">/// # use matrix_sdk::{</span>
-    <span class="doccomment">/// #    api::r0::uiaa::{UiaaResponse, AuthData},</span>
-    <span class="doccomment">/// #    Client, SyncSettings, Error, FromHttpResponseError, ServerError,</span>
+    <span class="doccomment">/// #    ruma::api::{</span>
+    <span class="doccomment">/// #        client::r0::uiaa::{UiaaResponse, AuthData},</span>
+    <span class="doccomment">/// #        error::{FromHttpResponseError, ServerError},</span>
+    <span class="doccomment">/// #    },</span>
+    <span class="doccomment">/// #    Client, Error, SyncSettings,</span>
     <span class="doccomment">/// # };</span>
     <span class="doccomment">/// # use futures::executor::block_on;</span>
     <span class="doccomment">/// # use serde_json::json;</span>
@@ -5872,7 +5892,7 @@
     <span class="doccomment">/// UI thread.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// ```no_run</span>
-    <span class="doccomment">/// # use matrix_sdk::events::{</span>
+    <span class="doccomment">/// # use matrix_sdk::ruma::events::{</span>
     <span class="doccomment">/// #     room::message::{MessageEvent, MessageEventContent, TextMessageEventContent},</span>
     <span class="doccomment">/// # };</span>
     <span class="doccomment">/// # use std::sync::{Arc, RwLock};</span>
@@ -6141,7 +6161,7 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// ```no_run</span>
     <span class="doccomment">/// # use std::convert::TryFrom;</span>
-    <span class="doccomment">/// # use matrix_sdk::{Client, identifiers::UserId};</span>
+    <span class="doccomment">/// # use matrix_sdk::{Client, ruma::UserId};</span>
     <span class="doccomment">/// # use url::Url;</span>
     <span class="doccomment">/// # use futures::executor::block_on;</span>
     <span class="doccomment">/// # let alice = UserId::try_from(&quot;@alice:example.org&quot;).unwrap();</span>
@@ -6183,8 +6203,8 @@
     <span class="doccomment">/// # Examples</span>
     <span class="doccomment">/// ```no_run</span>
     <span class="doccomment">/// # use std::{convert::TryFrom, collections::BTreeMap};</span>
-    <span class="doccomment">/// # use matrix_sdk::{Client, identifiers::UserId};</span>
-    <span class="doccomment">/// # use matrix_sdk::api::r0::uiaa::AuthData;</span>
+    <span class="doccomment">/// # use matrix_sdk::{Client, ruma::UserId};</span>
+    <span class="doccomment">/// # use matrix_sdk::ruma::api::client::r0::uiaa::AuthData;</span>
     <span class="doccomment">/// # use url::Url;</span>
     <span class="doccomment">/// # use futures::executor::block_on;</span>
     <span class="doccomment">/// # use serde_json::json;</span>
@@ -6254,7 +6274,7 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// ```no_run</span>
     <span class="doccomment">/// # use std::convert::TryFrom;</span>
-    <span class="doccomment">/// # use matrix_sdk::{Client, identifiers::UserId};</span>
+    <span class="doccomment">/// # use matrix_sdk::{Client, ruma::UserId};</span>
     <span class="doccomment">/// # use url::Url;</span>
     <span class="doccomment">/// # use futures::executor::block_on;</span>
     <span class="doccomment">/// # let alice = UserId::try_from(&quot;@alice:example.org&quot;).unwrap();</span>
@@ -6308,7 +6328,7 @@
     <span class="doccomment">/// # use std::{path::PathBuf, time::Duration};</span>
     <span class="doccomment">/// # use matrix_sdk::{</span>
     <span class="doccomment">/// #     Client, SyncSettings,</span>
-    <span class="doccomment">/// #     identifiers::room_id,</span>
+    <span class="doccomment">/// #     ruma::room_id,</span>
     <span class="doccomment">/// # };</span>
     <span class="doccomment">/// # use futures::executor::block_on;</span>
     <span class="doccomment">/// # use url::Url;</span>
@@ -6332,8 +6352,7 @@
     <span class="doccomment">///     .expect(&quot;Can&#39;t export keys.&quot;);</span>
     <span class="doccomment">/// # });</span>
     <span class="doccomment">/// ```</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;encryption&quot;</span>)]</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">target_arch</span> <span class="op">=</span> <span class="string">&quot;wasm32&quot;</span>))]</span>
+    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;encryption&quot;</span>, <span class="ident">not</span>(<span class="ident">target_arch</span> <span class="op">=</span> <span class="string">&quot;wasm32&quot;</span>)))]</span>
     <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;docs&quot;</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">encryption</span>, <span class="ident">not</span>(<span class="ident">target_arch</span> <span class="op">=</span> <span class="string">&quot;wasm32&quot;</span>)))))]</span>
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">export_keys</span>(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
@@ -6378,7 +6397,7 @@
     <span class="doccomment">/// # use std::{path::PathBuf, time::Duration};</span>
     <span class="doccomment">/// # use matrix_sdk::{</span>
     <span class="doccomment">/// #     Client, SyncSettings,</span>
-    <span class="doccomment">/// #     identifiers::room_id,</span>
+    <span class="doccomment">/// #     ruma::room_id,</span>
     <span class="doccomment">/// # };</span>
     <span class="doccomment">/// # use futures::executor::block_on;</span>
     <span class="doccomment">/// # use url::Url;</span>
@@ -6392,8 +6411,7 @@
     <span class="doccomment">///     .expect(&quot;Can&#39;t import keys&quot;);</span>
     <span class="doccomment">/// # });</span>
     <span class="doccomment">/// ```</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;encryption&quot;</span>)]</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">target_arch</span> <span class="op">=</span> <span class="string">&quot;wasm32&quot;</span>))]</span>
+    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;encryption&quot;</span>, <span class="ident">not</span>(<span class="ident">target_arch</span> <span class="op">=</span> <span class="string">&quot;wasm32&quot;</span>)))]</span>
     <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;docs&quot;</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">encryption</span>, <span class="ident">not</span>(<span class="ident">target_arch</span> <span class="op">=</span> <span class="string">&quot;wasm32&quot;</span>)))))]</span>
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">import_keys</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">path</span>: <span class="ident">PathBuf</span>, <span class="ident">passphrase</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(<span class="ident">usize</span>, <span class="ident">usize</span>)<span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">olm</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">base_client</span>.<span class="ident">olm_machine</span>().<span class="kw">await</span>.<span class="ident">ok_or</span>(<span class="ident">Error::AuthenticationRequired</span>)<span class="question-mark">?</span>;

@@ -1,1 +1,0 @@
-initSidebarItems({"mod":[["query_room_alias","Endpoint to query the existence of a given room alias."],["query_user_id","Endpoint to query the existence of a given user ID."]]});
