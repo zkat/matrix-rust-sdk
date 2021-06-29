@@ -500,30 +500,6 @@
 <span id="500">500</span>
 <span id="501">501</span>
 <span id="502">502</span>
-<span id="503">503</span>
-<span id="504">504</span>
-<span id="505">505</span>
-<span id="506">506</span>
-<span id="507">507</span>
-<span id="508">508</span>
-<span id="509">509</span>
-<span id="510">510</span>
-<span id="511">511</span>
-<span id="512">512</span>
-<span id="513">513</span>
-<span id="514">514</span>
-<span id="515">515</span>
-<span id="516">516</span>
-<span id="517">517</span>
-<span id="518">518</span>
-<span id="519">519</span>
-<span id="520">520</span>
-<span id="521">521</span>
-<span id="522">522</span>
-<span id="523">523</span>
-<span id="524">524</span>
-<span id="525">525</span>
-<span id="526">526</span>
 </pre><pre class="rust">
 <span class="comment">// Copyright 2021 Famedly GmbH</span>
 <span class="comment">//</span>
@@ -601,8 +577,8 @@
 <span class="doccomment">//! [matrix-org/matrix-rust-sdk#228]: https://github.com/matrix-org/matrix-rust-sdk/issues/228</span>
 <span class="doccomment">//! [examples directory]: https://github.com/matrix-org/matrix-rust-sdk/tree/master/matrix_sdk_appservice/examples</span>
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">any</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;actix&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;warp&quot;</span>)))]</span>
-<span class="macro">compile_error!</span>(<span class="string">&quot;one webserver feature must be enabled. available ones: `actix`, `warp`&quot;</span>);
+<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">any</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;warp&quot;</span>)))]</span>
+<span class="macro">compile_error!</span>(<span class="string">&quot;one webserver feature must be enabled. available ones: `warp`&quot;</span>);
 
 <span class="kw">use</span> <span class="ident">std</span>::{
     <span class="ident">convert</span>::{<span class="ident">TryFrom</span>, <span class="ident">TryInto</span>},
@@ -968,24 +944,6 @@
         <span class="prelude-val">Ok</span>(<span class="bool-val">false</span>)
     }
 
-    <span class="doccomment">/// Returns a closure to be used with [`actix_web::App::configure()`]</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Note that if you handle any of the [application-service-specific</span>
-    <span class="doccomment">/// routes], including the legacy routes, you will break the appservice</span>
-    <span class="doccomment">/// functionality.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [application-service-specific routes]: https://spec.matrix.org/unstable/application-service-api/#legacy-routes</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;actix&quot;</span>)]</span>
-    <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;actix&quot;</span>)))]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">actix_configure</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw">impl</span> <span class="ident">FnOnce</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">actix_web::web::ServiceConfig</span>) {
-        <span class="kw">let</span> <span class="ident">appservice</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">clone</span>();
-
-        <span class="kw">move</span> <span class="op">|</span><span class="ident">config</span><span class="op">|</span> {
-            <span class="ident">config</span>.<span class="ident">data</span>(<span class="ident">appservice</span>);
-            <span class="ident">webserver::actix::configure</span>(<span class="ident">config</span>);
-        }
-    }
-
     <span class="doccomment">/// Returns a [`warp::Filter`] to be used as [`warp::serve()`] route</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// Note that if you handle any of the [application-service-specific</span>
@@ -1009,19 +967,13 @@
         <span class="kw">let</span> <span class="ident">port</span> <span class="op">=</span> <span class="ident">port</span>.<span class="ident">into</span>();
         <span class="macro">info!</span>(<span class="string">&quot;Starting AppService on {}:{}&quot;</span>, <span class="kw-2">&amp;</span><span class="ident">host</span>, <span class="kw-2">&amp;</span><span class="ident">port</span>);
 
-        <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;actix&quot;</span>)]</span>
-        {
-            <span class="ident">webserver::actix::run_server</span>(<span class="self">self</span>.<span class="ident">clone</span>(), <span class="ident">host</span>, <span class="ident">port</span>).<span class="kw">await</span><span class="question-mark">?</span>;
-            <span class="prelude-val">Ok</span>(())
-        }
-
         <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;warp&quot;</span>)]</span>
         {
             <span class="ident">webserver::warp::run_server</span>(<span class="self">self</span>.<span class="ident">clone</span>(), <span class="ident">host</span>, <span class="ident">port</span>).<span class="kw">await</span><span class="question-mark">?</span>;
             <span class="prelude-val">Ok</span>(())
         }
 
-        <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">any</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;actix&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;warp&quot;</span>,)))]</span>
+        <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">any</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;warp&quot;</span>,)))]</span>
         <span class="macro">unreachable!</span>()
     }
 }
