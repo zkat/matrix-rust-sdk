@@ -1845,6 +1845,16 @@
 <span id="1845">1845</span>
 <span id="1846">1846</span>
 <span id="1847">1847</span>
+<span id="1848">1848</span>
+<span id="1849">1849</span>
+<span id="1850">1850</span>
+<span id="1851">1851</span>
+<span id="1852">1852</span>
+<span id="1853">1853</span>
+<span id="1854">1854</span>
+<span id="1855">1855</span>
+<span id="1856">1856</span>
+<span id="1857">1857</span>
 </pre><pre class="rust">
 <span class="comment">// Copyright 2020 The Matrix.org Foundation C.I.C.</span>
 <span class="comment">//</span>
@@ -1894,7 +1904,7 @@
 <span class="kw">use</span> <span class="kw">crate</span><span class="ident">::store::sled::SledStore</span>;
 <span class="kw">use</span> <span class="kw">crate</span>::{
     <span class="ident">error</span>::{<span class="ident">EventError</span>, <span class="ident">MegolmError</span>, <span class="ident">MegolmResult</span>, <span class="ident">OlmError</span>, <span class="ident">OlmResult</span>},
-    <span class="ident">identities</span>::{<span class="ident">Device</span>, <span class="ident">IdentityManager</span>, <span class="ident">UserDevices</span>},
+    <span class="ident">identities</span>::{<span class="ident">user::UserIdentities</span>, <span class="ident">Device</span>, <span class="ident">IdentityManager</span>, <span class="ident">UserDevices</span>},
     <span class="ident">key_request::KeyRequestMachine</span>,
     <span class="ident">olm</span>::{
         <span class="ident">Account</span>, <span class="ident">EncryptionSettings</span>, <span class="ident">ExportedRoomKey</span>, <span class="ident">GroupSessionKey</span>, <span class="ident">IdentityKeys</span>,
@@ -2637,7 +2647,7 @@
         <span class="ident">one_time_keys_counts</span>: <span class="kw-2">&amp;</span><span class="ident">BTreeMap</span><span class="op">&lt;</span><span class="ident">DeviceKeyAlgorithm</span>, <span class="ident">UInt</span><span class="op">&gt;</span>,
     ) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">OlmResult</span><span class="op">&lt;</span><span class="ident">ToDevice</span><span class="op">&gt;</span> {
         <span class="comment">// Remove verification objects that have expired or are done.</span>
-        <span class="self">self</span>.<span class="ident">verification_machine</span>.<span class="ident">garbage_collect</span>();
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">events</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">verification_machine</span>.<span class="ident">garbage_collect</span>();
 
         <span class="comment">// Always save the account, a new session might get created which also</span>
         <span class="comment">// touches the account.</span>
@@ -2651,8 +2661,6 @@
                 <span class="macro">error!</span>(<span class="string">&quot;Error marking a tracked user as changed {:?}&quot;</span>, <span class="ident">e</span>);
             }
         }
-
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">events</span> <span class="op">=</span> <span class="ident">Vec::new</span>();
 
         <span class="kw">for</span> <span class="kw-2">mut</span> <span class="ident">raw_event</span> <span class="kw">in</span> <span class="ident">to_device_events</span>.<span class="ident">events</span> {
             <span class="kw">let</span> <span class="ident">event</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">raw_event</span>.<span class="ident">deserialize</span>() {
@@ -2776,7 +2784,7 @@
                     .<span class="ident">unwrap_or</span>(<span class="bool-val">false</span>)
             }) {
             <span class="kw">if</span> (<span class="self">self</span>.<span class="ident">user_id</span>() <span class="op">=</span><span class="op">=</span> <span class="ident">device</span>.<span class="ident">user_id</span>() <span class="op">&amp;&amp;</span> <span class="self">self</span>.<span class="ident">device_id</span>() <span class="op">=</span><span class="op">=</span> <span class="ident">device</span>.<span class="ident">device_id</span>())
-                <span class="op">|</span><span class="op">|</span> <span class="ident">device</span>.<span class="ident">is_trusted</span>()
+                <span class="op">|</span><span class="op">|</span> <span class="ident">device</span>.<span class="ident">verified</span>()
             {
                 <span class="ident">VerificationState::Trusted</span>
             } <span class="kw">else</span> {
@@ -2900,6 +2908,18 @@
         <span class="ident">device_id</span>: <span class="kw-2">&amp;</span><span class="ident">DeviceId</span>,
     ) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">StoreResult</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Device</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">store</span>.<span class="ident">get_device</span>(<span class="ident">user_id</span>, <span class="ident">device_id</span>).<span class="kw">await</span>
+    }
+
+    <span class="doccomment">/// Get the cross signing user identity of a user.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// # Arguments</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// * `user_id` - The unique id of the user that the identity belongs to</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// Returns a `UserIdentities` enum if one is found and the crypto store</span>
+    <span class="doccomment">/// didn&#39;t throw an error.</span>
+    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">get_identity</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">user_id</span>: <span class="kw-2">&amp;</span><span class="ident">UserId</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">StoreResult</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">UserIdentities</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+        <span class="self">self</span>.<span class="ident">store</span>.<span class="ident">get_identity</span>(<span class="ident">user_id</span>).<span class="kw">await</span>
     }
 
     <span class="doccomment">/// Get a map holding all the devices of an user.</span>
@@ -3619,7 +3639,7 @@
 
         <span class="kw">let</span> <span class="ident">bob_device</span> <span class="op">=</span> <span class="ident">alice</span>.<span class="ident">get_device</span>(<span class="ident">bob</span>.<span class="ident">user_id</span>(), <span class="ident">bob</span>.<span class="ident">device_id</span>()).<span class="kw">await</span>.<span class="ident">unwrap</span>().<span class="ident">unwrap</span>();
 
-        <span class="macro">assert!</span>(<span class="op">!</span><span class="ident">bob_device</span>.<span class="ident">is_trusted</span>());
+        <span class="macro">assert!</span>(<span class="op">!</span><span class="ident">bob_device</span>.<span class="ident">verified</span>());
 
         <span class="kw">let</span> (<span class="ident">alice_sas</span>, <span class="ident">request</span>) <span class="op">=</span> <span class="ident">bob_device</span>.<span class="ident">start_verification</span>().<span class="kw">await</span>.<span class="ident">unwrap</span>();
 
@@ -3682,15 +3702,15 @@
             .<span class="ident">unwrap</span>();
 
         <span class="macro">assert!</span>(<span class="ident">alice_sas</span>.<span class="ident">is_done</span>());
-        <span class="macro">assert!</span>(<span class="ident">bob_device</span>.<span class="ident">is_trusted</span>());
+        <span class="macro">assert!</span>(<span class="ident">bob_device</span>.<span class="ident">verified</span>());
 
         <span class="kw">let</span> <span class="ident">alice_device</span> <span class="op">=</span>
             <span class="ident">bob</span>.<span class="ident">get_device</span>(<span class="ident">alice</span>.<span class="ident">user_id</span>(), <span class="ident">alice</span>.<span class="ident">device_id</span>()).<span class="kw">await</span>.<span class="ident">unwrap</span>().<span class="ident">unwrap</span>();
 
-        <span class="macro">assert!</span>(<span class="op">!</span><span class="ident">alice_device</span>.<span class="ident">is_trusted</span>());
+        <span class="macro">assert!</span>(<span class="op">!</span><span class="ident">alice_device</span>.<span class="ident">verified</span>());
         <span class="ident">bob</span>.<span class="ident">handle_verification_event</span>(<span class="kw-2">&amp;</span><span class="ident">event</span>).<span class="kw">await</span>;
         <span class="macro">assert!</span>(<span class="ident">bob_sas</span>.<span class="ident">is_done</span>());
-        <span class="macro">assert!</span>(<span class="ident">alice_device</span>.<span class="ident">is_trusted</span>());
+        <span class="macro">assert!</span>(<span class="ident">alice_device</span>.<span class="ident">verified</span>());
     }
 }
 </pre></div>

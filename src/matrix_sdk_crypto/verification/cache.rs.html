@@ -152,6 +152,14 @@
 <span id="152">152</span>
 <span id="153">153</span>
 <span id="154">154</span>
+<span id="155">155</span>
+<span id="156">156</span>
+<span id="157">157</span>
+<span id="158">158</span>
+<span id="159">159</span>
+<span id="160">160</span>
+<span id="161">161</span>
+<span id="162">162</span>
 </pre><pre class="rust">
 <span class="comment">// Copyright 2021 The Matrix.org Foundation C.I.C.</span>
 <span class="comment">//</span>
@@ -172,9 +180,13 @@
 <span class="kw">use</span> <span class="ident">dashmap::DashMap</span>;
 <span class="kw">use</span> <span class="ident">matrix_sdk_common::uuid::Uuid</span>;
 <span class="kw">use</span> <span class="ident">ruma</span>::{<span class="ident">DeviceId</span>, <span class="ident">UserId</span>};
+<span class="kw">use</span> <span class="ident">tracing::trace</span>;
 
 <span class="kw">use</span> <span class="kw">super</span>::{<span class="ident">event_enums::OutgoingContent</span>, <span class="ident">Sas</span>, <span class="ident">Verification</span>};
-<span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">OutgoingRequest</span>, <span class="ident">QrVerification</span>, <span class="ident">RoomMessageRequest</span>, <span class="ident">ToDeviceRequest</span>};
+<span class="kw">use</span> <span class="kw">crate</span>::{
+    <span class="ident">OutgoingRequest</span>, <span class="ident">OutgoingVerificationRequest</span>, <span class="ident">QrVerification</span>, <span class="ident">RoomMessageRequest</span>,
+    <span class="ident">ToDeviceRequest</span>,
+};
 
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">VerificationCache</span> {
@@ -228,7 +240,7 @@
         <span class="self">self</span>.<span class="ident">outgoing_requests</span>.<span class="ident">iter</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">r</span><span class="op">|</span> (<span class="kw-2">*</span><span class="ident">r</span>).<span class="ident">clone</span>()).<span class="ident">collect</span>()
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">garbage_collect</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">OutgoingRequest</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">garbage_collect</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">OutgoingVerificationRequest</span><span class="op">&gt;</span> {
         <span class="kw">for</span> <span class="ident">user_verification</span> <span class="kw">in</span> <span class="self">self</span>.<span class="ident">verification</span>.<span class="ident">iter</span>() {
             <span class="ident">user_verification</span>.<span class="ident">retain</span>(<span class="op">|</span><span class="kw">_</span>, <span class="ident">s</span><span class="op">|</span> <span class="op">!</span>(<span class="ident">s</span>.<span class="ident">is_done</span>() <span class="op">|</span><span class="op">|</span> <span class="ident">s</span>.<span class="ident">is_cancelled</span>()));
         }
@@ -238,15 +250,12 @@
         <span class="self">self</span>.<span class="ident">verification</span>
             .<span class="ident">iter</span>()
             .<span class="ident">flat_map</span>(<span class="op">|</span><span class="ident">v</span><span class="op">|</span> {
-                <span class="kw">let</span> <span class="ident">requests</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">OutgoingRequest</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">v</span>
+                <span class="kw">let</span> <span class="ident">requests</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">OutgoingVerificationRequest</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">v</span>
                     .<span class="ident">value</span>()
                     .<span class="ident">iter</span>()
                     .<span class="ident">filter_map</span>(<span class="op">|</span><span class="ident">s</span><span class="op">|</span> {
                         <span class="kw">if</span> <span class="kw">let</span> <span class="ident">Verification::SasV1</span>(<span class="ident">s</span>) <span class="op">=</span> <span class="ident">s</span>.<span class="ident">value</span>() {
-                            <span class="ident">s</span>.<span class="ident">cancel_if_timed_out</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">r</span><span class="op">|</span> <span class="ident">OutgoingRequest</span> {
-                                <span class="ident">request_id</span>: <span class="ident">r</span>.<span class="ident">request_id</span>(),
-                                <span class="ident">request</span>: <span class="ident">Arc::new</span>(<span class="ident">r</span>.<span class="ident">into</span>()),
-                            })
+                            <span class="ident">s</span>.<span class="ident">cancel_if_timed_out</span>()
                         } <span class="kw">else</span> {
                             <span class="prelude-val">None</span>
                         }
@@ -269,7 +278,14 @@
     }
 
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">add_request</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">request</span>: <span class="ident">OutgoingRequest</span>) {
+        <span class="macro">trace!</span>(<span class="string">&quot;Adding an outgoing verification request {:?}&quot;</span>, <span class="ident">request</span>);
         <span class="self">self</span>.<span class="ident">outgoing_requests</span>.<span class="ident">insert</span>(<span class="ident">request</span>.<span class="ident">request_id</span>, <span class="ident">request</span>);
+    }
+
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">add_verification_request</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">request</span>: <span class="ident">OutgoingVerificationRequest</span>) {
+        <span class="kw">let</span> <span class="ident">request</span> <span class="op">=</span>
+            <span class="ident">OutgoingRequest</span> { <span class="ident">request_id</span>: <span class="ident">request</span>.<span class="ident">request_id</span>(), <span class="ident">request</span>: <span class="ident">Arc::new</span>(<span class="ident">request</span>.<span class="ident">into</span>()) };
+        <span class="self">self</span>.<span class="ident">add_request</span>(<span class="ident">request</span>);
     }
 
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">queue_up_content</span>(

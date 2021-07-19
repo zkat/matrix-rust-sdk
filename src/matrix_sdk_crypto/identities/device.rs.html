@@ -646,6 +646,55 @@
 <span id="646">646</span>
 <span id="647">647</span>
 <span id="648">648</span>
+<span id="649">649</span>
+<span id="650">650</span>
+<span id="651">651</span>
+<span id="652">652</span>
+<span id="653">653</span>
+<span id="654">654</span>
+<span id="655">655</span>
+<span id="656">656</span>
+<span id="657">657</span>
+<span id="658">658</span>
+<span id="659">659</span>
+<span id="660">660</span>
+<span id="661">661</span>
+<span id="662">662</span>
+<span id="663">663</span>
+<span id="664">664</span>
+<span id="665">665</span>
+<span id="666">666</span>
+<span id="667">667</span>
+<span id="668">668</span>
+<span id="669">669</span>
+<span id="670">670</span>
+<span id="671">671</span>
+<span id="672">672</span>
+<span id="673">673</span>
+<span id="674">674</span>
+<span id="675">675</span>
+<span id="676">676</span>
+<span id="677">677</span>
+<span id="678">678</span>
+<span id="679">679</span>
+<span id="680">680</span>
+<span id="681">681</span>
+<span id="682">682</span>
+<span id="683">683</span>
+<span id="684">684</span>
+<span id="685">685</span>
+<span id="686">686</span>
+<span id="687">687</span>
+<span id="688">688</span>
+<span id="689">689</span>
+<span id="690">690</span>
+<span id="691">691</span>
+<span id="692">692</span>
+<span id="693">693</span>
+<span id="694">694</span>
+<span id="695">695</span>
+<span id="696">696</span>
+<span id="697">697</span>
 </pre><pre class="rust">
 <span class="comment">// Copyright 2020 The Matrix.org Foundation C.I.C.</span>
 <span class="comment">//</span>
@@ -677,7 +726,8 @@
     <span class="ident">encryption</span>::{<span class="ident">DeviceKeys</span>, <span class="ident">SignedKey</span>},
     <span class="ident">events</span>::{
         <span class="ident">forwarded_room_key::ForwardedRoomKeyToDeviceEventContent</span>,
-        <span class="ident">room::encrypted::EncryptedEventContent</span>, <span class="ident">AnyToDeviceEventContent</span>,
+        <span class="ident">key::verification::VerificationMethod</span>, <span class="ident">room::encrypted::EncryptedEventContent</span>,
+        <span class="ident">AnyToDeviceEventContent</span>,
     },
     <span class="ident">DeviceId</span>, <span class="ident">DeviceIdBox</span>, <span class="ident">DeviceKeyAlgorithm</span>, <span class="ident">DeviceKeyId</span>, <span class="ident">EventEncryptionAlgorithm</span>, <span class="ident">UserId</span>,
 };
@@ -688,11 +738,11 @@
 <span class="kw">use</span> <span class="kw">super</span>::{<span class="ident">atomic_bool_deserializer</span>, <span class="ident">atomic_bool_serializer</span>};
 <span class="kw">use</span> <span class="kw">crate</span>::{
     <span class="ident">error</span>::{<span class="ident">EventError</span>, <span class="ident">OlmError</span>, <span class="ident">OlmResult</span>, <span class="ident">SignatureError</span>},
-    <span class="ident">identities</span>::{<span class="ident">OwnUserIdentity</span>, <span class="ident">UserIdentities</span>},
+    <span class="ident">identities</span>::{<span class="ident">ReadOnlyOwnUserIdentity</span>, <span class="ident">ReadOnlyUserIdentities</span>},
     <span class="ident">olm</span>::{<span class="ident">InboundGroupSession</span>, <span class="ident">PrivateCrossSigningIdentity</span>, <span class="ident">Session</span>, <span class="ident">Utility</span>},
     <span class="ident">store</span>::{<span class="ident">Changes</span>, <span class="ident">CryptoStore</span>, <span class="ident">DeviceChanges</span>, <span class="prelude-ty">Result</span> <span class="kw">as</span> <span class="ident">StoreResult</span>},
     <span class="ident">verification::VerificationMachine</span>,
-    <span class="ident">OutgoingVerificationRequest</span>, <span class="ident">Sas</span>, <span class="ident">ToDeviceRequest</span>,
+    <span class="ident">OutgoingVerificationRequest</span>, <span class="ident">Sas</span>, <span class="ident">ToDeviceRequest</span>, <span class="ident">VerificationRequest</span>,
 };
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
 <span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">OlmMachine</span>, <span class="ident">ReadOnlyAccount</span>};
@@ -753,8 +803,8 @@
     <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">inner</span>: <span class="ident">ReadOnlyDevice</span>,
     <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">private_identity</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">Mutex</span><span class="op">&lt;</span><span class="ident">PrivateCrossSigningIdentity</span><span class="op">&gt;</span><span class="op">&gt;</span>,
     <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">verification_machine</span>: <span class="ident">VerificationMachine</span>,
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">own_identity</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">OwnUserIdentity</span><span class="op">&gt;</span>,
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">device_owner_identity</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">UserIdentities</span><span class="op">&gt;</span>,
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">own_identity</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ReadOnlyOwnUserIdentity</span><span class="op">&gt;</span>,
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">device_owner_identity</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ReadOnlyUserIdentities</span><span class="op">&gt;</span>,
 }
 
 <span class="kw">impl</span> <span class="ident">std::fmt::Debug</span> <span class="kw">for</span> <span class="ident">Device</span> {
@@ -774,7 +824,13 @@
 <span class="kw">impl</span> <span class="ident">Device</span> {
     <span class="doccomment">/// Start a interactive verification with this `Device`</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// Returns a `Sas` object and to-device request that needs to be sent out.</span>
+    <span class="doccomment">/// Returns a `Sas` object and a to-device request that needs to be sent</span>
+    <span class="doccomment">/// out.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// This method has been deprecated in the spec and the</span>
+    <span class="doccomment">/// [`request_verification()`] method should be used instead.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// [`request_verification()`]: #method.request_verification</span>
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">start_verification</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">StoreResult</span><span class="op">&lt;</span>(<span class="ident">Sas</span>, <span class="ident">ToDeviceRequest</span>)<span class="op">&gt;</span> {
         <span class="kw">let</span> (<span class="ident">sas</span>, <span class="ident">request</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">verification_machine</span>.<span class="ident">start_sas</span>(<span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">clone</span>()).<span class="kw">await</span><span class="question-mark">?</span>;
 
@@ -783,6 +839,42 @@
         } <span class="kw">else</span> {
             <span class="macro">panic!</span>(<span class="string">&quot;Invalid verification request type&quot;</span>);
         }
+    }
+
+    <span class="doccomment">/// Request an interacitve verification with this `Device`</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// Returns a `VerificationRequest` object and a to-device request that</span>
+    <span class="doccomment">/// needs to be sent out.</span>
+    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">request_verification</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> (<span class="ident">VerificationRequest</span>, <span class="ident">OutgoingVerificationRequest</span>) {
+        <span class="self">self</span>.<span class="ident">request_verification_helper</span>(<span class="prelude-val">None</span>).<span class="kw">await</span>
+    }
+
+    <span class="doccomment">/// Request an interacitve verification with this `Device`</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// Returns a `VerificationRequest` object and a to-device request that</span>
+    <span class="doccomment">/// needs to be sent out.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// # Arguments</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// * `methods` - The verification methods that we want to support.</span>
+    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">request_verification_with_methods</span>(
+        <span class="kw-2">&amp;</span><span class="self">self</span>,
+        <span class="ident">methods</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">VerificationMethod</span><span class="op">&gt;</span>,
+    ) <span class="op">-</span><span class="op">&gt;</span> (<span class="ident">VerificationRequest</span>, <span class="ident">OutgoingVerificationRequest</span>) {
+        <span class="self">self</span>.<span class="ident">request_verification_helper</span>(<span class="prelude-val">Some</span>(<span class="ident">methods</span>)).<span class="kw">await</span>
+    }
+
+    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">request_verification_helper</span>(
+        <span class="kw-2">&amp;</span><span class="self">self</span>,
+        <span class="ident">methods</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">VerificationMethod</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+    ) <span class="op">-</span><span class="op">&gt;</span> (<span class="ident">VerificationRequest</span>, <span class="ident">OutgoingVerificationRequest</span>) {
+        <span class="self">self</span>.<span class="ident">verification_machine</span>
+            .<span class="ident">request_to_device_verification</span>(
+                <span class="self">self</span>.<span class="ident">user_id</span>(),
+                <span class="macro">vec!</span>[<span class="self">self</span>.<span class="ident">device_id</span>().<span class="ident">to_owned</span>()],
+                <span class="ident">methods</span>,
+            )
+            .<span class="kw">await</span>
     }
 
     <span class="doccomment">/// Get the Olm sessions that belong to this device.</span>
@@ -794,9 +886,20 @@
         }
     }
 
-    <span class="doccomment">/// Get the trust state of the device.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">trust_state</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">trust_state</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">own_identity</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">device_owner_identity</span>)
+    <span class="doccomment">/// Is this device considered to be verified.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// This method returns true if either [`is_locally_trusted()`] returns true</span>
+    <span class="doccomment">/// or if [`is_cross_signing_trusted()`] returns true.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// [`is_locally_trusted()`]: #method.is_locally_trusted</span>
+    <span class="doccomment">/// [`is_cross_signing_trusted()`]: #method.is_cross_signing_trusted</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">verified</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+        <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">verified</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">own_identity</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">device_owner_identity</span>)
+    }
+
+    <span class="doccomment">/// Is this device considered to be verified using cross signing.</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_cross_signing_trusted</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+        <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">is_cross_signing_trusted</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">own_identity</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">device_owner_identity</span>)
     }
 
     <span class="doccomment">/// Set the local trust state of the device to the given state.</span>
@@ -866,8 +969,8 @@
     <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">inner</span>: <span class="ident">HashMap</span><span class="op">&lt;</span><span class="ident">DeviceIdBox</span>, <span class="ident">ReadOnlyDevice</span><span class="op">&gt;</span>,
     <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">private_identity</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">Mutex</span><span class="op">&lt;</span><span class="ident">PrivateCrossSigningIdentity</span><span class="op">&gt;</span><span class="op">&gt;</span>,
     <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">verification_machine</span>: <span class="ident">VerificationMachine</span>,
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">own_identity</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">OwnUserIdentity</span><span class="op">&gt;</span>,
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">device_owner_identity</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">UserIdentities</span><span class="op">&gt;</span>,
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">own_identity</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ReadOnlyOwnUserIdentity</span><span class="op">&gt;</span>,
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">device_owner_identity</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ReadOnlyUserIdentities</span><span class="op">&gt;</span>,
 }
 
 <span class="kw">impl</span> <span class="ident">UserDevices</span> {
@@ -885,7 +988,7 @@
     <span class="doccomment">/// Returns true if there is at least one devices of this user that is</span>
     <span class="doccomment">/// considered to be verified, false otherwise.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_any_verified</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">values</span>().<span class="ident">any</span>(<span class="op">|</span><span class="ident">d</span><span class="op">|</span> <span class="ident">d</span>.<span class="ident">trust_state</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">own_identity</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">device_owner_identity</span>))
+        <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">values</span>().<span class="ident">any</span>(<span class="op">|</span><span class="ident">d</span><span class="op">|</span> <span class="ident">d</span>.<span class="ident">verified</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">own_identity</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">device_owner_identity</span>))
     }
 
     <span class="doccomment">/// Iterator over all the device ids of the user devices.</span>
@@ -989,7 +1092,7 @@
     }
 
     <span class="doccomment">/// Is the device locally marked as trusted.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_trusted</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_locally_trusted</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
         <span class="self">self</span>.<span class="ident">local_trust_state</span>() <span class="op">=</span><span class="op">=</span> <span class="ident">LocalTrust::Verified</span>
     }
 
@@ -1018,46 +1121,41 @@
         <span class="self">self</span>.<span class="ident">deleted</span>.<span class="ident">load</span>(<span class="ident">Ordering::Relaxed</span>)
     }
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">trust_state</span>(
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">verified</span>(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
-        <span class="ident">own_identity</span>: <span class="kw-2">&amp;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">OwnUserIdentity</span><span class="op">&gt;</span>,
-        <span class="ident">device_owner</span>: <span class="kw-2">&amp;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">UserIdentities</span><span class="op">&gt;</span>,
+        <span class="ident">own_identity</span>: <span class="kw-2">&amp;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ReadOnlyOwnUserIdentity</span><span class="op">&gt;</span>,
+        <span class="ident">device_owner</span>: <span class="kw-2">&amp;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ReadOnlyUserIdentities</span><span class="op">&gt;</span>,
     ) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
-        <span class="comment">// TODO we want to return an enum mentioning if the trust is local, if</span>
-        <span class="comment">// only the identity is trusted, if the identity and the device are</span>
-        <span class="comment">// trusted.</span>
-        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">is_trusted</span>() {
-            <span class="comment">// If the device is locally marked as verified just return so, no</span>
-            <span class="comment">// need to check signatures.</span>
-            <span class="bool-val">true</span>
-        } <span class="kw">else</span> {
-            <span class="ident">own_identity</span>.<span class="ident">as_ref</span>().<span class="ident">map_or</span>(<span class="bool-val">false</span>, <span class="op">|</span><span class="ident">own_identity</span><span class="op">|</span> {
-                <span class="comment">// Our own identity needs to be marked as verified.</span>
-                <span class="ident">own_identity</span>.<span class="ident">is_verified</span>()
-                    <span class="op">&amp;&amp;</span> <span class="ident">device_owner</span>
-                        .<span class="ident">as_ref</span>()
-                        .<span class="ident">map</span>(<span class="op">|</span><span class="ident">device_identity</span><span class="op">|</span> <span class="kw">match</span> <span class="ident">device_identity</span> {
-                            <span class="comment">// If it&#39;s one of our own devices, just check that</span>
-                            <span class="comment">// we signed the device.</span>
-                            <span class="ident">UserIdentities::Own</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> {
-                                <span class="ident">own_identity</span>.<span class="ident">is_device_signed</span>(<span class="self">self</span>).<span class="ident">map_or</span>(<span class="bool-val">false</span>, <span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="bool-val">true</span>)
-                            }
+        <span class="self">self</span>.<span class="ident">is_locally_trusted</span>() <span class="op">|</span><span class="op">|</span> <span class="self">self</span>.<span class="ident">is_cross_signing_trusted</span>(<span class="ident">own_identity</span>, <span class="ident">device_owner</span>)
+    }
 
-                            <span class="comment">// If it&#39;s a device from someone else, first check</span>
-                            <span class="comment">// that our user has signed the other user and then</span>
-                            <span class="comment">// check if the other user has signed this device.</span>
-                            <span class="ident">UserIdentities::Other</span>(<span class="ident">device_identity</span>) <span class="op">=</span><span class="op">&gt;</span> {
-                                <span class="ident">own_identity</span>
-                                    .<span class="ident">is_identity_signed</span>(<span class="ident">device_identity</span>)
-                                    .<span class="ident">map_or</span>(<span class="bool-val">false</span>, <span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="bool-val">true</span>)
-                                    <span class="op">&amp;&amp;</span> <span class="ident">device_identity</span>
-                                        .<span class="ident">is_device_signed</span>(<span class="self">self</span>)
-                                        .<span class="ident">map_or</span>(<span class="bool-val">false</span>, <span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="bool-val">true</span>)
-                            }
-                        })
-                        .<span class="ident">unwrap_or</span>(<span class="bool-val">false</span>)
-            })
-        }
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">is_cross_signing_trusted</span>(
+        <span class="kw-2">&amp;</span><span class="self">self</span>,
+        <span class="ident">own_identity</span>: <span class="kw-2">&amp;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ReadOnlyOwnUserIdentity</span><span class="op">&gt;</span>,
+        <span class="ident">device_owner</span>: <span class="kw-2">&amp;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ReadOnlyUserIdentities</span><span class="op">&gt;</span>,
+    ) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+        <span class="ident">own_identity</span>.<span class="ident">as_ref</span>().<span class="ident">map_or</span>(<span class="bool-val">false</span>, <span class="op">|</span><span class="ident">own_identity</span><span class="op">|</span> {
+            <span class="comment">// Our own identity needs to be marked as verified.</span>
+            <span class="ident">own_identity</span>.<span class="ident">is_verified</span>()
+                <span class="op">&amp;&amp;</span> <span class="ident">device_owner</span>
+                    .<span class="ident">as_ref</span>()
+                    .<span class="ident">map</span>(<span class="op">|</span><span class="ident">device_identity</span><span class="op">|</span> <span class="kw">match</span> <span class="ident">device_identity</span> {
+                        <span class="comment">// If it&#39;s one of our own devices, just check that</span>
+                        <span class="comment">// we signed the device.</span>
+                        <span class="ident">ReadOnlyUserIdentities::Own</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> {
+                            <span class="ident">own_identity</span>.<span class="ident">is_device_signed</span>(<span class="self">self</span>).<span class="ident">map_or</span>(<span class="bool-val">false</span>, <span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="bool-val">true</span>)
+                        }
+
+                        <span class="comment">// If it&#39;s a device from someone else, first check</span>
+                        <span class="comment">// that our user has signed the other user and then</span>
+                        <span class="comment">// check if the other user has signed this device.</span>
+                        <span class="ident">ReadOnlyUserIdentities::Other</span>(<span class="ident">device_identity</span>) <span class="op">=</span><span class="op">&gt;</span> {
+                            <span class="ident">own_identity</span>.<span class="ident">is_identity_signed</span>(<span class="ident">device_identity</span>).<span class="ident">map_or</span>(<span class="bool-val">false</span>, <span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="bool-val">true</span>)
+                                <span class="op">&amp;&amp;</span> <span class="ident">device_identity</span>.<span class="ident">is_device_signed</span>(<span class="self">self</span>).<span class="ident">map_or</span>(<span class="bool-val">false</span>, <span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="bool-val">true</span>)
+                        }
+                    })
+                    .<span class="ident">unwrap_or</span>(<span class="bool-val">false</span>)
+        })
     }
 
     <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">encrypt</span>(

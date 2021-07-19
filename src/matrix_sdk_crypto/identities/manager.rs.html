@@ -674,8 +674,8 @@
 <span class="kw">use</span> <span class="kw">crate</span>::{
     <span class="ident">error::OlmResult</span>,
     <span class="ident">identities</span>::{
-        <span class="ident">MasterPubkey</span>, <span class="ident">OwnUserIdentity</span>, <span class="ident">ReadOnlyDevice</span>, <span class="ident">SelfSigningPubkey</span>, <span class="ident">UserIdentities</span>,
-        <span class="ident">UserIdentity</span>, <span class="ident">UserSigningPubkey</span>,
+        <span class="ident">MasterPubkey</span>, <span class="ident">ReadOnlyDevice</span>, <span class="ident">ReadOnlyOwnUserIdentity</span>, <span class="ident">ReadOnlyUserIdentities</span>,
+        <span class="ident">ReadOnlyUserIdentity</span>, <span class="ident">SelfSigningPubkey</span>, <span class="ident">UserSigningPubkey</span>,
     },
     <span class="ident">requests::KeysQueryRequest</span>,
     <span class="ident">store</span>::{<span class="ident">Changes</span>, <span class="ident">DeviceChanges</span>, <span class="ident">IdentityChanges</span>, <span class="prelude-ty">Result</span> <span class="kw">as</span> <span class="ident">StoreResult</span>, <span class="ident">Store</span>},
@@ -891,7 +891,7 @@
 
             <span class="kw">let</span> <span class="ident">result</span> <span class="op">=</span> <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="kw-2">mut</span> <span class="ident">i</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">store</span>.<span class="ident">get_user_identity</span>(<span class="ident">user_id</span>).<span class="kw">await</span><span class="question-mark">?</span> {
                 <span class="kw">match</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">i</span> {
-                    <span class="ident">UserIdentities::Own</span>(<span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="ident">identity</span>) <span class="op">=</span><span class="op">&gt;</span> {
+                    <span class="ident">ReadOnlyUserIdentities::Own</span>(<span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="ident">identity</span>) <span class="op">=</span><span class="op">&gt;</span> {
                         <span class="kw">let</span> <span class="ident">user_signing</span> <span class="op">=</span> <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">s</span>) <span class="op">=</span> <span class="ident">response</span>.<span class="ident">user_signing_keys</span>.<span class="ident">get</span>(<span class="ident">user_id</span>)
                         {
                             <span class="ident">UserSigningPubkey::from</span>(<span class="ident">s</span>)
@@ -906,7 +906,7 @@
 
                         <span class="ident">identity</span>.<span class="ident">update</span>(<span class="ident">master_key</span>, <span class="ident">self_signing</span>, <span class="ident">user_signing</span>).<span class="ident">map</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> (<span class="ident">i</span>, <span class="bool-val">false</span>))
                     }
-                    <span class="ident">UserIdentities::Other</span>(<span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="ident">identity</span>) <span class="op">=</span><span class="op">&gt;</span> {
+                    <span class="ident">ReadOnlyUserIdentities::Other</span>(<span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="ident">identity</span>) <span class="op">=</span><span class="op">&gt;</span> {
                         <span class="ident">identity</span>.<span class="ident">update</span>(<span class="ident">master_key</span>, <span class="ident">self_signing</span>).<span class="ident">map</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> (<span class="ident">i</span>, <span class="bool-val">false</span>))
                     }
                 }
@@ -925,8 +925,8 @@
                         <span class="kw">continue</span>;
                     }
 
-                    <span class="ident">OwnUserIdentity::new</span>(<span class="ident">master_key</span>, <span class="ident">self_signing</span>, <span class="ident">user_signing</span>)
-                        .<span class="ident">map</span>(<span class="op">|</span><span class="ident">i</span><span class="op">|</span> (<span class="ident">UserIdentities::Own</span>(<span class="ident">i</span>), <span class="bool-val">true</span>))
+                    <span class="ident">ReadOnlyOwnUserIdentity::new</span>(<span class="ident">master_key</span>, <span class="ident">self_signing</span>, <span class="ident">user_signing</span>)
+                        .<span class="ident">map</span>(<span class="op">|</span><span class="ident">i</span><span class="op">|</span> (<span class="ident">ReadOnlyUserIdentities::Own</span>(<span class="ident">i</span>), <span class="bool-val">true</span>))
                 } <span class="kw">else</span> {
                     <span class="macro">warn!</span>(
                         <span class="string">&quot;User identity for our own user {} didn&#39;t contain a \
@@ -939,8 +939,8 @@
                 <span class="macro">warn!</span>(<span class="string">&quot;User id mismatch in one of the cross signing keys for user {}&quot;</span>, <span class="ident">user_id</span>);
                 <span class="kw">continue</span>;
             } <span class="kw">else</span> {
-                <span class="ident">UserIdentity::new</span>(<span class="ident">master_key</span>, <span class="ident">self_signing</span>)
-                    .<span class="ident">map</span>(<span class="op">|</span><span class="ident">i</span><span class="op">|</span> (<span class="ident">UserIdentities::Other</span>(<span class="ident">i</span>), <span class="bool-val">true</span>))
+                <span class="ident">ReadOnlyUserIdentity::new</span>(<span class="ident">master_key</span>, <span class="ident">self_signing</span>)
+                    .<span class="ident">map</span>(<span class="op">|</span><span class="ident">i</span><span class="op">|</span> (<span class="ident">ReadOnlyUserIdentities::Other</span>(<span class="ident">i</span>), <span class="bool-val">true</span>))
             };
 
             <span class="kw">match</span> <span class="ident">result</span> {

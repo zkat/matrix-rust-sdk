@@ -380,6 +380,46 @@
 <span id="380">380</span>
 <span id="381">381</span>
 <span id="382">382</span>
+<span id="383">383</span>
+<span id="384">384</span>
+<span id="385">385</span>
+<span id="386">386</span>
+<span id="387">387</span>
+<span id="388">388</span>
+<span id="389">389</span>
+<span id="390">390</span>
+<span id="391">391</span>
+<span id="392">392</span>
+<span id="393">393</span>
+<span id="394">394</span>
+<span id="395">395</span>
+<span id="396">396</span>
+<span id="397">397</span>
+<span id="398">398</span>
+<span id="399">399</span>
+<span id="400">400</span>
+<span id="401">401</span>
+<span id="402">402</span>
+<span id="403">403</span>
+<span id="404">404</span>
+<span id="405">405</span>
+<span id="406">406</span>
+<span id="407">407</span>
+<span id="408">408</span>
+<span id="409">409</span>
+<span id="410">410</span>
+<span id="411">411</span>
+<span id="412">412</span>
+<span id="413">413</span>
+<span id="414">414</span>
+<span id="415">415</span>
+<span id="416">416</span>
+<span id="417">417</span>
+<span id="418">418</span>
+<span id="419">419</span>
+<span id="420">420</span>
+<span id="421">421</span>
+<span id="422">422</span>
 </pre><pre class="rust">
 <span class="comment">// Copyright 2020 The Matrix.org Foundation C.I.C.</span>
 <span class="comment">//</span>
@@ -407,11 +447,12 @@
 <span class="kw">use</span> <span class="kw">super</span>::{
     <span class="ident">sas_state</span>::{
         <span class="ident">Accepted</span>, <span class="ident">Confirmed</span>, <span class="ident">Created</span>, <span class="ident">KeyReceived</span>, <span class="ident">MacReceived</span>, <span class="ident">SasState</span>, <span class="ident">Started</span>, <span class="ident">WaitingForDone</span>,
+        <span class="ident">WeAccepted</span>,
     },
     <span class="ident">FlowId</span>,
 };
 <span class="kw">use</span> <span class="kw">crate</span>::{
-    <span class="ident">identities</span>::{<span class="ident">ReadOnlyDevice</span>, <span class="ident">UserIdentities</span>},
+    <span class="ident">identities</span>::{<span class="ident">ReadOnlyDevice</span>, <span class="ident">ReadOnlyUserIdentities</span>},
     <span class="ident">verification</span>::{
         <span class="ident">event_enums</span>::{<span class="ident">AnyVerificationContent</span>, <span class="ident">OutgoingContent</span>, <span class="ident">OwnedAcceptContent</span>, <span class="ident">StartContent</span>},
         <span class="ident">Cancelled</span>, <span class="ident">Done</span>,
@@ -424,6 +465,7 @@
     <span class="ident">Created</span>(<span class="ident">SasState</span><span class="op">&lt;</span><span class="ident">Created</span><span class="op">&gt;</span>),
     <span class="ident">Started</span>(<span class="ident">SasState</span><span class="op">&lt;</span><span class="ident">Started</span><span class="op">&gt;</span>),
     <span class="ident">Accepted</span>(<span class="ident">SasState</span><span class="op">&lt;</span><span class="ident">Accepted</span><span class="op">&gt;</span>),
+    <span class="ident">WeAccepted</span>(<span class="ident">SasState</span><span class="op">&lt;</span><span class="ident">WeAccepted</span><span class="op">&gt;</span>),
     <span class="ident">KeyReceived</span>(<span class="ident">SasState</span><span class="op">&lt;</span><span class="ident">KeyReceived</span><span class="op">&gt;</span>),
     <span class="ident">Confirmed</span>(<span class="ident">SasState</span><span class="op">&lt;</span><span class="ident">Confirmed</span><span class="op">&gt;</span>),
     <span class="ident">MacReceived</span>(<span class="ident">SasState</span><span class="op">&lt;</span><span class="ident">MacReceived</span><span class="op">&gt;</span>),
@@ -436,7 +478,7 @@
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">start</span>(
         <span class="ident">account</span>: <span class="ident">ReadOnlyAccount</span>,
         <span class="ident">other_device</span>: <span class="ident">ReadOnlyDevice</span>,
-        <span class="ident">other_identity</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">UserIdentities</span><span class="op">&gt;</span>,
+        <span class="ident">other_identity</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ReadOnlyUserIdentities</span><span class="op">&gt;</span>,
         <span class="ident">transaction_id</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
     ) <span class="op">-</span><span class="op">&gt;</span> (<span class="ident">InnerSas</span>, <span class="ident">OutgoingContent</span>) {
         <span class="kw">let</span> <span class="ident">sas</span> <span class="op">=</span> <span class="ident">SasState</span>::<span class="op">&lt;</span><span class="ident">Created</span><span class="op">&gt;</span><span class="ident">::new</span>(<span class="ident">account</span>, <span class="ident">other_device</span>, <span class="ident">other_identity</span>, <span class="ident">transaction_id</span>);
@@ -448,6 +490,7 @@
         <span class="kw">match</span> <span class="self">self</span> {
             <span class="ident">InnerSas::Created</span>(<span class="ident">s</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">s</span>.<span class="ident">started_from_request</span>,
             <span class="ident">InnerSas::Started</span>(<span class="ident">s</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">s</span>.<span class="ident">started_from_request</span>,
+            <span class="ident">InnerSas::WeAccepted</span>(<span class="ident">s</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">s</span>.<span class="ident">started_from_request</span>,
             <span class="ident">InnerSas::Accepted</span>(<span class="ident">s</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">s</span>.<span class="ident">started_from_request</span>,
             <span class="ident">InnerSas::KeyReceived</span>(<span class="ident">s</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">s</span>.<span class="ident">started_from_request</span>,
             <span class="ident">InnerSas::Confirmed</span>(<span class="ident">s</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">s</span>.<span class="ident">started_from_request</span>,
@@ -458,10 +501,28 @@
         }
     }
 
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">has_been_accepted</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+        <span class="kw">match</span> <span class="self">self</span> {
+            <span class="ident">InnerSas::Created</span>(<span class="kw">_</span>) <span class="op">|</span> <span class="ident">InnerSas::Started</span>(<span class="kw">_</span>) <span class="op">|</span> <span class="ident">InnerSas::Cancelled</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="bool-val">false</span>,
+            <span class="ident">InnerSas::Accepted</span>(<span class="kw">_</span>)
+            <span class="op">|</span> <span class="ident">InnerSas::WeAccepted</span>(<span class="kw">_</span>)
+            <span class="op">|</span> <span class="ident">InnerSas::KeyReceived</span>(<span class="kw">_</span>)
+            <span class="op">|</span> <span class="ident">InnerSas::Confirmed</span>(<span class="kw">_</span>)
+            <span class="op">|</span> <span class="ident">InnerSas::MacReceived</span>(<span class="kw">_</span>)
+            <span class="op">|</span> <span class="ident">InnerSas::WaitingForDone</span>(<span class="kw">_</span>)
+            <span class="op">|</span> <span class="ident">InnerSas::Done</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="bool-val">true</span>,
+        }
+    }
+
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">supports_emoji</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
         <span class="kw">match</span> <span class="self">self</span> {
             <span class="ident">InnerSas::Created</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="bool-val">false</span>,
             <span class="ident">InnerSas::Started</span>(<span class="ident">s</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">s</span>
+                .<span class="ident">state</span>
+                .<span class="ident">accepted_protocols</span>
+                .<span class="ident">short_auth_string</span>
+                .<span class="ident">contains</span>(<span class="kw-2">&amp;</span><span class="ident">ShortAuthenticationString::Emoji</span>),
+            <span class="ident">InnerSas::WeAccepted</span>(<span class="ident">s</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">s</span>
                 .<span class="ident">state</span>
                 .<span class="ident">accepted_protocols</span>
                 .<span class="ident">short_auth_string</span>
@@ -493,7 +554,7 @@
         <span class="ident">room_id</span>: <span class="ident">RoomId</span>,
         <span class="ident">account</span>: <span class="ident">ReadOnlyAccount</span>,
         <span class="ident">other_device</span>: <span class="ident">ReadOnlyDevice</span>,
-        <span class="ident">other_identity</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">UserIdentities</span><span class="op">&gt;</span>,
+        <span class="ident">other_identity</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ReadOnlyUserIdentities</span><span class="op">&gt;</span>,
     ) <span class="op">-</span><span class="op">&gt;</span> (<span class="ident">InnerSas</span>, <span class="ident">OutgoingContent</span>) {
         <span class="kw">let</span> <span class="ident">sas</span> <span class="op">=</span> <span class="ident">SasState</span>::<span class="op">&lt;</span><span class="ident">Created</span><span class="op">&gt;</span><span class="ident">::new_in_room</span>(
             <span class="ident">room_id</span>,
@@ -511,7 +572,7 @@
         <span class="ident">other_device</span>: <span class="ident">ReadOnlyDevice</span>,
         <span class="ident">flow_id</span>: <span class="ident">FlowId</span>,
         <span class="ident">content</span>: <span class="kw-2">&amp;</span><span class="ident">StartContent</span>,
-        <span class="ident">other_identity</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">UserIdentities</span><span class="op">&gt;</span>,
+        <span class="ident">other_identity</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ReadOnlyUserIdentities</span><span class="op">&gt;</span>,
         <span class="ident">started_from_request</span>: <span class="ident">bool</span>,
     ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">InnerSas</span>, <span class="ident">OutgoingContent</span><span class="op">&gt;</span> {
         <span class="kw">match</span> <span class="ident">SasState</span>::<span class="op">&lt;</span><span class="ident">Started</span><span class="op">&gt;</span><span class="ident">::from_start_event</span>(
@@ -527,9 +588,14 @@
         }
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">accept</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">OwnedAcceptContent</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">accept</span>(
+        <span class="self">self</span>,
+        <span class="ident">methods</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">ShortAuthenticationString</span><span class="op">&gt;</span>,
+    ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span>(<span class="ident">InnerSas</span>, <span class="ident">OwnedAcceptContent</span>)<span class="op">&gt;</span> {
         <span class="kw">if</span> <span class="kw">let</span> <span class="ident">InnerSas::Started</span>(<span class="ident">s</span>) <span class="op">=</span> <span class="self">self</span> {
-            <span class="prelude-val">Some</span>(<span class="ident">s</span>.<span class="ident">as_content</span>())
+            <span class="kw">let</span> <span class="ident">sas</span> <span class="op">=</span> <span class="ident">s</span>.<span class="ident">into_accepted</span>(<span class="ident">methods</span>);
+            <span class="kw">let</span> <span class="ident">content</span> <span class="op">=</span> <span class="ident">sas</span>.<span class="ident">as_content</span>();
+            <span class="prelude-val">Some</span>((<span class="ident">InnerSas::WeAccepted</span>(<span class="ident">sas</span>), <span class="ident">content</span>))
         } <span class="kw">else</span> {
             <span class="prelude-val">None</span>
         }
@@ -548,17 +614,25 @@
             <span class="ident">InnerSas::MacReceived</span>(<span class="ident">s</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">s</span>.<span class="ident">set_creation_time</span>(<span class="ident">time</span>),
             <span class="ident">InnerSas::Done</span>(<span class="ident">s</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">s</span>.<span class="ident">set_creation_time</span>(<span class="ident">time</span>),
             <span class="ident">InnerSas::WaitingForDone</span>(<span class="ident">s</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">s</span>.<span class="ident">set_creation_time</span>(<span class="ident">time</span>),
+            <span class="ident">InnerSas::WeAccepted</span>(<span class="ident">s</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">s</span>.<span class="ident">set_creation_time</span>(<span class="ident">time</span>),
         }
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">cancel</span>(<span class="self">self</span>, <span class="ident">code</span>: <span class="ident">CancelCode</span>) <span class="op">-</span><span class="op">&gt;</span> (<span class="ident">InnerSas</span>, <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">OutgoingContent</span><span class="op">&gt;</span>) {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">cancel</span>(
+        <span class="self">self</span>,
+        <span class="ident">cancelled_by_us</span>: <span class="ident">bool</span>,
+        <span class="ident">code</span>: <span class="ident">CancelCode</span>,
+    ) <span class="op">-</span><span class="op">&gt;</span> (<span class="ident">InnerSas</span>, <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">OutgoingContent</span><span class="op">&gt;</span>) {
         <span class="kw">let</span> <span class="ident">sas</span> <span class="op">=</span> <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">InnerSas::Created</span>(<span class="ident">s</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">s</span>.<span class="ident">cancel</span>(<span class="ident">code</span>),
-            <span class="ident">InnerSas::Started</span>(<span class="ident">s</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">s</span>.<span class="ident">cancel</span>(<span class="ident">code</span>),
-            <span class="ident">InnerSas::Accepted</span>(<span class="ident">s</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">s</span>.<span class="ident">cancel</span>(<span class="ident">code</span>),
-            <span class="ident">InnerSas::KeyReceived</span>(<span class="ident">s</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">s</span>.<span class="ident">cancel</span>(<span class="ident">code</span>),
-            <span class="ident">InnerSas::MacReceived</span>(<span class="ident">s</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">s</span>.<span class="ident">cancel</span>(<span class="ident">code</span>),
-            <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="kw">return</span> (<span class="self">self</span>, <span class="prelude-val">None</span>),
+            <span class="ident">InnerSas::Created</span>(<span class="ident">s</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">s</span>.<span class="ident">cancel</span>(<span class="ident">cancelled_by_us</span>, <span class="ident">code</span>),
+            <span class="ident">InnerSas::Started</span>(<span class="ident">s</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">s</span>.<span class="ident">cancel</span>(<span class="ident">cancelled_by_us</span>, <span class="ident">code</span>),
+            <span class="ident">InnerSas::Accepted</span>(<span class="ident">s</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">s</span>.<span class="ident">cancel</span>(<span class="ident">cancelled_by_us</span>, <span class="ident">code</span>),
+            <span class="ident">InnerSas::WeAccepted</span>(<span class="ident">s</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">s</span>.<span class="ident">cancel</span>(<span class="ident">cancelled_by_us</span>, <span class="ident">code</span>),
+            <span class="ident">InnerSas::KeyReceived</span>(<span class="ident">s</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">s</span>.<span class="ident">cancel</span>(<span class="ident">cancelled_by_us</span>, <span class="ident">code</span>),
+            <span class="ident">InnerSas::MacReceived</span>(<span class="ident">s</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">s</span>.<span class="ident">cancel</span>(<span class="ident">cancelled_by_us</span>, <span class="ident">code</span>),
+            <span class="ident">InnerSas::Confirmed</span>(<span class="ident">s</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">s</span>.<span class="ident">cancel</span>(<span class="ident">cancelled_by_us</span>, <span class="ident">code</span>),
+            <span class="ident">InnerSas::WaitingForDone</span>(<span class="ident">s</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">s</span>.<span class="ident">cancel</span>(<span class="ident">cancelled_by_us</span>, <span class="ident">code</span>),
+            <span class="ident">InnerSas::Done</span>(<span class="kw">_</span>) <span class="op">|</span> <span class="ident">InnerSas::Cancelled</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="kw">return</span> (<span class="self">self</span>, <span class="prelude-val">None</span>),
         };
 
         <span class="kw">let</span> <span class="ident">content</span> <span class="op">=</span> <span class="ident">sas</span>.<span class="ident">as_content</span>();
@@ -613,7 +687,7 @@
                 }
             }
             <span class="ident">AnyVerificationContent::Cancel</span>(<span class="ident">c</span>) <span class="op">=</span><span class="op">&gt;</span> {
-                <span class="kw">let</span> (<span class="ident">sas</span>, <span class="kw">_</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">cancel</span>(<span class="ident">c</span>.<span class="ident">cancel_code</span>().<span class="ident">to_owned</span>());
+                <span class="kw">let</span> (<span class="ident">sas</span>, <span class="kw">_</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">cancel</span>(<span class="bool-val">false</span>, <span class="ident">c</span>.<span class="ident">cancel_code</span>().<span class="ident">to_owned</span>());
                 (<span class="ident">sas</span>, <span class="prelude-val">None</span>)
             }
             <span class="ident">AnyVerificationContent::Key</span>(<span class="ident">c</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="kw">match</span> <span class="self">self</span> {
@@ -624,7 +698,7 @@
                         (<span class="ident">InnerSas::Cancelled</span>(<span class="ident">s</span>), <span class="prelude-val">Some</span>(<span class="ident">content</span>))
                     }
                 },
-                <span class="ident">InnerSas::Started</span>(<span class="ident">s</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="kw">match</span> <span class="ident">s</span>.<span class="ident">into_key_received</span>(<span class="ident">sender</span>, <span class="ident">c</span>) {
+                <span class="ident">InnerSas::WeAccepted</span>(<span class="ident">s</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="kw">match</span> <span class="ident">s</span>.<span class="ident">into_key_received</span>(<span class="ident">sender</span>, <span class="ident">c</span>) {
                     <span class="prelude-val">Ok</span>(<span class="ident">s</span>) <span class="op">=</span><span class="op">&gt;</span> {
                         <span class="kw">let</span> <span class="ident">content</span> <span class="op">=</span> <span class="ident">s</span>.<span class="ident">as_content</span>();
                         (<span class="ident">InnerSas::KeyReceived</span>(<span class="ident">s</span>), <span class="prelude-val">Some</span>(<span class="ident">content</span>))
@@ -695,6 +769,10 @@
         <span class="macro">matches!</span>(<span class="self">self</span>, <span class="ident">InnerSas::Cancelled</span>(<span class="kw">_</span>))
     }
 
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">have_we_confirmed</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+        <span class="macro">matches!</span>(<span class="self">self</span>, <span class="ident">InnerSas::Confirmed</span>(<span class="kw">_</span>) <span class="op">|</span> <span class="ident">InnerSas::WaitingForDone</span>(<span class="kw">_</span>) <span class="op">|</span> <span class="ident">InnerSas::Done</span>(<span class="kw">_</span>))
+    }
+
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">timed_out</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
         <span class="kw">match</span> <span class="self">self</span> {
             <span class="ident">InnerSas::Created</span>(<span class="ident">s</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">s</span>.<span class="ident">timed_out</span>(),
@@ -706,6 +784,7 @@
             <span class="ident">InnerSas::MacReceived</span>(<span class="ident">s</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">s</span>.<span class="ident">timed_out</span>(),
             <span class="ident">InnerSas::WaitingForDone</span>(<span class="ident">s</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">s</span>.<span class="ident">timed_out</span>(),
             <span class="ident">InnerSas::Done</span>(<span class="ident">s</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">s</span>.<span class="ident">timed_out</span>(),
+            <span class="ident">InnerSas::WeAccepted</span>(<span class="ident">s</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">s</span>.<span class="ident">timed_out</span>(),
         }
     }
 
@@ -720,6 +799,7 @@
             <span class="ident">InnerSas::MacReceived</span>(<span class="ident">s</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">s</span>.<span class="ident">verification_flow_id</span>.<span class="ident">clone</span>(),
             <span class="ident">InnerSas::WaitingForDone</span>(<span class="ident">s</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">s</span>.<span class="ident">verification_flow_id</span>.<span class="ident">clone</span>(),
             <span class="ident">InnerSas::Done</span>(<span class="ident">s</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">s</span>.<span class="ident">verification_flow_id</span>.<span class="ident">clone</span>(),
+            <span class="ident">InnerSas::WeAccepted</span>(<span class="ident">s</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">s</span>.<span class="ident">verification_flow_id</span>.<span class="ident">clone</span>(),
         }
     }
 
@@ -755,7 +835,7 @@
         }
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">verified_identities</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Arc</span><span class="op">&lt;</span>[<span class="ident">UserIdentities</span>]<span class="op">&gt;</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">verified_identities</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Arc</span><span class="op">&lt;</span>[<span class="ident">ReadOnlyUserIdentities</span>]<span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="kw">if</span> <span class="kw">let</span> <span class="ident">InnerSas::Done</span>(<span class="ident">s</span>) <span class="op">=</span> <span class="self">self</span> {
             <span class="prelude-val">Some</span>(<span class="ident">s</span>.<span class="ident">verified_identities</span>())
         } <span class="kw">else</span> {

@@ -597,6 +597,71 @@
 <span id="597">597</span>
 <span id="598">598</span>
 <span id="599">599</span>
+<span id="600">600</span>
+<span id="601">601</span>
+<span id="602">602</span>
+<span id="603">603</span>
+<span id="604">604</span>
+<span id="605">605</span>
+<span id="606">606</span>
+<span id="607">607</span>
+<span id="608">608</span>
+<span id="609">609</span>
+<span id="610">610</span>
+<span id="611">611</span>
+<span id="612">612</span>
+<span id="613">613</span>
+<span id="614">614</span>
+<span id="615">615</span>
+<span id="616">616</span>
+<span id="617">617</span>
+<span id="618">618</span>
+<span id="619">619</span>
+<span id="620">620</span>
+<span id="621">621</span>
+<span id="622">622</span>
+<span id="623">623</span>
+<span id="624">624</span>
+<span id="625">625</span>
+<span id="626">626</span>
+<span id="627">627</span>
+<span id="628">628</span>
+<span id="629">629</span>
+<span id="630">630</span>
+<span id="631">631</span>
+<span id="632">632</span>
+<span id="633">633</span>
+<span id="634">634</span>
+<span id="635">635</span>
+<span id="636">636</span>
+<span id="637">637</span>
+<span id="638">638</span>
+<span id="639">639</span>
+<span id="640">640</span>
+<span id="641">641</span>
+<span id="642">642</span>
+<span id="643">643</span>
+<span id="644">644</span>
+<span id="645">645</span>
+<span id="646">646</span>
+<span id="647">647</span>
+<span id="648">648</span>
+<span id="649">649</span>
+<span id="650">650</span>
+<span id="651">651</span>
+<span id="652">652</span>
+<span id="653">653</span>
+<span id="654">654</span>
+<span id="655">655</span>
+<span id="656">656</span>
+<span id="657">657</span>
+<span id="658">658</span>
+<span id="659">659</span>
+<span id="660">660</span>
+<span id="661">661</span>
+<span id="662">662</span>
+<span id="663">663</span>
+<span id="664">664</span>
 </pre><pre class="rust">
 <span class="comment">// Copyright 2020 The Matrix.org Foundation C.I.C.</span>
 <span class="comment">//</span>
@@ -625,11 +690,7 @@
 <span class="kw">use</span> <span class="ident">ruma</span>::{
     <span class="ident">api::client::r0::keys::upload_signatures::Request</span> <span class="kw">as</span> <span class="ident">SignatureUploadRequest</span>,
     <span class="ident">events</span>::{
-        <span class="ident">key::verification</span>::{
-            <span class="ident">accept</span>::{<span class="ident">AcceptEventContent</span>, <span class="ident">AcceptMethod</span>, <span class="ident">AcceptToDeviceEventContent</span>},
-            <span class="ident">cancel::CancelCode</span>,
-            <span class="ident">ShortAuthenticationString</span>,
-        },
+        <span class="ident">key::verification</span>::{<span class="ident">cancel::CancelCode</span>, <span class="ident">ShortAuthenticationString</span>},
         <span class="ident">AnyMessageEventContent</span>, <span class="ident">AnyToDeviceEventContent</span>,
     },
     <span class="ident">DeviceId</span>, <span class="ident">EventId</span>, <span class="ident">RoomId</span>, <span class="ident">UserId</span>,
@@ -638,10 +699,11 @@
 
 <span class="kw">use</span> <span class="kw">super</span>::{
     <span class="ident">event_enums</span>::{<span class="ident">AnyVerificationContent</span>, <span class="ident">OutgoingContent</span>, <span class="ident">OwnedAcceptContent</span>, <span class="ident">StartContent</span>},
-    <span class="ident">FlowId</span>, <span class="ident">IdentitiesBeingVerified</span>, <span class="ident">VerificationResult</span>,
+    <span class="ident">requests::RequestHandle</span>,
+    <span class="ident">CancelInfo</span>, <span class="ident">FlowId</span>, <span class="ident">IdentitiesBeingVerified</span>, <span class="ident">VerificationResult</span>,
 };
 <span class="kw">use</span> <span class="kw">crate</span>::{
-    <span class="ident">identities</span>::{<span class="ident">ReadOnlyDevice</span>, <span class="ident">UserIdentities</span>},
+    <span class="ident">identities</span>::{<span class="ident">ReadOnlyDevice</span>, <span class="ident">ReadOnlyUserIdentities</span>},
     <span class="ident">olm::PrivateCrossSigningIdentity</span>,
     <span class="ident">requests</span>::{<span class="ident">OutgoingVerificationRequest</span>, <span class="ident">RoomMessageRequest</span>},
     <span class="ident">store</span>::{<span class="ident">CryptoStore</span>, <span class="ident">CryptoStoreError</span>},
@@ -655,6 +717,8 @@
     <span class="ident">account</span>: <span class="ident">ReadOnlyAccount</span>,
     <span class="ident">identities_being_verified</span>: <span class="ident">IdentitiesBeingVerified</span>,
     <span class="ident">flow_id</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">FlowId</span><span class="op">&gt;</span>,
+    <span class="ident">we_started</span>: <span class="ident">bool</span>,
+    <span class="ident">request_handle</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">RequestHandle</span><span class="op">&gt;</span>,
 }
 
 <span class="kw">impl</span> <span class="ident">Sas</span> {
@@ -688,6 +752,15 @@
         <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">flow_id</span>
     }
 
+    <span class="doccomment">/// Get the room id if the verification is happening inside a room.</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">room_id</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">RoomId</span><span class="op">&gt;</span> {
+        <span class="kw">if</span> <span class="kw">let</span> <span class="ident">FlowId::InRoom</span>(<span class="ident">r</span>, <span class="kw">_</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">flow_id</span>() {
+            <span class="prelude-val">Some</span>(<span class="ident">r</span>)
+        } <span class="kw">else</span> {
+            <span class="prelude-val">None</span>
+        }
+    }
+
     <span class="doccomment">/// Does this verification flow support displaying emoji for the short</span>
     <span class="doccomment">/// authentication string.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">supports_emoji</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
@@ -704,19 +777,47 @@
         <span class="self">self</span>.<span class="ident">identities_being_verified</span>.<span class="ident">is_self_verification</span>()
     }
 
+    <span class="doccomment">/// Have we confirmed that the short auth string matches.</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">have_we_confirmed</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+        <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">lock</span>().<span class="ident">unwrap</span>().<span class="ident">have_we_confirmed</span>()
+    }
+
+    <span class="doccomment">/// Has the verification been accepted by both parties.</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">has_been_accepted</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+        <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">lock</span>().<span class="ident">unwrap</span>().<span class="ident">has_been_accepted</span>()
+    }
+
+    <span class="doccomment">/// Get info about the cancellation if the verification flow has been</span>
+    <span class="doccomment">/// cancelled.</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">cancel_info</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">CancelInfo</span><span class="op">&gt;</span> {
+        <span class="kw">if</span> <span class="kw">let</span> <span class="ident">InnerSas::Cancelled</span>(<span class="ident">c</span>) <span class="op">=</span> <span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">lock</span>().<span class="ident">unwrap</span>() {
+            <span class="prelude-val">Some</span>(<span class="ident">c</span>.<span class="ident">state</span>.<span class="ident">as_ref</span>().<span class="ident">clone</span>().<span class="ident">into</span>())
+        } <span class="kw">else</span> {
+            <span class="prelude-val">None</span>
+        }
+    }
+
+    <span class="doccomment">/// Did we initiate the verification flow.</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">we_started</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+        <span class="self">self</span>.<span class="ident">we_started</span>
+    }
+
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
     <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">dead_code</span>)]</span>
     <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">set_creation_time</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">time</span>: <span class="ident">Instant</span>) {
         <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">lock</span>().<span class="ident">unwrap</span>().<span class="ident">set_creation_time</span>(<span class="ident">time</span>)
     }
 
+    <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy::too_many_arguments</span>)]</span>
     <span class="kw">fn</span> <span class="ident">start_helper</span>(
         <span class="ident">inner_sas</span>: <span class="ident">InnerSas</span>,
         <span class="ident">account</span>: <span class="ident">ReadOnlyAccount</span>,
         <span class="ident">private_identity</span>: <span class="ident">PrivateCrossSigningIdentity</span>,
         <span class="ident">other_device</span>: <span class="ident">ReadOnlyDevice</span>,
         <span class="ident">store</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">CryptoStore</span><span class="op">&gt;</span>,
-        <span class="ident">other_identity</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">UserIdentities</span><span class="op">&gt;</span>,
+        <span class="ident">other_identity</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ReadOnlyUserIdentities</span><span class="op">&gt;</span>,
+        <span class="ident">we_started</span>: <span class="ident">bool</span>,
+        <span class="ident">request_handle</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">RequestHandle</span><span class="op">&gt;</span>,
     ) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Sas</span> {
         <span class="kw">let</span> <span class="ident">flow_id</span> <span class="op">=</span> <span class="ident">inner_sas</span>.<span class="ident">verification_flow_id</span>();
 
@@ -732,6 +833,8 @@
             <span class="ident">account</span>,
             <span class="ident">identities_being_verified</span>: <span class="ident">identities</span>,
             <span class="ident">flow_id</span>,
+            <span class="ident">we_started</span>,
+            <span class="ident">request_handle</span>,
         }
     }
 
@@ -745,13 +848,16 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// Returns the new `Sas` object and a `StartEventContent` that needs to be</span>
     <span class="doccomment">/// sent out through the server to the other device.</span>
+    <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy::too_many_arguments</span>)]</span>
     <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">start</span>(
         <span class="ident">account</span>: <span class="ident">ReadOnlyAccount</span>,
         <span class="ident">private_identity</span>: <span class="ident">PrivateCrossSigningIdentity</span>,
         <span class="ident">other_device</span>: <span class="ident">ReadOnlyDevice</span>,
         <span class="ident">store</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">CryptoStore</span><span class="op">&gt;</span>,
-        <span class="ident">other_identity</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">UserIdentities</span><span class="op">&gt;</span>,
+        <span class="ident">other_identity</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ReadOnlyUserIdentities</span><span class="op">&gt;</span>,
         <span class="ident">transaction_id</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
+        <span class="ident">we_started</span>: <span class="ident">bool</span>,
+        <span class="ident">request_handle</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">RequestHandle</span><span class="op">&gt;</span>,
     ) <span class="op">-</span><span class="op">&gt;</span> (<span class="ident">Sas</span>, <span class="ident">OutgoingContent</span>) {
         <span class="kw">let</span> (<span class="ident">inner</span>, <span class="ident">content</span>) <span class="op">=</span> <span class="ident">InnerSas::start</span>(
             <span class="ident">account</span>.<span class="ident">clone</span>(),
@@ -768,6 +874,8 @@
                 <span class="ident">other_device</span>,
                 <span class="ident">store</span>,
                 <span class="ident">other_identity</span>,
+                <span class="ident">we_started</span>,
+                <span class="ident">request_handle</span>,
             ),
             <span class="ident">content</span>,
         )
@@ -783,6 +891,7 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// Returns the new `Sas` object and a `StartEventContent` that needs to be</span>
     <span class="doccomment">/// sent out through the server to the other device.</span>
+    <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy::too_many_arguments</span>)]</span>
     <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">start_in_room</span>(
         <span class="ident">flow_id</span>: <span class="ident">EventId</span>,
         <span class="ident">room_id</span>: <span class="ident">RoomId</span>,
@@ -790,7 +899,9 @@
         <span class="ident">private_identity</span>: <span class="ident">PrivateCrossSigningIdentity</span>,
         <span class="ident">other_device</span>: <span class="ident">ReadOnlyDevice</span>,
         <span class="ident">store</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">CryptoStore</span><span class="op">&gt;</span>,
-        <span class="ident">other_identity</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">UserIdentities</span><span class="op">&gt;</span>,
+        <span class="ident">other_identity</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ReadOnlyUserIdentities</span><span class="op">&gt;</span>,
+        <span class="ident">we_started</span>: <span class="ident">bool</span>,
+        <span class="ident">request_handle</span>: <span class="ident">RequestHandle</span>,
     ) <span class="op">-</span><span class="op">&gt;</span> (<span class="ident">Sas</span>, <span class="ident">OutgoingContent</span>) {
         <span class="kw">let</span> (<span class="ident">inner</span>, <span class="ident">content</span>) <span class="op">=</span> <span class="ident">InnerSas::start_in_room</span>(
             <span class="ident">flow_id</span>,
@@ -808,6 +919,8 @@
                 <span class="ident">other_device</span>,
                 <span class="ident">store</span>,
                 <span class="ident">other_identity</span>,
+                <span class="ident">we_started</span>,
+                <span class="prelude-val">Some</span>(<span class="ident">request_handle</span>),
             ),
             <span class="ident">content</span>,
         )
@@ -831,8 +944,9 @@
         <span class="ident">account</span>: <span class="ident">ReadOnlyAccount</span>,
         <span class="ident">private_identity</span>: <span class="ident">PrivateCrossSigningIdentity</span>,
         <span class="ident">other_device</span>: <span class="ident">ReadOnlyDevice</span>,
-        <span class="ident">other_identity</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">UserIdentities</span><span class="op">&gt;</span>,
-        <span class="ident">started_from_request</span>: <span class="ident">bool</span>,
+        <span class="ident">other_identity</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ReadOnlyUserIdentities</span><span class="op">&gt;</span>,
+        <span class="ident">request_handle</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">RequestHandle</span><span class="op">&gt;</span>,
+        <span class="ident">we_started</span>: <span class="ident">bool</span>,
     ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Sas</span>, <span class="ident">OutgoingContent</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">inner</span> <span class="op">=</span> <span class="ident">InnerSas::from_start_event</span>(
             <span class="ident">account</span>.<span class="ident">clone</span>(),
@@ -840,7 +954,7 @@
             <span class="ident">flow_id</span>,
             <span class="ident">content</span>,
             <span class="ident">other_identity</span>.<span class="ident">clone</span>(),
-            <span class="ident">started_from_request</span>,
+            <span class="ident">request_handle</span>.<span class="ident">is_some</span>(),
         )<span class="question-mark">?</span>;
 
         <span class="prelude-val">Ok</span>(<span class="self">Self</span><span class="ident">::start_helper</span>(
@@ -850,6 +964,8 @@
             <span class="ident">other_device</span>,
             <span class="ident">store</span>,
             <span class="ident">other_identity</span>,
+            <span class="ident">we_started</span>,
+            <span class="ident">request_handle</span>,
         ))
     }
 
@@ -871,18 +987,28 @@
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         <span class="ident">settings</span>: <span class="ident">AcceptSettings</span>,
     ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">OutgoingVerificationRequest</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">lock</span>().<span class="ident">unwrap</span>().<span class="ident">accept</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">c</span><span class="op">|</span> <span class="kw">match</span> <span class="ident">settings</span>.<span class="ident">apply</span>(<span class="ident">c</span>) {
-            <span class="ident">OwnedAcceptContent::ToDevice</span>(<span class="ident">c</span>) <span class="op">=</span><span class="op">&gt;</span> {
-                <span class="kw">let</span> <span class="ident">content</span> <span class="op">=</span> <span class="ident">AnyToDeviceEventContent::KeyVerificationAccept</span>(<span class="ident">c</span>);
-                <span class="self">self</span>.<span class="ident">content_to_request</span>(<span class="ident">content</span>).<span class="ident">into</span>()
-            }
-            <span class="ident">OwnedAcceptContent::Room</span>(<span class="ident">room_id</span>, <span class="ident">content</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">RoomMessageRequest</span> {
-                <span class="ident">room_id</span>,
-                <span class="ident">txn_id</span>: <span class="ident">Uuid::new_v4</span>(),
-                <span class="ident">content</span>: <span class="ident">AnyMessageEventContent::KeyVerificationAccept</span>(<span class="ident">content</span>),
-            }
-            .<span class="ident">into</span>(),
-        })
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">guard</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">lock</span>().<span class="ident">unwrap</span>();
+        <span class="kw">let</span> <span class="ident">sas</span>: <span class="ident">InnerSas</span> <span class="op">=</span> (<span class="kw-2">*</span><span class="ident">guard</span>).<span class="ident">clone</span>();
+        <span class="kw">let</span> <span class="ident">methods</span> <span class="op">=</span> <span class="ident">settings</span>.<span class="ident">allowed_methods</span>;
+
+        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>((<span class="ident">sas</span>, <span class="ident">content</span>)) <span class="op">=</span> <span class="ident">sas</span>.<span class="ident">accept</span>(<span class="ident">methods</span>) {
+            <span class="kw-2">*</span><span class="ident">guard</span> <span class="op">=</span> <span class="ident">sas</span>;
+
+            <span class="prelude-val">Some</span>(<span class="kw">match</span> <span class="ident">content</span> {
+                <span class="ident">OwnedAcceptContent::ToDevice</span>(<span class="ident">c</span>) <span class="op">=</span><span class="op">&gt;</span> {
+                    <span class="kw">let</span> <span class="ident">content</span> <span class="op">=</span> <span class="ident">AnyToDeviceEventContent::KeyVerificationAccept</span>(<span class="ident">c</span>);
+                    <span class="self">self</span>.<span class="ident">content_to_request</span>(<span class="ident">content</span>).<span class="ident">into</span>()
+                }
+                <span class="ident">OwnedAcceptContent::Room</span>(<span class="ident">room_id</span>, <span class="ident">content</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">RoomMessageRequest</span> {
+                    <span class="ident">room_id</span>,
+                    <span class="ident">txn_id</span>: <span class="ident">Uuid::new_v4</span>(),
+                    <span class="ident">content</span>: <span class="ident">AnyMessageEventContent::KeyVerificationAccept</span>(<span class="ident">content</span>),
+                }
+                .<span class="ident">into</span>(),
+            })
+        } <span class="kw">else</span> {
+            <span class="prelude-val">None</span>
+        }
     }
 
     <span class="doccomment">/// Confirm the Sas verification.</span>
@@ -949,10 +1075,28 @@
         <span class="self">self</span>.<span class="ident">cancel_with_code</span>(<span class="ident">CancelCode::User</span>)
     }
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">cancel_with_code</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">code</span>: <span class="ident">CancelCode</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">OutgoingVerificationRequest</span><span class="op">&gt;</span> {
+    <span class="doccomment">/// Cancel the verification.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// This cancels the verification with given `CancelCode`.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// **Note**: This method should generally not be used, the [`cancel()`]</span>
+    <span class="doccomment">/// method should be preferred. The SDK will automatically cancel with the</span>
+    <span class="doccomment">/// approprate cancel code, user initiated cancellations should only cancel</span>
+    <span class="doccomment">/// with the `CancelCode::User`</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// Returns None if the `Sas` object is already in a canceled state,</span>
+    <span class="doccomment">/// otherwise it returns a request that needs to be sent out.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// [`cancel()`]: #method.cancel</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">cancel_with_code</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">code</span>: <span class="ident">CancelCode</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">OutgoingVerificationRequest</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">guard</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">lock</span>().<span class="ident">unwrap</span>();
+
+        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">request</span>) <span class="op">=</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">request_handle</span> {
+            <span class="ident">request</span>.<span class="ident">cancel_with_code</span>(<span class="kw-2">&amp;</span><span class="ident">code</span>)
+        }
+
         <span class="kw">let</span> <span class="ident">sas</span>: <span class="ident">InnerSas</span> <span class="op">=</span> (<span class="kw-2">*</span><span class="ident">guard</span>).<span class="ident">clone</span>();
-        <span class="kw">let</span> (<span class="ident">sas</span>, <span class="ident">content</span>) <span class="op">=</span> <span class="ident">sas</span>.<span class="ident">cancel</span>(<span class="ident">code</span>);
+        <span class="kw">let</span> (<span class="ident">sas</span>, <span class="ident">content</span>) <span class="op">=</span> <span class="ident">sas</span>.<span class="ident">cancel</span>(<span class="bool-val">true</span>, <span class="ident">code</span>);
         <span class="kw-2">*</span><span class="ident">guard</span> <span class="op">=</span> <span class="ident">sas</span>;
         <span class="ident">content</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">c</span><span class="op">|</span> <span class="kw">match</span> <span class="ident">c</span> {
             <span class="ident">OutgoingContent::Room</span>(<span class="ident">room_id</span>, <span class="ident">content</span>) <span class="op">=</span><span class="op">&gt;</span> {
@@ -1036,7 +1180,7 @@
         <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">lock</span>().<span class="ident">unwrap</span>().<span class="ident">verified_devices</span>()
     }
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">verified_identities</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Arc</span><span class="op">&lt;</span>[<span class="ident">UserIdentities</span>]<span class="op">&gt;</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">verified_identities</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Arc</span><span class="op">&lt;</span>[<span class="ident">ReadOnlyUserIdentities</span>]<span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">lock</span>().<span class="ident">unwrap</span>().<span class="ident">verified_identities</span>()
     }
 
@@ -1071,23 +1215,6 @@
     <span class="doccomment">/// * `methods` - The methods this client allows at most</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">with_allowed_methods</span>(<span class="ident">methods</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">ShortAuthenticationString</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
         <span class="self">Self</span> { <span class="ident">allowed_methods</span>: <span class="ident">methods</span> }
-    }
-
-    <span class="kw">fn</span> <span class="ident">apply</span>(<span class="self">self</span>, <span class="kw-2">mut</span> <span class="ident">content</span>: <span class="ident">OwnedAcceptContent</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">OwnedAcceptContent</span> {
-        <span class="kw">match</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">content</span> {
-            <span class="ident">OwnedAcceptContent::ToDevice</span>(<span class="ident">AcceptToDeviceEventContent</span> {
-                <span class="ident">method</span>: <span class="ident">AcceptMethod::SasV1</span>(<span class="ident">c</span>),
-                ..
-            })
-            <span class="op">|</span> <span class="ident">OwnedAcceptContent::Room</span>(
-                <span class="kw">_</span>,
-                <span class="ident">AcceptEventContent</span> { <span class="ident">method</span>: <span class="ident">AcceptMethod::SasV1</span>(<span class="ident">c</span>), .. },
-            ) <span class="op">=</span><span class="op">&gt;</span> {
-                <span class="ident">c</span>.<span class="ident">short_authentication_string</span>.<span class="ident">retain</span>(<span class="op">|</span><span class="ident">sas</span><span class="op">|</span> <span class="self">self</span>.<span class="ident">allowed_methods</span>.<span class="ident">contains</span>(<span class="ident">sas</span>));
-                <span class="ident">content</span>
-            }
-            <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">content</span>,
-        }
     }
 }
 
@@ -1145,6 +1272,8 @@
             <span class="ident">alice_store</span>,
             <span class="prelude-val">None</span>,
             <span class="prelude-val">None</span>,
+            <span class="bool-val">true</span>,
+            <span class="prelude-val">None</span>,
         );
 
         <span class="kw">let</span> <span class="ident">flow_id</span> <span class="op">=</span> <span class="ident">alice</span>.<span class="ident">flow_id</span>().<span class="ident">to_owned</span>();
@@ -1157,6 +1286,7 @@
             <span class="ident">bob</span>,
             <span class="ident">PrivateCrossSigningIdentity::empty</span>(<span class="ident">bob_id</span>()),
             <span class="ident">alice_device</span>,
+            <span class="prelude-val">None</span>,
             <span class="prelude-val">None</span>,
             <span class="bool-val">false</span>,
         )

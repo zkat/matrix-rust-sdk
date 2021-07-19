@@ -428,6 +428,23 @@
 <span id="428">428</span>
 <span id="429">429</span>
 <span id="430">430</span>
+<span id="431">431</span>
+<span id="432">432</span>
+<span id="433">433</span>
+<span id="434">434</span>
+<span id="435">435</span>
+<span id="436">436</span>
+<span id="437">437</span>
+<span id="438">438</span>
+<span id="439">439</span>
+<span id="440">440</span>
+<span id="441">441</span>
+<span id="442">442</span>
+<span id="443">443</span>
+<span id="444">444</span>
+<span id="445">445</span>
+<span id="446">446</span>
+<span id="447">447</span>
 </pre><pre class="rust">
 <span class="comment">// Copyright 2020 The Matrix.org Foundation C.I.C.</span>
 <span class="comment">//</span>
@@ -497,7 +514,10 @@
 <span class="kw">pub</span> <span class="kw">use</span> <span class="self">self</span><span class="ident">::sled::SledStore</span>;
 <span class="kw">use</span> <span class="kw">crate</span>::{
     <span class="ident">error::SessionUnpicklingError</span>,
-    <span class="ident">identities</span>::{<span class="ident">Device</span>, <span class="ident">ReadOnlyDevice</span>, <span class="ident">UserDevices</span>, <span class="ident">UserIdentities</span>},
+    <span class="ident">identities</span>::{
+        <span class="ident">user</span>::{<span class="ident">OwnUserIdentity</span>, <span class="ident">UserIdentities</span>, <span class="ident">UserIdentity</span>},
+        <span class="ident">Device</span>, <span class="ident">ReadOnlyDevice</span>, <span class="ident">ReadOnlyUserIdentities</span>, <span class="ident">UserDevices</span>,
+    },
     <span class="ident">key_request::OutgoingKeyRequest</span>,
     <span class="ident">olm</span>::{
         <span class="ident">InboundGroupSession</span>, <span class="ident">OlmMessageHash</span>, <span class="ident">OutboundGroupSession</span>, <span class="ident">PrivateCrossSigningIdentity</span>,
@@ -540,8 +560,8 @@
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>, <span class="ident">Default</span>)]</span>
 <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">missing_docs</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">IdentityChanges</span> {
-    <span class="kw">pub</span> <span class="ident">new</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">UserIdentities</span><span class="op">&gt;</span>,
-    <span class="kw">pub</span> <span class="ident">changed</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">UserIdentities</span><span class="op">&gt;</span>,
+    <span class="kw">pub</span> <span class="ident">new</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">ReadOnlyUserIdentities</span><span class="op">&gt;</span>,
+    <span class="kw">pub</span> <span class="ident">changed</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">ReadOnlyUserIdentities</span><span class="op">&gt;</span>,
 }
 
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>, <span class="ident">Default</span>)]</span>
@@ -646,8 +666,8 @@
         <span class="ident">device_id</span>: <span class="kw-2">&amp;</span><span class="ident">DeviceId</span>,
     ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Device</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">own_identity</span> <span class="op">=</span>
-            <span class="self">self</span>.<span class="ident">get_user_identity</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">user_id</span>).<span class="kw">await</span><span class="question-mark">?</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">i</span><span class="op">|</span> <span class="ident">i</span>.<span class="ident">own</span>().<span class="ident">cloned</span>()).<span class="ident">flatten</span>();
-        <span class="kw">let</span> <span class="ident">device_owner_identity</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">get_user_identity</span>(<span class="ident">user_id</span>).<span class="kw">await</span><span class="question-mark">?</span>;
+            <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">get_user_identity</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">user_id</span>).<span class="kw">await</span><span class="question-mark">?</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">i</span><span class="op">|</span> <span class="ident">i</span>.<span class="ident">own</span>().<span class="ident">cloned</span>()).<span class="ident">flatten</span>();
+        <span class="kw">let</span> <span class="ident">device_owner_identity</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">get_user_identity</span>(<span class="ident">user_id</span>).<span class="kw">await</span><span class="question-mark">?</span>;
 
         <span class="prelude-val">Ok</span>(<span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">get_device</span>(<span class="ident">user_id</span>, <span class="ident">device_id</span>).<span class="kw">await</span><span class="question-mark">?</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">d</span><span class="op">|</span> <span class="ident">Device</span> {
             <span class="ident">inner</span>: <span class="ident">d</span>,
@@ -655,6 +675,20 @@
             <span class="ident">verification_machine</span>: <span class="self">self</span>.<span class="ident">verification_machine</span>.<span class="ident">clone</span>(),
             <span class="ident">own_identity</span>,
             <span class="ident">device_owner_identity</span>,
+        }))
+    }
+
+    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">get_identity</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">user_id</span>: <span class="kw-2">&amp;</span><span class="ident">UserId</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">UserIdentities</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+        <span class="prelude-val">Ok</span>(<span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">get_user_identity</span>(<span class="ident">user_id</span>).<span class="kw">await</span><span class="question-mark">?</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">i</span><span class="op">|</span> <span class="kw">match</span> <span class="ident">i</span> {
+            <span class="ident">ReadOnlyUserIdentities::Own</span>(<span class="ident">i</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">OwnUserIdentity</span> {
+                <span class="ident">inner</span>: <span class="ident">i</span>,
+                <span class="ident">verification_machine</span>: <span class="self">self</span>.<span class="ident">verification_machine</span>.<span class="ident">clone</span>(),
+            }
+            .<span class="ident">into</span>(),
+            <span class="ident">ReadOnlyUserIdentities::Other</span>(<span class="ident">i</span>) <span class="op">=</span><span class="op">&gt;</span> {
+                <span class="ident">UserIdentity</span> { <span class="ident">inner</span>: <span class="ident">i</span>, <span class="ident">verification_machine</span>: <span class="self">self</span>.<span class="ident">verification_machine</span>.<span class="ident">clone</span>() }
+                    .<span class="ident">into</span>()
+            }
         }))
     }
 }
@@ -819,7 +853,7 @@
     <span class="doccomment">/// # Arguments</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// * `user_id` - The user for which we should get the identity.</span>
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">get_user_identity</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">user_id</span>: <span class="kw-2">&amp;</span><span class="ident">UserId</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">UserIdentities</span><span class="op">&gt;</span><span class="op">&gt;</span>;
+    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">get_user_identity</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">user_id</span>: <span class="kw-2">&amp;</span><span class="ident">UserId</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ReadOnlyUserIdentities</span><span class="op">&gt;</span><span class="op">&gt;</span>;
 
     <span class="doccomment">/// Check if a hash for an Olm message stored in the database.</span>
     <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">is_message_known</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">message_hash</span>: <span class="kw-2">&amp;</span><span class="ident">OlmMessageHash</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">bool</span><span class="op">&gt;</span>;
