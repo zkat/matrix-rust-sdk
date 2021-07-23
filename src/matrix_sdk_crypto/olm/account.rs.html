@@ -1046,6 +1046,10 @@
 <span id="1046">1046</span>
 <span id="1047">1047</span>
 <span id="1048">1048</span>
+<span id="1049">1049</span>
+<span id="1050">1050</span>
+<span id="1051">1051</span>
+<span id="1052">1052</span>
 </pre><pre class="rust">
 <span class="comment">// Copyright 2020 The Matrix.org Foundation C.I.C.</span>
 <span class="comment">//</span>
@@ -1063,11 +1067,11 @@
 
 <span class="kw">use</span> <span class="ident">std</span>::{
     <span class="ident">collections::BTreeMap</span>,
-    <span class="ident">convert</span>::{<span class="ident">TryFrom</span>, <span class="ident">TryInto</span>},
+    <span class="ident">convert::TryInto</span>,
     <span class="ident">fmt</span>,
     <span class="ident">ops::Deref</span>,
     <span class="ident">sync</span>::{
-        <span class="ident">atomic</span>::{<span class="ident">AtomicBool</span>, <span class="ident">AtomicI64</span>, <span class="ident">Ordering</span>},
+        <span class="ident">atomic</span>::{<span class="ident">AtomicBool</span>, <span class="ident">AtomicU64</span>, <span class="ident">Ordering</span>},
         <span class="ident">Arc</span>,
     },
 };
@@ -1230,9 +1234,22 @@
         }
     }
 
-    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">update_uploaded_key_count</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">key_count</span>: <span class="kw-2">&amp;</span><span class="ident">BTreeMap</span><span class="op">&lt;</span><span class="ident">DeviceKeyAlgorithm</span>, <span class="ident">UInt</span><span class="op">&gt;</span>) {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">update_uploaded_key_count</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">key_count</span>: <span class="kw-2">&amp;</span><span class="ident">BTreeMap</span><span class="op">&lt;</span><span class="ident">DeviceKeyAlgorithm</span>, <span class="ident">UInt</span><span class="op">&gt;</span>) {
         <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">count</span>) <span class="op">=</span> <span class="ident">key_count</span>.<span class="ident">get</span>(<span class="kw-2">&amp;</span><span class="ident">DeviceKeyAlgorithm::SignedCurve25519</span>) {
             <span class="kw">let</span> <span class="ident">count</span>: <span class="ident">u64</span> <span class="op">=</span> (<span class="kw-2">*</span><span class="ident">count</span>).<span class="ident">into</span>();
+            <span class="kw">let</span> <span class="ident">old_count</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">uploaded_key_count</span>();
+
+            <span class="comment">// Some servers might always return the key counts in the sync</span>
+            <span class="comment">// response, we don&#39;t want to the logs with noop changes if they do</span>
+            <span class="comment">// so.</span>
+            <span class="kw">if</span> <span class="ident">count</span> <span class="op">!</span><span class="op">=</span> <span class="ident">old_count</span> {
+                <span class="macro">debug!</span>(
+                    <span class="string">&quot;Updated uploaded one-time key count {} -&gt; {}.&quot;</span>,
+                    <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">uploaded_key_count</span>(),
+                    <span class="ident">count</span>
+                );
+            }
+
             <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">update_uploaded_key_count</span>(<span class="ident">count</span>);
         }
     }
@@ -1246,16 +1263,8 @@
         }
         <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">mark_as_shared</span>();
 
-        <span class="kw">let</span> <span class="ident">one_time_key_count</span> <span class="op">=</span>
-            <span class="ident">response</span>.<span class="ident">one_time_key_counts</span>.<span class="ident">get</span>(<span class="kw-2">&amp;</span><span class="ident">DeviceKeyAlgorithm::SignedCurve25519</span>);
-
-        <span class="kw">let</span> <span class="ident">count</span>: <span class="ident">u64</span> <span class="op">=</span> <span class="ident">one_time_key_count</span>.<span class="ident">map_or</span>(<span class="number">0</span>, <span class="op">|</span><span class="ident">c</span><span class="op">|</span> (<span class="kw-2">*</span><span class="ident">c</span>).<span class="ident">into</span>());
-        <span class="macro">debug!</span>(
-            <span class="string">&quot;Updated uploaded one-time key count {} -&gt; {}, marking keys as published&quot;</span>,
-            <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">uploaded_key_count</span>(),
-            <span class="ident">count</span>
-        );
-        <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">update_uploaded_key_count</span>(<span class="ident">count</span>);
+        <span class="macro">debug!</span>(<span class="string">&quot;Marking one-time keys as published&quot;</span>);
+        <span class="self">self</span>.<span class="ident">update_uploaded_key_count</span>(<span class="kw-2">&amp;</span><span class="ident">response</span>.<span class="ident">one_time_key_counts</span>);
         <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">mark_keys_as_published</span>().<span class="kw">await</span>;
         <span class="self">self</span>.<span class="ident">store</span>.<span class="ident">save_account</span>(<span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">clone</span>()).<span class="kw">await</span><span class="question-mark">?</span>;
 
@@ -1481,7 +1490,7 @@
     <span class="doccomment">/// this is None, no action will be taken. After a sync request the client</span>
     <span class="doccomment">/// needs to set this for us, depending on the count we will suggest the</span>
     <span class="doccomment">/// client to upload new keys.</span>
-    <span class="ident">uploaded_signed_key_count</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">AtomicI64</span><span class="op">&gt;</span>,
+    <span class="ident">uploaded_signed_key_count</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">AtomicU64</span><span class="op">&gt;</span>,
 }
 
 <span class="doccomment">/// A typed representation of a base64 encoded string containing the account</span>
@@ -1517,7 +1526,7 @@
     <span class="doccomment">/// Was the account shared.</span>
     <span class="kw">pub</span> <span class="ident">shared</span>: <span class="ident">bool</span>,
     <span class="doccomment">/// The number of uploaded one-time keys we have on the server.</span>
-    <span class="kw">pub</span> <span class="ident">uploaded_signed_key_count</span>: <span class="ident">i64</span>,
+    <span class="kw">pub</span> <span class="ident">uploaded_signed_key_count</span>: <span class="ident">u64</span>,
 }
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">tarpaulin_include</span>))]</span>
@@ -1548,7 +1557,7 @@
             <span class="ident">inner</span>: <span class="ident">Arc::new</span>(<span class="ident">Mutex::new</span>(<span class="ident">account</span>)),
             <span class="ident">identity_keys</span>: <span class="ident">Arc::new</span>(<span class="ident">identity_keys</span>),
             <span class="ident">shared</span>: <span class="ident">Arc::new</span>(<span class="ident">AtomicBool::new</span>(<span class="bool-val">false</span>)),
-            <span class="ident">uploaded_signed_key_count</span>: <span class="ident">Arc::new</span>(<span class="ident">AtomicI64::new</span>(<span class="number">0</span>)),
+            <span class="ident">uploaded_signed_key_count</span>: <span class="ident">Arc::new</span>(<span class="ident">AtomicU64::new</span>(<span class="number">0</span>)),
         }
     }
 
@@ -1573,18 +1582,17 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// * `new_count` - The new count that was reported by the server.</span>
     <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">update_uploaded_key_count</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">new_count</span>: <span class="ident">u64</span>) {
-        <span class="kw">let</span> <span class="ident">key_count</span> <span class="op">=</span> <span class="ident">i64::try_from</span>(<span class="ident">new_count</span>).<span class="ident">unwrap_or</span>(<span class="ident">i64::MAX</span>);
-        <span class="self">self</span>.<span class="ident">uploaded_signed_key_count</span>.<span class="ident">store</span>(<span class="ident">key_count</span>, <span class="ident">Ordering::Relaxed</span>);
+        <span class="self">self</span>.<span class="ident">uploaded_signed_key_count</span>.<span class="ident">store</span>(<span class="ident">new_count</span>, <span class="ident">Ordering::SeqCst</span>);
     }
 
     <span class="doccomment">/// Get the currently known uploaded key count.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">uploaded_key_count</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">i64</span> {
-        <span class="self">self</span>.<span class="ident">uploaded_signed_key_count</span>.<span class="ident">load</span>(<span class="ident">Ordering::Relaxed</span>)
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">uploaded_key_count</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">u64</span> {
+        <span class="self">self</span>.<span class="ident">uploaded_signed_key_count</span>.<span class="ident">load</span>(<span class="ident">Ordering::SeqCst</span>)
     }
 
     <span class="doccomment">/// Has the account been shared with the server.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">shared</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">shared</span>.<span class="ident">load</span>(<span class="ident">Ordering::Relaxed</span>)
+        <span class="self">self</span>.<span class="ident">shared</span>.<span class="ident">load</span>(<span class="ident">Ordering::SeqCst</span>)
     }
 
     <span class="doccomment">/// Mark the account as shared.</span>
@@ -1592,7 +1600,7 @@
     <span class="doccomment">/// Messages shouldn&#39;t be encrypted with the session before it has been</span>
     <span class="doccomment">/// shared.</span>
     <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">mark_as_shared</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) {
-        <span class="self">self</span>.<span class="ident">shared</span>.<span class="ident">store</span>(<span class="bool-val">true</span>, <span class="ident">Ordering::Relaxed</span>);
+        <span class="self">self</span>.<span class="ident">shared</span>.<span class="ident">store</span>(<span class="bool-val">true</span>, <span class="ident">Ordering::SeqCst</span>);
     }
 
     <span class="doccomment">/// Get the one-time keys of the account.</span>
@@ -1616,7 +1624,7 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// Returns an empty error if no keys need to be uploaded.</span>
     <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">generate_one_time_keys</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">u64</span>, ()<span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">count</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">uploaded_key_count</span>() <span class="kw">as</span> <span class="ident">u64</span>;
+        <span class="kw">let</span> <span class="ident">count</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">uploaded_key_count</span>();
         <span class="kw">let</span> <span class="ident">max_keys</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">max_one_time_keys</span>().<span class="kw">await</span>;
         <span class="kw">let</span> <span class="ident">max_on_server</span> <span class="op">=</span> (<span class="ident">max_keys</span> <span class="kw">as</span> <span class="ident">u64</span>) <span class="op">/</span> <span class="number">2</span>;
 
@@ -1637,7 +1645,7 @@
             <span class="kw">return</span> <span class="bool-val">true</span>;
         }
 
-        <span class="kw">let</span> <span class="ident">count</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">uploaded_key_count</span>() <span class="kw">as</span> <span class="ident">u64</span>;
+        <span class="kw">let</span> <span class="ident">count</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">uploaded_key_count</span>();
 
         <span class="comment">// If we have a known key count, check that we have more than</span>
         <span class="comment">// max_one_time_Keys() / 2, otherwise tell the client to upload more.</span>
@@ -1722,7 +1730,7 @@
             <span class="ident">inner</span>: <span class="ident">Arc::new</span>(<span class="ident">Mutex::new</span>(<span class="ident">account</span>)),
             <span class="ident">identity_keys</span>: <span class="ident">Arc::new</span>(<span class="ident">identity_keys</span>),
             <span class="ident">shared</span>: <span class="ident">Arc::new</span>(<span class="ident">AtomicBool::from</span>(<span class="ident">pickle</span>.<span class="ident">shared</span>)),
-            <span class="ident">uploaded_signed_key_count</span>: <span class="ident">Arc::new</span>(<span class="ident">AtomicI64::new</span>(<span class="ident">pickle</span>.<span class="ident">uploaded_signed_key_count</span>)),
+            <span class="ident">uploaded_signed_key_count</span>: <span class="ident">Arc::new</span>(<span class="ident">AtomicU64::new</span>(<span class="ident">pickle</span>.<span class="ident">uploaded_signed_key_count</span>)),
         })
     }
 
