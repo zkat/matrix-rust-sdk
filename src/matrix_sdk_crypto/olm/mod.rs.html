@@ -229,6 +229,79 @@
 <span id="229">229</span>
 <span id="230">230</span>
 <span id="231">231</span>
+<span id="232">232</span>
+<span id="233">233</span>
+<span id="234">234</span>
+<span id="235">235</span>
+<span id="236">236</span>
+<span id="237">237</span>
+<span id="238">238</span>
+<span id="239">239</span>
+<span id="240">240</span>
+<span id="241">241</span>
+<span id="242">242</span>
+<span id="243">243</span>
+<span id="244">244</span>
+<span id="245">245</span>
+<span id="246">246</span>
+<span id="247">247</span>
+<span id="248">248</span>
+<span id="249">249</span>
+<span id="250">250</span>
+<span id="251">251</span>
+<span id="252">252</span>
+<span id="253">253</span>
+<span id="254">254</span>
+<span id="255">255</span>
+<span id="256">256</span>
+<span id="257">257</span>
+<span id="258">258</span>
+<span id="259">259</span>
+<span id="260">260</span>
+<span id="261">261</span>
+<span id="262">262</span>
+<span id="263">263</span>
+<span id="264">264</span>
+<span id="265">265</span>
+<span id="266">266</span>
+<span id="267">267</span>
+<span id="268">268</span>
+<span id="269">269</span>
+<span id="270">270</span>
+<span id="271">271</span>
+<span id="272">272</span>
+<span id="273">273</span>
+<span id="274">274</span>
+<span id="275">275</span>
+<span id="276">276</span>
+<span id="277">277</span>
+<span id="278">278</span>
+<span id="279">279</span>
+<span id="280">280</span>
+<span id="281">281</span>
+<span id="282">282</span>
+<span id="283">283</span>
+<span id="284">284</span>
+<span id="285">285</span>
+<span id="286">286</span>
+<span id="287">287</span>
+<span id="288">288</span>
+<span id="289">289</span>
+<span id="290">290</span>
+<span id="291">291</span>
+<span id="292">292</span>
+<span id="293">293</span>
+<span id="294">294</span>
+<span id="295">295</span>
+<span id="296">296</span>
+<span id="297">297</span>
+<span id="298">298</span>
+<span id="299">299</span>
+<span id="300">300</span>
+<span id="301">301</span>
+<span id="302">302</span>
+<span id="303">303</span>
+<span id="304">304</span>
 </pre><pre class="rust">
 <span class="comment">// Copyright 2020 The Matrix.org Foundation C.I.C.</span>
 <span class="comment">//</span>
@@ -293,11 +366,19 @@
 <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">mod</span> <span class="ident">test</span> {
     <span class="kw">use</span> <span class="ident">std</span>::{<span class="ident">collections::BTreeMap</span>, <span class="ident">convert::TryInto</span>};
 
+    <span class="kw">use</span> <span class="ident">matches::assert_matches</span>;
     <span class="kw">use</span> <span class="ident">olm_rs::session::OlmMessage</span>;
     <span class="kw">use</span> <span class="ident">ruma</span>::{
-        <span class="ident">encryption::SignedKey</span>, <span class="ident">events::forwarded_room_key::ForwardedRoomKeyToDeviceEventContent</span>,
+        <span class="ident">encryption::SignedKey</span>,
+        <span class="ident">event_id</span>,
+        <span class="ident">events</span>::{
+            <span class="ident">forwarded_room_key::ForwardedRoomKeyToDeviceEventContent</span>,
+            <span class="ident">room::message</span>::{<span class="ident">MessageEventContent</span>, <span class="ident">Relation</span>, <span class="ident">Replacement</span>},
+            <span class="ident">AnyMessageEventContent</span>, <span class="ident">AnySyncMessageEvent</span>, <span class="ident">AnySyncRoomEvent</span>,
+        },
         <span class="ident">room_id</span>, <span class="ident">user_id</span>, <span class="ident">DeviceId</span>, <span class="ident">UserId</span>,
     };
+    <span class="kw">use</span> <span class="ident">serde_json::json</span>;
 
     <span class="kw">use</span> <span class="kw">crate</span><span class="ident">::olm</span>::{<span class="ident">InboundGroupSession</span>, <span class="ident">ReadOnlyAccount</span>, <span class="ident">Session</span>};
 
@@ -444,6 +525,71 @@
         <span class="kw">let</span> <span class="ident">ciphertext</span> <span class="op">=</span> <span class="ident">outbound</span>.<span class="ident">encrypt_helper</span>(<span class="ident">plaintext</span>.<span class="ident">clone</span>()).<span class="kw">await</span>;
 
         <span class="macro">assert_eq!</span>(<span class="ident">plaintext</span>, <span class="ident">inbound</span>.<span class="ident">decrypt_helper</span>(<span class="ident">ciphertext</span>).<span class="kw">await</span>.<span class="ident">unwrap</span>().<span class="number">0</span>);
+    }
+
+    <span class="attribute">#[<span class="ident">tokio::test</span>]</span>
+    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">edit_decryption</span>() {
+        <span class="kw">let</span> <span class="ident">alice</span> <span class="op">=</span> <span class="ident">ReadOnlyAccount::new</span>(<span class="kw-2">&amp;</span><span class="ident">alice_id</span>(), <span class="kw-2">&amp;</span><span class="ident">alice_device_id</span>());
+        <span class="kw">let</span> <span class="ident">room_id</span> <span class="op">=</span> <span class="macro">room_id!</span>(<span class="string">&quot;!test:localhost&quot;</span>);
+        <span class="kw">let</span> <span class="ident">event_id</span> <span class="op">=</span> <span class="macro">event_id!</span>(<span class="string">&quot;$1234adfad:asdf&quot;</span>);
+
+        <span class="kw">let</span> (<span class="ident">outbound</span>, <span class="kw">_</span>) <span class="op">=</span> <span class="ident">alice</span>.<span class="ident">create_group_session_pair_with_defaults</span>(<span class="kw-2">&amp;</span><span class="ident">room_id</span>).<span class="kw">await</span>.<span class="ident">unwrap</span>();
+
+        <span class="macro">assert_eq!</span>(<span class="number">0</span>, <span class="ident">outbound</span>.<span class="ident">message_index</span>().<span class="kw">await</span>);
+        <span class="macro">assert!</span>(<span class="op">!</span><span class="ident">outbound</span>.<span class="ident">shared</span>());
+        <span class="ident">outbound</span>.<span class="ident">mark_as_shared</span>();
+        <span class="macro">assert!</span>(<span class="ident">outbound</span>.<span class="ident">shared</span>());
+
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">content</span> <span class="op">=</span> <span class="ident">MessageEventContent::text_plain</span>(<span class="string">&quot;Hello&quot;</span>);
+        <span class="ident">content</span>.<span class="ident">relates_to</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">Relation::Replacement</span>(<span class="ident">Replacement::new</span>(
+            <span class="ident">event_id</span>.<span class="ident">clone</span>(),
+            <span class="ident">MessageEventContent::text_plain</span>(<span class="string">&quot;Hello edit&quot;</span>).<span class="ident">into</span>(),
+        )));
+
+        <span class="kw">let</span> <span class="ident">inbound</span> <span class="op">=</span> <span class="ident">InboundGroupSession::new</span>(
+            <span class="string">&quot;test_key&quot;</span>,
+            <span class="string">&quot;test_key&quot;</span>,
+            <span class="kw-2">&amp;</span><span class="ident">room_id</span>,
+            <span class="ident">outbound</span>.<span class="ident">session_key</span>().<span class="kw">await</span>,
+            <span class="prelude-val">None</span>,
+        )
+        .<span class="ident">unwrap</span>();
+
+        <span class="macro">assert_eq!</span>(<span class="number">0</span>, <span class="ident">inbound</span>.<span class="ident">first_known_index</span>());
+
+        <span class="macro">assert_eq!</span>(<span class="ident">outbound</span>.<span class="ident">session_id</span>(), <span class="ident">inbound</span>.<span class="ident">session_id</span>());
+
+        <span class="kw">let</span> <span class="ident">encrypted_content</span> <span class="op">=</span>
+            <span class="ident">outbound</span>.<span class="ident">encrypt</span>(<span class="ident">AnyMessageEventContent::RoomMessage</span>(<span class="ident">content</span>)).<span class="kw">await</span>;
+
+        <span class="kw">let</span> <span class="ident">event</span> <span class="op">=</span> <span class="macro">json!</span>({
+            <span class="string">&quot;sender&quot;</span>: <span class="ident">alice</span>.<span class="ident">user_id</span>(),
+            <span class="string">&quot;event_id&quot;</span>: <span class="ident">event_id</span>,
+            <span class="string">&quot;origin_server_ts&quot;</span>: <span class="number">0</span>,
+            <span class="string">&quot;room_id&quot;</span>: <span class="ident">room_id</span>,
+            <span class="string">&quot;type&quot;</span>: <span class="string">&quot;m.room.encrypted&quot;</span>,
+            <span class="string">&quot;content&quot;</span>: <span class="ident">encrypted_content</span>,
+        })
+        .<span class="ident">to_string</span>();
+
+        <span class="kw">let</span> <span class="ident">event</span>: <span class="ident">AnySyncRoomEvent</span> <span class="op">=</span> <span class="ident">serde_json::from_str</span>(<span class="kw-2">&amp;</span><span class="ident">event</span>).<span class="ident">expect</span>(<span class="string">&quot;WHAAAT?!?!?&quot;</span>);
+
+        <span class="kw">let</span> <span class="ident">event</span> <span class="op">=</span>
+            <span class="kw">if</span> <span class="kw">let</span> <span class="ident">AnySyncRoomEvent::Message</span>(<span class="ident">AnySyncMessageEvent::RoomEncrypted</span>(<span class="ident">event</span>)) <span class="op">=</span> <span class="ident">event</span> {
+                <span class="ident">event</span>
+            } <span class="kw">else</span> {
+                <span class="macro">panic!</span>(<span class="string">&quot;Invalid event type&quot;</span>)
+            };
+
+        <span class="kw">let</span> <span class="ident">decrypted</span> <span class="op">=</span> <span class="ident">inbound</span>.<span class="ident">decrypt</span>(<span class="kw-2">&amp;</span><span class="ident">event</span>).<span class="kw">await</span>.<span class="ident">unwrap</span>().<span class="number">0</span>;
+
+        <span class="kw">if</span> <span class="kw">let</span> <span class="ident">AnySyncRoomEvent::Message</span>(<span class="ident">AnySyncMessageEvent::RoomMessage</span>(<span class="ident">e</span>)) <span class="op">=</span>
+            <span class="ident">decrypted</span>.<span class="ident">deserialize</span>().<span class="ident">unwrap</span>()
+        {
+            <span class="macro">assert_matches!</span>(<span class="ident">e</span>.<span class="ident">content</span>.<span class="ident">relates_to</span>, <span class="prelude-val">Some</span>(<span class="ident">Relation::Replacement</span>(<span class="kw">_</span>)));
+        } <span class="kw">else</span> {
+            <span class="macro">panic!</span>(<span class="string">&quot;Invalid event type&quot;</span>)
+        }
     }
 
     <span class="attribute">#[<span class="ident">tokio::test</span>]</span>
