@@ -3923,6 +3923,104 @@
 <span id="3923">3923</span>
 <span id="3924">3924</span>
 <span id="3925">3925</span>
+<span id="3926">3926</span>
+<span id="3927">3927</span>
+<span id="3928">3928</span>
+<span id="3929">3929</span>
+<span id="3930">3930</span>
+<span id="3931">3931</span>
+<span id="3932">3932</span>
+<span id="3933">3933</span>
+<span id="3934">3934</span>
+<span id="3935">3935</span>
+<span id="3936">3936</span>
+<span id="3937">3937</span>
+<span id="3938">3938</span>
+<span id="3939">3939</span>
+<span id="3940">3940</span>
+<span id="3941">3941</span>
+<span id="3942">3942</span>
+<span id="3943">3943</span>
+<span id="3944">3944</span>
+<span id="3945">3945</span>
+<span id="3946">3946</span>
+<span id="3947">3947</span>
+<span id="3948">3948</span>
+<span id="3949">3949</span>
+<span id="3950">3950</span>
+<span id="3951">3951</span>
+<span id="3952">3952</span>
+<span id="3953">3953</span>
+<span id="3954">3954</span>
+<span id="3955">3955</span>
+<span id="3956">3956</span>
+<span id="3957">3957</span>
+<span id="3958">3958</span>
+<span id="3959">3959</span>
+<span id="3960">3960</span>
+<span id="3961">3961</span>
+<span id="3962">3962</span>
+<span id="3963">3963</span>
+<span id="3964">3964</span>
+<span id="3965">3965</span>
+<span id="3966">3966</span>
+<span id="3967">3967</span>
+<span id="3968">3968</span>
+<span id="3969">3969</span>
+<span id="3970">3970</span>
+<span id="3971">3971</span>
+<span id="3972">3972</span>
+<span id="3973">3973</span>
+<span id="3974">3974</span>
+<span id="3975">3975</span>
+<span id="3976">3976</span>
+<span id="3977">3977</span>
+<span id="3978">3978</span>
+<span id="3979">3979</span>
+<span id="3980">3980</span>
+<span id="3981">3981</span>
+<span id="3982">3982</span>
+<span id="3983">3983</span>
+<span id="3984">3984</span>
+<span id="3985">3985</span>
+<span id="3986">3986</span>
+<span id="3987">3987</span>
+<span id="3988">3988</span>
+<span id="3989">3989</span>
+<span id="3990">3990</span>
+<span id="3991">3991</span>
+<span id="3992">3992</span>
+<span id="3993">3993</span>
+<span id="3994">3994</span>
+<span id="3995">3995</span>
+<span id="3996">3996</span>
+<span id="3997">3997</span>
+<span id="3998">3998</span>
+<span id="3999">3999</span>
+<span id="4000">4000</span>
+<span id="4001">4001</span>
+<span id="4002">4002</span>
+<span id="4003">4003</span>
+<span id="4004">4004</span>
+<span id="4005">4005</span>
+<span id="4006">4006</span>
+<span id="4007">4007</span>
+<span id="4008">4008</span>
+<span id="4009">4009</span>
+<span id="4010">4010</span>
+<span id="4011">4011</span>
+<span id="4012">4012</span>
+<span id="4013">4013</span>
+<span id="4014">4014</span>
+<span id="4015">4015</span>
+<span id="4016">4016</span>
+<span id="4017">4017</span>
+<span id="4018">4018</span>
+<span id="4019">4019</span>
+<span id="4020">4020</span>
+<span id="4021">4021</span>
+<span id="4022">4022</span>
+<span id="4023">4023</span>
 </pre><pre class="rust">
 <span class="comment">// Copyright 2020 Damir Jelić</span>
 <span class="comment">// Copyright 2020 The Matrix.org Foundation C.I.C.</span>
@@ -6698,7 +6796,7 @@
                 <span class="ident">message</span>::{<span class="ident">ImageMessageEventContent</span>, <span class="ident">MessageEventContent</span>},
                 <span class="ident">ImageInfo</span>,
             },
-            <span class="ident">AnyMessageEventContent</span>,
+            <span class="ident">AnyMessageEventContent</span>, <span class="ident">AnySyncStateEvent</span>, <span class="ident">EventType</span>,
         },
         <span class="ident">mxc_uri</span>, <span class="ident">room_id</span>, <span class="ident">thirdparty</span>, <span class="ident">uint</span>, <span class="ident">user_id</span>, <span class="ident">UserId</span>,
     };
@@ -7847,6 +7945,104 @@
         <span class="kw">let</span> <span class="ident">user_id</span> <span class="op">=</span> <span class="macro">user_id!</span>(<span class="string">&quot;@joe:example.org&quot;</span>);
 
         <span class="macro">assert_eq!</span>(<span class="ident">client</span>.<span class="ident">whoami</span>().<span class="kw">await</span>.<span class="ident">unwrap</span>().<span class="ident">user_id</span>, <span class="ident">user_id</span>);
+    }
+
+    <span class="attribute">#[<span class="ident">tokio::test</span>]</span>
+    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">test_state_event_getting</span>() {
+        <span class="kw">let</span> <span class="ident">homeserver</span> <span class="op">=</span> <span class="ident">Url::from_str</span>(<span class="kw-2">&amp;</span><span class="ident">mockito::server_url</span>()).<span class="ident">unwrap</span>();
+        <span class="kw">let</span> <span class="ident">room_id</span> <span class="op">=</span> <span class="macro">room_id!</span>(<span class="string">&quot;!SVkFJHzfwvuaIEawgC:localhost&quot;</span>);
+
+        <span class="kw">let</span> <span class="ident">session</span> <span class="op">=</span> <span class="ident">Session</span> {
+            <span class="ident">access_token</span>: <span class="string">&quot;1234&quot;</span>.<span class="ident">to_owned</span>(),
+            <span class="ident">user_id</span>: <span class="macro">user_id!</span>(<span class="string">&quot;@example:localhost&quot;</span>),
+            <span class="ident">device_id</span>: <span class="string">&quot;DEVICEID&quot;</span>.<span class="ident">into</span>(),
+        };
+
+        <span class="kw">let</span> <span class="ident">sync</span> <span class="op">=</span> <span class="macro">json!</span>({
+            <span class="string">&quot;next_batch&quot;</span>: <span class="string">&quot;1234&quot;</span>,
+            <span class="string">&quot;rooms&quot;</span>: {
+                <span class="string">&quot;join&quot;</span>: {
+                    <span class="string">&quot;!SVkFJHzfwvuaIEawgC:localhost&quot;</span>: {
+                        <span class="string">&quot;state&quot;</span>: {
+                          <span class="string">&quot;events&quot;</span>: [
+                            {
+                              <span class="string">&quot;type&quot;</span>: <span class="string">&quot;m.custom.note&quot;</span>,
+                              <span class="string">&quot;sender&quot;</span>: <span class="string">&quot;@example:localhost&quot;</span>,
+                              <span class="string">&quot;content&quot;</span>: {
+                                <span class="string">&quot;body&quot;</span>: <span class="string">&quot;Note 1&quot;</span>,
+                              },
+                              <span class="string">&quot;state_key&quot;</span>: <span class="string">&quot;note.1&quot;</span>,
+                              <span class="string">&quot;origin_server_ts&quot;</span>: <span class="number">1611853078727u64</span>,
+                              <span class="string">&quot;unsigned&quot;</span>: {
+                                <span class="string">&quot;replaces_state&quot;</span>: <span class="string">&quot;$2s9GcbVxbbFS3EZY9vN1zhavaDJnF32cAIGAxi99NuQ&quot;</span>,
+                                <span class="string">&quot;age&quot;</span>: <span class="number">15458166523u64</span>
+                              },
+                              <span class="string">&quot;event_id&quot;</span>: <span class="string">&quot;$NVCTvrlxodf3ZGjJ6foxepEq8ysSkTq8wG0wKeQBVZg&quot;</span>
+                            },
+                            {
+                              <span class="string">&quot;type&quot;</span>: <span class="string">&quot;m.custom.note&quot;</span>,
+                              <span class="string">&quot;sender&quot;</span>: <span class="string">&quot;@example2:localhost&quot;</span>,
+                              <span class="string">&quot;content&quot;</span>: {
+                                <span class="string">&quot;body&quot;</span>: <span class="string">&quot;Note 2&quot;</span>,
+                              },
+                              <span class="string">&quot;state_key&quot;</span>: <span class="string">&quot;note.2&quot;</span>,
+                              <span class="string">&quot;origin_server_ts&quot;</span>: <span class="number">1611853078727u64</span>,
+                              <span class="string">&quot;unsigned&quot;</span>: {
+                                <span class="string">&quot;replaces_state&quot;</span>: <span class="string">&quot;$2s9GcbVxbbFS3EZY9vN1zhavaDJnF32cAIGAxi99NuQ&quot;</span>,
+                                <span class="string">&quot;age&quot;</span>: <span class="number">15458166523u64</span>
+                              },
+                              <span class="string">&quot;event_id&quot;</span>: <span class="string">&quot;$NVCTvrlxodf3ZGjJ6foxepEq8ysSkTq8wG0wKeQBVZg&quot;</span>
+                            },
+                            {
+                              <span class="string">&quot;type&quot;</span>: <span class="string">&quot;m.room.encryption&quot;</span>,
+                              <span class="string">&quot;sender&quot;</span>: <span class="string">&quot;@example:localhost&quot;</span>,
+                              <span class="string">&quot;content&quot;</span>: {
+                                <span class="string">&quot;algorithm&quot;</span>: <span class="string">&quot;m.megolm.v1.aes-sha2&quot;</span>
+                              },
+                              <span class="string">&quot;state_key&quot;</span>: <span class="string">&quot;&quot;</span>,
+                              <span class="string">&quot;origin_server_ts&quot;</span>: <span class="number">1586437448151u64</span>,
+                              <span class="string">&quot;unsigned&quot;</span>: {
+                                <span class="string">&quot;age&quot;</span>: <span class="number">40873797099u64</span>
+                              },
+                              <span class="string">&quot;event_id&quot;</span>: <span class="string">&quot;$vyG3wu1QdJSh5gc-09SwjXBXlXo8gS7s4QV_Yxha0Xw&quot;</span>
+                            },
+                          ]
+                        }
+                    }
+                }
+            }
+        });
+
+        <span class="kw">let</span> <span class="ident">_m</span> <span class="op">=</span> <span class="ident">mock</span>(<span class="string">&quot;GET&quot;</span>, <span class="ident">Matcher::Regex</span>(<span class="string">r&quot;^/_matrix/client/r0/sync\?.*$&quot;</span>.<span class="ident">to_string</span>()))
+            .<span class="ident">with_status</span>(<span class="number">200</span>)
+            .<span class="ident">with_body</span>(<span class="ident">sync</span>.<span class="ident">to_string</span>())
+            .<span class="ident">create</span>();
+
+        <span class="kw">let</span> <span class="ident">client</span> <span class="op">=</span> <span class="ident">Client::new</span>(<span class="ident">homeserver</span>.<span class="ident">clone</span>()).<span class="ident">unwrap</span>();
+        <span class="ident">client</span>.<span class="ident">restore_login</span>(<span class="ident">session</span>.<span class="ident">clone</span>()).<span class="kw">await</span>.<span class="ident">unwrap</span>();
+
+        <span class="kw">let</span> <span class="ident">room</span> <span class="op">=</span> <span class="ident">client</span>.<span class="ident">get_joined_room</span>(<span class="kw-2">&amp;</span><span class="ident">room_id</span>);
+        <span class="macro">assert!</span>(<span class="ident">room</span>.<span class="ident">is_none</span>());
+
+        <span class="ident">client</span>.<span class="ident">sync_once</span>(<span class="ident">SyncSettings::default</span>()).<span class="kw">await</span>.<span class="ident">unwrap</span>();
+
+        <span class="kw">let</span> <span class="ident">room</span> <span class="op">=</span> <span class="ident">client</span>.<span class="ident">get_joined_room</span>(<span class="kw-2">&amp;</span><span class="ident">room_id</span>).<span class="ident">unwrap</span>();
+
+        <span class="kw">let</span> <span class="ident">state_events</span> <span class="op">=</span> <span class="ident">room</span>.<span class="ident">get_state_events</span>(<span class="ident">EventType::RoomEncryption</span>).<span class="kw">await</span>.<span class="ident">unwrap</span>();
+        <span class="macro">assert_eq!</span>(<span class="ident">state_events</span>.<span class="ident">len</span>(), <span class="number">1</span>);
+
+        <span class="kw">let</span> <span class="ident">state_events</span> <span class="op">=</span> <span class="ident">room</span>.<span class="ident">get_state_events</span>(<span class="string">&quot;m.custom.note&quot;</span>.<span class="ident">into</span>()).<span class="kw">await</span>.<span class="ident">unwrap</span>();
+        <span class="macro">assert_eq!</span>(<span class="ident">state_events</span>.<span class="ident">len</span>(), <span class="number">2</span>);
+
+        <span class="kw">let</span> <span class="ident">encryption_event</span> <span class="op">=</span> <span class="ident">room</span>
+            .<span class="ident">get_state_event</span>(<span class="ident">EventType::RoomEncryption</span>, <span class="string">&quot;&quot;</span>)
+            .<span class="kw">await</span>
+            .<span class="ident">unwrap</span>()
+            .<span class="ident">unwrap</span>()
+            .<span class="ident">deserialize</span>()
+            .<span class="ident">unwrap</span>();
+
+        <span class="macro">matches::assert_matches!</span>(<span class="ident">encryption_event</span>, <span class="ident">AnySyncStateEvent::RoomEncryption</span>(<span class="kw">_</span>));
     }
 }
 </pre></div>
