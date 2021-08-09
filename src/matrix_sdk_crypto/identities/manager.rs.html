@@ -797,7 +797,7 @@
                 );
                 <span class="prelude-val">None</span>
             } <span class="kw">else</span> {
-                <span class="prelude-val">Some</span>(<span class="ident">spawn</span>(<span class="self">Self</span><span class="ident">::update_or_create_device</span>(<span class="ident">store</span>.<span class="ident">clone</span>(), <span class="ident">device_keys</span>)))
+                <span class="prelude-val">Some</span>(<span class="ident">spawn</span>(<span class="ident"><span class="self">Self</span>::update_or_create_device</span>(<span class="ident">store</span>.<span class="ident">clone</span>(), <span class="ident">device_keys</span>)))
             }
         });
 
@@ -845,7 +845,7 @@
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">changes</span> <span class="op">=</span> <span class="ident">DeviceChanges::default</span>();
 
         <span class="kw">let</span> <span class="ident">tasks</span> <span class="op">=</span> <span class="ident">device_keys_map</span>.<span class="ident">into_iter</span>().<span class="ident">map</span>(<span class="op">|</span>(<span class="ident">user_id</span>, <span class="ident">device_keys_map</span>)<span class="op">|</span> {
-            <span class="ident">spawn</span>(<span class="self">Self</span><span class="ident">::update_user_devices</span>(
+            <span class="ident">spawn</span>(<span class="ident"><span class="self">Self</span>::update_user_devices</span>(
                 <span class="self">self</span>.<span class="ident">store</span>.<span class="ident">clone</span>(),
                 <span class="self">self</span>.<span class="ident">user_id</span>.<span class="ident">clone</span>(),
                 <span class="self">self</span>.<span class="ident">device_id</span>.<span class="ident">clone</span>(),
@@ -981,7 +981,7 @@
             <span class="kw">let</span> <span class="ident">users</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">UserId</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">users</span>.<span class="ident">into_iter</span>().<span class="ident">collect</span>();
 
             <span class="ident">users</span>
-                .<span class="ident">chunks</span>(<span class="self">Self</span><span class="ident">::MAX_KEY_QUERY_USERS</span>)
+                .<span class="ident">chunks</span>(<span class="ident"><span class="self">Self</span>::MAX_KEY_QUERY_USERS</span>)
                 .<span class="ident">map</span>(<span class="op">|</span><span class="ident">u</span><span class="op">|</span> <span class="ident">u</span>.<span class="ident">iter</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">u</span><span class="op">|</span> (<span class="ident">u</span>.<span class="ident">clone</span>(), <span class="ident">Vec::new</span>())).<span class="ident">collect</span>())
                 .<span class="ident">map</span>(<span class="ident">KeysQueryRequest::new</span>)
                 .<span class="ident">collect</span>()

@@ -1428,7 +1428,7 @@
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">shared_secret</span> <span class="op">=</span> [<span class="number">0u8</span>; <span class="ident">SECRET_SIZE</span>];
         <span class="ident">getrandom::getrandom</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">shared_secret</span>)
             .<span class="ident">expect</span>(<span class="string">&quot;Can&#39;t generate randomness for the shared secret&quot;</span>);
-        <span class="kw">crate</span><span class="ident">::utilities::encode</span>(<span class="ident">shared_secret</span>)
+        <span class="ident"><span class="kw">crate</span>::utilities::encode</span>(<span class="ident">shared_secret</span>)
     }
 
     <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">new_self</span>(
@@ -1440,7 +1440,7 @@
         <span class="ident">we_started</span>: <span class="ident">bool</span>,
         <span class="ident">request_handle</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">RequestHandle</span><span class="op">&gt;</span>,
     ) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
-        <span class="kw">let</span> <span class="ident">secret</span> <span class="op">=</span> <span class="self">Self</span><span class="ident">::generate_secret</span>();
+        <span class="kw">let</span> <span class="ident">secret</span> <span class="op">=</span> <span class="ident"><span class="self">Self</span>::generate_secret</span>();
 
         <span class="kw">let</span> <span class="ident">inner</span>: <span class="ident">QrVerificationData</span> <span class="op">=</span> <span class="ident">SelfVerificationData::new</span>(
             <span class="ident">flow_id</span>.<span class="ident">as_str</span>().<span class="ident">to_owned</span>(),
@@ -1450,7 +1450,7 @@
         )
         .<span class="ident">into</span>();
 
-        <span class="self">Self</span><span class="ident">::new_helper</span>(<span class="ident">store</span>, <span class="ident">flow_id</span>, <span class="ident">inner</span>, <span class="ident">identities</span>, <span class="ident">we_started</span>, <span class="ident">request_handle</span>)
+        <span class="ident"><span class="self">Self</span>::new_helper</span>(<span class="ident">store</span>, <span class="ident">flow_id</span>, <span class="ident">inner</span>, <span class="ident">identities</span>, <span class="ident">we_started</span>, <span class="ident">request_handle</span>)
     }
 
     <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">new_self_no_master</span>(
@@ -1462,7 +1462,7 @@
         <span class="ident">we_started</span>: <span class="ident">bool</span>,
         <span class="ident">request_handle</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">RequestHandle</span><span class="op">&gt;</span>,
     ) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">QrVerification</span> {
-        <span class="kw">let</span> <span class="ident">secret</span> <span class="op">=</span> <span class="self">Self</span><span class="ident">::generate_secret</span>();
+        <span class="kw">let</span> <span class="ident">secret</span> <span class="op">=</span> <span class="ident"><span class="self">Self</span>::generate_secret</span>();
 
         <span class="kw">let</span> <span class="ident">inner</span>: <span class="ident">QrVerificationData</span> <span class="op">=</span> <span class="ident">SelfVerificationNoMasterKey::new</span>(
             <span class="ident">flow_id</span>.<span class="ident">as_str</span>().<span class="ident">to_owned</span>(),
@@ -1472,7 +1472,7 @@
         )
         .<span class="ident">into</span>();
 
-        <span class="self">Self</span><span class="ident">::new_helper</span>(<span class="ident">store</span>, <span class="ident">flow_id</span>, <span class="ident">inner</span>, <span class="ident">identities</span>, <span class="ident">we_started</span>, <span class="ident">request_handle</span>)
+        <span class="ident"><span class="self">Self</span>::new_helper</span>(<span class="ident">store</span>, <span class="ident">flow_id</span>, <span class="ident">inner</span>, <span class="ident">identities</span>, <span class="ident">we_started</span>, <span class="ident">request_handle</span>)
     }
 
     <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">new_cross</span>(
@@ -1484,7 +1484,7 @@
         <span class="ident">we_started</span>: <span class="ident">bool</span>,
         <span class="ident">request_handle</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">RequestHandle</span><span class="op">&gt;</span>,
     ) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
-        <span class="kw">let</span> <span class="ident">secret</span> <span class="op">=</span> <span class="self">Self</span><span class="ident">::generate_secret</span>();
+        <span class="kw">let</span> <span class="ident">secret</span> <span class="op">=</span> <span class="ident"><span class="self">Self</span>::generate_secret</span>();
 
         <span class="kw">let</span> <span class="ident">event_id</span> <span class="op">=</span> <span class="kw">if</span> <span class="kw">let</span> <span class="ident">FlowId::InRoom</span>(<span class="kw">_</span>, <span class="ident">e</span>) <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">flow_id</span> {
             <span class="ident">e</span>.<span class="ident">to_owned</span>()
@@ -1495,7 +1495,7 @@
         <span class="kw">let</span> <span class="ident">inner</span>: <span class="ident">QrVerificationData</span> <span class="op">=</span>
             <span class="ident">VerificationData::new</span>(<span class="ident">event_id</span>, <span class="ident">own_master_key</span>, <span class="ident">other_master_key</span>, <span class="ident">secret</span>).<span class="ident">into</span>();
 
-        <span class="self">Self</span><span class="ident">::new_helper</span>(<span class="ident">store</span>, <span class="ident">flow_id</span>, <span class="ident">inner</span>, <span class="ident">identities</span>, <span class="ident">we_started</span>, <span class="ident">request_handle</span>)
+        <span class="ident"><span class="self">Self</span>::new_helper</span>(<span class="ident">store</span>, <span class="ident">flow_id</span>, <span class="ident">inner</span>, <span class="ident">identities</span>, <span class="ident">we_started</span>, <span class="ident">request_handle</span>)
     }
 
     <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy::too_many_arguments</span>)]</span>

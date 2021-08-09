@@ -1835,7 +1835,7 @@
 
         <span class="ident">inner</span>.<span class="ident">accept</span>(<span class="ident">methods</span>).<span class="ident">map</span>(<span class="op">|</span><span class="ident">c</span><span class="op">|</span> <span class="kw">match</span> <span class="ident">c</span> {
             <span class="ident">OutgoingContent::ToDevice</span>(<span class="ident">content</span>) <span class="op">=</span><span class="op">&gt;</span> {
-                <span class="ident">ToDeviceRequest::new</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">other_user</span>(), <span class="ident">inner</span>.<span class="ident">other_device_id</span>(), <span class="ident">content</span>).<span class="ident">into</span>()
+                <span class="ident">ToDeviceRequest::new</span>(<span class="self">self</span>.<span class="ident">other_user</span>(), <span class="ident">inner</span>.<span class="ident">other_device_id</span>(), <span class="ident">content</span>).<span class="ident">into</span>()
             }
             <span class="ident">OutgoingContent::Room</span>(<span class="ident">room_id</span>, <span class="ident">content</span>) <span class="op">=</span><span class="op">&gt;</span> {
                 <span class="ident">RoomMessageRequest</span> { <span class="ident">room_id</span>, <span class="ident">txn_id</span>: <span class="ident">Uuid::new_v4</span>(), <span class="ident">content</span> }.<span class="ident">into</span>()
@@ -1879,14 +1879,14 @@
             <span class="ident">OutgoingContent::ToDevice</span>(<span class="ident">content</span>) <span class="op">=</span><span class="op">&gt;</span> {
                 <span class="kw">if</span> <span class="ident">send_to_everyone</span> {
                     <span class="ident">ToDeviceRequest::new_for_recipients</span>(
-                        <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">other_user</span>(),
+                        <span class="self">self</span>.<span class="ident">other_user</span>(),
                         <span class="self">self</span>.<span class="ident">recipient_devices</span>.<span class="ident">to_vec</span>(),
                         <span class="ident">content</span>,
                         <span class="ident">Uuid::new_v4</span>(),
                     )
                     .<span class="ident">into</span>()
                 } <span class="kw">else</span> {
-                    <span class="ident">ToDeviceRequest::new</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">other_user</span>(), <span class="ident">other_device</span>, <span class="ident">content</span>).<span class="ident">into</span>()
+                    <span class="ident">ToDeviceRequest::new</span>(<span class="self">self</span>.<span class="ident">other_user</span>(), <span class="ident">other_device</span>, <span class="ident">content</span>).<span class="ident">into</span>()
                 }
             }
             <span class="ident">OutgoingContent::Room</span>(<span class="ident">room_id</span>, <span class="ident">content</span>) <span class="op">=</span><span class="op">&gt;</span> {
@@ -1900,8 +1900,8 @@
             <span class="self">self</span>.<span class="ident">verification_cache</span>.<span class="ident">get</span>(<span class="self">self</span>.<span class="ident">other_user</span>(), <span class="self">self</span>.<span class="ident">flow_id</span>().<span class="ident">as_str</span>())
         {
             <span class="kw">match</span> <span class="ident">verification</span> {
-                <span class="kw">crate</span><span class="ident">::Verification::SasV1</span>(<span class="ident">s</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">s</span>.<span class="ident">cancel_with_code</span>(<span class="ident">cancel_code</span>),
-                <span class="kw">crate</span><span class="ident">::Verification::QrV1</span>(<span class="ident">q</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">q</span>.<span class="ident">cancel_with_code</span>(<span class="ident">cancel_code</span>),
+                <span class="ident"><span class="kw">crate</span>::Verification::SasV1</span>(<span class="ident">s</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">s</span>.<span class="ident">cancel_with_code</span>(<span class="ident">cancel_code</span>),
+                <span class="ident"><span class="kw">crate</span>::Verification::QrV1</span>(<span class="ident">q</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">q</span>.<span class="ident">cancel_with_code</span>(<span class="ident">cancel_code</span>),
             };
         }
 
@@ -2067,7 +2067,7 @@
 
                     <span class="kw">let</span> <span class="ident">request</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">content</span> {
                         <span class="ident">OutgoingContent::ToDevice</span>(<span class="ident">content</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">ToDeviceRequest::new</span>(
-                            <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">other_user</span>(),
+                            <span class="self">self</span>.<span class="ident">other_user</span>(),
                             <span class="ident">inner</span>.<span class="ident">other_device_id</span>(),
                             <span class="ident">content</span>,
                         )
@@ -2673,7 +2673,7 @@
     <span class="kw">use</span> <span class="ident">matrix_sdk_test::async_test</span>;
     <span class="kw">use</span> <span class="ident">ruma</span>::{<span class="ident">event_id</span>, <span class="ident">room_id</span>, <span class="ident">DeviceIdBox</span>, <span class="ident">UserId</span>};
 
-    <span class="kw">use</span> <span class="kw">super</span><span class="ident">::VerificationRequest</span>;
+    <span class="kw">use</span> <span class="ident"><span class="kw">super</span>::VerificationRequest</span>;
     <span class="kw">use</span> <span class="kw">crate</span>::{
         <span class="ident">olm</span>::{<span class="ident">PrivateCrossSigningIdentity</span>, <span class="ident">ReadOnlyAccount</span>},
         <span class="ident">store</span>::{<span class="ident">Changes</span>, <span class="ident">CryptoStore</span>, <span class="ident">MemoryStore</span>},

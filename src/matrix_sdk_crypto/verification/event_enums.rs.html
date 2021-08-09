@@ -814,7 +814,7 @@
     <span class="ident">DeviceId</span>, <span class="ident">MilliSecondsSinceUnixEpoch</span>, <span class="ident">RoomId</span>, <span class="ident">UserId</span>,
 };
 
-<span class="kw">use</span> <span class="kw">super</span><span class="ident">::FlowId</span>;
+<span class="kw">use</span> <span class="ident"><span class="kw">super</span>::FlowId</span>;
 
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
 <span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">AnyEvent</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
@@ -825,8 +825,8 @@
 <span class="kw">impl</span> <span class="ident">AnyEvent</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span> {
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">sender</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="ident">UserId</span> {
         <span class="kw">match</span> <span class="self">self</span> {
-            <span class="self">Self</span><span class="ident">::Room</span>(<span class="ident">e</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">e</span>.<span class="ident">sender</span>(),
-            <span class="self">Self</span><span class="ident">::ToDevice</span>(<span class="ident">e</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">e</span>.<span class="ident">sender</span>(),
+            <span class="ident"><span class="self">Self</span>::Room</span>(<span class="ident">e</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">e</span>.<span class="ident">sender</span>(),
+            <span class="ident"><span class="self">Self</span>::ToDevice</span>(<span class="ident">e</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">e</span>.<span class="ident">sender</span>(),
         }
     }
 
@@ -920,20 +920,20 @@
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">From</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">AnyMessageEvent</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">AnyEvent</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
     <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">e</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">AnyMessageEvent</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
-        <span class="self">Self</span><span class="ident">::Room</span>(<span class="ident">e</span>)
+        <span class="ident"><span class="self">Self</span>::Room</span>(<span class="ident">e</span>)
     }
 }
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">From</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">AnyToDeviceEvent</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">AnyEvent</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
     <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">e</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">AnyToDeviceEvent</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
-        <span class="self">Self</span><span class="ident">::ToDevice</span>(<span class="ident">e</span>)
+        <span class="ident"><span class="self">Self</span>::ToDevice</span>(<span class="ident">e</span>)
     }
 }
 
 <span class="kw">impl</span> <span class="ident">TryFrom</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">AnyEvent</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">FlowId</span> {
     <span class="kw">type</span> <span class="ident">Error</span> <span class="op">=</span> ();
 
-    <span class="kw">fn</span> <span class="ident">try_from</span>(<span class="ident">value</span>: <span class="kw-2">&amp;</span><span class="ident">AnyEvent</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="self">Self</span><span class="ident">::Error</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">try_from</span>(<span class="ident">value</span>: <span class="kw-2">&amp;</span><span class="ident">AnyEvent</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident"><span class="self">Self</span>::Error</span><span class="op">&gt;</span> {
         <span class="kw">match</span> <span class="ident">value</span> {
             <span class="ident">AnyEvent::Room</span>(<span class="ident">e</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">FlowId::try_from</span>(<span class="kw-2">*</span><span class="ident">e</span>),
             <span class="ident">AnyEvent::ToDevice</span>(<span class="ident">e</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">FlowId::try_from</span>(<span class="kw-2">*</span><span class="ident">e</span>),
@@ -944,7 +944,7 @@
 <span class="kw">impl</span> <span class="ident">TryFrom</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">AnyMessageEvent</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">FlowId</span> {
     <span class="kw">type</span> <span class="ident">Error</span> <span class="op">=</span> ();
 
-    <span class="kw">fn</span> <span class="ident">try_from</span>(<span class="ident">value</span>: <span class="kw-2">&amp;</span><span class="ident">AnyMessageEvent</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="self">Self</span><span class="ident">::Error</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">try_from</span>(<span class="ident">value</span>: <span class="kw-2">&amp;</span><span class="ident">AnyMessageEvent</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident"><span class="self">Self</span>::Error</span><span class="op">&gt;</span> {
         <span class="kw">match</span> <span class="ident">value</span> {
             <span class="ident">AnyMessageEvent::CallAnswer</span>(<span class="kw">_</span>)
             <span class="op">|</span> <span class="ident">AnyMessageEvent::CallInvite</span>(<span class="kw">_</span>)
@@ -985,7 +985,7 @@
 <span class="kw">impl</span> <span class="ident">TryFrom</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">AnyToDeviceEvent</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">FlowId</span> {
     <span class="kw">type</span> <span class="ident">Error</span> <span class="op">=</span> ();
 
-    <span class="kw">fn</span> <span class="ident">try_from</span>(<span class="ident">value</span>: <span class="kw-2">&amp;</span><span class="ident">AnyToDeviceEvent</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="self">Self</span><span class="ident">::Error</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">try_from</span>(<span class="ident">value</span>: <span class="kw-2">&amp;</span><span class="ident">AnyToDeviceEvent</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident"><span class="self">Self</span>::Error</span><span class="op">&gt;</span> {
         <span class="kw">match</span> <span class="ident">value</span> {
             <span class="ident">AnyToDeviceEvent::Dummy</span>(<span class="kw">_</span>)
             <span class="op">|</span> <span class="ident">AnyToDeviceEvent::RoomKey</span>(<span class="kw">_</span>)
@@ -1042,15 +1042,15 @@
 <span class="kw">impl</span> <span class="ident">RequestContent</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span> {
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">from_device</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="ident">DeviceId</span> {
         <span class="kw">match</span> <span class="self">self</span> {
-            <span class="self">Self</span><span class="ident">::ToDevice</span>(<span class="ident">t</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="ident">t</span>.<span class="ident">from_device</span>,
-            <span class="self">Self</span><span class="ident">::Room</span>(<span class="ident">r</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="ident">r</span>.<span class="ident">from_device</span>,
+            <span class="ident"><span class="self">Self</span>::ToDevice</span>(<span class="ident">t</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="ident">t</span>.<span class="ident">from_device</span>,
+            <span class="ident"><span class="self">Self</span>::Room</span>(<span class="ident">r</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="ident">r</span>.<span class="ident">from_device</span>,
         }
     }
 
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">methods</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span>[<span class="ident">VerificationMethod</span>] {
         <span class="kw">match</span> <span class="self">self</span> {
-            <span class="self">Self</span><span class="ident">::ToDevice</span>(<span class="ident">t</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="ident">t</span>.<span class="ident">methods</span>,
-            <span class="self">Self</span><span class="ident">::Room</span>(<span class="ident">r</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="ident">r</span>.<span class="ident">methods</span>,
+            <span class="ident"><span class="self">Self</span>::ToDevice</span>(<span class="ident">t</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="ident">t</span>.<span class="ident">methods</span>,
+            <span class="ident"><span class="self">Self</span>::Room</span>(<span class="ident">r</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="ident">r</span>.<span class="ident">methods</span>,
         }
     }
 }
@@ -1064,15 +1064,15 @@
 <span class="kw">impl</span> <span class="ident">ReadyContent</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span> {
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">from_device</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="ident">DeviceId</span> {
         <span class="kw">match</span> <span class="self">self</span> {
-            <span class="self">Self</span><span class="ident">::ToDevice</span>(<span class="ident">t</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="ident">t</span>.<span class="ident">from_device</span>,
-            <span class="self">Self</span><span class="ident">::Room</span>(<span class="ident">r</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="ident">r</span>.<span class="ident">from_device</span>,
+            <span class="ident"><span class="self">Self</span>::ToDevice</span>(<span class="ident">t</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="ident">t</span>.<span class="ident">from_device</span>,
+            <span class="ident"><span class="self">Self</span>::Room</span>(<span class="ident">r</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="ident">r</span>.<span class="ident">from_device</span>,
         }
     }
 
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">methods</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span>[<span class="ident">VerificationMethod</span>] {
         <span class="kw">match</span> <span class="self">self</span> {
-            <span class="self">Self</span><span class="ident">::ToDevice</span>(<span class="ident">t</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="ident">t</span>.<span class="ident">methods</span>,
-            <span class="self">Self</span><span class="ident">::Room</span>(<span class="ident">r</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="ident">r</span>.<span class="ident">methods</span>,
+            <span class="ident"><span class="self">Self</span>::ToDevice</span>(<span class="ident">t</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="ident">t</span>.<span class="ident">methods</span>,
+            <span class="ident"><span class="self">Self</span>::Room</span>(<span class="ident">r</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="ident">r</span>.<span class="ident">methods</span>,
         }
     }
 }
@@ -1080,7 +1080,7 @@
 <span class="macro">macro_rules!</span> <span class="ident">from_for_enum</span> {
     (<span class="macro-nonterminal">$</span><span class="kw">type</span>: <span class="macro-nonterminal">ident</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">enum_variant</span>: <span class="ident">ident</span>, <span class="macro-nonterminal">$</span><span class="kw">enum</span>: <span class="macro-nonterminal">ident</span>) <span class="op">=</span><span class="op">&gt;</span> {
         <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">From</span><span class="op">&lt;</span><span class="macro-nonterminal">$</span><span class="kw">type</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="macro-nonterminal">$</span><span class="kw">enum</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-            <span class="kw">fn</span> <span class="macro-nonterminal">from</span>(<span class="ident">c</span>: <span class="macro-nonterminal">$</span><span class="kw">type</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+            <span class="kw">fn</span> <span class="macro-nonterminal">from</span>(<span class="ident">c</span>: <span class="macro-nonterminal">$</span><span class="kw">type</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="macro-nonterminal">Self</span> {
                 <span class="self">Self</span>::<span class="macro-nonterminal">$</span><span class="macro-nonterminal">enum_variant</span>(<span class="ident">c</span>)
             }
         }
@@ -1090,7 +1090,7 @@
 <span class="macro">macro_rules!</span> <span class="ident">from_borrow_for_enum</span> {
     (<span class="macro-nonterminal">$</span><span class="kw">type</span>: <span class="macro-nonterminal">ident</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">enum_variant</span>: <span class="ident">ident</span>, <span class="macro-nonterminal">$</span><span class="kw">enum</span>: <span class="macro-nonterminal">ident</span>) <span class="op">=</span><span class="op">&gt;</span> {
         <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">From</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="macro-nonterminal">$</span><span class="kw">type</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="macro-nonterminal">$</span><span class="kw">enum</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-            <span class="kw">fn</span> <span class="macro-nonterminal">from</span>(<span class="ident">c</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="macro-nonterminal">$</span><span class="kw">type</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+            <span class="kw">fn</span> <span class="macro-nonterminal">from</span>(<span class="ident">c</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="macro-nonterminal">$</span><span class="kw">type</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="macro-nonterminal">Self</span> {
                 <span class="self">Self</span>::<span class="macro-nonterminal">$</span><span class="macro-nonterminal">enum_variant</span>(<span class="ident">c</span>)
             }
         }
@@ -1126,18 +1126,18 @@
         <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">TryFrom</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">OutgoingContent</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="macro-nonterminal">$</span><span class="kw">type</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
             <span class="kw">type</span> <span class="macro-nonterminal">Error</span> <span class="op">=</span> ();
 
-            <span class="kw">fn</span> <span class="ident">try_from</span>(<span class="ident">value</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">OutgoingContent</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="self">Self</span><span class="ident">::Error</span><span class="op">&gt;</span> {
+            <span class="kw">fn</span> <span class="ident">try_from</span>(<span class="ident">value</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">OutgoingContent</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident"><span class="self">Self</span>::Error</span><span class="op">&gt;</span> {
                 <span class="kw">match</span> <span class="ident">value</span> {
                     <span class="ident">OutgoingContent::Room</span>(<span class="kw">_</span>, <span class="ident">c</span>) <span class="op">=</span><span class="op">&gt;</span> {
                         <span class="kw">if</span> <span class="kw">let</span> <span class="ident">AnyMessageEventContent</span>::<span class="macro-nonterminal">$</span><span class="macro-nonterminal">enum_variant</span>(<span class="ident">c</span>) <span class="op">=</span> <span class="ident">c</span> {
-                            <span class="prelude-val">Ok</span>(<span class="self">Self</span><span class="ident">::Room</span>(<span class="ident">c</span>))
+                            <span class="prelude-val">Ok</span>(<span class="ident"><span class="self">Self</span>::Room</span>(<span class="ident">c</span>))
                         } <span class="kw">else</span> {
                             <span class="prelude-val">Err</span>(())
                         }
                     }
                     <span class="ident">OutgoingContent::ToDevice</span>(<span class="ident">c</span>) <span class="op">=</span><span class="op">&gt;</span> {
                         <span class="kw">if</span> <span class="kw">let</span> <span class="ident">AnyToDeviceEventContent</span>::<span class="macro-nonterminal">$</span><span class="macro-nonterminal">enum_variant</span>(<span class="ident">c</span>) <span class="op">=</span> <span class="ident">c</span> {
-                            <span class="prelude-val">Ok</span>(<span class="self">Self</span><span class="ident">::ToDevice</span>(<span class="ident">c</span>))
+                            <span class="prelude-val">Ok</span>(<span class="ident"><span class="self">Self</span>::ToDevice</span>(<span class="ident">c</span>))
                         } <span class="kw">else</span> {
                             <span class="prelude-val">Err</span>(())
                         }
@@ -1159,12 +1159,12 @@
 <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">TryFrom</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">OutgoingContent</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">RequestContent</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
     <span class="kw">type</span> <span class="ident">Error</span> <span class="op">=</span> ();
 
-    <span class="kw">fn</span> <span class="ident">try_from</span>(<span class="ident">value</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">OutgoingContent</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="self">Self</span><span class="ident">::Error</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">try_from</span>(<span class="ident">value</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">OutgoingContent</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident"><span class="self">Self</span>::Error</span><span class="op">&gt;</span> {
         <span class="kw">match</span> <span class="ident">value</span> {
             <span class="ident">OutgoingContent::Room</span>(<span class="kw">_</span>, <span class="ident">c</span>) <span class="op">=</span><span class="op">&gt;</span> {
                 <span class="kw">if</span> <span class="kw">let</span> <span class="ident">AnyMessageEventContent::RoomMessage</span>(<span class="ident">m</span>) <span class="op">=</span> <span class="ident">c</span> {
                     <span class="kw">if</span> <span class="kw">let</span> <span class="ident">MessageType::VerificationRequest</span>(<span class="ident">c</span>) <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">m</span>.<span class="ident">msgtype</span> {
-                        <span class="prelude-val">Ok</span>(<span class="self">Self</span><span class="ident">::Room</span>(<span class="ident">c</span>))
+                        <span class="prelude-val">Ok</span>(<span class="ident"><span class="self">Self</span>::Room</span>(<span class="ident">c</span>))
                     } <span class="kw">else</span> {
                         <span class="prelude-val">Err</span>(())
                     }
@@ -1174,7 +1174,7 @@
             }
             <span class="ident">OutgoingContent::ToDevice</span>(<span class="ident">c</span>) <span class="op">=</span><span class="op">&gt;</span> {
                 <span class="kw">if</span> <span class="kw">let</span> <span class="ident">AnyToDeviceEventContent::KeyVerificationRequest</span>(<span class="ident">c</span>) <span class="op">=</span> <span class="ident">c</span> {
-                    <span class="prelude-val">Ok</span>(<span class="self">Self</span><span class="ident">::ToDevice</span>(<span class="ident">c</span>))
+                    <span class="prelude-val">Ok</span>(<span class="ident"><span class="self">Self</span>::ToDevice</span>(<span class="ident">c</span>))
                 } <span class="kw">else</span> {
                     <span class="prelude-val">Err</span>(())
                 }
@@ -1192,29 +1192,29 @@
 <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">StartContent</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">from_device</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="ident">DeviceId</span> {
         <span class="kw">match</span> <span class="self">self</span> {
-            <span class="self">Self</span><span class="ident">::ToDevice</span>(<span class="ident">c</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="ident">c</span>.<span class="ident">from_device</span>,
-            <span class="self">Self</span><span class="ident">::Room</span>(<span class="ident">c</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="ident">c</span>.<span class="ident">from_device</span>,
+            <span class="ident"><span class="self">Self</span>::ToDevice</span>(<span class="ident">c</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="ident">c</span>.<span class="ident">from_device</span>,
+            <span class="ident"><span class="self">Self</span>::Room</span>(<span class="ident">c</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="ident">c</span>.<span class="ident">from_device</span>,
         }
     }
 
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">flow_id</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="ident">str</span> {
         <span class="kw">match</span> <span class="self">self</span> {
-            <span class="self">Self</span><span class="ident">::ToDevice</span>(<span class="ident">c</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="ident">c</span>.<span class="ident">transaction_id</span>,
-            <span class="self">Self</span><span class="ident">::Room</span>(<span class="ident">c</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">c</span>.<span class="ident">relates_to</span>.<span class="ident">event_id</span>.<span class="ident">as_str</span>(),
+            <span class="ident"><span class="self">Self</span>::ToDevice</span>(<span class="ident">c</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="ident">c</span>.<span class="ident">transaction_id</span>,
+            <span class="ident"><span class="self">Self</span>::Room</span>(<span class="ident">c</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">c</span>.<span class="ident">relates_to</span>.<span class="ident">event_id</span>.<span class="ident">as_str</span>(),
         }
     }
 
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">method</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="ident">StartMethod</span> {
         <span class="kw">match</span> <span class="self">self</span> {
-            <span class="self">Self</span><span class="ident">::ToDevice</span>(<span class="ident">c</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="ident">c</span>.<span class="ident">method</span>,
-            <span class="self">Self</span><span class="ident">::Room</span>(<span class="ident">c</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="ident">c</span>.<span class="ident">method</span>,
+            <span class="ident"><span class="self">Self</span>::ToDevice</span>(<span class="ident">c</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="ident">c</span>.<span class="ident">method</span>,
+            <span class="ident"><span class="self">Self</span>::Room</span>(<span class="ident">c</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="ident">c</span>.<span class="ident">method</span>,
         }
     }
 
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">canonical_json</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">CanonicalJsonValue</span> {
         <span class="kw">let</span> <span class="ident">content</span> <span class="op">=</span> <span class="kw">match</span> <span class="self">self</span> {
-            <span class="self">Self</span><span class="ident">::ToDevice</span>(<span class="ident">c</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">serde_json::to_value</span>(<span class="ident">c</span>),
-            <span class="self">Self</span><span class="ident">::Room</span>(<span class="ident">c</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">serde_json::to_value</span>(<span class="ident">c</span>),
+            <span class="ident"><span class="self">Self</span>::ToDevice</span>(<span class="ident">c</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">serde_json::to_value</span>(<span class="ident">c</span>),
+            <span class="ident"><span class="self">Self</span>::Room</span>(<span class="ident">c</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">serde_json::to_value</span>(<span class="ident">c</span>),
         };
 
         <span class="ident">content</span>.<span class="ident">expect</span>(<span class="string">&quot;Can&#39;t serialize content&quot;</span>).<span class="ident">try_into</span>().<span class="ident">expect</span>(<span class="string">&quot;Can&#39;t canonicalize content&quot;</span>)
@@ -1224,8 +1224,8 @@
 <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">From</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">OwnedStartContent</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">StartContent</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
     <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">c</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">OwnedStartContent</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
         <span class="kw">match</span> <span class="ident">c</span> {
-            <span class="ident">OwnedStartContent::ToDevice</span>(<span class="ident">c</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="self">Self</span><span class="ident">::ToDevice</span>(<span class="ident">c</span>),
-            <span class="ident">OwnedStartContent::Room</span>(<span class="kw">_</span>, <span class="ident">c</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="self">Self</span><span class="ident">::Room</span>(<span class="ident">c</span>),
+            <span class="ident">OwnedStartContent::ToDevice</span>(<span class="ident">c</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident"><span class="self">Self</span>::ToDevice</span>(<span class="ident">c</span>),
+            <span class="ident">OwnedStartContent::Room</span>(<span class="kw">_</span>, <span class="ident">c</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident"><span class="self">Self</span>::Room</span>(<span class="ident">c</span>),
         }
     }
 }
@@ -1238,21 +1238,21 @@
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">From</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">DoneEventContent</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">DoneContent</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
     <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">c</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">DoneEventContent</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
-        <span class="self">Self</span><span class="ident">::Room</span>(<span class="ident">c</span>)
+        <span class="ident"><span class="self">Self</span>::Room</span>(<span class="ident">c</span>)
     }
 }
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">From</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">DoneToDeviceEventContent</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">DoneContent</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
     <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">c</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">DoneToDeviceEventContent</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
-        <span class="self">Self</span><span class="ident">::ToDevice</span>(<span class="ident">c</span>)
+        <span class="ident"><span class="self">Self</span>::ToDevice</span>(<span class="ident">c</span>)
     }
 }
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">DoneContent</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">flow_id</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="ident">str</span> {
         <span class="kw">match</span> <span class="self">self</span> {
-            <span class="self">Self</span><span class="ident">::ToDevice</span>(<span class="ident">c</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="ident">c</span>.<span class="ident">transaction_id</span>,
-            <span class="self">Self</span><span class="ident">::Room</span>(<span class="ident">c</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">c</span>.<span class="ident">relates_to</span>.<span class="ident">event_id</span>.<span class="ident">as_str</span>(),
+            <span class="ident"><span class="self">Self</span>::ToDevice</span>(<span class="ident">c</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="ident">c</span>.<span class="ident">transaction_id</span>,
+            <span class="ident"><span class="self">Self</span>::Room</span>(<span class="ident">c</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">c</span>.<span class="ident">relates_to</span>.<span class="ident">event_id</span>.<span class="ident">as_str</span>(),
         }
     }
 }
@@ -1266,15 +1266,15 @@
 <span class="kw">impl</span> <span class="ident">AcceptContent</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span> {
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">flow_id</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="ident">str</span> {
         <span class="kw">match</span> <span class="self">self</span> {
-            <span class="self">Self</span><span class="ident">::ToDevice</span>(<span class="ident">c</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="ident">c</span>.<span class="ident">transaction_id</span>,
-            <span class="self">Self</span><span class="ident">::Room</span>(<span class="ident">c</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">c</span>.<span class="ident">relates_to</span>.<span class="ident">event_id</span>.<span class="ident">as_str</span>(),
+            <span class="ident"><span class="self">Self</span>::ToDevice</span>(<span class="ident">c</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="ident">c</span>.<span class="ident">transaction_id</span>,
+            <span class="ident"><span class="self">Self</span>::Room</span>(<span class="ident">c</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">c</span>.<span class="ident">relates_to</span>.<span class="ident">event_id</span>.<span class="ident">as_str</span>(),
         }
     }
 
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">method</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="ident">AcceptMethod</span> {
         <span class="kw">match</span> <span class="self">self</span> {
-            <span class="self">Self</span><span class="ident">::ToDevice</span>(<span class="ident">c</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="ident">c</span>.<span class="ident">method</span>,
-            <span class="self">Self</span><span class="ident">::Room</span>(<span class="ident">c</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="ident">c</span>.<span class="ident">method</span>,
+            <span class="ident"><span class="self">Self</span>::ToDevice</span>(<span class="ident">c</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="ident">c</span>.<span class="ident">method</span>,
+            <span class="ident"><span class="self">Self</span>::Room</span>(<span class="ident">c</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="ident">c</span>.<span class="ident">method</span>,
         }
     }
 }
@@ -1282,8 +1282,8 @@
 <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">From</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">OwnedAcceptContent</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">AcceptContent</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
     <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">content</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">OwnedAcceptContent</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
         <span class="kw">match</span> <span class="ident">content</span> {
-            <span class="ident">OwnedAcceptContent::ToDevice</span>(<span class="ident">c</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="self">Self</span><span class="ident">::ToDevice</span>(<span class="ident">c</span>),
-            <span class="ident">OwnedAcceptContent::Room</span>(<span class="kw">_</span>, <span class="ident">c</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="self">Self</span><span class="ident">::Room</span>(<span class="ident">c</span>),
+            <span class="ident">OwnedAcceptContent::ToDevice</span>(<span class="ident">c</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident"><span class="self">Self</span>::ToDevice</span>(<span class="ident">c</span>),
+            <span class="ident">OwnedAcceptContent::Room</span>(<span class="kw">_</span>, <span class="ident">c</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident"><span class="self">Self</span>::Room</span>(<span class="ident">c</span>),
         }
     }
 }
@@ -1297,15 +1297,15 @@
 <span class="kw">impl</span> <span class="ident">KeyContent</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span> {
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">flow_id</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="ident">str</span> {
         <span class="kw">match</span> <span class="self">self</span> {
-            <span class="self">Self</span><span class="ident">::ToDevice</span>(<span class="ident">c</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="ident">c</span>.<span class="ident">transaction_id</span>,
-            <span class="self">Self</span><span class="ident">::Room</span>(<span class="ident">c</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">c</span>.<span class="ident">relates_to</span>.<span class="ident">event_id</span>.<span class="ident">as_str</span>(),
+            <span class="ident"><span class="self">Self</span>::ToDevice</span>(<span class="ident">c</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="ident">c</span>.<span class="ident">transaction_id</span>,
+            <span class="ident"><span class="self">Self</span>::Room</span>(<span class="ident">c</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">c</span>.<span class="ident">relates_to</span>.<span class="ident">event_id</span>.<span class="ident">as_str</span>(),
         }
     }
 
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">public_key</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="ident">str</span> {
         <span class="kw">match</span> <span class="self">self</span> {
-            <span class="self">Self</span><span class="ident">::ToDevice</span>(<span class="ident">c</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="ident">c</span>.<span class="ident">key</span>,
-            <span class="self">Self</span><span class="ident">::Room</span>(<span class="ident">c</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="ident">c</span>.<span class="ident">key</span>,
+            <span class="ident"><span class="self">Self</span>::ToDevice</span>(<span class="ident">c</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="ident">c</span>.<span class="ident">key</span>,
+            <span class="ident"><span class="self">Self</span>::Room</span>(<span class="ident">c</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="ident">c</span>.<span class="ident">key</span>,
         }
     }
 }
@@ -1319,22 +1319,22 @@
 <span class="kw">impl</span> <span class="ident">MacContent</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span> {
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">flow_id</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="ident">str</span> {
         <span class="kw">match</span> <span class="self">self</span> {
-            <span class="self">Self</span><span class="ident">::ToDevice</span>(<span class="ident">c</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="ident">c</span>.<span class="ident">transaction_id</span>,
-            <span class="self">Self</span><span class="ident">::Room</span>(<span class="ident">c</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">c</span>.<span class="ident">relates_to</span>.<span class="ident">event_id</span>.<span class="ident">as_str</span>(),
+            <span class="ident"><span class="self">Self</span>::ToDevice</span>(<span class="ident">c</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="ident">c</span>.<span class="ident">transaction_id</span>,
+            <span class="ident"><span class="self">Self</span>::Room</span>(<span class="ident">c</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">c</span>.<span class="ident">relates_to</span>.<span class="ident">event_id</span>.<span class="ident">as_str</span>(),
         }
     }
 
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">mac</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="ident">BTreeMap</span><span class="op">&lt;</span><span class="ident">String</span>, <span class="ident">String</span><span class="op">&gt;</span> {
         <span class="kw">match</span> <span class="self">self</span> {
-            <span class="self">Self</span><span class="ident">::ToDevice</span>(<span class="ident">c</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="ident">c</span>.<span class="ident">mac</span>,
-            <span class="self">Self</span><span class="ident">::Room</span>(<span class="ident">c</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="ident">c</span>.<span class="ident">mac</span>,
+            <span class="ident"><span class="self">Self</span>::ToDevice</span>(<span class="ident">c</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="ident">c</span>.<span class="ident">mac</span>,
+            <span class="ident"><span class="self">Self</span>::Room</span>(<span class="ident">c</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="ident">c</span>.<span class="ident">mac</span>,
         }
     }
 
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">keys</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="ident">str</span> {
         <span class="kw">match</span> <span class="self">self</span> {
-            <span class="self">Self</span><span class="ident">::ToDevice</span>(<span class="ident">c</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="ident">c</span>.<span class="ident">keys</span>,
-            <span class="self">Self</span><span class="ident">::Room</span>(<span class="ident">c</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="ident">c</span>.<span class="ident">keys</span>,
+            <span class="ident"><span class="self">Self</span>::ToDevice</span>(<span class="ident">c</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="ident">c</span>.<span class="ident">keys</span>,
+            <span class="ident"><span class="self">Self</span>::Room</span>(<span class="ident">c</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="ident">c</span>.<span class="ident">keys</span>,
         }
     }
 }
@@ -1348,8 +1348,8 @@
 <span class="kw">impl</span> <span class="ident">CancelContent</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span> {
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">cancel_code</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="ident">CancelCode</span> {
         <span class="kw">match</span> <span class="self">self</span> {
-            <span class="self">Self</span><span class="ident">::ToDevice</span>(<span class="ident">c</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="ident">c</span>.<span class="ident">code</span>,
-            <span class="self">Self</span><span class="ident">::Room</span>(<span class="ident">c</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="ident">c</span>.<span class="ident">code</span>,
+            <span class="ident"><span class="self">Self</span>::ToDevice</span>(<span class="ident">c</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="ident">c</span>.<span class="ident">code</span>,
+            <span class="ident"><span class="self">Self</span>::Room</span>(<span class="ident">c</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="ident">c</span>.<span class="ident">code</span>,
         }
     }
 }
@@ -1363,36 +1363,36 @@
 <span class="kw">impl</span> <span class="ident">OwnedStartContent</span> {
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">method</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="ident">StartMethod</span> {
         <span class="kw">match</span> <span class="self">self</span> {
-            <span class="self">Self</span><span class="ident">::ToDevice</span>(<span class="ident">c</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="ident">c</span>.<span class="ident">method</span>,
-            <span class="self">Self</span><span class="ident">::Room</span>(<span class="kw">_</span>, <span class="ident">c</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="ident">c</span>.<span class="ident">method</span>,
+            <span class="ident"><span class="self">Self</span>::ToDevice</span>(<span class="ident">c</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="ident">c</span>.<span class="ident">method</span>,
+            <span class="ident"><span class="self">Self</span>::Room</span>(<span class="kw">_</span>, <span class="ident">c</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="ident">c</span>.<span class="ident">method</span>,
         }
     }
 
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">method_mut</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">StartMethod</span> {
         <span class="kw">match</span> <span class="self">self</span> {
-            <span class="self">Self</span><span class="ident">::ToDevice</span>(<span class="ident">c</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">c</span>.<span class="ident">method</span>,
-            <span class="self">Self</span><span class="ident">::Room</span>(<span class="kw">_</span>, <span class="ident">c</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">c</span>.<span class="ident">method</span>,
+            <span class="ident"><span class="self">Self</span>::ToDevice</span>(<span class="ident">c</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">c</span>.<span class="ident">method</span>,
+            <span class="ident"><span class="self">Self</span>::Room</span>(<span class="kw">_</span>, <span class="ident">c</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">c</span>.<span class="ident">method</span>,
         }
     }
 
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">as_start_content</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">StartContent</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span> {
         <span class="kw">match</span> <span class="self">self</span> {
-            <span class="self">Self</span><span class="ident">::ToDevice</span>(<span class="ident">c</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">StartContent::ToDevice</span>(<span class="ident">c</span>),
-            <span class="self">Self</span><span class="ident">::Room</span>(<span class="kw">_</span>, <span class="ident">c</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">StartContent::Room</span>(<span class="ident">c</span>),
+            <span class="ident"><span class="self">Self</span>::ToDevice</span>(<span class="ident">c</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">StartContent::ToDevice</span>(<span class="ident">c</span>),
+            <span class="ident"><span class="self">Self</span>::Room</span>(<span class="kw">_</span>, <span class="ident">c</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">StartContent::Room</span>(<span class="ident">c</span>),
         }
     }
 
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">flow_id</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">FlowId</span> {
         <span class="kw">match</span> <span class="self">self</span> {
-            <span class="self">Self</span><span class="ident">::ToDevice</span>(<span class="ident">c</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">FlowId::ToDevice</span>(<span class="ident">c</span>.<span class="ident">transaction_id</span>.<span class="ident">clone</span>()),
-            <span class="self">Self</span><span class="ident">::Room</span>(<span class="ident">r</span>, <span class="ident">c</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">FlowId::InRoom</span>(<span class="ident">r</span>.<span class="ident">clone</span>(), <span class="ident">c</span>.<span class="ident">relates_to</span>.<span class="ident">event_id</span>.<span class="ident">clone</span>()),
+            <span class="ident"><span class="self">Self</span>::ToDevice</span>(<span class="ident">c</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">FlowId::ToDevice</span>(<span class="ident">c</span>.<span class="ident">transaction_id</span>.<span class="ident">clone</span>()),
+            <span class="ident"><span class="self">Self</span>::Room</span>(<span class="ident">r</span>, <span class="ident">c</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">FlowId::InRoom</span>(<span class="ident">r</span>.<span class="ident">clone</span>(), <span class="ident">c</span>.<span class="ident">relates_to</span>.<span class="ident">event_id</span>.<span class="ident">clone</span>()),
         }
     }
 
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">canonical_json</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">CanonicalJsonValue</span> {
         <span class="kw">let</span> <span class="ident">content</span> <span class="op">=</span> <span class="kw">match</span> <span class="self">self</span> {
-            <span class="self">Self</span><span class="ident">::ToDevice</span>(<span class="ident">c</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">serde_json::to_value</span>(<span class="ident">c</span>),
-            <span class="self">Self</span><span class="ident">::Room</span>(<span class="kw">_</span>, <span class="ident">c</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">serde_json::to_value</span>(<span class="ident">c</span>),
+            <span class="ident"><span class="self">Self</span>::ToDevice</span>(<span class="ident">c</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">serde_json::to_value</span>(<span class="ident">c</span>),
+            <span class="ident"><span class="self">Self</span>::Room</span>(<span class="kw">_</span>, <span class="ident">c</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">serde_json::to_value</span>(<span class="ident">c</span>),
         };
 
         <span class="ident">content</span>.<span class="ident">expect</span>(<span class="string">&quot;Can&#39;t serialize content&quot;</span>).<span class="ident">try_into</span>().<span class="ident">expect</span>(<span class="string">&quot;Can&#39;t canonicalize content&quot;</span>)
@@ -1401,13 +1401,13 @@
 
 <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span>(<span class="ident">RoomId</span>, <span class="ident">StartEventContent</span>)<span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">OwnedStartContent</span> {
     <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">tuple</span>: (<span class="ident">RoomId</span>, <span class="ident">StartEventContent</span>)) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
-        <span class="self">Self</span><span class="ident">::Room</span>(<span class="ident">tuple</span>.<span class="number">0</span>, <span class="ident">tuple</span>.<span class="number">1</span>)
+        <span class="ident"><span class="self">Self</span>::Room</span>(<span class="ident">tuple</span>.<span class="number">0</span>, <span class="ident">tuple</span>.<span class="number">1</span>)
     }
 }
 
 <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">StartToDeviceEventContent</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">OwnedStartContent</span> {
     <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">content</span>: <span class="ident">StartToDeviceEventContent</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
-        <span class="self">Self</span><span class="ident">::ToDevice</span>(<span class="ident">content</span>)
+        <span class="ident"><span class="self">Self</span>::ToDevice</span>(<span class="ident">content</span>)
     }
 }
 
@@ -1419,21 +1419,21 @@
 
 <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">AcceptToDeviceEventContent</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">OwnedAcceptContent</span> {
     <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">content</span>: <span class="ident">AcceptToDeviceEventContent</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
-        <span class="self">Self</span><span class="ident">::ToDevice</span>(<span class="ident">content</span>)
+        <span class="ident"><span class="self">Self</span>::ToDevice</span>(<span class="ident">content</span>)
     }
 }
 
 <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span>(<span class="ident">RoomId</span>, <span class="ident">AcceptEventContent</span>)<span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">OwnedAcceptContent</span> {
     <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">content</span>: (<span class="ident">RoomId</span>, <span class="ident">AcceptEventContent</span>)) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
-        <span class="self">Self</span><span class="ident">::Room</span>(<span class="ident">content</span>.<span class="number">0</span>, <span class="ident">content</span>.<span class="number">1</span>)
+        <span class="ident"><span class="self">Self</span>::Room</span>(<span class="ident">content</span>.<span class="number">0</span>, <span class="ident">content</span>.<span class="number">1</span>)
     }
 }
 
 <span class="kw">impl</span> <span class="ident">OwnedAcceptContent</span> {
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">method_mut</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">AcceptMethod</span> {
         <span class="kw">match</span> <span class="self">self</span> {
-            <span class="self">Self</span><span class="ident">::ToDevice</span>(<span class="ident">c</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">c</span>.<span class="ident">method</span>,
-            <span class="self">Self</span><span class="ident">::Room</span>(<span class="kw">_</span>, <span class="ident">c</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">c</span>.<span class="ident">method</span>,
+            <span class="ident"><span class="self">Self</span>::ToDevice</span>(<span class="ident">c</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">c</span>.<span class="ident">method</span>,
+            <span class="ident"><span class="self">Self</span>::Room</span>(<span class="kw">_</span>, <span class="ident">c</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">c</span>.<span class="ident">method</span>,
         }
     }
 }
@@ -1474,10 +1474,10 @@
 <span class="kw">impl</span> <span class="ident">TryFrom</span><span class="op">&lt;</span><span class="ident">OutgoingVerificationRequest</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">OutgoingContent</span> {
     <span class="kw">type</span> <span class="ident">Error</span> <span class="op">=</span> <span class="ident">String</span>;
 
-    <span class="kw">fn</span> <span class="ident">try_from</span>(<span class="ident">request</span>: <span class="ident">OutgoingVerificationRequest</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="self">Self</span><span class="ident">::Error</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">try_from</span>(<span class="ident">request</span>: <span class="ident">OutgoingVerificationRequest</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident"><span class="self">Self</span>::Error</span><span class="op">&gt;</span> {
         <span class="kw">match</span> <span class="ident">request</span> {
-            <span class="ident">OutgoingVerificationRequest::ToDevice</span>(<span class="ident">r</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="self">Self</span><span class="ident">::try_from</span>(<span class="ident">r</span>),
-            <span class="ident">OutgoingVerificationRequest::InRoom</span>(<span class="ident">r</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="self">Self</span><span class="ident">::from</span>(<span class="ident">r</span>)),
+            <span class="ident">OutgoingVerificationRequest::ToDevice</span>(<span class="ident">r</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident"><span class="self">Self</span>::try_from</span>(<span class="ident">r</span>),
+            <span class="ident">OutgoingVerificationRequest::InRoom</span>(<span class="ident">r</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident"><span class="self">Self</span>::from</span>(<span class="ident">r</span>)),
         }
     }
 }
@@ -1491,7 +1491,7 @@
 <span class="kw">impl</span> <span class="ident">TryFrom</span><span class="op">&lt;</span><span class="ident">ToDeviceRequest</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">OutgoingContent</span> {
     <span class="kw">type</span> <span class="ident">Error</span> <span class="op">=</span> <span class="ident">String</span>;
 
-    <span class="kw">fn</span> <span class="ident">try_from</span>(<span class="ident">request</span>: <span class="ident">ToDeviceRequest</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="self">Self</span><span class="ident">::Error</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">try_from</span>(<span class="ident">request</span>: <span class="ident">ToDeviceRequest</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident"><span class="self">Self</span>::Error</span><span class="op">&gt;</span> {
         <span class="kw">use</span> <span class="ident">ruma::events::EventType</span>;
         <span class="kw">use</span> <span class="ident">serde_json::Value</span>;
 
@@ -1541,13 +1541,13 @@
 <span class="kw">impl</span> <span class="ident">TryFrom</span><span class="op">&lt;</span><span class="ident">OutgoingRequest</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">OutgoingContent</span> {
     <span class="kw">type</span> <span class="ident">Error</span> <span class="op">=</span> <span class="ident">String</span>;
 
-    <span class="kw">fn</span> <span class="ident">try_from</span>(<span class="ident">value</span>: <span class="ident">OutgoingRequest</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="self">Self</span><span class="ident">::Error</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">try_from</span>(<span class="ident">value</span>: <span class="ident">OutgoingRequest</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident"><span class="self">Self</span>::Error</span><span class="op">&gt;</span> {
         <span class="kw">match</span> <span class="ident">value</span>.<span class="ident">request</span>() {
-            <span class="kw">crate</span><span class="ident">::OutgoingRequests::KeysUpload</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Err</span>(<span class="string">&quot;Invalid request type&quot;</span>.<span class="ident">to_owned</span>()),
-            <span class="kw">crate</span><span class="ident">::OutgoingRequests::KeysQuery</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Err</span>(<span class="string">&quot;Invalid request type&quot;</span>.<span class="ident">to_owned</span>()),
-            <span class="kw">crate</span><span class="ident">::OutgoingRequests::ToDeviceRequest</span>(<span class="ident">r</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="self">Self</span><span class="ident">::try_from</span>(<span class="ident">r</span>.<span class="ident">clone</span>()),
-            <span class="kw">crate</span><span class="ident">::OutgoingRequests::SignatureUpload</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Err</span>(<span class="string">&quot;Invalid request type&quot;</span>.<span class="ident">to_owned</span>()),
-            <span class="kw">crate</span><span class="ident">::OutgoingRequests::RoomMessage</span>(<span class="ident">r</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="self">Self</span><span class="ident">::from</span>(<span class="ident">r</span>.<span class="ident">clone</span>())),
+            <span class="ident"><span class="kw">crate</span>::OutgoingRequests::KeysUpload</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Err</span>(<span class="string">&quot;Invalid request type&quot;</span>.<span class="ident">to_owned</span>()),
+            <span class="ident"><span class="kw">crate</span>::OutgoingRequests::KeysQuery</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Err</span>(<span class="string">&quot;Invalid request type&quot;</span>.<span class="ident">to_owned</span>()),
+            <span class="ident"><span class="kw">crate</span>::OutgoingRequests::ToDeviceRequest</span>(<span class="ident">r</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident"><span class="self">Self</span>::try_from</span>(<span class="ident">r</span>.<span class="ident">clone</span>()),
+            <span class="ident"><span class="kw">crate</span>::OutgoingRequests::SignatureUpload</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Err</span>(<span class="string">&quot;Invalid request type&quot;</span>.<span class="ident">to_owned</span>()),
+            <span class="ident"><span class="kw">crate</span>::OutgoingRequests::RoomMessage</span>(<span class="ident">r</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident"><span class="self">Self</span>::from</span>(<span class="ident">r</span>.<span class="ident">clone</span>())),
         }
     }
 }
