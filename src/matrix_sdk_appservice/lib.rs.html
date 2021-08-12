@@ -500,6 +500,43 @@
 <span id="500">500</span>
 <span id="501">501</span>
 <span id="502">502</span>
+<span id="503">503</span>
+<span id="504">504</span>
+<span id="505">505</span>
+<span id="506">506</span>
+<span id="507">507</span>
+<span id="508">508</span>
+<span id="509">509</span>
+<span id="510">510</span>
+<span id="511">511</span>
+<span id="512">512</span>
+<span id="513">513</span>
+<span id="514">514</span>
+<span id="515">515</span>
+<span id="516">516</span>
+<span id="517">517</span>
+<span id="518">518</span>
+<span id="519">519</span>
+<span id="520">520</span>
+<span id="521">521</span>
+<span id="522">522</span>
+<span id="523">523</span>
+<span id="524">524</span>
+<span id="525">525</span>
+<span id="526">526</span>
+<span id="527">527</span>
+<span id="528">528</span>
+<span id="529">529</span>
+<span id="530">530</span>
+<span id="531">531</span>
+<span id="532">532</span>
+<span id="533">533</span>
+<span id="534">534</span>
+<span id="535">535</span>
+<span id="536">536</span>
+<span id="537">537</span>
+<span id="538">538</span>
+<span id="539">539</span>
 </pre><pre class="rust">
 <span class="comment">// Copyright 2021 Famedly GmbH</span>
 <span class="comment">//</span>
@@ -590,7 +627,7 @@
 
 <span class="kw">use</span> <span class="ident">dashmap::DashMap</span>;
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">error::Error</span>;
-<span class="kw">use</span> <span class="ident">http</span>::{<span class="ident">uri::PathAndQuery</span>, <span class="ident">Uri</span>};
+<span class="kw">use</span> <span class="ident">http::Uri</span>;
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">matrix_sdk</span>;
 <span class="attribute">#[<span class="ident">doc</span>(<span class="ident">no_inline</span>)]</span>
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">matrix_sdk::ruma</span>;
@@ -978,26 +1015,63 @@
     }
 }
 
-<span class="doccomment">/// Transforms [legacy routes] to the correct route so ruma can parse them</span>
-<span class="doccomment">/// properly</span>
+<span class="doccomment">/// Ruma always expects the path to start with `/_matrix`, so we transform</span>
+<span class="doccomment">/// accordingly. Handles [legacy routes] and appservice being located on a sub</span>
+<span class="doccomment">/// path.</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// [legacy routes]: https://matrix.org/docs/spec/application_service/r0.1.2#legacy-routes</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">transform_legacy_route</span>(
+<span class="comment">// TODO: consider ruma PR</span>
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">transform_request_path</span>(
     <span class="kw-2">mut</span> <span class="ident">request</span>: <span class="ident">http::Request</span><span class="op">&lt;</span><span class="ident">Bytes</span><span class="op">&gt;</span>,
 ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">http::Request</span><span class="op">&lt;</span><span class="ident">Bytes</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-    <span class="kw">let</span> <span class="ident">uri</span> <span class="op">=</span> <span class="ident">request</span>.<span class="ident">uri</span>().<span class="ident">to_owned</span>();
+    <span class="kw">let</span> <span class="ident">uri</span> <span class="op">=</span> <span class="ident">request</span>.<span class="ident">uri</span>();
+    <span class="comment">// remove trailing slash from path</span>
+    <span class="kw">let</span> <span class="ident">path</span> <span class="op">=</span> <span class="ident">uri</span>.<span class="ident">path</span>().<span class="ident">trim_end_matches</span>(<span class="string">&#39;/&#39;</span>).<span class="ident">to_string</span>();
 
-    <span class="kw">if</span> <span class="op">!</span><span class="ident">uri</span>.<span class="ident">path</span>().<span class="ident">starts_with</span>(<span class="string">&quot;/_matrix/app/v1&quot;</span>) {
-        <span class="comment">// rename legacy routes</span>
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">parts</span> <span class="op">=</span> <span class="ident">uri</span>.<span class="ident">into_parts</span>();
-        <span class="kw">let</span> <span class="ident">path_and_query</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">parts</span>.<span class="ident">path_and_query</span> {
-            <span class="prelude-val">Some</span>(<span class="ident">path_and_query</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="macro">format!</span>(<span class="string">&quot;/_matrix/app/v1{}&quot;</span>, <span class="ident">path_and_query</span>),
-            <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;/_matrix/app/v1&quot;</span>.<span class="ident">to_owned</span>(),
+    <span class="kw">if</span> <span class="op">!</span><span class="ident">path</span>.<span class="ident">starts_with</span>(<span class="string">&quot;/_matrix/app/v1/&quot;</span>) {
+        <span class="kw">let</span> <span class="ident">path</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">path</span> {
+            <span class="comment">// special-case paths without value at the end</span>
+            <span class="kw">_</span> <span class="kw">if</span> <span class="ident">path</span>.<span class="ident">ends_with</span>(<span class="string">&quot;/_matrix/app/unstable/thirdparty/user&quot;</span>) <span class="op">=</span><span class="op">&gt;</span> {
+                <span class="string">&quot;/_matrix/app/v1/thirdparty/user&quot;</span>.<span class="ident">to_owned</span>()
+            }
+            <span class="kw">_</span> <span class="kw">if</span> <span class="ident">path</span>.<span class="ident">ends_with</span>(<span class="string">&quot;/_matrix/app/unstable/thirdparty/location&quot;</span>) <span class="op">=</span><span class="op">&gt;</span> {
+                <span class="string">&quot;/_matrix/app/v1/thirdparty/location&quot;</span>.<span class="ident">to_owned</span>()
+            }
+            <span class="comment">// regular paths with values at the end</span>
+            <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> {
+                <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">path</span> <span class="op">=</span> <span class="ident">path</span>.<span class="ident">split</span>(<span class="string">&#39;/&#39;</span>).<span class="ident">into_iter</span>().<span class="ident">rev</span>();
+                <span class="kw">let</span> <span class="ident">value</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">path</span>.<span class="ident">next</span>() {
+                    <span class="prelude-val">Some</span>(<span class="ident">value</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">value</span>,
+                    <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error::UriEmptyPath</span>),
+                };
+
+                <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">path</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">path</span>.<span class="ident">next</span>() {
+                    <span class="prelude-val">Some</span>(<span class="ident">path_segment</span>)
+                        <span class="kw">if</span> [<span class="string">&quot;transactions&quot;</span>, <span class="string">&quot;users&quot;</span>, <span class="string">&quot;rooms&quot;</span>].<span class="ident">contains</span>(<span class="kw-2">&amp;</span><span class="ident">path_segment</span>) <span class="op">=</span><span class="op">&gt;</span>
+                    {
+                        <span class="macro">format!</span>(<span class="string">&quot;/_matrix/app/v1/{}/{}&quot;</span>, <span class="ident">path_segment</span>, <span class="ident">value</span>)
+                    }
+                    <span class="prelude-val">Some</span>(<span class="ident">path_segment</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="kw">match</span> <span class="ident">path</span>.<span class="ident">next</span>() {
+                        <span class="prelude-val">Some</span>(<span class="ident">path_segment2</span>) <span class="kw">if</span> <span class="ident">path_segment2</span> <span class="op">=</span><span class="op">=</span> <span class="string">&quot;thirdparty&quot;</span> <span class="op">=</span><span class="op">&gt;</span> {
+                            <span class="macro">format!</span>(<span class="string">&quot;/_matrix/app/v1/thirdparty/{}/{}&quot;</span>, <span class="ident">path_segment</span>, <span class="ident">value</span>)
+                        }
+                        <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error::UriPathUnknown</span>),
+                    },
+                    <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error::UriEmptyPath</span>),
+                };
+
+                <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">query</span>) <span class="op">=</span> <span class="ident">uri</span>.<span class="ident">query</span>() {
+                    <span class="ident">path</span>.<span class="ident">push_str</span>(<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">&quot;?{}&quot;</span>, <span class="ident">query</span>));
+                }
+
+                <span class="ident">path</span>
+            }
         };
-        <span class="ident">parts</span>.<span class="ident">path_and_query</span> <span class="op">=</span>
-            <span class="prelude-val">Some</span>(<span class="ident">PathAndQuery::try_from</span>(<span class="ident">path_and_query</span>).<span class="ident">map_err</span>(<span class="ident">http::Error::from</span>)<span class="question-mark">?</span>);
-        <span class="kw">let</span> <span class="ident">uri</span> <span class="op">=</span> <span class="ident">parts</span>.<span class="ident">try_into</span>().<span class="ident">map_err</span>(<span class="ident">http::Error::from</span>)<span class="question-mark">?</span>;
 
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">parts</span> <span class="op">=</span> <span class="ident">uri</span>.<span class="ident">clone</span>().<span class="ident">into_parts</span>();
+        <span class="ident">parts</span>.<span class="ident">path_and_query</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">path</span>.<span class="ident">parse</span>()<span class="question-mark">?</span>);
+
+        <span class="kw">let</span> <span class="ident">uri</span> <span class="op">=</span> <span class="ident">parts</span>.<span class="ident">try_into</span>().<span class="ident">map_err</span>(<span class="ident">http::Error::from</span>)<span class="question-mark">?</span>;
         <span class="kw-2">*</span><span class="ident">request</span>.<span class="ident">uri_mut</span>() <span class="op">=</span> <span class="ident">uri</span>;
     }
 
