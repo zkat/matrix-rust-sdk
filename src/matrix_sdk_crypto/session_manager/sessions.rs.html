@@ -452,6 +452,21 @@
 <span id="452">452</span>
 <span id="453">453</span>
 <span id="454">454</span>
+<span id="455">455</span>
+<span id="456">456</span>
+<span id="457">457</span>
+<span id="458">458</span>
+<span id="459">459</span>
+<span id="460">460</span>
+<span id="461">461</span>
+<span id="462">462</span>
+<span id="463">463</span>
+<span id="464">464</span>
+<span id="465">465</span>
+<span id="466">466</span>
+<span id="467">467</span>
+<span id="468">468</span>
+<span id="469">469</span>
 </pre><pre class="rust">
 <span class="comment">// Copyright 2020 The Matrix.org Foundation C.I.C.</span>
 <span class="comment">//</span>
@@ -483,7 +498,7 @@
 
 <span class="kw">use</span> <span class="kw">crate</span>::{
     <span class="ident">error::OlmResult</span>,
-    <span class="ident">key_request::KeyRequestMachine</span>,
+    <span class="ident">gossiping::GossipMachine</span>,
     <span class="ident">olm::Account</span>,
     <span class="ident">requests</span>::{<span class="ident">OutgoingRequest</span>, <span class="ident">ToDeviceRequest</span>},
     <span class="ident">store</span>::{<span class="ident">Changes</span>, <span class="prelude-ty">Result</span> <span class="kw">as</span> <span class="ident">StoreResult</span>, <span class="ident">Store</span>},
@@ -500,7 +515,7 @@
     <span class="doccomment">/// [`get_missing_sessions`](#method.get_missing_sessions) is called.</span>
     <span class="ident">users_for_key_claim</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">DashMap</span><span class="op">&lt;</span><span class="ident">UserId</span>, <span class="ident">DashSet</span><span class="op">&lt;</span><span class="ident">DeviceIdBox</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span>,
     <span class="ident">wedged_devices</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">DashMap</span><span class="op">&lt;</span><span class="ident">UserId</span>, <span class="ident">DashSet</span><span class="op">&lt;</span><span class="ident">DeviceIdBox</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-    <span class="ident">key_request_machine</span>: <span class="ident">KeyRequestMachine</span>,
+    <span class="ident">key_request_machine</span>: <span class="ident">GossipMachine</span>,
     <span class="ident">outgoing_to_device_requests</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">DashMap</span><span class="op">&lt;</span><span class="ident">Uuid</span>, <span class="ident">OutgoingRequest</span><span class="op">&gt;</span><span class="op">&gt;</span>,
 }
 
@@ -511,7 +526,7 @@
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(
         <span class="ident">account</span>: <span class="ident">Account</span>,
         <span class="ident">users_for_key_claim</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">DashMap</span><span class="op">&lt;</span><span class="ident">UserId</span>, <span class="ident">DashSet</span><span class="op">&lt;</span><span class="ident">DeviceIdBox</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-        <span class="ident">key_request_machine</span>: <span class="ident">KeyRequestMachine</span>,
+        <span class="ident">key_request_machine</span>: <span class="ident">GossipMachine</span>,
         <span class="ident">store</span>: <span class="ident">Store</span>,
     ) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
         <span class="self">Self</span> {
@@ -734,7 +749,22 @@
             }
         }
 
-        <span class="prelude-val">Ok</span>(<span class="self">self</span>.<span class="ident">store</span>.<span class="ident">save_changes</span>(<span class="ident">changes</span>).<span class="kw">await</span><span class="question-mark">?</span>)
+        <span class="comment">// TODO turn this into a single save_changes() call.</span>
+        <span class="self">self</span>.<span class="ident">store</span>.<span class="ident">save_changes</span>(<span class="ident">changes</span>).<span class="kw">await</span><span class="question-mark">?</span>;
+
+        <span class="kw">match</span> <span class="self">self</span>.<span class="ident">key_request_machine</span>.<span class="ident">collect_incoming_key_requests</span>().<span class="kw">await</span> {
+            <span class="prelude-val">Ok</span>(<span class="ident">sessions</span>) <span class="op">=</span><span class="op">&gt;</span> {
+                <span class="kw">let</span> <span class="ident">changes</span> <span class="op">=</span> <span class="ident">Changes</span> { <span class="ident">sessions</span>, ..<span class="ident">Default::default</span>() };
+                <span class="self">self</span>.<span class="ident">store</span>.<span class="ident">save_changes</span>(<span class="ident">changes</span>).<span class="kw">await</span><span class="question-mark">?</span>
+            }
+            <span class="comment">// We don&#39;t propagate the error here since the next sync will retry</span>
+            <span class="comment">// this.</span>
+            <span class="prelude-val">Err</span>(<span class="ident">e</span>) <span class="op">=</span><span class="op">&gt;</span> {
+                <span class="macro">warn!</span>(<span class="ident">error</span> <span class="op">=</span><span class="question-mark">?</span> <span class="ident">e</span>, <span class="string">&quot;Error while trying to collect the incoming secret requests&quot;</span>)
+            }
+        }
+
+        <span class="prelude-val">Ok</span>(())
     }
 }
 
@@ -752,8 +782,8 @@
 
     <span class="kw">use</span> <span class="ident"><span class="kw">super</span>::SessionManager</span>;
     <span class="kw">use</span> <span class="kw">crate</span>::{
+        <span class="ident">gossiping::GossipMachine</span>,
         <span class="ident">identities::ReadOnlyDevice</span>,
-        <span class="ident">key_request::KeyRequestMachine</span>,
         <span class="ident">olm</span>::{<span class="ident">Account</span>, <span class="ident">PrivateCrossSigningIdentity</span>, <span class="ident">ReadOnlyAccount</span>},
         <span class="ident">session_manager::GroupSessionCache</span>,
         <span class="ident">store</span>::{<span class="ident">CryptoStore</span>, <span class="ident">MemoryStore</span>, <span class="ident">Store</span>},
@@ -793,7 +823,7 @@
 
         <span class="kw">let</span> <span class="ident">session_cache</span> <span class="op">=</span> <span class="ident">GroupSessionCache::new</span>(<span class="ident">store</span>.<span class="ident">clone</span>());
 
-        <span class="kw">let</span> <span class="ident">key_request</span> <span class="op">=</span> <span class="ident">KeyRequestMachine::new</span>(
+        <span class="kw">let</span> <span class="ident">key_request</span> <span class="op">=</span> <span class="ident">GossipMachine::new</span>(
             <span class="ident">user_id</span>,
             <span class="ident">device_id</span>,
             <span class="ident">store</span>.<span class="ident">clone</span>(),

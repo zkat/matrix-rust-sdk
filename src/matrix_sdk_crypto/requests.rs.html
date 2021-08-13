@@ -385,6 +385,16 @@
 <span id="385">385</span>
 <span id="386">386</span>
 <span id="387">387</span>
+<span id="388">388</span>
+<span id="389">389</span>
+<span id="390">390</span>
+<span id="391">391</span>
+<span id="392">392</span>
+<span id="393">393</span>
+<span id="394">394</span>
+<span id="395">395</span>
+<span id="396">396</span>
+<span id="397">397</span>
 </pre><pre class="rust">
 <span class="comment">// Copyright 2020 The Matrix.org Foundation C.I.C.</span>
 <span class="comment">//</span>
@@ -406,7 +416,7 @@
 <span class="kw">use</span> <span class="ident">ruma</span>::{
     <span class="ident">api::client::r0</span>::{
         <span class="ident">keys</span>::{
-            <span class="ident">claim_keys::Response</span> <span class="kw">as</span> <span class="ident">KeysClaimResponse</span>,
+            <span class="ident">claim_keys</span>::{<span class="ident">Request</span> <span class="kw">as</span> <span class="ident">KeysClaimRequest</span>, <span class="ident">Response</span> <span class="kw">as</span> <span class="ident">KeysClaimResponse</span>},
             <span class="ident">get_keys::Response</span> <span class="kw">as</span> <span class="ident">KeysQueryResponse</span>,
             <span class="ident">upload_keys</span>::{<span class="ident">Request</span> <span class="kw">as</span> <span class="ident">KeysUploadRequest</span>, <span class="ident">Response</span> <span class="kw">as</span> <span class="ident">KeysUploadResponse</span>},
             <span class="ident">upload_signatures</span>::{
@@ -571,6 +581,10 @@
     <span class="doccomment">/// The keys query request, fetching the device and cross singing keys of</span>
     <span class="doccomment">/// other users.</span>
     <span class="ident">KeysQuery</span>(<span class="ident">KeysQueryRequest</span>),
+    <span class="doccomment">/// The request to claim one-time keys for a user/device pair from the</span>
+    <span class="doccomment">/// server, after the response is received an 1-to-1 Olm session will be</span>
+    <span class="doccomment">/// established with the user/device pair.</span>
+    <span class="ident">KeysClaim</span>(<span class="ident">KeysClaimRequest</span>),
     <span class="doccomment">/// The to-device requests, this request is used for a couple of different</span>
     <span class="doccomment">/// things, the main use is key requests/forwards and interactive device</span>
     <span class="doccomment">/// verification.</span>
@@ -596,6 +610,12 @@
 <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">KeysQueryRequest</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">OutgoingRequests</span> {
     <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">request</span>: <span class="ident">KeysQueryRequest</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
         <span class="ident">OutgoingRequests::KeysQuery</span>(<span class="ident">request</span>)
+    }
+}
+
+<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">KeysClaimRequest</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">OutgoingRequests</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">r</span>: <span class="ident">KeysClaimRequest</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+        <span class="ident"><span class="self">Self</span>::KeysClaim</span>(<span class="ident">r</span>)
     }
 }
 

@@ -372,6 +372,11 @@
 <span id="372">372</span>
 <span id="373">373</span>
 <span id="374">374</span>
+<span id="375">375</span>
+<span id="376">376</span>
+<span id="377">377</span>
+<span id="378">378</span>
+<span id="379">379</span>
 </pre><pre class="rust">
 <span class="comment">// Copyright 2020 The Matrix.org Foundation C.I.C.</span>
 <span class="comment">//</span>
@@ -394,20 +399,25 @@
 
 <span class="kw">use</span> <span class="ident">dashmap</span>::{<span class="ident">DashMap</span>, <span class="ident">DashSet</span>};
 <span class="kw">use</span> <span class="ident">matrix_sdk_common</span>::{<span class="ident">async_trait</span>, <span class="ident">locks::Mutex</span>, <span class="ident">uuid::Uuid</span>};
-<span class="kw">use</span> <span class="ident">ruma</span>::{<span class="ident">events::room_key_request::RequestedKeyInfo</span>, <span class="ident">DeviceId</span>, <span class="ident">DeviceIdBox</span>, <span class="ident">RoomId</span>, <span class="ident">UserId</span>};
+<span class="kw">use</span> <span class="ident">ruma</span>::{<span class="ident">DeviceId</span>, <span class="ident">DeviceIdBox</span>, <span class="ident">RoomId</span>, <span class="ident">UserId</span>};
 
 <span class="kw">use</span> <span class="kw">super</span>::{
     <span class="ident">caches</span>::{<span class="ident">DeviceStore</span>, <span class="ident">GroupSessionStore</span>, <span class="ident">SessionStore</span>},
     <span class="ident">Changes</span>, <span class="ident">CryptoStore</span>, <span class="ident">InboundGroupSession</span>, <span class="ident">ReadOnlyAccount</span>, <span class="prelude-ty">Result</span>, <span class="ident">Session</span>,
 };
 <span class="kw">use</span> <span class="kw">crate</span>::{
+    <span class="ident">gossiping</span>::{<span class="ident">GossipRequest</span>, <span class="ident">SecretInfo</span>},
     <span class="ident">identities</span>::{<span class="ident">ReadOnlyDevice</span>, <span class="ident">ReadOnlyUserIdentities</span>},
-    <span class="ident">key_request::OutgoingKeyRequest</span>,
     <span class="ident">olm</span>::{<span class="ident">OutboundGroupSession</span>, <span class="ident">PrivateCrossSigningIdentity</span>},
 };
 
-<span class="kw">fn</span> <span class="ident">encode_key_info</span>(<span class="ident">info</span>: <span class="kw-2">&amp;</span><span class="ident">RequestedKeyInfo</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">String</span> {
-    <span class="macro">format!</span>(<span class="string">&quot;{}{}{}{}&quot;</span>, <span class="ident">info</span>.<span class="ident">room_id</span>, <span class="ident">info</span>.<span class="ident">sender_key</span>, <span class="ident">info</span>.<span class="ident">algorithm</span>, <span class="ident">info</span>.<span class="ident">session_id</span>)
+<span class="kw">fn</span> <span class="ident">encode_key_info</span>(<span class="ident">info</span>: <span class="kw-2">&amp;</span><span class="ident">SecretInfo</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">String</span> {
+    <span class="kw">match</span> <span class="ident">info</span> {
+        <span class="ident">SecretInfo::KeyRequest</span>(<span class="ident">info</span>) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="macro">format!</span>(<span class="string">&quot;{}{}{}{}&quot;</span>, <span class="ident">info</span>.<span class="ident">room_id</span>, <span class="ident">info</span>.<span class="ident">sender_key</span>, <span class="ident">info</span>.<span class="ident">algorithm</span>, <span class="ident">info</span>.<span class="ident">session_id</span>)
+        }
+        <span class="ident">SecretInfo::SecretRequest</span>(<span class="ident">i</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">i</span>.<span class="ident">as_ref</span>().<span class="ident">to_owned</span>(),
+    }
 }
 
 <span class="doccomment">/// An in-memory only store that will forget all the E2EE key once it&#39;s dropped.</span>
@@ -420,7 +430,7 @@
     <span class="ident">olm_hashes</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">DashMap</span><span class="op">&lt;</span><span class="ident">String</span>, <span class="ident">DashSet</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span>,
     <span class="ident">devices</span>: <span class="ident">DeviceStore</span>,
     <span class="ident">identities</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">DashMap</span><span class="op">&lt;</span><span class="ident">UserId</span>, <span class="ident">ReadOnlyUserIdentities</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-    <span class="ident">outgoing_key_requests</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">DashMap</span><span class="op">&lt;</span><span class="ident">Uuid</span>, <span class="ident">OutgoingKeyRequest</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+    <span class="ident">outgoing_key_requests</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">DashMap</span><span class="op">&lt;</span><span class="ident">Uuid</span>, <span class="ident">GossipRequest</span><span class="op">&gt;</span><span class="op">&gt;</span>,
     <span class="ident">key_requests_by_info</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">DashMap</span><span class="op">&lt;</span><span class="ident">String</span>, <span class="ident">Uuid</span><span class="op">&gt;</span><span class="op">&gt;</span>,
 }
 
@@ -603,17 +613,17 @@
             .<span class="ident">contains</span>(<span class="kw-2">&amp;</span><span class="ident">message_hash</span>.<span class="ident">hash</span>))
     }
 
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">get_outgoing_key_request</span>(
+    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">get_outgoing_secret_requests</span>(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         <span class="ident">request_id</span>: <span class="ident">Uuid</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">OutgoingKeyRequest</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+    ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">GossipRequest</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="prelude-val">Ok</span>(<span class="self">self</span>.<span class="ident">outgoing_key_requests</span>.<span class="ident">get</span>(<span class="kw-2">&amp;</span><span class="ident">request_id</span>).<span class="ident">map</span>(<span class="op">|</span><span class="ident">r</span><span class="op">|</span> <span class="ident">r</span>.<span class="ident">clone</span>()))
     }
 
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">get_key_request_by_info</span>(
+    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">get_secret_request_by_info</span>(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
-        <span class="ident">key_info</span>: <span class="kw-2">&amp;</span><span class="ident">RequestedKeyInfo</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">OutgoingKeyRequest</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+        <span class="ident">key_info</span>: <span class="kw-2">&amp;</span><span class="ident">SecretInfo</span>,
+    ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">GossipRequest</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">key_info_string</span> <span class="op">=</span> <span class="ident">encode_key_info</span>(<span class="ident">key_info</span>);
 
         <span class="prelude-val">Ok</span>(<span class="self">self</span>
@@ -622,7 +632,7 @@
             .<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">i</span><span class="op">|</span> <span class="self">self</span>.<span class="ident">outgoing_key_requests</span>.<span class="ident">get</span>(<span class="kw-2">&amp;</span><span class="ident">i</span>).<span class="ident">map</span>(<span class="op">|</span><span class="ident">r</span><span class="op">|</span> <span class="ident">r</span>.<span class="ident">clone</span>())))
     }
 
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">get_unsent_key_requests</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">OutgoingKeyRequest</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">get_unsent_secret_requests</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">GossipRequest</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="prelude-val">Ok</span>(<span class="self">self</span>
             .<span class="ident">outgoing_key_requests</span>
             .<span class="ident">iter</span>()
@@ -631,7 +641,7 @@
             .<span class="ident">collect</span>())
     }
 
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">delete_outgoing_key_request</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">request_id</span>: <span class="ident">Uuid</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">delete_outgoing_secret_requests</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">request_id</span>: <span class="ident">Uuid</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">outgoing_key_requests</span>.<span class="ident">remove</span>(<span class="kw-2">&amp;</span><span class="ident">request_id</span>).<span class="ident">and_then</span>(<span class="op">|</span>(<span class="kw">_</span>, <span class="ident">i</span>)<span class="op">|</span> {
             <span class="kw">let</span> <span class="ident">key_info_string</span> <span class="op">=</span> <span class="ident">encode_key_info</span>(<span class="kw-2">&amp;</span><span class="ident">i</span>.<span class="ident">info</span>);
             <span class="self">self</span>.<span class="ident">key_requests_by_info</span>.<span class="ident">remove</span>(<span class="kw-2">&amp;</span><span class="ident">key_info_string</span>)

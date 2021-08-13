@@ -4042,6 +4042,14 @@
 <span id="4042">4042</span>
 <span id="4043">4043</span>
 <span id="4044">4044</span>
+<span id="4045">4045</span>
+<span id="4046">4046</span>
+<span id="4047">4047</span>
+<span id="4048">4048</span>
+<span id="4049">4049</span>
+<span id="4050">4050</span>
+<span id="4051">4051</span>
+<span id="4052">4052</span>
 </pre><pre class="rust">
 <span class="comment">// Copyright 2020 Damir Jelić</span>
 <span class="comment">// Copyright 2020 The Matrix.org Foundation C.I.C.</span>
@@ -6159,6 +6167,14 @@
                         }
                         <span class="ident">OutgoingRequests::RoomMessage</span>(<span class="ident">request</span>) <span class="op">=</span><span class="op">&gt;</span> {
                             <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Ok</span>(<span class="ident">resp</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">room_send_helper</span>(<span class="ident">request</span>).<span class="kw">await</span> {
+                                <span class="self">self</span>.<span class="ident">base_client</span>
+                                    .<span class="ident">mark_request_as_sent</span>(<span class="ident">r</span>.<span class="ident">request_id</span>(), <span class="kw-2">&amp;</span><span class="ident">resp</span>)
+                                    .<span class="kw">await</span>
+                                    .<span class="ident">unwrap</span>();
+                            }
+                        }
+                        <span class="ident">OutgoingRequests::KeysClaim</span>(<span class="ident">request</span>) <span class="op">=</span><span class="op">&gt;</span> {
+                            <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Ok</span>(<span class="ident">resp</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">send</span>(<span class="ident">request</span>.<span class="ident">clone</span>(), <span class="prelude-val">None</span>).<span class="kw">await</span> {
                                 <span class="self">self</span>.<span class="ident">base_client</span>
                                     .<span class="ident">mark_request_as_sent</span>(<span class="ident">r</span>.<span class="ident">request_id</span>(), <span class="kw-2">&amp;</span><span class="ident">resp</span>)
                                     .<span class="kw">await</span>

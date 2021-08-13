@@ -380,6 +380,52 @@
 <span id="380">380</span>
 <span id="381">381</span>
 <span id="382">382</span>
+<span id="383">383</span>
+<span id="384">384</span>
+<span id="385">385</span>
+<span id="386">386</span>
+<span id="387">387</span>
+<span id="388">388</span>
+<span id="389">389</span>
+<span id="390">390</span>
+<span id="391">391</span>
+<span id="392">392</span>
+<span id="393">393</span>
+<span id="394">394</span>
+<span id="395">395</span>
+<span id="396">396</span>
+<span id="397">397</span>
+<span id="398">398</span>
+<span id="399">399</span>
+<span id="400">400</span>
+<span id="401">401</span>
+<span id="402">402</span>
+<span id="403">403</span>
+<span id="404">404</span>
+<span id="405">405</span>
+<span id="406">406</span>
+<span id="407">407</span>
+<span id="408">408</span>
+<span id="409">409</span>
+<span id="410">410</span>
+<span id="411">411</span>
+<span id="412">412</span>
+<span id="413">413</span>
+<span id="414">414</span>
+<span id="415">415</span>
+<span id="416">416</span>
+<span id="417">417</span>
+<span id="418">418</span>
+<span id="419">419</span>
+<span id="420">420</span>
+<span id="421">421</span>
+<span id="422">422</span>
+<span id="423">423</span>
+<span id="424">424</span>
+<span id="425">425</span>
+<span id="426">426</span>
+<span id="427">427</span>
+<span id="428">428</span>
 </pre><pre class="rust">
 <span class="comment">// Copyright 2020 The Matrix.org Foundation C.I.C.</span>
 <span class="comment">//</span>
@@ -407,7 +453,7 @@
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
 <span class="kw">use</span> <span class="ident">olm_rs</span>::{<span class="ident">errors::OlmUtilityError</span>, <span class="ident">utility::OlmUtility</span>};
 <span class="kw">use</span> <span class="ident">ruma</span>::{
-    <span class="ident">encryption</span>::{<span class="ident">CrossSigningKey</span>, <span class="ident">DeviceKeys</span>, <span class="ident">KeyUsage</span>},
+    <span class="ident">encryption</span>::{<span class="ident">CrossSigningKey</span>, <span class="ident">CrossSigningKeySignatures</span>, <span class="ident">DeviceKeys</span>, <span class="ident">KeyUsage</span>},
     <span class="ident">serde::CanonicalJsonValue</span>,
     <span class="ident">DeviceKeyAlgorithm</span>, <span class="ident">DeviceKeyId</span>, <span class="ident">UserId</span>,
 };
@@ -419,7 +465,7 @@
 <span class="kw">use</span> <span class="kw">crate</span>::{
     <span class="ident">error::SignatureError</span>,
     <span class="ident">identities</span>::{<span class="ident">MasterPubkey</span>, <span class="ident">SelfSigningPubkey</span>, <span class="ident">UserSigningPubkey</span>},
-    <span class="ident">utilities</span>::{<span class="ident">decode_url_safe</span> <span class="kw">as</span> <span class="ident">decode</span>, <span class="ident">encode_url_safe</span> <span class="kw">as</span> <span class="ident">encode</span>, <span class="ident">DecodeError</span>},
+    <span class="ident">utilities</span>::{<span class="ident">decode_url_safe</span>, <span class="ident">encode</span>, <span class="ident">encode_url_safe</span>, <span class="ident">DecodeError</span>},
     <span class="ident">ReadOnlyUserIdentity</span>,
 };
 
@@ -518,6 +564,17 @@
         <span class="ident">PickledMasterSigning</span> { <span class="ident">pickle</span>, <span class="ident">public_key</span> }
     }
 
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">export_seed</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">String</span> {
+        <span class="ident">encode</span>(<span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">seed</span>.<span class="ident">as_slice</span>())
+    }
+
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">from_seed</span>(<span class="ident">user_id</span>: <span class="ident">UserId</span>, <span class="ident">seed</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+        <span class="kw">let</span> <span class="ident">inner</span> <span class="op">=</span> <span class="ident">Signing::from_seed</span>(<span class="ident">seed</span>);
+        <span class="kw">let</span> <span class="ident">public_key</span> <span class="op">=</span> <span class="ident">inner</span>.<span class="ident">cross_signing_key</span>(<span class="ident">user_id</span>, <span class="ident">KeyUsage::Master</span>).<span class="ident">into</span>();
+
+        <span class="self">Self</span> { <span class="ident">inner</span>, <span class="ident">public_key</span> }
+    }
+
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">from_pickle</span>(
         <span class="ident">pickle</span>: <span class="ident">PickledMasterSigning</span>,
         <span class="ident">pickle_key</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>],
@@ -560,10 +617,33 @@
         <span class="ident">PickledUserSigning</span> { <span class="ident">pickle</span>, <span class="ident">public_key</span> }
     }
 
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">export_seed</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">String</span> {
+        <span class="ident">encode</span>(<span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">seed</span>.<span class="ident">as_slice</span>())
+    }
+
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">from_seed</span>(<span class="ident">user_id</span>: <span class="ident">UserId</span>, <span class="ident">seed</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+        <span class="kw">let</span> <span class="ident">inner</span> <span class="op">=</span> <span class="ident">Signing::from_seed</span>(<span class="ident">seed</span>);
+        <span class="kw">let</span> <span class="ident">public_key</span> <span class="op">=</span> <span class="ident">inner</span>.<span class="ident">cross_signing_key</span>(<span class="ident">user_id</span>, <span class="ident">KeyUsage::UserSigning</span>).<span class="ident">into</span>();
+
+        <span class="self">Self</span> { <span class="ident">inner</span>, <span class="ident">public_key</span> }
+    }
+
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">sign_user</span>(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         <span class="ident">user</span>: <span class="kw-2">&amp;</span><span class="ident">ReadOnlyUserIdentity</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">BTreeMap</span><span class="op">&lt;</span><span class="ident">UserId</span>, <span class="ident">BTreeMap</span><span class="op">&lt;</span><span class="ident">String</span>, <span class="ident">Value</span><span class="op">&gt;</span><span class="op">&gt;</span>, <span class="ident">SignatureError</span><span class="op">&gt;</span> {
+    ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">CrossSigningKey</span>, <span class="ident">SignatureError</span><span class="op">&gt;</span> {
+        <span class="kw">let</span> <span class="ident">signature</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">sign_user_helper</span>(<span class="ident">user</span>).<span class="kw">await</span><span class="question-mark">?</span>;
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">master_key</span>: <span class="ident">CrossSigningKey</span> <span class="op">=</span> <span class="ident">user</span>.<span class="ident">master_key</span>().<span class="ident">to_owned</span>().<span class="ident">into</span>();
+
+        <span class="ident">master_key</span>.<span class="ident">signatures</span>.<span class="ident">extend</span>(<span class="ident">signature</span>);
+
+        <span class="prelude-val">Ok</span>(<span class="ident">master_key</span>)
+    }
+
+    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">sign_user_helper</span>(
+        <span class="kw-2">&amp;</span><span class="self">self</span>,
+        <span class="ident">user</span>: <span class="kw-2">&amp;</span><span class="ident">ReadOnlyUserIdentity</span>,
+    ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">CrossSigningKeySignatures</span>, <span class="ident">SignatureError</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">user_master</span>: <span class="kw-2">&amp;</span><span class="ident">CrossSigningKey</span> <span class="op">=</span> <span class="ident">user</span>.<span class="ident">master_key</span>().<span class="ident">as_ref</span>();
         <span class="kw">let</span> <span class="ident">signature</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">sign_json</span>(<span class="ident">serde_json::to_value</span>(<span class="ident">user_master</span>)<span class="question-mark">?</span>).<span class="kw">await</span><span class="question-mark">?</span>;
 
@@ -578,7 +658,7 @@
                     <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">public_key</span>.<span class="ident">as_str</span>().<span class="ident">into</span>(),
                 )
                 .<span class="ident">to_string</span>(),
-                <span class="ident">serde_json::to_value</span>(<span class="ident">signature</span>.<span class="number">0</span>)<span class="question-mark">?</span>,
+                <span class="ident">signature</span>.<span class="number">0</span>,
             );
 
         <span class="prelude-val">Ok</span>(<span class="ident">signatures</span>)
@@ -599,6 +679,17 @@
         <span class="kw">let</span> <span class="ident">pickle</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">pickle</span>(<span class="ident">pickle_key</span>).<span class="kw">await</span>;
         <span class="kw">let</span> <span class="ident">public_key</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">public_key</span>.<span class="ident">clone</span>().<span class="ident">into</span>();
         <span class="ident">PickledSelfSigning</span> { <span class="ident">pickle</span>, <span class="ident">public_key</span> }
+    }
+
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">export_seed</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">String</span> {
+        <span class="ident">encode</span>(<span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">seed</span>.<span class="ident">as_slice</span>())
+    }
+
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">from_seed</span>(<span class="ident">user_id</span>: <span class="ident">UserId</span>, <span class="ident">seed</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+        <span class="kw">let</span> <span class="ident">inner</span> <span class="op">=</span> <span class="ident">Signing::from_seed</span>(<span class="ident">seed</span>);
+        <span class="kw">let</span> <span class="ident">public_key</span> <span class="op">=</span> <span class="ident">inner</span>.<span class="ident">cross_signing_key</span>(<span class="ident">user_id</span>, <span class="ident">KeyUsage::SelfSigning</span>).<span class="ident">into</span>();
+
+        <span class="self">Self</span> { <span class="ident">inner</span>, <span class="ident">public_key</span> }
     }
 
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">sign_device_helper</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">value</span>: <span class="ident">Value</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Signature</span>, <span class="ident">SignatureError</span><span class="op">&gt;</span> {
@@ -696,9 +787,9 @@
         <span class="kw">let</span> <span class="ident">key</span> <span class="op">=</span> <span class="ident">GenericArray::from_slice</span>(<span class="ident">pickle_key</span>);
         <span class="kw">let</span> <span class="ident">cipher</span> <span class="op">=</span> <span class="ident">Aes256Gcm::new</span>(<span class="ident">key</span>);
 
-        <span class="kw">let</span> <span class="ident">nonce</span> <span class="op">=</span> <span class="ident">decode</span>(<span class="ident">pickled</span>.<span class="ident">nonce</span>)<span class="question-mark">?</span>;
+        <span class="kw">let</span> <span class="ident">nonce</span> <span class="op">=</span> <span class="ident">decode_url_safe</span>(<span class="ident">pickled</span>.<span class="ident">nonce</span>)<span class="question-mark">?</span>;
         <span class="kw">let</span> <span class="ident">nonce</span> <span class="op">=</span> <span class="ident">GenericArray::from_slice</span>(<span class="kw-2">&amp;</span><span class="ident">nonce</span>);
-        <span class="kw">let</span> <span class="ident">ciphertext</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">decode</span>(<span class="ident">pickled</span>.<span class="ident">ciphertext</span>)<span class="question-mark">?</span>;
+        <span class="kw">let</span> <span class="ident">ciphertext</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">decode_url_safe</span>(<span class="ident">pickled</span>.<span class="ident">ciphertext</span>)<span class="question-mark">?</span>;
 
         <span class="kw">let</span> <span class="ident">seed</span> <span class="op">=</span> <span class="ident">cipher</span>
             .<span class="ident">decrypt</span>(<span class="ident">nonce</span>, <span class="ident">ciphertext</span>.<span class="ident">as_slice</span>())
@@ -718,9 +809,10 @@
         <span class="kw">let</span> <span class="ident">ciphertext</span> <span class="op">=</span>
             <span class="ident">cipher</span>.<span class="ident">encrypt</span>(<span class="ident">nonce</span>, <span class="self">self</span>.<span class="ident">seed</span>.<span class="ident">as_slice</span>()).<span class="ident">expect</span>(<span class="string">&quot;Can&#39;t encrypt signing pickle&quot;</span>);
 
-        <span class="kw">let</span> <span class="ident">ciphertext</span> <span class="op">=</span> <span class="ident">encode</span>(<span class="ident">ciphertext</span>);
+        <span class="kw">let</span> <span class="ident">ciphertext</span> <span class="op">=</span> <span class="ident">encode_url_safe</span>(<span class="ident">ciphertext</span>);
 
-        <span class="kw">let</span> <span class="ident">pickle</span> <span class="op">=</span> <span class="ident">InnerPickle</span> { <span class="ident">version</span>: <span class="number">1</span>, <span class="ident">nonce</span>: <span class="ident">encode</span>(<span class="ident">nonce</span>.<span class="ident">as_slice</span>()), <span class="ident">ciphertext</span> };
+        <span class="kw">let</span> <span class="ident">pickle</span> <span class="op">=</span>
+            <span class="ident">InnerPickle</span> { <span class="ident">version</span>: <span class="number">1</span>, <span class="ident">nonce</span>: <span class="ident">encode_url_safe</span>(<span class="ident">nonce</span>.<span class="ident">as_slice</span>()), <span class="ident">ciphertext</span> };
 
         <span class="ident">PickledSigning</span>(<span class="ident">serde_json::to_string</span>(<span class="kw-2">&amp;</span><span class="ident">pickle</span>).<span class="ident">expect</span>(<span class="string">&quot;Can&#39;t encode pickled signing&quot;</span>))
     }

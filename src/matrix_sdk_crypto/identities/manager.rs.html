@@ -642,6 +642,33 @@
 <span id="642">642</span>
 <span id="643">643</span>
 <span id="644">644</span>
+<span id="645">645</span>
+<span id="646">646</span>
+<span id="647">647</span>
+<span id="648">648</span>
+<span id="649">649</span>
+<span id="650">650</span>
+<span id="651">651</span>
+<span id="652">652</span>
+<span id="653">653</span>
+<span id="654">654</span>
+<span id="655">655</span>
+<span id="656">656</span>
+<span id="657">657</span>
+<span id="658">658</span>
+<span id="659">659</span>
+<span id="660">660</span>
+<span id="661">661</span>
+<span id="662">662</span>
+<span id="663">663</span>
+<span id="664">664</span>
+<span id="665">665</span>
+<span id="666">666</span>
+<span id="667">667</span>
+<span id="668">668</span>
+<span id="669">669</span>
+<span id="670">670</span>
+<span id="671">671</span>
 </pre><pre class="rust">
 <span class="comment">// Copyright 2020 The Matrix.org Foundation C.I.C.</span>
 <span class="comment">//</span>
@@ -669,7 +696,7 @@
     <span class="ident">api::client::r0::keys::get_keys::Response</span> <span class="kw">as</span> <span class="ident">KeysQueryResponse</span>, <span class="ident">encryption::DeviceKeys</span>,
     <span class="ident">DeviceId</span>, <span class="ident">DeviceIdBox</span>, <span class="ident">UserId</span>,
 };
-<span class="kw">use</span> <span class="ident">tracing</span>::{<span class="ident">trace</span>, <span class="ident">warn</span>};
+<span class="kw">use</span> <span class="ident">tracing</span>::{<span class="ident">info</span>, <span class="ident">trace</span>, <span class="ident">warn</span>};
 
 <span class="kw">use</span> <span class="kw">crate</span>::{
     <span class="ident">error::OlmResult</span>,
@@ -677,6 +704,7 @@
         <span class="ident">MasterPubkey</span>, <span class="ident">ReadOnlyDevice</span>, <span class="ident">ReadOnlyOwnUserIdentity</span>, <span class="ident">ReadOnlyUserIdentities</span>,
         <span class="ident">ReadOnlyUserIdentity</span>, <span class="ident">SelfSigningPubkey</span>, <span class="ident">UserSigningPubkey</span>,
     },
+    <span class="ident">olm::PrivateCrossSigningIdentity</span>,
     <span class="ident">requests::KeysQueryRequest</span>,
     <span class="ident">store</span>::{<span class="ident">Changes</span>, <span class="ident">DeviceChanges</span>, <span class="ident">IdentityChanges</span>, <span class="prelude-ty">Result</span> <span class="kw">as</span> <span class="ident">StoreResult</span>, <span class="ident">Store</span>},
 };
@@ -720,11 +748,13 @@
     ) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">OlmResult</span><span class="op">&lt;</span>(<span class="ident">DeviceChanges</span>, <span class="ident">IdentityChanges</span>)<span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">changed_devices</span> <span class="op">=</span>
             <span class="self">self</span>.<span class="ident">handle_devices_from_key_query</span>(<span class="ident">response</span>.<span class="ident">device_keys</span>.<span class="ident">clone</span>()).<span class="kw">await</span><span class="question-mark">?</span>;
-        <span class="kw">let</span> <span class="ident">changed_identities</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">handle_cross_singing_keys</span>(<span class="ident">response</span>).<span class="kw">await</span><span class="question-mark">?</span>;
+        <span class="kw">let</span> (<span class="ident">changed_identities</span>, <span class="ident">cross_signing_identity</span>) <span class="op">=</span>
+            <span class="self">self</span>.<span class="ident">handle_cross_singing_keys</span>(<span class="ident">response</span>).<span class="kw">await</span><span class="question-mark">?</span>;
 
         <span class="kw">let</span> <span class="ident">changes</span> <span class="op">=</span> <span class="ident">Changes</span> {
             <span class="ident">identities</span>: <span class="ident">changed_identities</span>.<span class="ident">clone</span>(),
             <span class="ident">devices</span>: <span class="ident">changed_devices</span>.<span class="ident">clone</span>(),
+            <span class="ident">private_identity</span>: <span class="ident">cross_signing_identity</span>,
             ..<span class="ident">Default::default</span>()
         };
 
@@ -782,18 +812,20 @@
         <span class="ident">user_id</span>: <span class="ident">UserId</span>,
         <span class="ident">device_map</span>: <span class="ident">BTreeMap</span><span class="op">&lt;</span><span class="ident">DeviceIdBox</span>, <span class="ident">DeviceKeys</span><span class="op">&gt;</span>,
     ) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">StoreResult</span><span class="op">&lt;</span><span class="ident">DeviceChanges</span><span class="op">&gt;</span> {
+        <span class="kw">let</span> <span class="ident">own_device_id</span> <span class="op">=</span> (<span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="ident">own_device_id</span>).<span class="ident">to_owned</span>();
+
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">changes</span> <span class="op">=</span> <span class="ident">DeviceChanges::default</span>();
 
         <span class="kw">let</span> <span class="ident">current_devices</span>: <span class="ident">HashSet</span><span class="op">&lt;</span><span class="ident">DeviceIdBox</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">device_map</span>.<span class="ident">keys</span>().<span class="ident">cloned</span>().<span class="ident">collect</span>();
 
         <span class="kw">let</span> <span class="ident">tasks</span> <span class="op">=</span> <span class="ident">device_map</span>.<span class="ident">into_iter</span>().<span class="ident">filter_map</span>(<span class="op">|</span>(<span class="ident">device_id</span>, <span class="ident">device_keys</span>)<span class="op">|</span> {
-            <span class="comment">// We don&#39;t need our own device in the device store.</span>
-            <span class="kw">if</span> <span class="ident">user_id</span> <span class="op">=</span><span class="op">=</span> <span class="kw-2">*</span><span class="ident">own_user_id</span> <span class="op">&amp;&amp;</span> <span class="kw-2">*</span><span class="ident">device_id</span> <span class="op">=</span><span class="op">=</span> <span class="kw-2">*</span><span class="ident">own_device_id</span> {
-                <span class="prelude-val">None</span>
-            } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">user_id</span> <span class="op">!</span><span class="op">=</span> <span class="ident">device_keys</span>.<span class="ident">user_id</span> <span class="op">|</span><span class="op">|</span> <span class="ident">device_id</span> <span class="op">!</span><span class="op">=</span> <span class="ident">device_keys</span>.<span class="ident">device_id</span> {
+            <span class="kw">if</span> <span class="ident">user_id</span> <span class="op">!</span><span class="op">=</span> <span class="ident">device_keys</span>.<span class="ident">user_id</span> <span class="op">|</span><span class="op">|</span> <span class="ident">device_id</span> <span class="op">!</span><span class="op">=</span> <span class="ident">device_keys</span>.<span class="ident">device_id</span> {
                 <span class="macro">warn!</span>(
-                    <span class="string">&quot;Mismatch in device keys payload of device {}|{} from user {}|{}&quot;</span>,
-                    <span class="ident">device_id</span>, <span class="ident">device_keys</span>.<span class="ident">device_id</span>, <span class="ident">user_id</span>, <span class="ident">device_keys</span>.<span class="ident">user_id</span>
+                    <span class="ident">user_id</span> <span class="op">=</span> <span class="ident">user_id</span>.<span class="ident">as_str</span>(),
+                    <span class="ident">device_id</span> <span class="op">=</span> <span class="ident">device_id</span>.<span class="ident">as_str</span>(),
+                    <span class="ident">device_key_user</span> <span class="op">=</span> <span class="ident">device_keys</span>.<span class="ident">user_id</span>.<span class="ident">as_str</span>(),
+                    <span class="ident">device_key_device_id</span> <span class="op">=</span> <span class="ident">device_keys</span>.<span class="ident">device_id</span>.<span class="ident">as_str</span>(),
+                    <span class="string">&quot;Mismatch in the device keys payload&quot;</span>,
                 );
                 <span class="prelude-val">None</span>
             } <span class="kw">else</span> {
@@ -814,13 +846,14 @@
         }
 
         <span class="kw">let</span> <span class="ident">current_devices</span>: <span class="ident">HashSet</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">DeviceIdBox</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">current_devices</span>.<span class="ident">iter</span>().<span class="ident">collect</span>();
-        <span class="kw">let</span> <span class="ident">stored_devices</span> <span class="op">=</span> <span class="ident">store</span>.<span class="ident">get_readonly_devices</span>(<span class="kw-2">&amp;</span><span class="ident">user_id</span>).<span class="kw">await</span><span class="question-mark">?</span>;
+        <span class="kw">let</span> <span class="ident">stored_devices</span> <span class="op">=</span> <span class="ident">store</span>.<span class="ident">get_readonly_devices_unfiltered</span>(<span class="kw-2">&amp;</span><span class="ident">user_id</span>).<span class="kw">await</span><span class="question-mark">?</span>;
         <span class="kw">let</span> <span class="ident">stored_devices_set</span>: <span class="ident">HashSet</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">DeviceIdBox</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">stored_devices</span>.<span class="ident">keys</span>().<span class="ident">collect</span>();
-
         <span class="kw">let</span> <span class="ident">deleted_devices_set</span> <span class="op">=</span> <span class="ident">stored_devices_set</span>.<span class="ident">difference</span>(<span class="kw-2">&amp;</span><span class="ident">current_devices</span>);
 
         <span class="kw">for</span> <span class="ident">device_id</span> <span class="kw">in</span> <span class="ident">deleted_devices_set</span> {
-            <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">device</span>) <span class="op">=</span> <span class="ident">stored_devices</span>.<span class="ident">get</span>(<span class="kw-2">*</span><span class="ident">device_id</span>) {
+            <span class="kw">if</span> <span class="ident">user_id</span> <span class="op">=</span><span class="op">=</span> <span class="kw-2">*</span><span class="ident">own_user_id</span> <span class="op">&amp;&amp;</span> <span class="kw-2">*</span><span class="ident">device_id</span> <span class="op">=</span><span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">own_device_id</span> {
+                <span class="macro">warn!</span>(<span class="string">&quot;Our own device has been deleted&quot;</span>);
+            } <span class="kw">else</span> <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">device</span>) <span class="op">=</span> <span class="ident">stored_devices</span>.<span class="ident">get</span>(<span class="kw-2">*</span><span class="ident">device_id</span>) {
                 <span class="ident">device</span>.<span class="ident">mark_as_deleted</span>();
                 <span class="ident">changes</span>.<span class="ident">deleted</span>.<span class="ident">push</span>(<span class="ident">device</span>.<span class="ident">clone</span>());
             }
@@ -876,8 +909,9 @@
     <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">handle_cross_singing_keys</span>(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         <span class="ident">response</span>: <span class="kw-2">&amp;</span><span class="ident">KeysQueryResponse</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">StoreResult</span><span class="op">&lt;</span><span class="ident">IdentityChanges</span><span class="op">&gt;</span> {
+    ) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">StoreResult</span><span class="op">&lt;</span>(<span class="ident">IdentityChanges</span>, <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">PrivateCrossSigningIdentity</span><span class="op">&gt;</span>)<span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">changes</span> <span class="op">=</span> <span class="ident">IdentityChanges::default</span>();
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">changed_identity</span> <span class="op">=</span> <span class="prelude-val">None</span>;
 
         <span class="kw">for</span> (<span class="ident">user_id</span>, <span class="ident">master_key</span>) <span class="kw">in</span> <span class="kw-2">&amp;</span><span class="ident">response</span>.<span class="ident">master_keys</span> {
             <span class="kw">let</span> <span class="ident">master_key</span> <span class="op">=</span> <span class="ident">MasterPubkey::from</span>(<span class="ident">master_key</span>);
@@ -885,7 +919,10 @@
             <span class="kw">let</span> <span class="ident">self_signing</span> <span class="op">=</span> <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">s</span>) <span class="op">=</span> <span class="ident">response</span>.<span class="ident">self_signing_keys</span>.<span class="ident">get</span>(<span class="ident">user_id</span>) {
                 <span class="ident">SelfSigningPubkey::from</span>(<span class="ident">s</span>)
             } <span class="kw">else</span> {
-                <span class="macro">warn!</span>(<span class="string">&quot;User identity for user {} didn&#39;t contain a self signing pubkey&quot;</span>, <span class="ident">user_id</span>);
+                <span class="macro">warn!</span>(
+                    <span class="ident">user_id</span> <span class="op">=</span> <span class="ident">user_id</span>.<span class="ident">as_str</span>(),
+                    <span class="string">&quot;A user identity didn&#39;t contain a self signing pubkey&quot;</span>
+                );
                 <span class="kw">continue</span>;
             };
 
@@ -897,9 +934,9 @@
                             <span class="ident">UserSigningPubkey::from</span>(<span class="ident">s</span>)
                         } <span class="kw">else</span> {
                             <span class="macro">warn!</span>(
-                                <span class="string">&quot;User identity for our own user {} didn&#39;t \
-                                  contain a user signing pubkey&quot;</span>,
-                                <span class="ident">user_id</span>
+                                <span class="ident">user_id</span> <span class="op">=</span> <span class="ident">user_id</span>.<span class="ident">as_str</span>(),
+                                <span class="string">&quot;User identity for our own user didn&#39;t \
+                                contain a user signing pubkey&quot;</span>,
                             );
                             <span class="kw">continue</span>;
                         };
@@ -919,8 +956,8 @@
                         <span class="op">|</span><span class="op">|</span> <span class="ident">user_signing</span>.<span class="ident">user_id</span>() <span class="op">!</span><span class="op">=</span> <span class="ident">user_id</span>
                     {
                         <span class="macro">warn!</span>(
-                            <span class="string">&quot;User id mismatch in one of the cross signing keys for user {}&quot;</span>,
-                            <span class="ident">user_id</span>
+                            <span class="ident">user_id</span> <span class="op">=</span> <span class="ident">user_id</span>.<span class="ident">as_str</span>(),
+                            <span class="string">&quot;User ID mismatch in one of the cross signing keys&quot;</span>,
                         );
                         <span class="kw">continue</span>;
                     }
@@ -929,14 +966,14 @@
                         .<span class="ident">map</span>(<span class="op">|</span><span class="ident">i</span><span class="op">|</span> (<span class="ident">ReadOnlyUserIdentities::Own</span>(<span class="ident">i</span>), <span class="bool-val">true</span>))
                 } <span class="kw">else</span> {
                     <span class="macro">warn!</span>(
-                        <span class="string">&quot;User identity for our own user {} didn&#39;t contain a \
+                        <span class="ident">user_id</span> <span class="op">=</span> <span class="ident">user_id</span>.<span class="ident">as_str</span>(),
+                        <span class="string">&quot;User identity for our own user didn&#39;t contain a \
                         user signing pubkey&quot;</span>,
-                        <span class="ident">user_id</span>
                     );
                     <span class="kw">continue</span>;
                 }
             } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">master_key</span>.<span class="ident">user_id</span>() <span class="op">!</span><span class="op">=</span> <span class="ident">user_id</span> <span class="op">|</span><span class="op">|</span> <span class="ident">self_signing</span>.<span class="ident">user_id</span>() <span class="op">!</span><span class="op">=</span> <span class="ident">user_id</span> {
-                <span class="macro">warn!</span>(<span class="string">&quot;User id mismatch in one of the cross signing keys for user {}&quot;</span>, <span class="ident">user_id</span>);
+                <span class="macro">warn!</span>(<span class="ident">user</span> <span class="op">=</span> <span class="ident">user_id</span>.<span class="ident">as_str</span>(), <span class="string">&quot;User ID mismatch in one of the cross signing keys&quot;</span>,);
                 <span class="kw">continue</span>;
             } <span class="kw">else</span> {
                 <span class="ident">ReadOnlyUserIdentity::new</span>(<span class="ident">master_key</span>, <span class="ident">self_signing</span>)
@@ -945,21 +982,38 @@
 
             <span class="kw">match</span> <span class="ident">result</span> {
                 <span class="prelude-val">Ok</span>((<span class="ident">i</span>, <span class="ident">new</span>)) <span class="op">=</span><span class="op">&gt;</span> {
-                    <span class="macro">trace!</span>(<span class="string">&quot;Updated or created new user identity for {}: {:?}&quot;</span>, <span class="ident">user_id</span>, <span class="ident">i</span>);
+                    <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">identity</span>) <span class="op">=</span> <span class="ident">i</span>.<span class="ident">own</span>() {
+                        <span class="kw">let</span> <span class="ident">private_identity</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">store</span>.<span class="ident">private_identity</span>();
+                        <span class="kw">let</span> <span class="ident">private_identity</span> <span class="op">=</span> <span class="ident">private_identity</span>.<span class="ident">lock</span>().<span class="kw">await</span>;
+
+                        <span class="kw">let</span> <span class="ident">result</span> <span class="op">=</span> <span class="ident">private_identity</span>.<span class="ident">clear_if_differs</span>(<span class="ident">identity</span>).<span class="kw">await</span>;
+
+                        <span class="kw">if</span> <span class="ident">result</span>.<span class="ident">any_cleared</span>() {
+                            <span class="ident">changed_identity</span> <span class="op">=</span> <span class="prelude-val">Some</span>((<span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="ident">private_identity</span>).<span class="ident">clone</span>());
+                            <span class="macro">info!</span>(<span class="ident">cleared</span> <span class="op">=</span><span class="question-mark">?</span> <span class="ident">result</span>, <span class="string">&quot;Removed some or all of our private cross signing keys&quot;</span>);
+                        }
+                    }
+
                     <span class="kw">if</span> <span class="ident">new</span> {
+                        <span class="macro">trace!</span>(<span class="ident">user_id</span> <span class="op">=</span> <span class="ident">user_id</span>.<span class="ident">as_str</span>(), <span class="ident">identity</span> <span class="op">=</span><span class="question-mark">?</span> <span class="ident">i</span>, <span class="string">&quot;Created new user identity&quot;</span>);
                         <span class="ident">changes</span>.<span class="ident">new</span>.<span class="ident">push</span>(<span class="ident">i</span>);
                     } <span class="kw">else</span> {
+                        <span class="macro">trace!</span>(<span class="ident">user_id</span> <span class="op">=</span> <span class="ident">user_id</span>.<span class="ident">as_str</span>(), <span class="ident">identity</span> <span class="op">=</span><span class="question-mark">?</span> <span class="ident">i</span>, <span class="string">&quot;Updated a user identity&quot;</span>);
                         <span class="ident">changes</span>.<span class="ident">changed</span>.<span class="ident">push</span>(<span class="ident">i</span>);
                     }
                 }
                 <span class="prelude-val">Err</span>(<span class="ident">e</span>) <span class="op">=</span><span class="op">&gt;</span> {
-                    <span class="macro">warn!</span>(<span class="string">&quot;Couldn&#39;t update or create new user identity for {}: {:?}&quot;</span>, <span class="ident">user_id</span>, <span class="ident">e</span>);
+                    <span class="macro">warn!</span>(
+                        <span class="ident">user_id</span> <span class="op">=</span> <span class="ident">user_id</span>.<span class="ident">as_str</span>(),
+                        <span class="ident">error</span> <span class="op">=</span><span class="question-mark">?</span> <span class="ident">e</span>,
+                        <span class="string">&quot;Couldn&#39;t update or create new user identity for&quot;</span>
+                    );
                     <span class="kw">continue</span>;
                 }
             }
         }
 
-        <span class="prelude-val">Ok</span>(<span class="ident">changes</span>)
+        <span class="prelude-val">Ok</span>((<span class="ident">changes</span>, <span class="ident">changed_identity</span>))
     }
 
     <span class="doccomment">/// Get a key query request if one is needed.</span>

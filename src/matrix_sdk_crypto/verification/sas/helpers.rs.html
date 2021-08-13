@@ -607,6 +607,21 @@
 <span id="607">607</span>
 <span id="608">608</span>
 <span id="609">609</span>
+<span id="610">610</span>
+<span id="611">611</span>
+<span id="612">612</span>
+<span id="613">613</span>
+<span id="614">614</span>
+<span id="615">615</span>
+<span id="616">616</span>
+<span id="617">617</span>
+<span id="618">618</span>
+<span id="619">619</span>
+<span id="620">620</span>
+<span id="621">621</span>
+<span id="622">622</span>
+<span id="623">623</span>
+<span id="624">624</span>
 </pre><pre class="rust">
 <span class="comment">// Copyright 2020 The Matrix.org Foundation C.I.C.</span>
 <span class="comment">//</span>
@@ -644,12 +659,13 @@
     <span class="ident">identities</span>::{<span class="ident">ReadOnlyDevice</span>, <span class="ident">ReadOnlyUserIdentities</span>},
     <span class="ident">utilities::encode</span>,
     <span class="ident">verification::event_enums</span>::{<span class="ident">MacContent</span>, <span class="ident">StartContent</span>},
-    <span class="ident">ReadOnlyAccount</span>,
+    <span class="ident">ReadOnlyAccount</span>, <span class="ident">ReadOnlyOwnUserIdentity</span>,
 };
 
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">SasIds</span> {
     <span class="kw">pub</span> <span class="ident">account</span>: <span class="ident">ReadOnlyAccount</span>,
+    <span class="kw">pub</span> <span class="ident">own_identity</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ReadOnlyOwnUserIdentity</span><span class="op">&gt;</span>,
     <span class="kw">pub</span> <span class="ident">other_device</span>: <span class="ident">ReadOnlyDevice</span>,
     <span class="kw">pub</span> <span class="ident">other_identity</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ReadOnlyUserIdentities</span><span class="op">&gt;</span>,
 }
@@ -913,6 +929,20 @@
         <span class="ident">key_id</span>.<span class="ident">to_string</span>(),
         <span class="ident">sas</span>.<span class="ident">calculate_mac</span>(<span class="ident">key</span>, <span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">&quot;{}{}&quot;</span>, <span class="ident">info</span>, <span class="ident">key_id</span>)).<span class="ident">expect</span>(<span class="string">&quot;Can&#39;t calculate SAS MAC&quot;</span>),
     );
+
+    <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">own_identity</span>) <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">ids</span>.<span class="ident">own_identity</span> {
+        <span class="kw">if</span> <span class="ident">own_identity</span>.<span class="ident">is_verified</span>() {
+            <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">key</span>) <span class="op">=</span> <span class="ident">own_identity</span>.<span class="ident">master_key</span>().<span class="ident">get_first_key</span>() {
+                <span class="kw">let</span> <span class="ident">key_id</span> <span class="op">=</span> <span class="macro">format!</span>(<span class="string">&quot;{}:{}&quot;</span>, <span class="ident">DeviceKeyAlgorithm::Ed25519</span>, <span class="kw-2">&amp;</span><span class="ident">key</span>);
+
+                <span class="kw">let</span> <span class="ident">calculated_mac</span> <span class="op">=</span> <span class="ident">sas</span>
+                    .<span class="ident">calculate_mac</span>(<span class="ident">key</span>, <span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">&quot;{}{}&quot;</span>, <span class="ident">info</span>, <span class="kw-2">&amp;</span><span class="ident">key_id</span>))
+                    .<span class="ident">expect</span>(<span class="string">&quot;Can&#39;t calculate SAS Master key MAC&quot;</span>);
+
+                <span class="ident">mac</span>.<span class="ident">insert</span>(<span class="ident">key_id</span>, <span class="ident">calculated_mac</span>);
+            }
+        }
+    }
 
     <span class="comment">// TODO Add the cross signing master key here if we trust/have it.</span>
 

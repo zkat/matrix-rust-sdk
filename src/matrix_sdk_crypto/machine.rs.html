@@ -1863,6 +1863,77 @@
 <span id="1863">1863</span>
 <span id="1864">1864</span>
 <span id="1865">1865</span>
+<span id="1866">1866</span>
+<span id="1867">1867</span>
+<span id="1868">1868</span>
+<span id="1869">1869</span>
+<span id="1870">1870</span>
+<span id="1871">1871</span>
+<span id="1872">1872</span>
+<span id="1873">1873</span>
+<span id="1874">1874</span>
+<span id="1875">1875</span>
+<span id="1876">1876</span>
+<span id="1877">1877</span>
+<span id="1878">1878</span>
+<span id="1879">1879</span>
+<span id="1880">1880</span>
+<span id="1881">1881</span>
+<span id="1882">1882</span>
+<span id="1883">1883</span>
+<span id="1884">1884</span>
+<span id="1885">1885</span>
+<span id="1886">1886</span>
+<span id="1887">1887</span>
+<span id="1888">1888</span>
+<span id="1889">1889</span>
+<span id="1890">1890</span>
+<span id="1891">1891</span>
+<span id="1892">1892</span>
+<span id="1893">1893</span>
+<span id="1894">1894</span>
+<span id="1895">1895</span>
+<span id="1896">1896</span>
+<span id="1897">1897</span>
+<span id="1898">1898</span>
+<span id="1899">1899</span>
+<span id="1900">1900</span>
+<span id="1901">1901</span>
+<span id="1902">1902</span>
+<span id="1903">1903</span>
+<span id="1904">1904</span>
+<span id="1905">1905</span>
+<span id="1906">1906</span>
+<span id="1907">1907</span>
+<span id="1908">1908</span>
+<span id="1909">1909</span>
+<span id="1910">1910</span>
+<span id="1911">1911</span>
+<span id="1912">1912</span>
+<span id="1913">1913</span>
+<span id="1914">1914</span>
+<span id="1915">1915</span>
+<span id="1916">1916</span>
+<span id="1917">1917</span>
+<span id="1918">1918</span>
+<span id="1919">1919</span>
+<span id="1920">1920</span>
+<span id="1921">1921</span>
+<span id="1922">1922</span>
+<span id="1923">1923</span>
+<span id="1924">1924</span>
+<span id="1925">1925</span>
+<span id="1926">1926</span>
+<span id="1927">1927</span>
+<span id="1928">1928</span>
+<span id="1929">1929</span>
+<span id="1930">1930</span>
+<span id="1931">1931</span>
+<span id="1932">1932</span>
+<span id="1933">1933</span>
+<span id="1934">1934</span>
+<span id="1935">1935</span>
+<span id="1936">1936</span>
 </pre><pre class="rust">
 <span class="comment">// Copyright 2020 The Matrix.org Foundation C.I.C.</span>
 <span class="comment">//</span>
@@ -1904,6 +1975,7 @@
             <span class="ident">EncryptedEventContent</span>, <span class="ident">EncryptedEventScheme</span>, <span class="ident">EncryptedToDeviceEventContent</span>,
         },
         <span class="ident">room_key::RoomKeyToDeviceEventContent</span>,
+        <span class="ident">secret::request::SecretName</span>,
         <span class="ident">AnyMessageEventContent</span>, <span class="ident">AnyRoomEvent</span>, <span class="ident">AnyToDeviceEvent</span>, <span class="ident">SyncMessageEvent</span>, <span class="ident">ToDeviceEvent</span>,
     },
     <span class="ident">DeviceId</span>, <span class="ident">DeviceIdBox</span>, <span class="ident">DeviceKeyAlgorithm</span>, <span class="ident">EventEncryptionAlgorithm</span>, <span class="ident">RoomId</span>, <span class="ident">UInt</span>, <span class="ident">UserId</span>,
@@ -1914,21 +1986,21 @@
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::store::sled::SledStore</span>;
 <span class="kw">use</span> <span class="kw">crate</span>::{
     <span class="ident">error</span>::{<span class="ident">EventError</span>, <span class="ident">MegolmError</span>, <span class="ident">MegolmResult</span>, <span class="ident">OlmError</span>, <span class="ident">OlmResult</span>},
+    <span class="ident">gossiping::GossipMachine</span>,
     <span class="ident">identities</span>::{<span class="ident">user::UserIdentities</span>, <span class="ident">Device</span>, <span class="ident">IdentityManager</span>, <span class="ident">UserDevices</span>},
-    <span class="ident">key_request::KeyRequestMachine</span>,
     <span class="ident">olm</span>::{
-        <span class="ident">Account</span>, <span class="ident">EncryptionSettings</span>, <span class="ident">ExportedRoomKey</span>, <span class="ident">GroupSessionKey</span>, <span class="ident">IdentityKeys</span>,
-        <span class="ident">InboundGroupSession</span>, <span class="ident">OlmDecryptionInfo</span>, <span class="ident">PrivateCrossSigningIdentity</span>, <span class="ident">ReadOnlyAccount</span>,
-        <span class="ident">SessionType</span>,
+        <span class="ident">Account</span>, <span class="ident">CrossSigningStatus</span>, <span class="ident">EncryptionSettings</span>, <span class="ident">ExportedRoomKey</span>, <span class="ident">GroupSessionKey</span>,
+        <span class="ident">IdentityKeys</span>, <span class="ident">InboundGroupSession</span>, <span class="ident">OlmDecryptionInfo</span>, <span class="ident">PrivateCrossSigningIdentity</span>,
+        <span class="ident">ReadOnlyAccount</span>, <span class="ident">SessionType</span>,
     },
     <span class="ident">requests</span>::{<span class="ident">IncomingResponse</span>, <span class="ident">OutgoingRequest</span>, <span class="ident">UploadSigningKeysRequest</span>},
     <span class="ident">session_manager</span>::{<span class="ident">GroupSessionManager</span>, <span class="ident">SessionManager</span>},
     <span class="ident">store</span>::{
         <span class="ident">Changes</span>, <span class="ident">CryptoStore</span>, <span class="ident">DeviceChanges</span>, <span class="ident">IdentityChanges</span>, <span class="ident">MemoryStore</span>, <span class="prelude-ty">Result</span> <span class="kw">as</span> <span class="ident">StoreResult</span>,
-        <span class="ident">Store</span>,
+        <span class="ident">SecretImportError</span>, <span class="ident">Store</span>,
     },
     <span class="ident">verification</span>::{<span class="ident">Verification</span>, <span class="ident">VerificationMachine</span>, <span class="ident">VerificationRequest</span>},
-    <span class="ident">ToDeviceRequest</span>,
+    <span class="ident">CrossSigningKeyExport</span>, <span class="ident">ToDeviceRequest</span>,
 };
 
 <span class="doccomment">/// State machine implementation of the Olm/Megolm encryption protocol used for</span>
@@ -1959,7 +2031,7 @@
     <span class="ident">verification_machine</span>: <span class="ident">VerificationMachine</span>,
     <span class="doccomment">/// The state machine that is responsible to handle outgoing and incoming</span>
     <span class="doccomment">/// key requests.</span>
-    <span class="ident">key_request_machine</span>: <span class="ident">KeyRequestMachine</span>,
+    <span class="ident">key_request_machine</span>: <span class="ident">GossipMachine</span>,
     <span class="doccomment">/// State machine handling public user identities and devices, keeping track</span>
     <span class="doccomment">/// of when a key query needs to be done and handling one.</span>
     <span class="ident">identity_manager</span>: <span class="ident">IdentityManager</span>,
@@ -2023,7 +2095,7 @@
 
         <span class="kw">let</span> <span class="ident">group_session_manager</span> <span class="op">=</span> <span class="ident">GroupSessionManager::new</span>(<span class="ident">account</span>.<span class="ident">clone</span>(), <span class="ident">store</span>.<span class="ident">clone</span>());
 
-        <span class="kw">let</span> <span class="ident">key_request_machine</span> <span class="op">=</span> <span class="ident">KeyRequestMachine::new</span>(
+        <span class="kw">let</span> <span class="ident">key_request_machine</span> <span class="op">=</span> <span class="ident">GossipMachine::new</span>(
             <span class="ident">user_id</span>.<span class="ident">clone</span>(),
             <span class="ident">device_id</span>.<span class="ident">clone</span>(),
             <span class="ident">store</span>.<span class="ident">clone</span>(),
@@ -2081,12 +2153,15 @@
     ) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">StoreResult</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">account</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">store</span>.<span class="ident">load_account</span>().<span class="kw">await</span><span class="question-mark">?</span> {
             <span class="prelude-val">Some</span>(<span class="ident">a</span>) <span class="op">=</span><span class="op">&gt;</span> {
-                <span class="macro">debug!</span>(<span class="string">&quot;Restored account&quot;</span>);
+                <span class="macro">debug!</span>(<span class="ident">ed25519_key</span> <span class="op">=</span> <span class="ident">a</span>.<span class="ident">identity_keys</span>().<span class="ident">ed25519</span>(), <span class="string">&quot;Restored an Olm account&quot;</span>);
                 <span class="ident">a</span>
             }
             <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> {
-                <span class="macro">debug!</span>(<span class="string">&quot;Creating a new account&quot;</span>);
                 <span class="kw">let</span> <span class="ident">account</span> <span class="op">=</span> <span class="ident">ReadOnlyAccount::new</span>(<span class="kw-2">&amp;</span><span class="ident">user_id</span>, <span class="kw-2">&amp;</span><span class="ident">device_id</span>);
+                <span class="macro">debug!</span>(
+                    <span class="ident">ed25519_key</span> <span class="op">=</span> <span class="ident">account</span>.<span class="ident">identity_keys</span>().<span class="ident">ed25519</span>(),
+                    <span class="string">&quot;Created a new Olm account&quot;</span>
+                );
                 <span class="ident">store</span>.<span class="ident">save_account</span>(<span class="ident">account</span>.<span class="ident">clone</span>()).<span class="kw">await</span><span class="question-mark">?</span>;
                 <span class="ident">account</span>
             }
@@ -2094,7 +2169,14 @@
 
         <span class="kw">let</span> <span class="ident">identity</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">store</span>.<span class="ident">load_identity</span>().<span class="kw">await</span><span class="question-mark">?</span> {
             <span class="prelude-val">Some</span>(<span class="ident">i</span>) <span class="op">=</span><span class="op">&gt;</span> {
-                <span class="macro">debug!</span>(<span class="string">&quot;Restored the cross signing identity&quot;</span>);
+                <span class="kw">let</span> <span class="ident">master_key</span> <span class="op">=</span> <span class="ident">i</span>
+                    .<span class="ident">master_public_key</span>()
+                    .<span class="kw">await</span>
+                    .<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">m</span><span class="op">|</span> <span class="ident">m</span>.<span class="ident">get_first_key</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">m</span><span class="op">|</span> <span class="ident">m</span>.<span class="ident">to_string</span>()));
+                <span class="macro">debug!</span>(
+                    <span class="ident">master_key</span> <span class="op">=</span><span class="question-mark">?</span> <span class="ident">master_key</span>,
+                    <span class="string">&quot;Restored the cross signing identity&quot;</span>
+                );
                 <span class="ident">i</span>
             }
             <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> {
@@ -2141,6 +2223,11 @@
     <span class="doccomment">/// Get the public parts of our Olm identity keys.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">identity_keys</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="ident">IdentityKeys</span> {
         <span class="self">self</span>.<span class="ident">account</span>.<span class="ident">identity_keys</span>()
+    }
+
+    <span class="doccomment">/// Get the display name of our own device</span>
+    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">dislpay_name</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">StoreResult</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+        <span class="self">self</span>.<span class="ident">store</span>.<span class="ident">device_display_name</span>().<span class="kw">await</span>
     }
 
     <span class="doccomment">/// Get the outgoing requests that need to be sent out.</span>
@@ -2562,8 +2649,12 @@
                 .<span class="ident">key_request_machine</span>
                 .<span class="ident">receive_forwarded_room_key</span>(<span class="kw-2">&amp;</span><span class="ident">decrypted</span>.<span class="ident">sender_key</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">e</span>)
                 .<span class="kw">await</span><span class="question-mark">?</span>),
+            <span class="ident">AnyToDeviceEvent::SecretSend</span>(<span class="kw-2">mut</span> <span class="ident">e</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>((
+                <span class="self">self</span>.<span class="ident">key_request_machine</span>.<span class="ident">receive_secret</span>(<span class="kw-2">&amp;</span><span class="ident">decrypted</span>.<span class="ident">sender_key</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">e</span>).<span class="kw">await</span><span class="question-mark">?</span>,
+                <span class="prelude-val">None</span>,
+            )),
             <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> {
-                <span class="macro">warn!</span>(<span class="string">&quot;Received an unexpected encrypted to-device event&quot;</span>);
+                <span class="macro">warn!</span>(<span class="ident">event_type</span> <span class="op">=</span><span class="question-mark">?</span> <span class="ident">event</span>.<span class="ident">event_type</span>(), <span class="string">&quot;Received an unexpected encrypted to-device event&quot;</span>);
                 <span class="prelude-val">Ok</span>((<span class="prelude-val">Some</span>(<span class="ident">event</span>), <span class="prelude-val">None</span>))
             }
         }
@@ -2612,6 +2703,9 @@
         <span class="kw">match</span> <span class="ident">event</span> {
             <span class="ident">AnyToDeviceEvent::RoomKeyRequest</span>(<span class="ident">e</span>) <span class="op">=</span><span class="op">&gt;</span> {
                 <span class="self">self</span>.<span class="ident">key_request_machine</span>.<span class="ident">receive_incoming_key_request</span>(<span class="ident">e</span>)
+            }
+            <span class="ident">AnyToDeviceEvent::SecretRequest</span>(<span class="ident">e</span>) <span class="op">=</span><span class="op">&gt;</span> {
+                <span class="self">self</span>.<span class="ident">key_request_machine</span>.<span class="ident">receive_incoming_secret_request</span>(<span class="ident">e</span>)
             }
             <span class="ident">AnyToDeviceEvent::KeyVerificationAccept</span>(..)
             <span class="op">|</span> <span class="ident">AnyToDeviceEvent::KeyVerificationCancel</span>(..)
@@ -2677,19 +2771,26 @@
                 <span class="prelude-val">Ok</span>(<span class="ident">e</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">e</span>,
                 <span class="prelude-val">Err</span>(<span class="ident">e</span>) <span class="op">=</span><span class="op">&gt;</span> {
                     <span class="comment">// Skip invalid events.</span>
-                    <span class="macro">warn!</span>(<span class="string">&quot;Received an invalid to-device event {:?} {:?}&quot;</span>, <span class="ident">e</span>, <span class="ident">raw_event</span>);
+                    <span class="macro">warn!</span>(
+                        <span class="ident">error</span> <span class="op">=</span><span class="question-mark">?</span> <span class="ident">e</span>,
+                        <span class="string">&quot;Received an invalid to-device event&quot;</span>
+                    );
                     <span class="kw">continue</span>;
                 }
             };
 
-            <span class="macro">info!</span>(<span class="string">&quot;Received a to-device event {:?}&quot;</span>, <span class="ident">event</span>);
+            <span class="macro">info!</span>(
+                <span class="ident">sender</span> <span class="op">=</span> <span class="ident">event</span>.<span class="ident">sender</span>().<span class="ident">as_str</span>(),
+                <span class="ident">event_type</span> <span class="op">=</span> <span class="ident">event</span>.<span class="ident">event_type</span>(),
+                <span class="string">&quot;Received a to-device event&quot;</span>
+            );
 
             <span class="kw">match</span> <span class="ident">event</span> {
                 <span class="ident">AnyToDeviceEvent::RoomEncrypted</span>(<span class="ident">e</span>) <span class="op">=</span><span class="op">&gt;</span> {
                     <span class="kw">let</span> <span class="ident">decrypted</span> <span class="op">=</span> <span class="kw">match</span> <span class="self">self</span>.<span class="ident">decrypt_to_device_event</span>(<span class="kw-2">&amp;</span><span class="ident">e</span>).<span class="kw">await</span> {
                         <span class="prelude-val">Ok</span>(<span class="ident">e</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">e</span>,
                         <span class="prelude-val">Err</span>(<span class="ident">err</span>) <span class="op">=</span><span class="op">&gt;</span> {
-                            <span class="macro">warn!</span>(<span class="string">&quot;Failed to decrypt to-device event from {} {}&quot;</span>, <span class="ident">e</span>.<span class="ident">sender</span>, <span class="ident">err</span>);
+                            <span class="macro">warn!</span>(<span class="ident">sender</span> <span class="op">=</span> <span class="ident">e</span>.<span class="ident">sender</span>.<span class="ident">as_str</span>(), <span class="ident">error</span> <span class="op">=</span><span class="question-mark">?</span> <span class="ident">e</span>, <span class="string">&quot;Failed to decrypt to-device event&quot;</span>);
 
                             <span class="kw">if</span> <span class="kw">let</span> <span class="ident">OlmError::SessionWedged</span>(<span class="ident">sender</span>, <span class="ident">curve_key</span>) <span class="op">=</span> <span class="ident">err</span> {
                                 <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Err</span>(<span class="ident">e</span>) <span class="op">=</span> <span class="self">self</span>
@@ -2698,8 +2799,9 @@
                                     .<span class="kw">await</span>
                                 {
                                     <span class="macro">error!</span>(
-                                        <span class="string">&quot;Couldn&#39;t mark device from {} to be unwedged {:?}&quot;</span>,
-                                        <span class="ident">sender</span>, <span class="ident">e</span>
+                                        <span class="ident">sender</span> <span class="op">=</span> <span class="ident">sender</span>.<span class="ident">as_str</span>(),
+                                        <span class="ident">error</span> <span class="op">=</span><span class="question-mark">?</span> <span class="ident">e</span>,
+                                        <span class="string">&quot;Couldn&#39;t mark device from to be unwedged&quot;</span>,
                                     );
                                 }
                             }
@@ -3092,6 +3194,46 @@
         }
 
         <span class="prelude-val">Ok</span>(<span class="ident">exported</span>)
+    }
+
+    <span class="doccomment">/// Get the status of the private cross signing keys.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// This can be used to check which private cross signing keys we have</span>
+    <span class="doccomment">/// stored locally.</span>
+    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">cross_signing_status</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">CrossSigningStatus</span> {
+        <span class="self">self</span>.<span class="ident">user_identity</span>.<span class="ident">lock</span>().<span class="kw">await</span>.<span class="ident">status</span>().<span class="kw">await</span>
+    }
+
+    <span class="doccomment">/// Export all the private cross signing keys we have.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// The export will contain the seed for the ed25519 keys as a unpadded</span>
+    <span class="doccomment">/// base64 encoded string.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// This method returns `None` if we don&#39;t have any private cross signing</span>
+    <span class="doccomment">/// keys.</span>
+    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">export_cross_signing_keys</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">CrossSigningKeyExport</span><span class="op">&gt;</span> {
+        <span class="kw">let</span> <span class="ident">master_key</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">store</span>.<span class="ident">export_secret</span>(<span class="kw-2">&amp;</span><span class="ident">SecretName::CrossSigningMasterKey</span>).<span class="kw">await</span>;
+        <span class="kw">let</span> <span class="ident">self_signing_key</span> <span class="op">=</span>
+            <span class="self">self</span>.<span class="ident">store</span>.<span class="ident">export_secret</span>(<span class="kw-2">&amp;</span><span class="ident">SecretName::CrossSigningSelfSigningKey</span>).<span class="kw">await</span>;
+        <span class="kw">let</span> <span class="ident">user_signing_key</span> <span class="op">=</span>
+            <span class="self">self</span>.<span class="ident">store</span>.<span class="ident">export_secret</span>(<span class="kw-2">&amp;</span><span class="ident">SecretName::CrossSigningUserSigningKey</span>).<span class="kw">await</span>;
+
+        <span class="kw">if</span> <span class="ident">master_key</span>.<span class="ident">is_none</span>() <span class="op">&amp;&amp;</span> <span class="ident">self_signing_key</span>.<span class="ident">is_none</span>() <span class="op">&amp;&amp;</span> <span class="ident">user_signing_key</span>.<span class="ident">is_none</span>() {
+            <span class="prelude-val">None</span>
+        } <span class="kw">else</span> {
+            <span class="prelude-val">Some</span>(<span class="ident">CrossSigningKeyExport</span> { <span class="ident">master_key</span>, <span class="ident">self_signing_key</span>, <span class="ident">user_signing_key</span> })
+        }
+    }
+
+    <span class="doccomment">/// Import our private cross signing keys.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// The export needs to contain the seed for the ed25519 keys as an unpadded</span>
+    <span class="doccomment">/// base64 encoded string.</span>
+    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">import_cross_signing_keys</span>(
+        <span class="kw-2">&amp;</span><span class="self">self</span>,
+        <span class="ident">export</span>: <span class="ident">CrossSigningKeyExport</span>,
+    ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">CrossSigningStatus</span>, <span class="ident">SecretImportError</span><span class="op">&gt;</span> {
+        <span class="self">self</span>.<span class="ident">store</span>.<span class="ident">import_cross_signing_keys</span>(<span class="ident">export</span>).<span class="kw">await</span>
     }
 }
 

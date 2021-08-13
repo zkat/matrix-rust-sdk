@@ -189,6 +189,19 @@
 <span id="189">189</span>
 <span id="190">190</span>
 <span id="191">191</span>
+<span id="192">192</span>
+<span id="193">193</span>
+<span id="194">194</span>
+<span id="195">195</span>
+<span id="196">196</span>
+<span id="197">197</span>
+<span id="198">198</span>
+<span id="199">199</span>
+<span id="200">200</span>
+<span id="201">201</span>
+<span id="202">202</span>
+<span id="203">203</span>
+<span id="204">204</span>
 </pre><pre class="rust">
 <span class="comment">// Copyright 2020 The Matrix.org Foundation C.I.C.</span>
 <span class="comment">//</span>
@@ -327,29 +340,42 @@
     <span class="ident">SessionTimestampError</span>,
 }
 
+<span class="doccomment">/// Error type describin different errors that happen when we check or create</span>
+<span class="doccomment">/// signatures for a Matrix JSON object.</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Error</span>, <span class="ident">Debug</span>)]</span>
 <span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">SignatureError</span> {
-    <span class="attribute">#[<span class="ident">error</span>(<span class="string">&quot;the signature used a unsupported algorithm&quot;</span>)]</span>
+    <span class="doccomment">/// The signature was made using an unsupported algorithm.</span>
+    <span class="attribute">#[<span class="ident">error</span>(<span class="string">&quot;the signature used an unsupported algorithm&quot;</span>)]</span>
     <span class="ident">UnsupportedAlgorithm</span>,
 
-    <span class="attribute">#[<span class="ident">error</span>(<span class="string">&quot;the key id of the signing key is invalid&quot;</span>)]</span>
+    <span class="doccomment">/// The ID of the signing key isn&#39;t a valid key ID.</span>
+    <span class="attribute">#[<span class="ident">error</span>(<span class="string">&quot;the ID of the signing key is invalid&quot;</span>)]</span>
     <span class="ident">InvalidKeyId</span>(<span class="attribute">#[<span class="ident">from</span>]</span> <span class="ident">IdentifierError</span>),
 
+    <span class="doccomment">/// The signing key that should create or check a signature is missing.</span>
     <span class="attribute">#[<span class="ident">error</span>(<span class="string">&quot;the signing key is missing from the object that signed the message&quot;</span>)]</span>
     <span class="ident">MissingSigningKey</span>,
 
-    <span class="attribute">#[<span class="ident">error</span>(<span class="string">&quot;the user id of the signing differs from the subkey user id&quot;</span>)]</span>
+    <span class="doccomment">/// The user id of signing key differs from the user id that provided the</span>
+    <span class="doccomment">/// signature.</span>
+    <span class="attribute">#[<span class="ident">error</span>(<span class="string">&quot;the user id of the signing key differs user id that provided the signature&quot;</span>)]</span>
     <span class="ident">UserIdMissmatch</span>,
 
+    <span class="doccomment">/// The provided JSON value that was signed and the signature should be</span>
+    <span class="doccomment">/// checked isn&#39;t a valid JSON object.</span>
     <span class="attribute">#[<span class="ident">error</span>(<span class="string">&quot;the provided JSON value isn&#39;t an object&quot;</span>)]</span>
     <span class="ident">NotAnObject</span>,
 
+    <span class="doccomment">/// The provided JSON value that was signed and the signature should be</span>
+    <span class="doccomment">/// checked isn&#39;t a valid JSON object.</span>
     <span class="attribute">#[<span class="ident">error</span>(<span class="string">&quot;the provided JSON object doesn&#39;t contain a signatures field&quot;</span>)]</span>
     <span class="ident">NoSignatureFound</span>,
 
+    <span class="doccomment">/// The signature couldn&#39;t be verified.</span>
     <span class="attribute">#[<span class="ident">error</span>(<span class="string">&quot;the signature didn&#39;t match the provided key&quot;</span>)]</span>
     <span class="ident">VerificationError</span>,
 
+    <span class="doccomment">/// The signed object couldn&#39;t be deserialized.</span>
     <span class="attribute">#[<span class="ident">error</span>(<span class="ident">transparent</span>)]</span>
     <span class="ident">JsonError</span>(<span class="attribute">#[<span class="ident">from</span>]</span> <span class="ident">SerdeError</span>),
 }
