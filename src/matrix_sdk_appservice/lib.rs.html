@@ -537,6 +537,13 @@
 <span id="537">537</span>
 <span id="538">538</span>
 <span id="539">539</span>
+<span id="540">540</span>
+<span id="541">541</span>
+<span id="542">542</span>
+<span id="543">543</span>
+<span id="544">544</span>
+<span id="545">545</span>
+<span id="546">546</span>
 </pre><pre class="rust"><code><span class="comment">// Copyright 2021 Famedly GmbH</span>
 <span class="comment">//</span>
 <span class="comment">// Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);</span>
@@ -573,14 +580,10 @@
 <span class="doccomment">//! ```no_run</span>
 <span class="doccomment">//! # async {</span>
 <span class="doccomment">//! #</span>
-<span class="doccomment">//! # use matrix_sdk::{async_trait, EventHandler};</span>
-<span class="doccomment">//! #</span>
-<span class="doccomment">//! # struct MyEventHandler;</span>
-<span class="doccomment">//! #</span>
-<span class="doccomment">//! # #[async_trait]</span>
-<span class="doccomment">//! # impl EventHandler for MyEventHandler {}</span>
-<span class="doccomment">//! #</span>
-<span class="doccomment">//! use matrix_sdk_appservice::{AppService, AppServiceRegistration};</span>
+<span class="doccomment">//! use matrix_sdk_appservice::{</span>
+<span class="doccomment">//!     ruma::events::{SyncStateEvent, room::member::MemberEventContent},</span>
+<span class="doccomment">//!     AppService, AppServiceRegistration</span>
+<span class="doccomment">//! };</span>
 <span class="doccomment">//!</span>
 <span class="doccomment">//! let homeserver_url = &quot;http://127.0.0.1:8008&quot;;</span>
 <span class="doccomment">//! let server_name = &quot;localhost&quot;;</span>
@@ -598,7 +601,9 @@
 <span class="doccomment">//!     &quot;)?;</span>
 <span class="doccomment">//!</span>
 <span class="doccomment">//! let mut appservice = AppService::new(homeserver_url, server_name, registration).await?;</span>
-<span class="doccomment">//! appservice.set_event_handler(Box::new(MyEventHandler)).await?;</span>
+<span class="doccomment">//! appservice.register_event_handler(|_ev: SyncStateEvent&lt;MemberEventContent&gt;| async {</span>
+<span class="doccomment">//!     // do stuff</span>
+<span class="doccomment">//! });</span>
 <span class="doccomment">//!</span>
 <span class="doccomment">//! let (host, port) = appservice.registration().get_host_and_port()?;</span>
 <span class="doccomment">//! appservice.run(host, port).await?;</span>
@@ -619,6 +624,7 @@
 <span class="kw">use</span> <span class="ident">std</span>::{
     <span class="ident">convert</span>::{<span class="ident">TryFrom</span>, <span class="ident">TryInto</span>},
     <span class="ident">fs::File</span>,
+    <span class="ident">future::Future</span>,
     <span class="ident">ops::Deref</span>,
     <span class="ident">path::PathBuf</span>,
     <span class="ident">sync::Arc</span>,
@@ -631,7 +637,10 @@
 <span class="attribute">#[<span class="ident">doc</span>(<span class="ident">no_inline</span>)]</span>
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">matrix_sdk::ruma</span>;
 <span class="kw">use</span> <span class="ident">matrix_sdk</span>::{
-    <span class="ident">bytes::Bytes</span>, <span class="ident">reqwest::Url</span>, <span class="ident">Client</span>, <span class="ident">ClientConfig</span>, <span class="ident">EventHandler</span>, <span class="ident">HttpError</span>, <span class="ident">Session</span>,
+    <span class="ident">bytes::Bytes</span>,
+    <span class="ident">event_handler</span>::{<span class="ident">EventHandler</span>, <span class="ident">EventHandlerResult</span>, <span class="ident">SyncEvent</span>},
+    <span class="ident">reqwest::Url</span>,
+    <span class="ident">Client</span>, <span class="ident">ClientConfig</span>, <span class="ident">HttpError</span>, <span class="ident">Session</span>,
 };
 <span class="kw">use</span> <span class="ident">regex::Regex</span>;
 <span class="kw">use</span> <span class="ident">ruma</span>::{
@@ -645,12 +654,13 @@
     },
     <span class="ident">assign</span>, <span class="ident">identifiers</span>, <span class="ident">DeviceId</span>, <span class="ident">ServerNameBox</span>, <span class="ident">UserId</span>,
 };
+<span class="kw">use</span> <span class="ident">serde::de::DeserializeOwned</span>;
 <span class="kw">use</span> <span class="ident">tracing</span>::{<span class="ident">info</span>, <span class="ident">warn</span>};
 
 <span class="kw">mod</span> <span class="ident">error</span>;
 <span class="kw">mod</span> <span class="ident">webserver</span>;
 
-<span class="kw">pub</span> <span class="kw">type</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">std::result::Result</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">Error</span><span class="op">&gt;</span>;
+<span class="kw">pub</span> <span class="kw">type</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">E</span> <span class="op">=</span> <span class="ident">Error</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">std::result::Result</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">E</span><span class="op">&gt;</span>;
 <span class="kw">pub</span> <span class="kw">type</span> <span class="ident">Host</span> <span class="op">=</span> <span class="ident">String</span>;
 <span class="kw">pub</span> <span class="kw">type</span> <span class="ident">Port</span> <span class="op">=</span> <span class="ident">u16</span>;
 
@@ -893,8 +903,8 @@
         <span class="prelude-val">Ok</span>(<span class="ident">entry</span>.<span class="ident">value</span>().<span class="ident">clone</span>())
     }
 
-    <span class="doccomment">/// Convenience wrapper around [`Client::set_event_handler()`] that attaches</span>
-    <span class="doccomment">/// the event handler to the [`MainUser`]&#39;s [`Client`]</span>
+    <span class="doccomment">/// Convenience wrapper around [`Client::register_event_handler()`] that</span>
+    <span class="doccomment">/// attaches the event handler to the [`MainUser`]&#39;s [`Client`]</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// Note that the event handler in the [`AppService`] context only triggers</span>
     <span class="doccomment">/// [`join` room `timeline` events], so no state events or events from the</span>
@@ -909,10 +919,14 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// [`join` room `timeline` events]: https://spec.matrix.org/unstable/client-server-api/#get_matrixclientr0sync</span>
     <span class="doccomment">/// [MSC2409]: https://github.com/matrix-org/matrix-doc/pull/2409</span>
-    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">set_event_handler</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">handler</span>: <span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">EventHandler</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">register_event_handler</span><span class="op">&lt;</span><span class="ident">Ev</span>, <span class="ident">Ctx</span>, <span class="ident">H</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">handler</span>: <span class="ident">H</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span>
+    <span class="kw">where</span>
+        <span class="ident">Ev</span>: <span class="ident">SyncEvent</span> <span class="op">+</span> <span class="ident">DeserializeOwned</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
+        <span class="ident">H</span>: <span class="ident">EventHandler</span><span class="op">&lt;</span><span class="ident">Ev</span>, <span class="ident">Ctx</span><span class="op">&gt;</span>,
+        <span class="op">&lt;</span><span class="ident">H::Future</span> <span class="kw">as</span> <span class="ident">Future</span><span class="op">&gt;</span><span class="ident">::Output</span>: <span class="ident">EventHandlerResult</span>,
+    {
         <span class="kw">let</span> <span class="ident">client</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">get_cached_client</span>(<span class="prelude-val">None</span>)<span class="question-mark">?</span>;
-
-        <span class="ident">client</span>.<span class="ident">set_event_handler</span>(<span class="ident">handler</span>).<span class="kw">await</span>;
+        <span class="ident">client</span>.<span class="ident">register_event_handler</span>(<span class="ident">handler</span>).<span class="kw">await</span>;
 
         <span class="prelude-val">Ok</span>(())
     }

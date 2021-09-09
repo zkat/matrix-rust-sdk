@@ -16,24 +16,26 @@ documentation</a>.</p>
 <p>The following crate feature flags are available:</p>
 <ul>
 <li><code>encryption</code>: Enables end-to-end encryption support in the library.</li>
-<li><code>sled_cryptostore</code>: Enables a Sled based store for the encryption
-keys. If this is disabled and <code>encryption</code> support is enabled the keys will
-by default be stored only in memory and thus lost after the client is
+<li><code>sled_cryptostore</code>: Enables a Sled based store for the encryption keys. If
+this is disabled and <code>encryption</code> support is enabled the keys will by
+default be stored only in memory and thus lost after the client is
 destroyed.</li>
 <li><code>markdown</code>: Support for sending markdown formatted messages.</li>
 <li><code>socks</code>: Enables SOCKS support in reqwest, the default HTTP client.</li>
 <li><code>sso_login</code>: Enables SSO login with a local http server.</li>
 <li><code>require_auth_for_profile_requests</code>: Whether to send the access token in
-the authentication
-header when calling endpoints that retrieve profile data. This matches the
-synapse configuration <code>require_auth_for_profile_requests</code>. Enabled by
-default.</li>
+the authentication header when calling endpoints that retrieve profile
+data. This matches the synapse configuration
+<code>require_auth_for_profile_requests</code>. Enabled by default.</li>
 <li><code>appservice</code>: Enables low-level appservice functionality. For an
 high-level API there’s the <code>matrix-sdk-appservice</code> crate</li>
+<li><code>anyhow</code>: Support for returning <code>anyhow::Result&lt;()&gt;</code> from event handlers.</li>
 </ul>
 </div></details><h2 id="reexports" class="section-header"><a href="#reexports">Re-exports</a></h2>
 <div class="item-table"><div class="item-left import-item"><code>pub use <a class="mod" href="https://docs.rs/bytes/1.1.0/bytes/index.html" title="mod bytes">bytes</a>;</code></div><div class="item-right docblock-short"></div><div class="item-left import-item"><code>pub use <a class="mod" href="https://docs.rs/reqwest/0.11.4/reqwest/index.html" title="mod reqwest">reqwest</a>;</code></div><div class="item-right docblock-short"></div><div class="item-left import-item"><code>pub use <a class="mod" href="https://docs.rs/ruma/0.3.0/ruma/index.html" title="mod ruma">ruma</a>;</code></div><div class="item-right docblock-short"></div></div><h2 id="modules" class="section-header"><a href="#modules">Modules</a></h2>
-<div class="item-table"><div class="item-left module-item"><a class="mod" href="deserialized_responses/index.html" title="matrix_sdk::deserialized_responses mod">deserialized_responses</a></div><div class="item-right docblock-short"></div><div class="item-left module-item"><a class="mod" href="executor/index.html" title="matrix_sdk::executor mod">executor</a></div><div class="item-right docblock-short"><p>Abstraction over an executor so we can spawn tasks under WASM the same way
+<div class="item-table"><div class="item-left module-item"><a class="mod" href="deserialized_responses/index.html" title="matrix_sdk::deserialized_responses mod">deserialized_responses</a></div><div class="item-right docblock-short"></div><div class="item-left module-item"><a class="mod" href="event_handler/index.html" title="matrix_sdk::event_handler mod">event_handler</a></div><div class="item-right docblock-short"><p>Types and traits related for event handlers. For usage, see
+<a href="struct.Client.html#method.register_event_handler" title="Client::register_event_handler"><code>Client::register_event_handler</code></a>.</p>
+</div><div class="item-left module-item"><a class="mod" href="executor/index.html" title="matrix_sdk::executor mod">executor</a></div><div class="item-right docblock-short"><p>Abstraction over an executor so we can spawn tasks under WASM the same way
 we do usually.</p>
 </div><div class="item-left module-item"><a class="mod" href="instant/index.html" title="matrix_sdk::instant mod">instant</a></div><div class="item-right docblock-short"></div><div class="item-left module-item"><a class="mod" href="locks/index.html" title="matrix_sdk::locks mod">locks</a></div><div class="item-right docblock-short"></div><div class="item-left module-item"><a class="mod" href="media/index.html" title="matrix_sdk::media mod">media</a></div><div class="item-right docblock-short"><p>Common types for <a href="https://matrix.org/docs/spec/client_server/r0.6.1#id66">media content</a>.</p>
 </div><div class="item-left module-item"><a class="mod" href="room/index.html" title="matrix_sdk::room mod">room</a></div><div class="item-right docblock-short"><p>High-level room API</p>
@@ -56,8 +58,7 @@ associated user account.</p>
 </div><div class="item-left module-item"><a class="struct" href="struct.StateChanges.html" title="matrix_sdk::StateChanges struct">StateChanges</a></div><div class="item-right docblock-short"><p>Store state changes and pass them to the StateStore.</p>
 </div><div class="item-left module-item"><a class="struct" href="struct.SyncSettings.html" title="matrix_sdk::SyncSettings struct">SyncSettings</a></div><div class="item-right docblock-short"><p>Settings for a sync call.</p>
 </div></div><h2 id="enums" class="section-header"><a href="#enums">Enums</a></h2>
-<div class="item-table"><div class="item-left module-item"><a class="enum" href="enum.CustomEvent.html" title="matrix_sdk::CustomEvent enum">CustomEvent</a></div><div class="item-right docblock-short"><p>This represents the various “unrecognized” events.</p>
-</div><div class="item-left module-item"><a class="enum" href="enum.Error.html" title="matrix_sdk::Error enum">Error</a></div><div class="item-right docblock-short"><p>Internal representation of errors.</p>
+<div class="item-table"><div class="item-left module-item"><a class="enum" href="enum.Error.html" title="matrix_sdk::Error enum">Error</a></div><div class="item-right docblock-short"><p>Internal representation of errors.</p>
 </div><div class="item-left module-item"><a class="enum" href="enum.HttpError.html" title="matrix_sdk::HttpError enum">HttpError</a></div><div class="item-right docblock-short"><p>An HTTP error, representing either a connection error or an error while
 converting the raw HTTP response into a Matrix response.</p>
 </div><div class="item-left module-item"><a class="enum" href="enum.LocalTrust.html" title="matrix_sdk::LocalTrust enum">LocalTrust</a><span class="stab portability" title="This is supported on `encryption` only"><code>encryption</code></span></div><div class="item-right docblock-short"><p>The local trust state of a device.</p>
@@ -69,9 +70,6 @@ joined, invited, or has left the room.</p>
 <div class="item-table"><div class="item-left module-item"><a class="trait" href="trait.AsyncTraitDeps.html" title="matrix_sdk::AsyncTraitDeps trait">AsyncTraitDeps</a></div><div class="item-right docblock-short"><p>Super trait that is used for our store traits, this trait will differ if
 it’s used on WASM. WASM targets will not require <code>Send</code> and <code>Sync</code> to have
 implemented, while other targets will.</p>
-</div><div class="item-left module-item"><a class="trait" href="trait.EventHandler.html" title="matrix_sdk::EventHandler trait">EventHandler</a></div><div class="item-right docblock-short"><p>This trait allows any type implementing <code>EventHandler</code> to specify event
-callbacks for each event. The <code>Client</code> calls each method when the
-corresponding event is received.</p>
 </div><div class="item-left module-item"><a class="trait" href="trait.HttpSend.html" title="matrix_sdk::HttpSend trait">HttpSend</a></div><div class="item-right docblock-short"><p>Abstraction around the http layer. The allows implementors to use different
 http libraries.</p>
 </div></div><h2 id="types" class="section-header"><a href="#types">Type Definitions</a></h2>

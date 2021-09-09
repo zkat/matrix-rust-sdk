@@ -153,23 +153,24 @@
 <span class="doccomment">//! The following crate feature flags are available:</span>
 <span class="doccomment">//!</span>
 <span class="doccomment">//! * `encryption`: Enables end-to-end encryption support in the library.</span>
-<span class="doccomment">//! * `sled_cryptostore`: Enables a Sled based store for the encryption</span>
-<span class="doccomment">//! keys. If this is disabled and `encryption` support is enabled the keys will</span>
-<span class="doccomment">//! by default be stored only in memory and thus lost after the client is</span>
-<span class="doccomment">//! destroyed.</span>
+<span class="doccomment">//! * `sled_cryptostore`: Enables a Sled based store for the encryption keys. If</span>
+<span class="doccomment">//!   this is disabled and `encryption` support is enabled the keys will by</span>
+<span class="doccomment">//!   default be stored only in memory and thus lost after the client is</span>
+<span class="doccomment">//!   destroyed.</span>
 <span class="doccomment">//! * `markdown`: Support for sending markdown formatted messages.</span>
 <span class="doccomment">//! * `socks`: Enables SOCKS support in reqwest, the default HTTP client.</span>
 <span class="doccomment">//! * `sso_login`: Enables SSO login with a local http server.</span>
 <span class="doccomment">//! * `require_auth_for_profile_requests`: Whether to send the access token in</span>
-<span class="doccomment">//!   the authentication</span>
-<span class="doccomment">//! header when calling endpoints that retrieve profile data. This matches the</span>
-<span class="doccomment">//! synapse configuration `require_auth_for_profile_requests`. Enabled by</span>
-<span class="doccomment">//! default.</span>
+<span class="doccomment">//!   the authentication header when calling endpoints that retrieve profile</span>
+<span class="doccomment">//!   data. This matches the synapse configuration</span>
+<span class="doccomment">//!   `require_auth_for_profile_requests`. Enabled by default.</span>
 <span class="doccomment">//! * `appservice`: Enables low-level appservice functionality. For an</span>
 <span class="doccomment">//!   high-level API there&#39;s the `matrix-sdk-appservice` crate</span>
+<span class="doccomment">//! * `anyhow`: Support for returning `anyhow::Result&lt;()&gt;` from event handlers.</span>
 
 <span class="attribute">#![<span class="ident">deny</span>(
     <span class="ident">missing_debug_implementations</span>,
+    <span class="ident">missing_docs</span>,
     <span class="ident">dead_code</span>,
     <span class="ident">missing_docs</span>,
     <span class="ident">trivial_casts</span>,
@@ -204,7 +205,7 @@
 
 <span class="kw">mod</span> <span class="ident">client</span>;
 <span class="kw">mod</span> <span class="ident">error</span>;
-<span class="kw">mod</span> <span class="ident">event_handler</span>;
+<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">event_handler</span>;
 <span class="kw">mod</span> <span class="ident">http_client</span>;
 <span class="doccomment">/// High-level room API</span>
 <span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">room</span>;
@@ -221,7 +222,6 @@
 <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;docs&quot;</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">encryption</span>)))]</span>
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">device::Device</span>;
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">error</span>::{<span class="ident">Error</span>, <span class="ident">HttpError</span>, <span class="prelude-ty">Result</span>};
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">event_handler</span>::{<span class="ident">CustomEvent</span>, <span class="ident">EventHandler</span>};
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">http_client::HttpSend</span>;
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">room_member::RoomMember</span>;
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">target_arch</span> <span class="op">=</span> <span class="string">&quot;wasm32&quot;</span>))]</span>
