@@ -1,6 +1,6 @@
 var N = null;var sourcesIndex = {};
 sourcesIndex["matrix_qrcode"] = {"name":"","files":["error.rs","lib.rs","types.rs","utils.rs"]};
-sourcesIndex["matrix_sdk"] = {"name":"","dirs":[{"name":"room","files":["common.rs","invited.rs","joined.rs","left.rs","mod.rs"]},{"name":"verification","files":["mod.rs","qrcode.rs","requests.rs","sas.rs"]}],"files":["client.rs","device.rs","error.rs","event_handler.rs","http_client.rs","lib.rs","room_member.rs"]};
+sourcesIndex["matrix_sdk"] = {"name":"","dirs":[{"name":"identities","files":["devices.rs","mod.rs","users.rs"]},{"name":"room","files":["common.rs","invited.rs","joined.rs","left.rs","mod.rs"]},{"name":"verification","files":["mod.rs","qrcode.rs","requests.rs","sas.rs"]}],"files":["client.rs","error.rs","event_handler.rs","http_client.rs","lib.rs","room_member.rs"]};
 sourcesIndex["matrix_sdk_appservice"] = {"name":"","dirs":[{"name":"webserver","files":["mod.rs","warp.rs"]}],"files":["error.rs","lib.rs"]};
 sourcesIndex["matrix_sdk_base"] = {"name":"","dirs":[{"name":"rooms","files":["members.rs","mod.rs","normal.rs"]},{"name":"store","dirs":[{"name":"sled_store","files":["mod.rs","store_key.rs"]}],"files":["ambiguity_map.rs","memory_store.rs","mod.rs"]}],"files":["client.rs","error.rs","lib.rs","media.rs","session.rs"]};
 sourcesIndex["matrix_sdk_common"] = {"name":"","files":["deserialized_responses.rs","executor.rs","lib.rs","locks.rs"]};

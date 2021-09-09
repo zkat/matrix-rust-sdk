@@ -640,7 +640,7 @@
     <span class="ident">bytes::Bytes</span>,
     <span class="ident">event_handler</span>::{<span class="ident">EventHandler</span>, <span class="ident">EventHandlerResult</span>, <span class="ident">SyncEvent</span>},
     <span class="ident">reqwest::Url</span>,
-    <span class="ident">Client</span>, <span class="ident">ClientConfig</span>, <span class="ident">HttpError</span>, <span class="ident">Session</span>,
+    <span class="ident">Client</span>, <span class="ident">ClientConfig</span>, <span class="ident">Session</span>,
 };
 <span class="kw">use</span> <span class="ident">regex::Regex</span>;
 <span class="kw">use</span> <span class="ident">ruma</span>::{
@@ -948,9 +948,9 @@
         <span class="kw">match</span> <span class="ident">client</span>.<span class="ident">register</span>(<span class="ident">request</span>).<span class="kw">await</span> {
             <span class="prelude-val">Ok</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> (),
             <span class="prelude-val">Err</span>(<span class="ident">error</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="kw">match</span> <span class="ident">error</span> {
-                <span class="ident">matrix_sdk::Error::Http</span>(<span class="ident">HttpError::UiaaError</span>(<span class="ident">FromHttpResponseError::Http</span>(
+                <span class="ident">matrix_sdk::HttpError::UiaaError</span>(<span class="ident">FromHttpResponseError::Http</span>(
                     <span class="ident">ServerError::Known</span>(<span class="ident">UiaaResponse::MatrixError</span>(<span class="kw-2">ref</span> <span class="ident">matrix_error</span>)),
-                ))) <span class="op">=</span><span class="op">&gt;</span> {
+                )) <span class="op">=</span><span class="op">&gt;</span> {
                     <span class="kw">match</span> <span class="ident">matrix_error</span>.<span class="ident">kind</span> {
                         <span class="ident">ErrorKind::UserInUse</span> <span class="op">=</span><span class="op">&gt;</span> {
                             <span class="comment">// TODO: persist the fact that we registered that user</span>
