@@ -4484,6 +4484,24 @@
 <span id="4484">4484</span>
 <span id="4485">4485</span>
 <span id="4486">4486</span>
+<span id="4487">4487</span>
+<span id="4488">4488</span>
+<span id="4489">4489</span>
+<span id="4490">4490</span>
+<span id="4491">4491</span>
+<span id="4492">4492</span>
+<span id="4493">4493</span>
+<span id="4494">4494</span>
+<span id="4495">4495</span>
+<span id="4496">4496</span>
+<span id="4497">4497</span>
+<span id="4498">4498</span>
+<span id="4499">4499</span>
+<span id="4500">4500</span>
+<span id="4501">4501</span>
+<span id="4502">4502</span>
+<span id="4503">4503</span>
+<span id="4504">4504</span>
 </pre><pre class="rust"><code><span class="comment">// Copyright 2020 Damir Jelić</span>
 <span class="comment">// Copyright 2020 The Matrix.org Foundation C.I.C.</span>
 <span class="comment">//</span>
@@ -5406,8 +5424,10 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// # Examples</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// ```no_run</span>
-    <span class="doccomment">/// # let client: matrix_sdk::Client = unimplemented!();</span>
+    <span class="doccomment">/// ```</span>
+    <span class="doccomment">/// # use url::Url;</span>
+    <span class="doccomment">/// # let homeserver = Url::parse(&quot;http://localhost:8080&quot;).unwrap();</span>
+    <span class="doccomment">/// # let client = Client::new(homeserver).unwrap();</span>
     <span class="doccomment">/// use matrix_sdk::{</span>
     <span class="doccomment">///     room::Room,</span>
     <span class="doccomment">///     ruma::{</span>
@@ -5426,18 +5446,21 @@
     <span class="doccomment">/// # let _ = async {</span>
     <span class="doccomment">/// client</span>
     <span class="doccomment">///     .register_event_handler(</span>
-    <span class="doccomment">///         |ev: SyncMessageEvent&lt;MessageEventContent&gt;, room: Room, client: Client| async move {</span>
+    <span class="doccomment">///         |ev: SyncMessageEvent&lt;MessageEventContent&gt;,</span>
+    <span class="doccomment">///          room: Room,</span>
+    <span class="doccomment">///          client: Client| async move {</span>
     <span class="doccomment">///             // Common usage: Room event plus room and client.</span>
     <span class="doccomment">///         },</span>
     <span class="doccomment">///     )</span>
     <span class="doccomment">///     .await</span>
-    <span class="doccomment">///     .register_event_handler(|ev: SyncStateEvent&lt;TopicEventContent&gt;| async move {</span>
-    <span class="doccomment">///         // Also possible: Omit any or all arguments after the first.</span>
-    <span class="doccomment">///     })</span>
-    <span class="doccomment">///     .await;</span>
+    <span class="doccomment">///     .register_event_handler(</span>
+    <span class="doccomment">///         |ev: SyncStateEvent&lt;TopicEventContent&gt;| async move {</span>
+    <span class="doccomment">///             // Also possible: Omit any or all arguments after the first.</span>
+    <span class="doccomment">///         }</span>
+    <span class="doccomment">///     ).await;</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// // Custom events work exactly the same way, you just need to declare the content struct and</span>
-    <span class="doccomment">/// // use the EventContent derive macro on it.</span>
+    <span class="doccomment">/// // Custom events work exactly the same way, you just need to declare</span>
+    <span class="doccomment">/// // the content struct and use the EventContent derive macro on it.</span>
     <span class="doccomment">/// #[derive(Clone, Debug, Deserialize, Serialize, EventContent)]</span>
     <span class="doccomment">/// #[ruma_event(type = &quot;org.shiny_new_2fa.token&quot;, kind = Message)]</span>
     <span class="doccomment">/// struct TokenEventContent {</span>
@@ -5451,6 +5474,19 @@
     <span class="doccomment">///         todo!(&quot;Display the token&quot;);</span>
     <span class="doccomment">///     },</span>
     <span class="doccomment">/// ).await;</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// // Adding your custom data to the handler can be done as well</span>
+    <span class="doccomment">/// let data = &quot;MyCustomIdentifier&quot;.to_string();</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// client.register_event_handler({</span>
+    <span class="doccomment">///     let data = data.clone();</span>
+    <span class="doccomment">///     move |ev: SyncMessageEvent&lt;MessageEventContent&gt; | {</span>
+    <span class="doccomment">///         let data = data.clone();</span>
+    <span class="doccomment">///         async move {</span>
+    <span class="doccomment">///             println!(&quot;Calling the handler with identifier {}&quot;, data);</span>
+    <span class="doccomment">///         }</span>
+    <span class="doccomment">///     }</span>
+    <span class="doccomment">/// }).await;</span>
     <span class="doccomment">/// # };</span>
     <span class="doccomment">/// ```</span>
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">register_event_handler</span><span class="op">&lt;</span><span class="ident">Ev</span>, <span class="ident">Ctx</span>, <span class="ident">H</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">handler</span>: <span class="ident">H</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="self">Self</span>
