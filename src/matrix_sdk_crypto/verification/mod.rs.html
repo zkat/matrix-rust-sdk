@@ -702,6 +702,23 @@
 <span id="702">702</span>
 <span id="703">703</span>
 <span id="704">704</span>
+<span id="705">705</span>
+<span id="706">706</span>
+<span id="707">707</span>
+<span id="708">708</span>
+<span id="709">709</span>
+<span id="710">710</span>
+<span id="711">711</span>
+<span id="712">712</span>
+<span id="713">713</span>
+<span id="714">714</span>
+<span id="715">715</span>
+<span id="716">716</span>
+<span id="717">717</span>
+<span id="718">718</span>
+<span id="719">719</span>
+<span id="720">720</span>
+<span id="721">721</span>
 </pre><pre class="rust"><code><span class="comment">// Copyright 2020 The Matrix.org Foundation C.I.C.</span>
 <span class="comment">//</span>
 <span class="comment">// Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);</span>
@@ -719,6 +736,7 @@
 <span class="kw">mod</span> <span class="ident">cache</span>;
 <span class="kw">mod</span> <span class="ident">event_enums</span>;
 <span class="kw">mod</span> <span class="ident">machine</span>;
+<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;qrcode&quot;</span>)]</span>
 <span class="kw">mod</span> <span class="ident">qrcode</span>;
 <span class="kw">mod</span> <span class="ident">requests</span>;
 <span class="kw">mod</span> <span class="ident">sas</span>;
@@ -731,6 +749,8 @@
 <span class="kw">use</span> <span class="ident">event_enums::OutgoingContent</span>;
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">machine::VerificationMachine</span>;
 <span class="kw">use</span> <span class="ident">matrix_sdk_common::locks::Mutex</span>;
+<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;qrcode&quot;</span>)]</span>
+<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;docs&quot;</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">qrcode</span>)))]</span>
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">qrcode::QrVerification</span>;
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">requests::VerificationRequest</span>;
 <span class="kw">use</span> <span class="ident">ruma</span>::{
@@ -819,6 +839,8 @@
 <span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">Verification</span> {
     <span class="doccomment">/// The `m.sas.v1` verification variant.</span>
     <span class="ident">SasV1</span>(<span class="ident">Sas</span>),
+    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;qrcode&quot;</span>)]</span>
+    <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;docs&quot;</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">qrcode</span>)))]</span>
     <span class="doccomment">/// The `m.qr_code.*.v1` verification variant.</span>
     <span class="ident">QrV1</span>(<span class="ident">QrVerification</span>),
 }
@@ -826,6 +848,7 @@
 <span class="kw">impl</span> <span class="ident">Verification</span> {
     <span class="doccomment">/// Try to deconstruct this verification enum into a SAS verification.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">sas_v1</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Sas</span><span class="op">&gt;</span> {
+        <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">irrefutable_let_patterns</span>)]</span>
         <span class="kw">if</span> <span class="kw">let</span> <span class="ident">Verification::SasV1</span>(<span class="ident">sas</span>) <span class="op">=</span> <span class="self">self</span> {
             <span class="prelude-val">Some</span>(<span class="ident">sas</span>)
         } <span class="kw">else</span> {
@@ -833,6 +856,8 @@
         }
     }
 
+    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;qrcode&quot;</span>)]</span>
+    <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;docs&quot;</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">qrcode</span>)))]</span>
     <span class="doccomment">/// Try to deconstruct this verification enum into a QR code verification.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">qr_v1</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">QrVerification</span><span class="op">&gt;</span> {
         <span class="kw">if</span> <span class="kw">let</span> <span class="ident">Verification::QrV1</span>(<span class="ident">qr</span>) <span class="op">=</span> <span class="self">self</span> {
@@ -846,6 +871,7 @@
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_done</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
         <span class="kw">match</span> <span class="self">self</span> {
             <span class="ident">Verification::SasV1</span>(<span class="ident">s</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">s</span>.<span class="ident">is_done</span>(),
+            <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;qrcode&quot;</span>)]</span>
             <span class="ident">Verification::QrV1</span>(<span class="ident">qr</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">qr</span>.<span class="ident">is_done</span>(),
         }
     }
@@ -854,6 +880,7 @@
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">flow_id</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="ident">str</span> {
         <span class="kw">match</span> <span class="self">self</span> {
             <span class="ident">Verification::SasV1</span>(<span class="ident">s</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">s</span>.<span class="ident">flow_id</span>().<span class="ident">as_str</span>(),
+            <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;qrcode&quot;</span>)]</span>
             <span class="ident">Verification::QrV1</span>(<span class="ident">qr</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">qr</span>.<span class="ident">flow_id</span>().<span class="ident">as_str</span>(),
         }
     }
@@ -862,6 +889,7 @@
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_cancelled</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
         <span class="kw">match</span> <span class="self">self</span> {
             <span class="ident">Verification::SasV1</span>(<span class="ident">s</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">s</span>.<span class="ident">is_cancelled</span>(),
+            <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;qrcode&quot;</span>)]</span>
             <span class="ident">Verification::QrV1</span>(<span class="ident">qr</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">qr</span>.<span class="ident">is_cancelled</span>(),
         }
     }
@@ -870,6 +898,7 @@
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">user_id</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="ident">UserId</span> {
         <span class="kw">match</span> <span class="self">self</span> {
             <span class="ident">Verification::SasV1</span>(<span class="ident">v</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">v</span>.<span class="ident">user_id</span>(),
+            <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;qrcode&quot;</span>)]</span>
             <span class="ident">Verification::QrV1</span>(<span class="ident">v</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">v</span>.<span class="ident">user_id</span>(),
         }
     }
@@ -878,6 +907,7 @@
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">other_user</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="ident">UserId</span> {
         <span class="kw">match</span> <span class="self">self</span> {
             <span class="ident">Verification::SasV1</span>(<span class="ident">s</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">s</span>.<span class="ident">other_user_id</span>(),
+            <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;qrcode&quot;</span>)]</span>
             <span class="ident">Verification::QrV1</span>(<span class="ident">qr</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">qr</span>.<span class="ident">other_user_id</span>(),
         }
     }
@@ -886,6 +916,7 @@
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_self_verification</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
         <span class="kw">match</span> <span class="self">self</span> {
             <span class="ident">Verification::SasV1</span>(<span class="ident">v</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">v</span>.<span class="ident">is_self_verification</span>(),
+            <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;qrcode&quot;</span>)]</span>
             <span class="ident">Verification::QrV1</span>(<span class="ident">v</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">v</span>.<span class="ident">is_self_verification</span>(),
         }
     }
@@ -897,6 +928,8 @@
     }
 }
 
+<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;qrcode&quot;</span>)]</span>
+<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;docs&quot;</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">qrcode</span>)))]</span>
 <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">QrVerification</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Verification</span> {
     <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">qr</span>: <span class="ident">QrVerification</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
         <span class="ident"><span class="self">Self</span>::QrV1</span>(<span class="ident">qr</span>)
@@ -1080,6 +1113,7 @@
 }
 
 <span class="kw">impl</span> <span class="ident">IdentitiesBeingVerified</span> {
+    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;qrcode&quot;</span>)]</span>
     <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">can_sign_devices</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
         <span class="self">self</span>.<span class="ident">private_identity</span>.<span class="ident">can_sign_devices</span>().<span class="kw">await</span>
     }

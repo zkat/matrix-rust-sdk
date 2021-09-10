@@ -4502,6 +4502,9 @@
 <span id="4502">4502</span>
 <span id="4503">4503</span>
 <span id="4504">4504</span>
+<span id="4505">4505</span>
+<span id="4506">4506</span>
+<span id="4507">4507</span>
 </pre><pre class="rust"><code><span class="comment">// Copyright 2020 Damir Jelić</span>
 <span class="comment">// Copyright 2020 The Matrix.org Foundation C.I.C.</span>
 <span class="comment">//</span>
@@ -4642,11 +4645,13 @@
     <span class="ident">DeviceIdBox</span>, <span class="ident">RoomId</span>, <span class="ident">RoomIdOrAliasId</span>, <span class="ident">ServerName</span>, <span class="ident">UInt</span>, <span class="ident">UserId</span>,
 };
 
+<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;qrcode&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;encryption&quot;</span>))]</span>
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::verification::QrVerification</span>;
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;encryption&quot;</span>)]</span>
 <span class="kw">use</span> <span class="kw">crate</span>::{
     <span class="ident">error::RoomKeyImportError</span>,
     <span class="ident">identities</span>::{<span class="ident">Device</span>, <span class="ident">UserDevices</span>},
-    <span class="ident">verification</span>::{<span class="ident">QrVerification</span>, <span class="ident">SasVerification</span>, <span class="ident">Verification</span>, <span class="ident">VerificationRequest</span>},
+    <span class="ident">verification</span>::{<span class="ident">SasVerification</span>, <span class="ident">Verification</span>, <span class="ident">VerificationRequest</span>},
 };
 <span class="kw">use</span> <span class="kw">crate</span>::{
     <span class="ident">error</span>::{<span class="ident">HttpError</span>, <span class="ident">HttpResult</span>},
@@ -7065,6 +7070,7 @@
             <span class="ident">matrix_sdk_base::crypto::Verification::SasV1</span>(<span class="ident">s</span>) <span class="op">=</span><span class="op">&gt;</span> {
                 <span class="ident">SasVerification</span> { <span class="ident">inner</span>: <span class="ident">s</span>, <span class="ident">client</span>: <span class="self">self</span>.<span class="ident">clone</span>() }.<span class="ident">into</span>()
             }
+            <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;qrcode&quot;</span>)]</span>
             <span class="ident">matrix_sdk_base::crypto::Verification::QrV1</span>(<span class="ident">qr</span>) <span class="op">=</span><span class="op">&gt;</span> {
                 <span class="ident">QrVerification</span> { <span class="ident">inner</span>: <span class="ident">qr</span>, <span class="ident">client</span>: <span class="self">self</span>.<span class="ident">clone</span>() }.<span class="ident">into</span>()
             }
