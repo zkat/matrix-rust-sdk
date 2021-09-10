@@ -4505,6 +4505,17 @@
 <span id="4505">4505</span>
 <span id="4506">4506</span>
 <span id="4507">4507</span>
+<span id="4508">4508</span>
+<span id="4509">4509</span>
+<span id="4510">4510</span>
+<span id="4511">4511</span>
+<span id="4512">4512</span>
+<span id="4513">4513</span>
+<span id="4514">4514</span>
+<span id="4515">4515</span>
+<span id="4516">4516</span>
+<span id="4517">4517</span>
+<span id="4518">4518</span>
 </pre><pre class="rust"><code><span class="comment">// Copyright 2020 Damir Jelić</span>
 <span class="comment">// Copyright 2020 The Matrix.org Foundation C.I.C.</span>
 <span class="comment">//</span>
@@ -5434,6 +5445,7 @@
     <span class="doccomment">/// # let homeserver = Url::parse(&quot;http://localhost:8080&quot;).unwrap();</span>
     <span class="doccomment">/// # let client = Client::new(homeserver).unwrap();</span>
     <span class="doccomment">/// use matrix_sdk::{</span>
+    <span class="doccomment">///     deserialized_responses::EncryptionInfo,</span>
     <span class="doccomment">///     room::Room,</span>
     <span class="doccomment">///     ruma::{</span>
     <span class="doccomment">///         events::{</span>
@@ -5459,10 +5471,20 @@
     <span class="doccomment">///     )</span>
     <span class="doccomment">///     .await</span>
     <span class="doccomment">///     .register_event_handler(</span>
+    <span class="doccomment">///         |ev: SyncMessageEvent&lt;MessageEventContent&gt;,</span>
+    <span class="doccomment">///          room: Room,</span>
+    <span class="doccomment">///          encryption_info: Option&lt;EncryptionInfo&gt;| async move {</span>
+    <span class="doccomment">///             // An `Option&lt;EncryptionInfo&gt;` parameter lets you distinguish between</span>
+    <span class="doccomment">///             // unencrypted events and events that were decrypted by the SDK.</span>
+    <span class="doccomment">///         },</span>
+    <span class="doccomment">///     )</span>
+    <span class="doccomment">///     .await</span>
+    <span class="doccomment">///     .register_event_handler(</span>
     <span class="doccomment">///         |ev: SyncStateEvent&lt;TopicEventContent&gt;| async move {</span>
-    <span class="doccomment">///             // Also possible: Omit any or all arguments after the first.</span>
+    <span class="doccomment">///             // You can omit any or all arguments after the first.</span>
     <span class="doccomment">///         }</span>
-    <span class="doccomment">///     ).await;</span>
+    <span class="doccomment">///     )</span>
+    <span class="doccomment">///     .await;</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// // Custom events work exactly the same way, you just need to declare</span>
     <span class="doccomment">/// // the content struct and use the EventContent derive macro on it.</span>

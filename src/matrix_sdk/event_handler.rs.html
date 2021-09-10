@@ -437,6 +437,11 @@
 <span id="437">437</span>
 <span id="438">438</span>
 <span id="439">439</span>
+<span id="440">440</span>
+<span id="441">441</span>
+<span id="442">442</span>
+<span id="443">443</span>
+<span id="444">444</span>
 </pre><pre class="rust"><code><span class="comment">// Copyright 2021 Jonas Platte</span>
 <span class="comment">//</span>
 <span class="comment">// Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);</span>
@@ -471,7 +476,7 @@
 
 <span class="kw">use</span> <span class="ident">std</span>::{<span class="ident">borrow::Cow</span>, <span class="ident">future::Future</span>, <span class="ident">ops::Deref</span>};
 
-<span class="kw">use</span> <span class="ident">matrix_sdk_base::deserialized_responses::SyncRoomEvent</span>;
+<span class="kw">use</span> <span class="ident">matrix_sdk_base::deserialized_responses</span>::{<span class="ident">EncryptionInfo</span>, <span class="ident">SyncRoomEvent</span>};
 <span class="kw">use</span> <span class="ident">ruma</span>::{<span class="ident">events::AnySyncStateEvent</span>, <span class="ident">serde::Raw</span>};
 <span class="kw">use</span> <span class="ident">serde::Deserialize</span>;
 <span class="kw">use</span> <span class="ident">serde_json::value::RawValue</span> <span class="kw">as</span> <span class="ident">RawJsonValue</span>;
@@ -556,6 +561,7 @@
     <span class="kw">pub</span> <span class="ident">client</span>: <span class="ident">Client</span>,
     <span class="kw">pub</span> <span class="ident">room</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">room::Room</span><span class="op">&gt;</span>,
     <span class="kw">pub</span> <span class="ident">raw</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">RawJsonValue</span>,
+    <span class="kw">pub</span> <span class="ident">encryption_info</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">EncryptionInfo</span><span class="op">&gt;</span>,
 }
 
 <span class="doccomment">/// Context for an event handler.</span>
@@ -608,6 +614,12 @@
     }
 }
 
+<span class="kw">impl</span> <span class="ident">EventHandlerContext</span> <span class="kw">for</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">EncryptionInfo</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">from_data</span>(<span class="ident">data</span>: <span class="kw-2">&amp;</span><span class="ident">EventHandlerData</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
+        <span class="prelude-val">Some</span>(<span class="ident">data</span>.<span class="ident">encryption_info</span>.<span class="ident">cloned</span>())
+    }
+}
+
 <span class="doccomment">/// Return types supported for event handlers implement this trait.</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// It is not meant to be implemented outside of matrix-sdk.</span>
@@ -650,7 +662,19 @@
         <span class="ident">room</span>: <span class="kw-2">&amp;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">room::Room</span><span class="op">&gt;</span>,
         <span class="ident">events</span>: <span class="kw-2">&amp;</span>[<span class="ident">Raw</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>],
     ) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">serde_json::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">handle_sync_events_wrapped</span>(<span class="ident">kind</span>, <span class="ident">room</span>, <span class="ident">events</span>, <span class="op">|</span><span class="ident">x</span><span class="op">|</span> <span class="ident">x</span>).<span class="kw">await</span>
+        <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Deserialize</span>)]</span>
+        <span class="kw">struct</span> <span class="ident">ExtractType</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
+            <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">borrow</span>, <span class="ident">rename</span> <span class="op">=</span> <span class="string">&quot;type&quot;</span>)]</span>
+            <span class="ident">event_type</span>: <span class="ident">Cow</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">str</span><span class="op">&gt;</span>,
+        }
+
+        <span class="self">self</span>.<span class="ident">handle_sync_events_wrapped_with</span>(
+            <span class="ident">room</span>,
+            <span class="ident">events</span>,
+            <span class="op">|</span><span class="ident">ev</span><span class="op">|</span> (<span class="ident">ev</span>, <span class="prelude-val">None</span>),
+            <span class="op">|</span><span class="ident">raw</span><span class="op">|</span> <span class="prelude-val">Ok</span>((<span class="ident">kind</span>, <span class="ident">raw</span>.<span class="ident">deserialize_as</span>::<span class="op">&lt;</span><span class="ident">ExtractType</span><span class="op">&gt;</span>()<span class="question-mark">?</span>.<span class="ident">event_type</span>)),
+        )
+        .<span class="kw">await</span>
     }
 
     <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">handle_sync_state_events</span>(
@@ -665,11 +689,16 @@
             <span class="ident">unsigned</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">UnsignedDetails</span><span class="op">&gt;</span>,
         }
 
-        <span class="self">self</span>.<span class="ident">handle_sync_events_wrapped_with</span>(<span class="ident">room</span>, <span class="ident">state_events</span>, <span class="ident">std::convert::identity</span>, <span class="op">|</span><span class="ident">raw</span><span class="op">|</span> {
-            <span class="kw">let</span> <span class="ident">StateEventDetails</span> { <span class="ident">event_type</span>, <span class="ident">unsigned</span> } <span class="op">=</span> <span class="ident">raw</span>.<span class="ident">deserialize_as</span>()<span class="question-mark">?</span>;
-            <span class="kw">let</span> <span class="ident">redacted</span> <span class="op">=</span> <span class="ident">unsigned</span>.<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">u</span><span class="op">|</span> <span class="ident">u</span>.<span class="ident">redacted_because</span>).<span class="ident">is_some</span>();
-            <span class="prelude-val">Ok</span>((<span class="ident">EventKind::State</span> { <span class="ident">redacted</span> }, <span class="ident">event_type</span>))
-        })
+        <span class="self">self</span>.<span class="ident">handle_sync_events_wrapped_with</span>(
+            <span class="ident">room</span>,
+            <span class="ident">state_events</span>,
+            <span class="op">|</span><span class="ident">ev</span><span class="op">|</span> (<span class="ident">ev</span>, <span class="prelude-val">None</span>),
+            <span class="op">|</span><span class="ident">raw</span><span class="op">|</span> {
+                <span class="kw">let</span> <span class="ident">StateEventDetails</span> { <span class="ident">event_type</span>, <span class="ident">unsigned</span> } <span class="op">=</span> <span class="ident">raw</span>.<span class="ident">deserialize_as</span>()<span class="question-mark">?</span>;
+                <span class="kw">let</span> <span class="ident">redacted</span> <span class="op">=</span> <span class="ident">unsigned</span>.<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">u</span><span class="op">|</span> <span class="ident">u</span>.<span class="ident">redacted_because</span>).<span class="ident">is_some</span>();
+                <span class="prelude-val">Ok</span>((<span class="ident">EventKind::State</span> { <span class="ident">redacted</span> }, <span class="ident">event_type</span>))
+            },
+        )
         .<span class="kw">await</span>
     }
 
@@ -678,7 +707,6 @@
         <span class="ident">room</span>: <span class="kw-2">&amp;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">room::Room</span><span class="op">&gt;</span>,
         <span class="ident">timeline_events</span>: <span class="kw-2">&amp;</span>[<span class="ident">SyncRoomEvent</span>],
     ) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">serde_json::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-        <span class="comment">// FIXME: add EncryptionInfo to context</span>
         <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Deserialize</span>)]</span>
         <span class="kw">struct</span> <span class="ident">TimelineEventDetails</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
             <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">borrow</span>, <span class="ident">rename</span> <span class="op">=</span> <span class="string">&quot;type&quot;</span>)]</span>
@@ -690,7 +718,7 @@
         <span class="self">self</span>.<span class="ident">handle_sync_events_wrapped_with</span>(
             <span class="ident">room</span>,
             <span class="ident">timeline_events</span>,
-            <span class="op">|</span><span class="ident">e</span><span class="op">|</span> <span class="kw-2">&amp;</span><span class="ident">e</span>.<span class="ident">event</span>,
+            <span class="op">|</span><span class="ident">e</span><span class="op">|</span> (<span class="kw-2">&amp;</span><span class="ident">e</span>.<span class="ident">event</span>, <span class="ident">e</span>.<span class="ident">encryption_info</span>.<span class="ident">as_ref</span>()),
             <span class="op">|</span><span class="ident">raw</span><span class="op">|</span> {
                 <span class="kw">let</span> <span class="ident">TimelineEventDetails</span> { <span class="ident">event_type</span>, <span class="ident">state_key</span>, <span class="ident">unsigned</span> } <span class="op">=</span>
                     <span class="ident">raw</span>.<span class="ident">deserialize_as</span>()<span class="question-mark">?</span>;
@@ -707,35 +735,16 @@
         .<span class="kw">await</span>
     }
 
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">handle_sync_events_wrapped</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span>: <span class="lifetime">&#39;a</span>, <span class="ident">U</span>: <span class="lifetime">&#39;a</span><span class="op">&gt;</span>(
-        <span class="kw-2">&amp;</span><span class="self">self</span>,
-        <span class="ident">kind</span>: <span class="ident">EventKind</span>,
-        <span class="ident">room</span>: <span class="kw-2">&amp;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">room::Room</span><span class="op">&gt;</span>,
-        <span class="ident">events</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> [<span class="ident">U</span>],
-        <span class="ident">get_event</span>: <span class="kw">impl</span> <span class="ident">Fn</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">U</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">Raw</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">serde_json::Error</span><span class="op">&gt;</span> {
-        <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Deserialize</span>)]</span>
-        <span class="kw">struct</span> <span class="ident">ExtractType</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-            <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">borrow</span>, <span class="ident">rename</span> <span class="op">=</span> <span class="string">&quot;type&quot;</span>)]</span>
-            <span class="ident">event_type</span>: <span class="ident">Cow</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">str</span><span class="op">&gt;</span>,
-        }
-
-        <span class="self">self</span>.<span class="ident">handle_sync_events_wrapped_with</span>(<span class="ident">room</span>, <span class="ident">events</span>, <span class="ident">get_event</span>, <span class="op">|</span><span class="ident">raw</span><span class="op">|</span> {
-            <span class="prelude-val">Ok</span>((<span class="ident">kind</span>, <span class="ident">raw</span>.<span class="ident">deserialize_as</span>::<span class="op">&lt;</span><span class="ident">ExtractType</span><span class="op">&gt;</span>()<span class="question-mark">?</span>.<span class="ident">event_type</span>))
-        })
-        .<span class="kw">await</span>
-    }
-
     <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">handle_sync_events_wrapped_with</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span>: <span class="lifetime">&#39;a</span>, <span class="ident">U</span>: <span class="lifetime">&#39;a</span><span class="op">&gt;</span>(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         <span class="ident">room</span>: <span class="kw-2">&amp;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">room::Room</span><span class="op">&gt;</span>,
         <span class="ident">list</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> [<span class="ident">U</span>],
-        <span class="ident">get_event</span>: <span class="kw">impl</span> <span class="ident">Fn</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">U</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">Raw</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>,
+        <span class="ident">get_event_details</span>: <span class="kw">impl</span> <span class="ident">Fn</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">U</span>) <span class="op">-</span><span class="op">&gt;</span> (<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">Raw</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>, <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">EncryptionInfo</span><span class="op">&gt;</span>),
         <span class="ident">get_id</span>: <span class="kw">impl</span> <span class="ident">Fn</span>(<span class="kw-2">&amp;</span><span class="ident">Raw</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">serde_json::Result</span><span class="op">&lt;</span>(<span class="ident">EventKind</span>, <span class="ident">Cow</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">str</span><span class="op">&gt;</span>)<span class="op">&gt;</span>,
     ) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">serde_json::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="kw">for</span> <span class="ident">x</span> <span class="kw">in</span> <span class="ident">list</span> {
-            <span class="kw">let</span> <span class="ident">event</span> <span class="op">=</span> <span class="ident">get_event</span>(<span class="ident">x</span>);
-            <span class="kw">let</span> (<span class="ident">ev_kind</span>, <span class="ident">ev_type</span>) <span class="op">=</span> <span class="ident">get_id</span>(<span class="ident">event</span>)<span class="question-mark">?</span>;
+            <span class="kw">let</span> (<span class="ident">raw_event</span>, <span class="ident">encryption_info</span>) <span class="op">=</span> <span class="ident">get_event_details</span>(<span class="ident">x</span>);
+            <span class="kw">let</span> (<span class="ident">ev_kind</span>, <span class="ident">ev_type</span>) <span class="op">=</span> <span class="ident">get_id</span>(<span class="ident">raw_event</span>)<span class="question-mark">?</span>;
             <span class="kw">let</span> <span class="ident">event_handler_id</span> <span class="op">=</span> (<span class="ident">ev_kind</span>, <span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="ident">ev_type</span>);
 
             <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">handlers</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">event_handlers</span>.<span class="ident">read</span>().<span class="kw">await</span>.<span class="ident">get</span>(<span class="kw-2">&amp;</span><span class="ident">event_handler_id</span>) {
@@ -743,7 +752,8 @@
                     <span class="kw">let</span> <span class="ident">data</span> <span class="op">=</span> <span class="ident">EventHandlerData</span> {
                         <span class="ident">client</span>: <span class="self">self</span>.<span class="ident">clone</span>(),
                         <span class="ident">room</span>: <span class="ident">room</span>.<span class="ident">clone</span>(),
-                        <span class="ident">raw</span>: <span class="ident">event</span>.<span class="ident">json</span>(),
+                        <span class="ident">raw</span>: <span class="ident">raw_event</span>.<span class="ident">json</span>(),
+                        <span class="ident">encryption_info</span>,
                     };
                     <span class="ident">matrix_sdk_common::executor::spawn</span>((<span class="ident">handler</span>)(<span class="ident">data</span>));
                 }
