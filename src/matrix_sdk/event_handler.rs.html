@@ -442,6 +442,110 @@
 <span id="442">442</span>
 <span id="443">443</span>
 <span id="444">444</span>
+<span id="445">445</span>
+<span id="446">446</span>
+<span id="447">447</span>
+<span id="448">448</span>
+<span id="449">449</span>
+<span id="450">450</span>
+<span id="451">451</span>
+<span id="452">452</span>
+<span id="453">453</span>
+<span id="454">454</span>
+<span id="455">455</span>
+<span id="456">456</span>
+<span id="457">457</span>
+<span id="458">458</span>
+<span id="459">459</span>
+<span id="460">460</span>
+<span id="461">461</span>
+<span id="462">462</span>
+<span id="463">463</span>
+<span id="464">464</span>
+<span id="465">465</span>
+<span id="466">466</span>
+<span id="467">467</span>
+<span id="468">468</span>
+<span id="469">469</span>
+<span id="470">470</span>
+<span id="471">471</span>
+<span id="472">472</span>
+<span id="473">473</span>
+<span id="474">474</span>
+<span id="475">475</span>
+<span id="476">476</span>
+<span id="477">477</span>
+<span id="478">478</span>
+<span id="479">479</span>
+<span id="480">480</span>
+<span id="481">481</span>
+<span id="482">482</span>
+<span id="483">483</span>
+<span id="484">484</span>
+<span id="485">485</span>
+<span id="486">486</span>
+<span id="487">487</span>
+<span id="488">488</span>
+<span id="489">489</span>
+<span id="490">490</span>
+<span id="491">491</span>
+<span id="492">492</span>
+<span id="493">493</span>
+<span id="494">494</span>
+<span id="495">495</span>
+<span id="496">496</span>
+<span id="497">497</span>
+<span id="498">498</span>
+<span id="499">499</span>
+<span id="500">500</span>
+<span id="501">501</span>
+<span id="502">502</span>
+<span id="503">503</span>
+<span id="504">504</span>
+<span id="505">505</span>
+<span id="506">506</span>
+<span id="507">507</span>
+<span id="508">508</span>
+<span id="509">509</span>
+<span id="510">510</span>
+<span id="511">511</span>
+<span id="512">512</span>
+<span id="513">513</span>
+<span id="514">514</span>
+<span id="515">515</span>
+<span id="516">516</span>
+<span id="517">517</span>
+<span id="518">518</span>
+<span id="519">519</span>
+<span id="520">520</span>
+<span id="521">521</span>
+<span id="522">522</span>
+<span id="523">523</span>
+<span id="524">524</span>
+<span id="525">525</span>
+<span id="526">526</span>
+<span id="527">527</span>
+<span id="528">528</span>
+<span id="529">529</span>
+<span id="530">530</span>
+<span id="531">531</span>
+<span id="532">532</span>
+<span id="533">533</span>
+<span id="534">534</span>
+<span id="535">535</span>
+<span id="536">536</span>
+<span id="537">537</span>
+<span id="538">538</span>
+<span id="539">539</span>
+<span id="540">540</span>
+<span id="541">541</span>
+<span id="542">542</span>
+<span id="543">543</span>
+<span id="544">544</span>
+<span id="545">545</span>
+<span id="546">546</span>
+<span id="547">547</span>
+<span id="548">548</span>
 </pre><pre class="rust"><code><span class="comment">// Copyright 2021 Jonas Platte</span>
 <span class="comment">//</span>
 <span class="comment">// Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);</span>
@@ -491,7 +595,7 @@
     <span class="ident">EphemeralRoomData</span>,
     <span class="ident">Message</span> { <span class="ident">redacted</span>: <span class="ident">bool</span> },
     <span class="ident">State</span> { <span class="ident">redacted</span>: <span class="ident">bool</span> },
-    <span class="ident">StrippedState</span> { <span class="ident">redacted</span>: <span class="ident">bool</span> },
+    <span class="ident">StrippedState</span>,
     <span class="ident">InitialState</span>,
     <span class="ident">ToDevice</span>,
     <span class="ident">Presence</span>,
@@ -842,8 +946,7 @@
     <span class="kw">where</span>
         <span class="ident">C</span>: <span class="ident">StaticEventContent</span> <span class="op">+</span> <span class="ident">events::StateEventContent</span>,
     {
-        <span class="kw">const</span> <span class="ident">ID</span>: (<span class="ident">EventKind</span>, <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>) <span class="op">=</span>
-            (<span class="ident">EventKind::StrippedState</span> { <span class="ident">redacted</span>: <span class="bool-val">false</span> }, <span class="ident">C::TYPE</span>);
+        <span class="kw">const</span> <span class="ident">ID</span>: (<span class="ident">EventKind</span>, <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>) <span class="op">=</span> (<span class="ident">EventKind::StrippedState</span>, <span class="ident">C::TYPE</span>);
     }
 
     <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">C</span><span class="op">&gt;</span> <span class="ident">SyncEvent</span> <span class="kw">for</span> <span class="ident">events::InitialStateEvent</span><span class="op">&lt;</span><span class="ident">C</span><span class="op">&gt;</span>
@@ -877,13 +980,118 @@
     {
         <span class="kw">const</span> <span class="ident">ID</span>: (<span class="ident">EventKind</span>, <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>) <span class="op">=</span> (<span class="ident">EventKind::State</span> { <span class="ident">redacted</span>: <span class="bool-val">true</span> }, <span class="ident">C::TYPE</span>);
     }
+}
 
-    <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">C</span><span class="op">&gt;</span> <span class="ident">SyncEvent</span> <span class="kw">for</span> <span class="ident">events::RedactedStrippedStateEvent</span><span class="op">&lt;</span><span class="ident">C</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">C</span>: <span class="ident">StaticEventContent</span> <span class="op">+</span> <span class="ident">events::RedactedStateEventContent</span>,
-    {
-        <span class="kw">const</span> <span class="ident">ID</span>: (<span class="ident">EventKind</span>, <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>) <span class="op">=</span>
-            (<span class="ident">EventKind::StrippedState</span> { <span class="ident">redacted</span>: <span class="bool-val">true</span> }, <span class="ident">C::TYPE</span>);
+<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
+<span class="kw">mod</span> <span class="ident">test</span> {
+    <span class="kw">use</span> <span class="ident">std</span>::{<span class="ident">future</span>, <span class="ident">sync::Arc</span>};
+
+    <span class="kw">use</span> <span class="ident">matrix_sdk_test</span>::{<span class="ident">EventBuilder</span>, <span class="ident">EventsJson</span>};
+    <span class="kw">use</span> <span class="ident">ruma</span>::{
+        <span class="ident">events</span>::{<span class="ident">room::member::MemberEventContent</span>, <span class="ident">StrippedStateEvent</span>, <span class="ident">SyncStateEvent</span>},
+        <span class="ident">room_id</span>,
+    };
+    <span class="kw">use</span> <span class="ident">serde_json::json</span>;
+
+    <span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">room</span>, <span class="ident">Client</span>};
+
+    <span class="attribute">#[<span class="ident">tokio::test</span>]</span>
+    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">event_handler</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+        <span class="kw">use</span> <span class="ident">std::sync::atomic</span>::{<span class="ident">AtomicU8</span>, <span class="ident">Ordering::SeqCst</span>};
+
+        <span class="kw">let</span> <span class="ident">client</span> <span class="op">=</span> <span class="ident"><span class="kw">crate</span>::client::test::logged_in_client</span>().<span class="kw">await</span>;
+
+        <span class="kw">let</span> <span class="ident">member_count</span> <span class="op">=</span> <span class="ident">Arc::new</span>(<span class="ident">AtomicU8::new</span>(<span class="number">0</span>));
+        <span class="kw">let</span> <span class="ident">typing_count</span> <span class="op">=</span> <span class="ident">Arc::new</span>(<span class="ident">AtomicU8::new</span>(<span class="number">0</span>));
+        <span class="kw">let</span> <span class="ident">power_levels_count</span> <span class="op">=</span> <span class="ident">Arc::new</span>(<span class="ident">AtomicU8::new</span>(<span class="number">0</span>));
+        <span class="kw">let</span> <span class="ident">invited_member_count</span> <span class="op">=</span> <span class="ident">Arc::new</span>(<span class="ident">AtomicU8::new</span>(<span class="number">0</span>));
+
+        <span class="ident">client</span>
+            .<span class="ident">register_event_handler</span>({
+                <span class="kw">let</span> <span class="ident">member_count</span> <span class="op">=</span> <span class="ident">member_count</span>.<span class="ident">clone</span>();
+                <span class="kw">move</span> <span class="op">|</span><span class="ident">_ev</span>: <span class="ident">SyncStateEvent</span><span class="op">&lt;</span><span class="ident">MemberEventContent</span><span class="op">&gt;</span>, <span class="ident">_room</span>: <span class="ident">room::Room</span><span class="op">|</span> {
+                    <span class="ident">member_count</span>.<span class="ident">fetch_add</span>(<span class="number">1</span>, <span class="ident">SeqCst</span>);
+                    <span class="ident">future::ready</span>(())
+                }
+            })
+            .<span class="kw">await</span>
+            .<span class="ident">register_event_handler</span>({
+                <span class="kw">let</span> <span class="ident">typing_count</span> <span class="op">=</span> <span class="ident">typing_count</span>.<span class="ident">clone</span>();
+                <span class="kw">move</span> <span class="op">|</span><span class="ident">_ev</span>: <span class="ident">SyncStateEvent</span><span class="op">&lt;</span><span class="ident">MemberEventContent</span><span class="op">&gt;</span><span class="op">|</span> {
+                    <span class="ident">typing_count</span>.<span class="ident">fetch_add</span>(<span class="number">1</span>, <span class="ident">SeqCst</span>);
+                    <span class="ident">future::ready</span>(())
+                }
+            })
+            .<span class="kw">await</span>
+            .<span class="ident">register_event_handler</span>({
+                <span class="kw">let</span> <span class="ident">power_levels_count</span> <span class="op">=</span> <span class="ident">power_levels_count</span>.<span class="ident">clone</span>();
+                <span class="kw">move</span> <span class="op">|</span><span class="ident">_ev</span>: <span class="ident">SyncStateEvent</span><span class="op">&lt;</span><span class="ident">MemberEventContent</span><span class="op">&gt;</span>,
+                      <span class="ident">_client</span>: <span class="ident">Client</span>,
+                      <span class="ident">_room</span>: <span class="ident">room::Room</span><span class="op">|</span> {
+                    <span class="ident">power_levels_count</span>.<span class="ident">fetch_add</span>(<span class="number">1</span>, <span class="ident">SeqCst</span>);
+                    <span class="ident">future::ready</span>(())
+                }
+            })
+            .<span class="kw">await</span>
+            .<span class="ident">register_event_handler</span>({
+                <span class="kw">let</span> <span class="ident">invited_member_count</span> <span class="op">=</span> <span class="ident">invited_member_count</span>.<span class="ident">clone</span>();
+                <span class="kw">move</span> <span class="op">|</span><span class="ident">_ev</span>: <span class="ident">StrippedStateEvent</span><span class="op">&lt;</span><span class="ident">MemberEventContent</span><span class="op">&gt;</span><span class="op">|</span> {
+                    <span class="ident">invited_member_count</span>.<span class="ident">fetch_add</span>(<span class="number">1</span>, <span class="ident">SeqCst</span>);
+                    <span class="ident">future::ready</span>(())
+                }
+            })
+            .<span class="kw">await</span>;
+
+        <span class="kw">let</span> <span class="ident">response</span> <span class="op">=</span> <span class="ident">EventBuilder::default</span>()
+            .<span class="ident">add_room_event</span>(<span class="ident">EventsJson::Member</span>)
+            .<span class="ident">add_ephemeral</span>(<span class="ident">EventsJson::Typing</span>)
+            .<span class="ident">add_state_event</span>(<span class="ident">EventsJson::PowerLevels</span>)
+            .<span class="ident">add_custom_invited_event</span>(
+                <span class="kw-2">&amp;</span><span class="macro">room_id!</span>(<span class="string">&quot;!test_invited:example.org&quot;</span>),
+                <span class="macro">json!</span>({
+                <span class="string">&quot;content&quot;</span>: {
+                  <span class="string">&quot;avatar_url&quot;</span>: <span class="string">&quot;mxc://example.org/SEsfnsuifSDFSSEF&quot;</span>,
+                  <span class="string">&quot;displayname&quot;</span>: <span class="string">&quot;Alice&quot;</span>,
+                  <span class="string">&quot;membership&quot;</span>: <span class="string">&quot;invite&quot;</span>,
+                },
+                <span class="string">&quot;event_id&quot;</span>: <span class="string">&quot;$143273582443PhrSn:example.org&quot;</span>,
+                <span class="string">&quot;origin_server_ts&quot;</span>: <span class="number">1432735824653u64</span>,
+                <span class="string">&quot;room_id&quot;</span>: <span class="string">&quot;!jEsUZKDJdhlrceRyVU:example.org&quot;</span>,
+                <span class="string">&quot;sender&quot;</span>: <span class="string">&quot;@example:example.org&quot;</span>,
+                <span class="string">&quot;state_key&quot;</span>: <span class="string">&quot;@alice:example.org&quot;</span>,
+                <span class="string">&quot;type&quot;</span>: <span class="string">&quot;m.room.member&quot;</span>,
+                <span class="string">&quot;unsigned&quot;</span>: {
+                  <span class="string">&quot;age&quot;</span>: <span class="number">1234</span>,
+                  <span class="string">&quot;invite_room_state&quot;</span>: [
+                    {
+                      <span class="string">&quot;content&quot;</span>: {
+                        <span class="string">&quot;name&quot;</span>: <span class="string">&quot;Example Room&quot;</span>
+                      },
+                      <span class="string">&quot;sender&quot;</span>: <span class="string">&quot;@bob:example.org&quot;</span>,
+                      <span class="string">&quot;state_key&quot;</span>: <span class="string">&quot;&quot;</span>,
+                      <span class="string">&quot;type&quot;</span>: <span class="string">&quot;m.room.name&quot;</span>
+                    },
+                    {
+                      <span class="string">&quot;content&quot;</span>: {
+                        <span class="string">&quot;join_rule&quot;</span>: <span class="string">&quot;invite&quot;</span>
+                      },
+                      <span class="string">&quot;sender&quot;</span>: <span class="string">&quot;@bob:example.org&quot;</span>,
+                      <span class="string">&quot;state_key&quot;</span>: <span class="string">&quot;&quot;</span>,
+                      <span class="string">&quot;type&quot;</span>: <span class="string">&quot;m.room.join_rules&quot;</span>
+                    }
+                  ]
+                }
+                          }),
+            )
+            .<span class="ident">build_sync_response</span>();
+        <span class="ident">client</span>.<span class="ident">process_sync</span>(<span class="ident">response</span>).<span class="kw">await</span><span class="question-mark">?</span>;
+
+        <span class="macro">assert_eq!</span>(<span class="ident">member_count</span>.<span class="ident">load</span>(<span class="ident">SeqCst</span>), <span class="number">1</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">typing_count</span>.<span class="ident">load</span>(<span class="ident">SeqCst</span>), <span class="number">1</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">power_levels_count</span>.<span class="ident">load</span>(<span class="ident">SeqCst</span>), <span class="number">1</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">invited_member_count</span>.<span class="ident">load</span>(<span class="ident">SeqCst</span>), <span class="number">1</span>);
+
+        <span class="prelude-val">Ok</span>(())
     }
 }
 </code></pre></div>
