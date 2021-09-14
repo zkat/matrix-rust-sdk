@@ -1,0 +1,1 @@
+initSidebarItems({"struct":[["ClientConfig","Configuration for the creation of the `Client`."],["RequestConfig","Configuration for requests the `Client` makes."],["SyncSettings","Settings for a sync call."]]});

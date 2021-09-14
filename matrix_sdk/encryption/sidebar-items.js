@@ -1,0 +1,1 @@
+initSidebarItems({"enum":[["LocalTrust","The local trust state of a device."]],"mod":[["identities","Cryptographic identities used in Matrix."],["verification","Interactive verification for E2EE capable users and devices in Matrix."]],"struct":[["EncryptionInfo","Struct holding all the information that is needed to decrypt an encrypted file."]]});

@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `crates&#x2F;matrix_sdk&#x2F;src&#x2F;room&#x2F;joined.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>joined.rs - source</title><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled ><script id="default-settings" ></script><script src="../../../storage.js"></script><script src="../../../crates.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"><style type="text/css">#crate-search{background-image:url("../../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu" role="button">&#9776;</div><a href='../../../matrix_sdk/index.html'><div class='logo-container rust-logo'><img src='../../../rust-logo.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu" title="themes"><img width="18" height="18" alt="Pick another theme!" src="../../../brush.svg"></button><div id="theme-choices" role="menu"></div></div><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" disabled autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><button type="button" id="help-button" title="help">?</button><a id="settings-menu" href="../../../settings.html" title="settings"><img width="18" height="18" alt="Change settings" src="../../../wheel.svg"></a></div></form></nav><section id="main" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">  1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `crates&#x2F;matrix-sdk&#x2F;src&#x2F;room&#x2F;joined.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>joined.rs - source</title><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled ><script id="default-settings" ></script><script src="../../../storage.js"></script><script src="../../../crates.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"><style type="text/css">#crate-search{background-image:url("../../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu" role="button">&#9776;</div><a href='../../../matrix_sdk/index.html'><div class='logo-container rust-logo'><img src='../../../rust-logo.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu" title="themes"><img width="18" height="18" alt="Pick another theme!" src="../../../brush.svg"></button><div id="theme-choices" role="menu"></div></div><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" disabled autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><button type="button" id="help-button" title="help">?</button><a id="settings-menu" href="../../../settings.html" title="settings"><img width="18" height="18" alt="Change settings" src="../../../wheel.svg"></a></div></form></nav><section id="main" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">  1</span>
 <span id="2">  2</span>
 <span id="3">  3</span>
 <span id="4">  4</span>
@@ -660,6 +660,10 @@
 <span id="660">660</span>
 <span id="661">661</span>
 <span id="662">662</span>
+<span id="663">663</span>
+<span id="664">664</span>
+<span id="665">665</span>
+<span id="666">666</span>
 </pre><pre class="rust"><code><span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;encryption&quot;</span>)]</span>
 <span class="kw">use</span> <span class="ident">std::sync::Arc</span>;
 <span class="kw">use</span> <span class="ident">std</span>::{<span class="ident">io::Read</span>, <span class="ident">ops::Deref</span>};
@@ -824,25 +828,23 @@
     <span class="doccomment">/// ```no_run</span>
     <span class="doccomment">/// use std::time::Duration;</span>
     <span class="doccomment">/// use matrix_sdk::ruma::api::client::r0::typing::create_typing_event::Typing;</span>
+    <span class="doccomment">///</span>
     <span class="doccomment">/// # use matrix_sdk::{</span>
-    <span class="doccomment">/// #     Client, SyncSettings,</span>
+    <span class="doccomment">/// #     Client, config::SyncSettings,</span>
     <span class="doccomment">/// #     ruma::room_id,</span>
     <span class="doccomment">/// # };</span>
     <span class="doccomment">/// # use futures::executor::block_on;</span>
     <span class="doccomment">/// # use url::Url;</span>
     <span class="doccomment">/// # block_on(async {</span>
-    <span class="doccomment">/// # let homeserver = Url::parse(&quot;http://localhost:8080&quot;).unwrap();</span>
-    <span class="doccomment">/// # let mut client = Client::new(homeserver).unwrap();</span>
+    <span class="doccomment">/// # let homeserver = Url::parse(&quot;http://localhost:8080&quot;)?;</span>
+    <span class="doccomment">/// # let client = Client::new(homeserver)?;</span>
     <span class="doccomment">/// # let room_id = room_id!(&quot;!test:localhost&quot;);</span>
-    <span class="doccomment">/// # let room = client</span>
-    <span class="doccomment">/// #    .get_joined_room(&amp;room_id!(&quot;!SVkFJHzfwvuaIEawgC:localhost&quot;))</span>
-    <span class="doccomment">/// #    .unwrap();</span>
+    <span class="doccomment">/// let room_id = room_id!(&quot;!SVkFJHzfwvuaIEawgC:localhost&quot;);</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// room</span>
-    <span class="doccomment">///     .typing_notice(true)</span>
-    <span class="doccomment">///     .await</span>
-    <span class="doccomment">///     .expect(&quot;Can&#39;t get devices from server&quot;);</span>
-    <span class="doccomment">/// # });</span>
+    <span class="doccomment">/// if let Some(room) = client.get_joined_room(&amp;room_id) {</span>
+    <span class="doccomment">///     room.typing_notice(true).await?</span>
+    <span class="doccomment">/// }</span>
+    <span class="doccomment">/// # matrix_sdk::Result::Ok(()) });</span>
     <span class="doccomment">/// ```</span>
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">typing_notice</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">typing</span>: <span class="ident">bool</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="comment">// Only send a request to the homeserver if the old timeout has elapsed</span>
@@ -1010,31 +1012,33 @@
     <span class="doccomment">/// # Example</span>
     <span class="doccomment">/// ```no_run</span>
     <span class="doccomment">/// # use std::sync::{Arc, RwLock};</span>
-    <span class="doccomment">/// # use matrix_sdk::{Client, SyncSettings};</span>
+    <span class="doccomment">/// # use matrix_sdk::{Client, config::SyncSettings};</span>
     <span class="doccomment">/// # use url::Url;</span>
     <span class="doccomment">/// # use futures::executor::block_on;</span>
     <span class="doccomment">/// # use matrix_sdk::ruma::room_id;</span>
     <span class="doccomment">/// # use std::convert::TryFrom;</span>
-    <span class="doccomment">/// use matrix_sdk::ruma::events::{</span>
-    <span class="doccomment">///     AnyMessageEventContent,</span>
-    <span class="doccomment">///     room::message::{MessageEventContent, TextMessageEventContent},</span>
+    <span class="doccomment">/// use matrix_sdk::{</span>
+    <span class="doccomment">///     uuid::Uuid,</span>
+    <span class="doccomment">///     ruma::events::{</span>
+    <span class="doccomment">///         AnyMessageEventContent,</span>
+    <span class="doccomment">///         room::message::{MessageEventContent, TextMessageEventContent},</span>
+    <span class="doccomment">///     }</span>
     <span class="doccomment">/// };</span>
     <span class="doccomment">/// # block_on(async {</span>
-    <span class="doccomment">/// # let homeserver = Url::parse(&quot;http://localhost:8080&quot;).unwrap();</span>
-    <span class="doccomment">/// # let mut client = Client::new(homeserver).unwrap();</span>
+    <span class="doccomment">/// # let homeserver = Url::parse(&quot;http://localhost:8080&quot;)?;</span>
+    <span class="doccomment">/// # let mut client = Client::new(homeserver)?;</span>
     <span class="doccomment">/// # let room_id = room_id!(&quot;!test:localhost&quot;);</span>
-    <span class="doccomment">/// use matrix_sdk_common::uuid::Uuid;</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// let content = AnyMessageEventContent::RoomMessage(</span>
     <span class="doccomment">///     MessageEventContent::text_plain(&quot;Hello world&quot;)</span>
     <span class="doccomment">/// );</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// let txn_id = Uuid::new_v4();</span>
-    <span class="doccomment">/// # let room = client</span>
-    <span class="doccomment">/// #    .get_joined_room(&amp;room_id)</span>
-    <span class="doccomment">/// #    .unwrap();</span>
-    <span class="doccomment">/// room.send(content, Some(txn_id)).await.unwrap();</span>
-    <span class="doccomment">/// # })</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// if let Some(room) = client.get_joined_room(&amp;room_id) {</span>
+    <span class="doccomment">///     room.send(content, Some(txn_id)).await?;</span>
+    <span class="doccomment">/// }</span>
+    <span class="doccomment">/// # matrix_sdk::Result::Ok(()) });</span>
     <span class="doccomment">/// ```</span>
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">send</span>(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
@@ -1100,19 +1104,21 @@
     <span class="doccomment">/// # use mime;</span>
     <span class="doccomment">/// # use futures::executor::block_on;</span>
     <span class="doccomment">/// # block_on(async {</span>
-    <span class="doccomment">/// # let homeserver = Url::parse(&quot;http://localhost:8080&quot;).unwrap();</span>
-    <span class="doccomment">/// # let mut client = Client::new(homeserver).unwrap();</span>
+    <span class="doccomment">/// # let homeserver = Url::parse(&quot;http://localhost:8080&quot;)?;</span>
+    <span class="doccomment">/// # let mut client = Client::new(homeserver)?;</span>
     <span class="doccomment">/// # let room_id = room_id!(&quot;!test:localhost&quot;);</span>
     <span class="doccomment">/// let path = PathBuf::from(&quot;/home/example/my-cat.jpg&quot;);</span>
-    <span class="doccomment">/// let mut image = File::open(path).unwrap();</span>
+    <span class="doccomment">/// let mut image = File::open(path)?;</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// # let room = client</span>
-    <span class="doccomment">/// #    .get_joined_room(&amp;room_id)</span>
-    <span class="doccomment">/// #    .unwrap();</span>
-    <span class="doccomment">/// room.send_attachment(&quot;My favorite cat&quot;, &amp;mime::IMAGE_JPEG, &amp;mut image, None)</span>
-    <span class="doccomment">///     .await</span>
-    <span class="doccomment">///     .expect(&quot;Can&#39;t upload my cat.&quot;);</span>
-    <span class="doccomment">/// # });</span>
+    <span class="doccomment">/// if let Some(room) = client.get_joined_room(&amp;room_id) {</span>
+    <span class="doccomment">///     room.send_attachment(</span>
+    <span class="doccomment">///         &quot;My favorite cat&quot;,</span>
+    <span class="doccomment">///         &amp;mime::IMAGE_JPEG,</span>
+    <span class="doccomment">///         &amp;mut image,</span>
+    <span class="doccomment">///         None,</span>
+    <span class="doccomment">///     ).await?;</span>
+    <span class="doccomment">/// }</span>
+    <span class="doccomment">/// # matrix_sdk::Result::Ok(()) });</span>
     <span class="doccomment">/// ```</span>
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">send_attachment</span><span class="op">&lt;</span><span class="ident">R</span>: <span class="ident">Read</span><span class="op">&gt;</span>(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
@@ -1204,21 +1210,20 @@
     <span class="doccomment">///     assign, mxc_uri,</span>
     <span class="doccomment">/// };</span>
     <span class="doccomment">/// # futures::executor::block_on(async {</span>
-    <span class="doccomment">/// # let homeserver = url::Url::parse(&quot;http://localhost:8080&quot;).unwrap();</span>
-    <span class="doccomment">/// # let mut client = matrix_sdk::Client::new(homeserver).unwrap();</span>
+    <span class="doccomment">/// # let homeserver = url::Url::parse(&quot;http://localhost:8080&quot;)?;</span>
+    <span class="doccomment">/// # let mut client = matrix_sdk::Client::new(homeserver)?;</span>
     <span class="doccomment">/// # let room_id = matrix_sdk::ruma::room_id!(&quot;!test:localhost&quot;);</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// let avatar_url = mxc_uri!(&quot;mxc://example.org/avatar&quot;);</span>
     <span class="doccomment">/// let member_event = assign!(MemberEventContent::new(MembershipState::Join), {</span>
     <span class="doccomment">///    avatar_url: Some(avatar_url),</span>
     <span class="doccomment">/// });</span>
-    <span class="doccomment">/// # let room = client</span>
-    <span class="doccomment">/// #    .get_joined_room(&amp;room_id)</span>
-    <span class="doccomment">/// #    .unwrap();</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// let content = AnyStateEventContent::RoomMember(member_event);</span>
-    <span class="doccomment">/// room.send_state_event(content, &quot;&quot;).await.unwrap();</span>
-    <span class="doccomment">/// # })</span>
+    <span class="doccomment">/// if let Some(room) = client.get_joined_room(&amp;room_id) {</span>
+    <span class="doccomment">///     let content = AnyStateEventContent::RoomMember(member_event);</span>
+    <span class="doccomment">///     room.send_state_event(content, &quot;&quot;).await?;</span>
+    <span class="doccomment">/// }</span>
+    <span class="doccomment">/// # matrix_sdk::Result::Ok(()) });</span>
     <span class="doccomment">/// ```</span>
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">send_state_event</span>(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
@@ -1252,16 +1257,17 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// ```no_run</span>
     <span class="doccomment">/// # futures::executor::block_on(async {</span>
-    <span class="doccomment">/// # let homeserver = url::Url::parse(&quot;http://localhost:8080&quot;).unwrap();</span>
-    <span class="doccomment">/// # let mut client = matrix_sdk::Client::new(homeserver).unwrap();</span>
+    <span class="doccomment">/// # let homeserver = url::Url::parse(&quot;http://localhost:8080&quot;)?;</span>
+    <span class="doccomment">/// # let mut client = matrix_sdk::Client::new(homeserver)?;</span>
     <span class="doccomment">/// # let room_id = matrix_sdk::ruma::room_id!(&quot;!test:localhost&quot;);</span>
-    <span class="doccomment">/// # let room = client</span>
-    <span class="doccomment">/// #   .get_joined_room(&amp;room_id)</span>
-    <span class="doccomment">/// #   .unwrap();</span>
-    <span class="doccomment">/// let event_id = matrix_sdk::ruma::event_id!(&quot;$xxxxxx:example.org&quot;);</span>
-    <span class="doccomment">/// let reason = Some(&quot;Indecent material&quot;);</span>
-    <span class="doccomment">/// room.redact(&amp;event_id, reason, None).await.unwrap();</span>
-    <span class="doccomment">/// # })</span>
+    <span class="doccomment">/// use matrix_sdk::ruma::event_id;</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// if let Some(room) = client.get_joined_room(&amp;room_id) {</span>
+    <span class="doccomment">///     let event_id = event_id!(&quot;$xxxxxx:example.org&quot;);</span>
+    <span class="doccomment">///     let reason = Some(&quot;Indecent material&quot;);</span>
+    <span class="doccomment">///     room.redact(&amp;event_id, reason, None).await?;</span>
+    <span class="doccomment">/// }</span>
+    <span class="doccomment">/// # matrix_sdk::Result::Ok(()) });</span>
     <span class="doccomment">/// ```</span>
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">redact</span>(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
@@ -1293,16 +1299,18 @@
     <span class="doccomment">/// ```no_run</span>
     <span class="doccomment">/// # use ruma::events::tag::TagInfo;</span>
     <span class="doccomment">/// # futures::executor::block_on(async {</span>
-    <span class="doccomment">/// # let homeserver = url::Url::parse(&quot;http://localhost:8080&quot;).unwrap();</span>
-    <span class="doccomment">/// # let mut client = matrix_sdk::Client::new(homeserver).unwrap();</span>
+    <span class="doccomment">/// # let homeserver = url::Url::parse(&quot;http://localhost:8080&quot;)?;</span>
+    <span class="doccomment">/// # let mut client = matrix_sdk::Client::new(homeserver)?;</span>
     <span class="doccomment">/// # let room_id = matrix_sdk::ruma::room_id!(&quot;!test:localhost&quot;);</span>
-    <span class="doccomment">/// # let room = client</span>
-    <span class="doccomment">/// #   .get_joined_room(&amp;room_id)</span>
-    <span class="doccomment">/// #   .unwrap();</span>
-    <span class="doccomment">/// let mut tag_info = TagInfo::new();</span>
-    <span class="doccomment">/// tag_info.order = Some(0.9);</span>
-    <span class="doccomment">/// room.set_tag(&quot;u.work&quot;, tag_info );</span>
-    <span class="doccomment">/// # })</span>
+    <span class="doccomment">/// use matrix_sdk::ruma::events::tag::TagInfo;</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// if let Some(room) = client.get_joined_room(&amp;room_id) {</span>
+    <span class="doccomment">///     let mut tag_info = TagInfo::new();</span>
+    <span class="doccomment">///     tag_info.order = Some(0.9);</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">///     room.set_tag(&quot;u.work&quot;, tag_info ).await?;</span>
+    <span class="doccomment">/// }</span>
+    <span class="doccomment">/// # matrix_sdk::Result::Ok(()) });</span>
     <span class="doccomment">/// ```</span>
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">set_tag</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">tag</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">tag_info</span>: <span class="ident">TagInfo</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">HttpResult</span><span class="op">&lt;</span><span class="ident">create_tag::Response</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">user_id</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">client</span>.<span class="ident">user_id</span>().<span class="kw">await</span>.<span class="ident">ok_or</span>(<span class="ident">HttpError::AuthenticationRequired</span>)<span class="question-mark">?</span>;
