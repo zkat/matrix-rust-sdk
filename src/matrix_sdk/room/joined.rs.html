@@ -813,10 +813,6 @@
 <span id="813">813</span>
 <span id="814">814</span>
 <span id="815">815</span>
-<span id="816">816</span>
-<span id="817">817</span>
-<span id="818">818</span>
-<span id="819">819</span>
 </pre><pre class="rust"><code><span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;encryption&quot;</span>)]</span>
 <span class="kw">use</span> <span class="ident">std::sync::Arc</span>;
 <span class="kw">use</span> <span class="ident">std</span>::{<span class="ident">io::Read</span>, <span class="ident">ops::Deref</span>};
@@ -1089,7 +1085,6 @@
     <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">preshare_group_session</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="comment">// TODO expose this publicly so people can pre-share a group session if</span>
         <span class="comment">// e.g. a user starts to type a message for a room.</span>
-        <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy::map_clone</span>)]</span>
         <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">mutex</span>) <span class="op">=</span>
             <span class="self">self</span>.<span class="ident">client</span>.<span class="ident">group_session_locks</span>.<span class="ident">get</span>(<span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">room_id</span>()).<span class="ident">map</span>(<span class="op">|</span><span class="ident">m</span><span class="op">|</span> <span class="ident">m</span>.<span class="ident">clone</span>())
         {
@@ -1196,9 +1191,7 @@
     <span class="doccomment">/// # let mut client = Client::new(homeserver)?;</span>
     <span class="doccomment">/// # let room_id = room_id!(&quot;!test:localhost&quot;);</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// let content = AnyMessageEventContent::RoomMessage(</span>
-    <span class="doccomment">///     MessageEventContent::text_plain(&quot;Hello world&quot;)</span>
-    <span class="doccomment">/// );</span>
+    <span class="doccomment">/// let content = MessageEventContent::text_plain(&quot;Hello world&quot;);</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// let txn_id = Uuid::new_v4();</span>
     <span class="doccomment">///</span>
@@ -1471,12 +1464,11 @@
     <span class="doccomment">/// # let room_id = matrix_sdk::ruma::room_id!(&quot;!test:localhost&quot;);</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// let avatar_url = mxc_uri!(&quot;mxc://example.org/avatar&quot;);</span>
-    <span class="doccomment">/// let member_event = assign!(MemberEventContent::new(MembershipState::Join), {</span>
+    <span class="doccomment">/// let content = assign!(MemberEventContent::new(MembershipState::Join), {</span>
     <span class="doccomment">///    avatar_url: Some(avatar_url),</span>
     <span class="doccomment">/// });</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// if let Some(room) = client.get_joined_room(&amp;room_id) {</span>
-    <span class="doccomment">///     let content = AnyStateEventContent::RoomMember(member_event);</span>
     <span class="doccomment">///     room.send_state_event(content, &quot;&quot;).await?;</span>
     <span class="doccomment">/// }</span>
     <span class="doccomment">/// # matrix_sdk::Result::Ok(()) });</span>
