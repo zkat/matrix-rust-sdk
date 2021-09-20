@@ -3565,6 +3565,10 @@
 <span id="3565">3565</span>
 <span id="3566">3566</span>
 <span id="3567">3567</span>
+<span id="3568">3568</span>
+<span id="3569">3569</span>
+<span id="3570">3570</span>
+<span id="3571">3571</span>
 </pre><pre class="rust"><code><span class="comment">// Copyright 2020 Damir Jelić</span>
 <span class="comment">// Copyright 2020 The Matrix.org Foundation C.I.C.</span>
 <span class="comment">//</span>
@@ -5240,6 +5244,8 @@
             .<span class="kw">await</span><span class="question-mark">?</span>;
         }
 
+        <span class="comment">// Construct notification event handler futures</span>
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">futures</span> <span class="op">=</span> <span class="ident">Vec::new</span>();
         <span class="kw">for</span> <span class="ident">handler</span> <span class="kw">in</span> <span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="self">self</span>.<span class="ident">notification_handlers</span>.<span class="ident">read</span>().<span class="kw">await</span> {
             <span class="kw">for</span> (<span class="ident">room_id</span>, <span class="ident">room_notifications</span>) <span class="kw">in</span> <span class="ident">notifications</span> {
                 <span class="kw">let</span> <span class="ident">room</span> <span class="op">=</span> <span class="kw">match</span> <span class="self">self</span>.<span class="ident">get_room</span>(<span class="ident">room_id</span>) {
@@ -5250,14 +5256,16 @@
                     }
                 };
 
-                <span class="kw">for</span> <span class="ident">notification</span> <span class="kw">in</span> <span class="ident">room_notifications</span> {
-                    <span class="ident">matrix_sdk_common::executor::spawn</span>((<span class="ident">handler</span>)(
-                        <span class="ident">notification</span>.<span class="ident">clone</span>(),
-                        <span class="ident">room</span>.<span class="ident">clone</span>(),
-                        <span class="self">self</span>.<span class="ident">clone</span>(),
-                    ));
-                }
+                <span class="ident">futures</span>.<span class="ident">extend</span>(<span class="ident">room_notifications</span>.<span class="ident">iter</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">notification</span><span class="op">|</span> {
+                    (<span class="ident">handler</span>)(<span class="ident">notification</span>.<span class="ident">clone</span>(), <span class="ident">room</span>.<span class="ident">clone</span>(), <span class="self">self</span>.<span class="ident">clone</span>())
+                }));
             }
+        }
+
+        <span class="comment">// Run the notification handler futures with the</span>
+        <span class="comment">// `self.notification_handlers` lock no longer being held, in order.</span>
+        <span class="kw">for</span> <span class="ident">fut</span> <span class="kw">in</span> <span class="ident">futures</span> {
+            <span class="ident">fut</span>.<span class="kw">await</span>;
         }
 
         <span class="prelude-val">Ok</span>(<span class="ident">response</span>)
