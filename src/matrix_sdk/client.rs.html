@@ -3569,6 +3569,7 @@
 <span id="3569">3569</span>
 <span id="3570">3570</span>
 <span id="3571">3571</span>
+<span id="3572">3572</span>
 </pre><pre class="rust"><code><span class="comment">// Copyright 2020 Damir Jelić</span>
 <span class="comment">// Copyright 2020 The Matrix.org Foundation C.I.C.</span>
 <span class="comment">//</span>
@@ -4747,7 +4748,8 @@
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         <span class="ident">registration</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">register::Request</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span><span class="op">&gt;</span>,
     ) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">HttpResult</span><span class="op">&lt;</span><span class="ident">register::Response</span><span class="op">&gt;</span> {
-        <span class="macro">info!</span>(<span class="string">&quot;Registering to {}&quot;</span>, <span class="self">self</span>.<span class="ident">homeserver</span>().<span class="kw">await</span>);
+        <span class="kw">let</span> <span class="ident">homeserver</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">homeserver</span>().<span class="kw">await</span>;
+        <span class="macro">info!</span>(<span class="string">&quot;Registering to {}&quot;</span>, <span class="ident">homeserver</span>);
 
         <span class="kw">let</span> <span class="ident">config</span> <span class="op">=</span> <span class="kw">if</span> <span class="self">self</span>.<span class="ident">appservice_mode</span> {
             <span class="prelude-val">Some</span>(<span class="self">self</span>.<span class="ident">http_client</span>.<span class="ident">request_config</span>.<span class="ident">force_auth</span>())
