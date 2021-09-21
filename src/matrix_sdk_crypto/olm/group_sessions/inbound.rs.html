@@ -416,6 +416,16 @@
 <span id="416">416</span>
 <span id="417">417</span>
 <span id="418">418</span>
+<span id="419">419</span>
+<span id="420">420</span>
+<span id="421">421</span>
+<span id="422">422</span>
+<span id="423">423</span>
+<span id="424">424</span>
+<span id="425">425</span>
+<span id="426">426</span>
+<span id="427">427</span>
+<span id="428">428</span>
 </pre><pre class="rust"><code><span class="comment">// Copyright 2020 The Matrix.org Foundation C.I.C.</span>
 <span class="comment">//</span>
 <span class="comment">// Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);</span>
@@ -733,6 +743,16 @@
         <span class="ident">decrypted_object</span>.<span class="ident">insert</span>(<span class="string">&quot;sender&quot;</span>.<span class="ident">to_owned</span>(), <span class="ident">event</span>.<span class="ident">sender</span>.<span class="ident">to_string</span>().<span class="ident">into</span>());
         <span class="ident">decrypted_object</span>.<span class="ident">insert</span>(<span class="string">&quot;event_id&quot;</span>.<span class="ident">to_owned</span>(), <span class="ident">event</span>.<span class="ident">event_id</span>.<span class="ident">to_string</span>().<span class="ident">into</span>());
         <span class="ident">decrypted_object</span>.<span class="ident">insert</span>(<span class="string">&quot;origin_server_ts&quot;</span>.<span class="ident">to_owned</span>(), <span class="ident">server_ts</span>.<span class="ident">into</span>());
+
+        <span class="kw">let</span> <span class="ident">room_id</span> <span class="op">=</span> <span class="ident">decrypted_object</span>
+            .<span class="ident">get</span>(<span class="string">&quot;room_id&quot;</span>)
+            .<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">r</span><span class="op">|</span> <span class="ident">r</span>.<span class="ident">as_str</span>().<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">r</span><span class="op">|</span> <span class="ident">RoomId::try_from</span>(<span class="ident">r</span>).<span class="ident">ok</span>()));
+
+        <span class="comment">// Check that we have a room id and that the event wasn&#39;t forwarded from</span>
+        <span class="comment">// another room.</span>
+        <span class="kw">if</span> <span class="ident">room_id</span>.<span class="ident">as_ref</span>() <span class="op">!</span><span class="op">=</span> <span class="prelude-val">Some</span>(<span class="self">self</span>.<span class="ident">room_id</span>()) {
+            <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">EventError::MismatchedRoom</span>(<span class="self">self</span>.<span class="ident">room_id</span>().<span class="ident">to_owned</span>(), <span class="ident">room_id</span>).<span class="ident">into</span>());
+        }
 
         <span class="ident">decrypted_object</span>.<span class="ident">insert</span>(
             <span class="string">&quot;unsigned&quot;</span>.<span class="ident">to_owned</span>(),

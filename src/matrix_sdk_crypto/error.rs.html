@@ -202,6 +202,12 @@
 <span id="202">202</span>
 <span id="203">203</span>
 <span id="204">204</span>
+<span id="205">205</span>
+<span id="206">206</span>
+<span id="207">207</span>
+<span id="208">208</span>
+<span id="209">209</span>
+<span id="210">210</span>
 </pre><pre class="rust"><code><span class="comment">// Copyright 2020 The Matrix.org Foundation C.I.C.</span>
 <span class="comment">//</span>
 <span class="comment">// Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);</span>
@@ -217,7 +223,7 @@
 <span class="comment">// limitations under the License.</span>
 
 <span class="kw">use</span> <span class="ident">olm_rs::errors</span>::{<span class="ident">OlmGroupSessionError</span>, <span class="ident">OlmSessionError</span>};
-<span class="kw">use</span> <span class="ident">ruma</span>::{<span class="ident">identifiers::Error</span> <span class="kw">as</span> <span class="ident">IdentifierError</span>, <span class="ident">DeviceId</span>, <span class="ident">UserId</span>};
+<span class="kw">use</span> <span class="ident">ruma</span>::{<span class="ident">identifiers::Error</span> <span class="kw">as</span> <span class="ident">IdentifierError</span>, <span class="ident">DeviceId</span>, <span class="ident">RoomId</span>, <span class="ident">UserId</span>};
 <span class="kw">use</span> <span class="ident">serde_json::Error</span> <span class="kw">as</span> <span class="ident">SerdeError</span>;
 <span class="kw">use</span> <span class="ident">thiserror::Error</span>;
 
@@ -327,6 +333,12 @@
 
     <span class="attribute">#[<span class="ident">error</span>(<span class="string">&quot;the keys of the message don&#39;t match the keys in our database.&quot;</span>)]</span>
     <span class="ident">MismatchedKeys</span>,
+
+    <span class="attribute">#[<span class="ident">error</span>(
+        <span class="string">&quot;the room id of the room key doesn&#39;t match the room id of the \
+        decrypted event: expected {0}, got {:1}&quot;</span>
+    )]</span>
+    <span class="ident">MismatchedRoom</span>(<span class="ident">RoomId</span>, <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">RoomId</span><span class="op">&gt;</span>),
 }
 
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Error</span>, <span class="ident">Debug</span>)]</span>
