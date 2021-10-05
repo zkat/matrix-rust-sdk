@@ -311,8 +311,6 @@
 <span id="311">311</span>
 <span id="312">312</span>
 <span id="313">313</span>
-<span id="314">314</span>
-<span id="315">315</span>
 </pre><pre class="rust"><code><span class="comment">// Copyright 2020 The Matrix.org Foundation C.I.C.</span>
 <span class="comment">//</span>
 <span class="comment">// Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);</span>
@@ -447,9 +445,7 @@
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         <span class="ident">methods</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">VerificationMethod</span><span class="op">&gt;</span>,
     ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">VerificationRequest</span><span class="op">&gt;</span> {
-        <span class="kw">if</span> <span class="ident">methods</span>.<span class="ident">is_empty</span>() {
-            <span class="macro">panic!</span>(<span class="string">&quot;The list of verification methods can&#39;t be non-empty&quot;</span>);
-        }
+        <span class="macro">assert!</span>(<span class="op">!</span><span class="ident">methods</span>.<span class="ident">is_empty</span>(), <span class="string">&quot;The list of verification methods can&#39;t be non-empty&quot;</span>);
 
         <span class="kw">let</span> (<span class="ident">verification</span>, <span class="ident">request</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">request_verification_with_methods</span>(<span class="ident">methods</span>).<span class="kw">await</span>;
         <span class="self">self</span>.<span class="ident">client</span>.<span class="ident">send_verification_request</span>(<span class="ident">request</span>).<span class="kw">await</span><span class="question-mark">?</span>;

@@ -1665,11 +1665,6 @@
 <span id="1665">1665</span>
 <span id="1666">1666</span>
 <span id="1667">1667</span>
-<span id="1668">1668</span>
-<span id="1669">1669</span>
-<span id="1670">1670</span>
-<span id="1671">1671</span>
-<span id="1672">1672</span>
 </pre><pre class="rust"><code><span class="comment">// Copyright 2020 The Matrix.org Foundation C.I.C.</span>
 <span class="comment">//</span>
 <span class="comment">// Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);</span>
@@ -1699,15 +1694,16 @@
 <span class="kw">use</span> <span class="ident">ruma</span>::{
     <span class="ident">api::client::r0::keys::claim_keys::Request</span> <span class="kw">as</span> <span class="ident">KeysClaimRequest</span>,
     <span class="ident">events</span>::{
-        <span class="ident">forwarded_room_key::ForwardedRoomKeyToDeviceEventContent</span>,
-        <span class="ident">room_key_request</span>::{<span class="ident">Action</span>, <span class="ident">RequestedKeyInfo</span>, <span class="ident">RoomKeyRequestToDeviceEventContent</span>},
+        <span class="ident">forwarded_room_key</span>::{<span class="ident">ToDeviceForwardedRoomKeyEvent</span>, <span class="ident">ToDeviceForwardedRoomKeyEventContent</span>},
+        <span class="ident">room_key_request</span>::{<span class="ident">Action</span>, <span class="ident">RequestedKeyInfo</span>, <span class="ident">ToDeviceRoomKeyRequestEvent</span>},
         <span class="ident">secret</span>::{
-            <span class="ident">request</span>::{
-                <span class="ident">RequestAction</span>, <span class="ident">RequestToDeviceEventContent</span> <span class="kw">as</span> <span class="ident">SecretRequestEventContent</span>, <span class="ident">SecretName</span>,
+            <span class="ident">request</span>::{<span class="ident">RequestAction</span>, <span class="ident">SecretName</span>, <span class="ident">ToDeviceRequestEvent</span> <span class="kw">as</span> <span class="ident">SecretRequestEvent</span>},
+            <span class="ident">send</span>::{
+                <span class="ident">ToDeviceSendEvent</span> <span class="kw">as</span> <span class="ident">SecretSendEvent</span>,
+                <span class="ident">ToDeviceSendEventContent</span> <span class="kw">as</span> <span class="ident">SecretSendEventContent</span>,
             },
-            <span class="ident">send::SendToDeviceEventContent</span> <span class="kw">as</span> <span class="ident">SecretSendEventContent</span>,
         },
-        <span class="ident">AnyToDeviceEvent</span>, <span class="ident">AnyToDeviceEventContent</span>, <span class="ident">ToDeviceEvent</span>,
+        <span class="ident">AnyToDeviceEvent</span>, <span class="ident">AnyToDeviceEventContent</span>,
     },
     <span class="ident">DeviceId</span>, <span class="ident">DeviceIdBox</span>, <span class="ident">DeviceKeyAlgorithm</span>, <span class="ident">EventEncryptionAlgorithm</span>, <span class="ident">RoomId</span>, <span class="ident">UserId</span>,
 };
@@ -1811,10 +1807,7 @@
     }
 
     <span class="doccomment">/// Receive a room key request event.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">receive_incoming_key_request</span>(
-        <span class="kw-2">&amp;</span><span class="self">self</span>,
-        <span class="ident">event</span>: <span class="kw-2">&amp;</span><span class="ident">ToDeviceEvent</span><span class="op">&lt;</span><span class="ident">RoomKeyRequestToDeviceEventContent</span><span class="op">&gt;</span>,
-    ) {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">receive_incoming_key_request</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">event</span>: <span class="kw-2">&amp;</span><span class="ident">ToDeviceRoomKeyRequestEvent</span>) {
         <span class="self">self</span>.<span class="ident">receive_event</span>(<span class="ident">event</span>.<span class="ident">clone</span>().<span class="ident">into</span>())
     }
 
@@ -1832,10 +1825,7 @@
         }
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">receive_incoming_secret_request</span>(
-        <span class="kw-2">&amp;</span><span class="self">self</span>,
-        <span class="ident">event</span>: <span class="kw-2">&amp;</span><span class="ident">ToDeviceEvent</span><span class="op">&lt;</span><span class="ident">SecretRequestEventContent</span><span class="op">&gt;</span>,
-    ) {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">receive_incoming_secret_request</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">event</span>: <span class="kw-2">&amp;</span><span class="ident">SecretRequestEvent</span>) {
         <span class="self">self</span>.<span class="ident">receive_event</span>(<span class="ident">event</span>.<span class="ident">clone</span>().<span class="ident">into</span>())
     }
 
@@ -1901,7 +1891,7 @@
 
     <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">handle_secret_request</span>(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
-        <span class="ident">event</span>: <span class="kw-2">&amp;</span><span class="ident">ToDeviceEvent</span><span class="op">&lt;</span><span class="ident">SecretRequestEventContent</span><span class="op">&gt;</span>,
+        <span class="ident">event</span>: <span class="kw-2">&amp;</span><span class="ident">SecretRequestEvent</span>,
     ) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">OlmResult</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Session</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">secret_name</span> <span class="op">=</span> <span class="kw">match</span> <span class="kw-2">&amp;</span><span class="ident">event</span>.<span class="ident">content</span>.<span class="ident">action</span> {
             <span class="ident">RequestAction::Request</span>(<span class="ident">s</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">s</span>,
@@ -1985,7 +1975,7 @@
     <span class="doccomment">/// Handle a single incoming key request.</span>
     <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">handle_key_request</span>(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
-        <span class="ident">event</span>: <span class="kw-2">&amp;</span><span class="ident">ToDeviceEvent</span><span class="op">&lt;</span><span class="ident">RoomKeyRequestToDeviceEventContent</span><span class="op">&gt;</span>,
+        <span class="ident">event</span>: <span class="kw-2">&amp;</span><span class="ident">ToDeviceRoomKeyRequestEvent</span>,
     ) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">OlmResult</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Session</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">key_info</span> <span class="op">=</span> <span class="kw">match</span> <span class="kw-2">&amp;</span><span class="ident">event</span>.<span class="ident">content</span>.<span class="ident">action</span> {
             <span class="ident">Action::Request</span> <span class="op">=</span><span class="op">&gt;</span> {
@@ -2366,7 +2356,7 @@
     <span class="doccomment">/// Get an outgoing key info that matches the forwarded room key content.</span>
     <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">get_key_info</span>(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
-        <span class="ident">content</span>: <span class="kw-2">&amp;</span><span class="ident">ForwardedRoomKeyToDeviceEventContent</span>,
+        <span class="ident">content</span>: <span class="kw-2">&amp;</span><span class="ident">ToDeviceForwardedRoomKeyEventContent</span>,
     ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">GossipRequest</span><span class="op">&gt;</span>, <span class="ident">CryptoStoreError</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">info</span> <span class="op">=</span> <span class="ident">RequestedKeyInfo::new</span>(
             <span class="ident">content</span>.<span class="ident">algorithm</span>.<span class="ident">clone</span>(),
@@ -2429,7 +2419,7 @@
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">receive_secret</span>(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         <span class="ident">sender_key</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>,
-        <span class="ident">event</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">ToDeviceEvent</span><span class="op">&lt;</span><span class="ident">SecretSendEventContent</span><span class="op">&gt;</span>,
+        <span class="ident">event</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">SecretSendEvent</span>,
     ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">AnyToDeviceEvent</span><span class="op">&gt;</span>, <span class="ident">CryptoStoreError</span><span class="op">&gt;</span> {
         <span class="macro">debug!</span>(
             <span class="ident">sender</span> <span class="op">=</span> <span class="ident">event</span>.<span class="ident">sender</span>.<span class="ident">as_str</span>(),
@@ -2518,7 +2508,7 @@
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">receive_forwarded_room_key</span>(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         <span class="ident">sender_key</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>,
-        <span class="ident">event</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">ToDeviceEvent</span><span class="op">&lt;</span><span class="ident">ForwardedRoomKeyToDeviceEventContent</span><span class="op">&gt;</span>,
+        <span class="ident">event</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">ToDeviceForwardedRoomKeyEvent</span>,
     ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(<span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">AnyToDeviceEvent</span><span class="op">&gt;</span>, <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">InboundGroupSession</span><span class="op">&gt;</span>), <span class="ident">CryptoStoreError</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">key_info</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">get_key_info</span>(<span class="kw-2">&amp;</span><span class="ident">event</span>.<span class="ident">content</span>).<span class="kw">await</span><span class="question-mark">?</span>;
 
@@ -2582,10 +2572,10 @@
     <span class="kw">use</span> <span class="ident">matrix_sdk_test::async_test</span>;
     <span class="kw">use</span> <span class="ident">ruma</span>::{
         <span class="ident">events</span>::{
-            <span class="ident">forwarded_room_key::ForwardedRoomKeyToDeviceEventContent</span>,
-            <span class="ident">room::encrypted::EncryptedToDeviceEventContent</span>,
-            <span class="ident">room_key_request::RoomKeyRequestToDeviceEventContent</span>,
-            <span class="ident">secret::request</span>::{<span class="ident">RequestAction</span>, <span class="ident">RequestToDeviceEventContent</span>, <span class="ident">SecretName</span>},
+            <span class="ident">forwarded_room_key::ToDeviceForwardedRoomKeyEventContent</span>,
+            <span class="ident">room::encrypted::ToDeviceEncryptedEventContent</span>,
+            <span class="ident">room_key_request::ToDeviceRoomKeyRequestEventContent</span>,
+            <span class="ident">secret::request</span>::{<span class="ident">RequestAction</span>, <span class="ident">SecretName</span>, <span class="ident">ToDeviceRequestEventContent</span>},
             <span class="ident">AnyToDeviceEvent</span>, <span class="ident">ToDeviceEvent</span>,
         },
         <span class="ident">room_id</span>,
@@ -2790,7 +2780,7 @@
 
         <span class="kw">let</span> <span class="ident">export</span> <span class="op">=</span> <span class="ident">session</span>.<span class="ident">export_at_index</span>(<span class="number">10</span>).<span class="kw">await</span>;
 
-        <span class="kw">let</span> <span class="ident">content</span>: <span class="ident">ForwardedRoomKeyToDeviceEventContent</span> <span class="op">=</span> <span class="ident">export</span>.<span class="ident">try_into</span>().<span class="ident">unwrap</span>();
+        <span class="kw">let</span> <span class="ident">content</span>: <span class="ident">ToDeviceForwardedRoomKeyEventContent</span> <span class="op">=</span> <span class="ident">export</span>.<span class="ident">try_into</span>().<span class="ident">unwrap</span>();
 
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">event</span> <span class="op">=</span> <span class="ident">ToDeviceEvent</span> { <span class="ident">sender</span>: <span class="ident">alice_id</span>(), <span class="ident">content</span> };
 
@@ -2837,7 +2827,7 @@
 
         <span class="kw">let</span> <span class="ident">export</span> <span class="op">=</span> <span class="ident">session</span>.<span class="ident">export_at_index</span>(<span class="number">15</span>).<span class="kw">await</span>;
 
-        <span class="kw">let</span> <span class="ident">content</span>: <span class="ident">ForwardedRoomKeyToDeviceEventContent</span> <span class="op">=</span> <span class="ident">export</span>.<span class="ident">try_into</span>().<span class="ident">unwrap</span>();
+        <span class="kw">let</span> <span class="ident">content</span>: <span class="ident">ToDeviceForwardedRoomKeyEventContent</span> <span class="op">=</span> <span class="ident">export</span>.<span class="ident">try_into</span>().<span class="ident">unwrap</span>();
 
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">event</span> <span class="op">=</span> <span class="ident">ToDeviceEvent</span> { <span class="ident">sender</span>: <span class="ident">alice_id</span>(), <span class="ident">content</span> };
 
@@ -2848,7 +2838,7 @@
 
         <span class="kw">let</span> <span class="ident">export</span> <span class="op">=</span> <span class="ident">session</span>.<span class="ident">export_at_index</span>(<span class="number">0</span>).<span class="kw">await</span>;
 
-        <span class="kw">let</span> <span class="ident">content</span>: <span class="ident">ForwardedRoomKeyToDeviceEventContent</span> <span class="op">=</span> <span class="ident">export</span>.<span class="ident">try_into</span>().<span class="ident">unwrap</span>();
+        <span class="kw">let</span> <span class="ident">content</span>: <span class="ident">ToDeviceForwardedRoomKeyEventContent</span> <span class="op">=</span> <span class="ident">export</span>.<span class="ident">try_into</span>().<span class="ident">unwrap</span>();
 
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">event</span> <span class="op">=</span> <span class="ident">ToDeviceEvent</span> { <span class="ident">sender</span>: <span class="ident">alice_id</span>(), <span class="ident">content</span> };
 
@@ -3040,7 +3030,7 @@
             .<span class="ident">unwrap</span>()
             .<span class="ident">get</span>(<span class="kw-2">&amp;</span><span class="ident">DeviceIdOrAllDevices::AllDevices</span>)
             .<span class="ident">unwrap</span>();
-        <span class="kw">let</span> <span class="ident">content</span>: <span class="ident">RoomKeyRequestToDeviceEventContent</span> <span class="op">=</span> <span class="ident">content</span>.<span class="ident">deserialize_as</span>().<span class="ident">unwrap</span>();
+        <span class="kw">let</span> <span class="ident">content</span>: <span class="ident">ToDeviceRoomKeyRequestEventContent</span> <span class="op">=</span> <span class="ident">content</span>.<span class="ident">deserialize_as</span>().<span class="ident">unwrap</span>();
 
         <span class="ident">alice_machine</span>.<span class="ident">mark_outgoing_request_as_sent</span>(<span class="ident">id</span>).<span class="kw">await</span>.<span class="ident">unwrap</span>();
 
@@ -3069,7 +3059,7 @@
             .<span class="ident">unwrap</span>()
             .<span class="ident">get</span>(<span class="kw-2">&amp;</span><span class="ident">DeviceIdOrAllDevices::DeviceId</span>(<span class="ident">alice_device_id</span>()))
             .<span class="ident">unwrap</span>();
-        <span class="kw">let</span> <span class="ident">content</span>: <span class="ident">EncryptedToDeviceEventContent</span> <span class="op">=</span> <span class="ident">content</span>.<span class="ident">deserialize_as</span>().<span class="ident">unwrap</span>();
+        <span class="kw">let</span> <span class="ident">content</span>: <span class="ident">ToDeviceEncryptedEventContent</span> <span class="op">=</span> <span class="ident">content</span>.<span class="ident">deserialize_as</span>().<span class="ident">unwrap</span>();
 
         <span class="ident">bob_machine</span>.<span class="ident">mark_outgoing_request_as_sent</span>(<span class="ident">id</span>).<span class="kw">await</span>.<span class="ident">unwrap</span>();
 
@@ -3134,7 +3124,7 @@
 
         <span class="kw">let</span> <span class="ident">event</span> <span class="op">=</span> <span class="ident">ToDeviceEvent</span> {
             <span class="ident">sender</span>: <span class="ident">bob_account</span>.<span class="ident">user_id</span>().<span class="ident">to_owned</span>(),
-            <span class="ident">content</span>: <span class="ident">RequestToDeviceEventContent::new</span>(
+            <span class="ident">content</span>: <span class="ident">ToDeviceRequestEventContent::new</span>(
                 <span class="ident">RequestAction::Request</span>(<span class="ident">SecretName::CrossSigningMasterKey</span>),
                 <span class="ident">bob_account</span>.<span class="ident">device_id</span>().<span class="ident">to_owned</span>(),
                 <span class="string">&quot;request_id&quot;</span>.<span class="ident">to_owned</span>(),
@@ -3163,7 +3153,7 @@
 
         <span class="kw">let</span> <span class="ident">event</span> <span class="op">=</span> <span class="ident">ToDeviceEvent</span> {
             <span class="ident">sender</span>: <span class="ident">alice_id</span>(),
-            <span class="ident">content</span>: <span class="ident">RequestToDeviceEventContent::new</span>(
+            <span class="ident">content</span>: <span class="ident">ToDeviceRequestEventContent::new</span>(
                 <span class="ident">RequestAction::Request</span>(<span class="ident">SecretName::CrossSigningMasterKey</span>),
                 <span class="ident">second_account</span>.<span class="ident">device_id</span>().<span class="ident">into</span>(),
                 <span class="string">&quot;request_id&quot;</span>.<span class="ident">to_owned</span>(),
@@ -3248,7 +3238,7 @@
             .<span class="ident">unwrap</span>()
             .<span class="ident">get</span>(<span class="kw-2">&amp;</span><span class="ident">DeviceIdOrAllDevices::AllDevices</span>)
             .<span class="ident">unwrap</span>();
-        <span class="kw">let</span> <span class="ident">content</span>: <span class="ident">RoomKeyRequestToDeviceEventContent</span> <span class="op">=</span> <span class="ident">content</span>.<span class="ident">deserialize_as</span>().<span class="ident">unwrap</span>();
+        <span class="kw">let</span> <span class="ident">content</span>: <span class="ident">ToDeviceRoomKeyRequestEventContent</span> <span class="op">=</span> <span class="ident">content</span>.<span class="ident">deserialize_as</span>().<span class="ident">unwrap</span>();
 
         <span class="ident">alice_machine</span>.<span class="ident">mark_outgoing_request_as_sent</span>(<span class="ident">id</span>).<span class="kw">await</span>.<span class="ident">unwrap</span>();
 
@@ -3297,7 +3287,7 @@
             .<span class="ident">unwrap</span>()
             .<span class="ident">get</span>(<span class="kw-2">&amp;</span><span class="ident">DeviceIdOrAllDevices::DeviceId</span>(<span class="ident">alice_device_id</span>()))
             .<span class="ident">unwrap</span>();
-        <span class="kw">let</span> <span class="ident">content</span>: <span class="ident">EncryptedToDeviceEventContent</span> <span class="op">=</span> <span class="ident">content</span>.<span class="ident">deserialize_as</span>().<span class="ident">unwrap</span>();
+        <span class="kw">let</span> <span class="ident">content</span>: <span class="ident">ToDeviceEncryptedEventContent</span> <span class="op">=</span> <span class="ident">content</span>.<span class="ident">deserialize_as</span>().<span class="ident">unwrap</span>();
 
         <span class="ident">bob_machine</span>.<span class="ident">mark_outgoing_request_as_sent</span>(<span class="ident">id</span>).<span class="kw">await</span>.<span class="ident">unwrap</span>();
 

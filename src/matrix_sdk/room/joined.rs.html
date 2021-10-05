@@ -809,6 +809,35 @@
 <span id="809">809</span>
 <span id="810">810</span>
 <span id="811">811</span>
+<span id="812">812</span>
+<span id="813">813</span>
+<span id="814">814</span>
+<span id="815">815</span>
+<span id="816">816</span>
+<span id="817">817</span>
+<span id="818">818</span>
+<span id="819">819</span>
+<span id="820">820</span>
+<span id="821">821</span>
+<span id="822">822</span>
+<span id="823">823</span>
+<span id="824">824</span>
+<span id="825">825</span>
+<span id="826">826</span>
+<span id="827">827</span>
+<span id="828">828</span>
+<span id="829">829</span>
+<span id="830">830</span>
+<span id="831">831</span>
+<span id="832">832</span>
+<span id="833">833</span>
+<span id="834">834</span>
+<span id="835">835</span>
+<span id="836">836</span>
+<span id="837">837</span>
+<span id="838">838</span>
+<span id="839">839</span>
+<span id="840">840</span>
 </pre><pre class="rust"><code><span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;encryption&quot;</span>)]</span>
 <span class="kw">use</span> <span class="ident">std::sync::Arc</span>;
 <span class="kw">use</span> <span class="ident">std</span>::{<span class="ident">io::Read</span>, <span class="ident">ops::Deref</span>};
@@ -840,12 +869,13 @@
         <span class="ident">room</span>::{
             <span class="ident">message</span>::{
                 <span class="ident">AudioMessageEventContent</span>, <span class="ident">FileMessageEventContent</span>, <span class="ident">ImageMessageEventContent</span>,
-                <span class="ident">MessageEventContent</span>, <span class="ident">MessageType</span>, <span class="ident">VideoMessageEventContent</span>,
+                <span class="ident">MessageEventContent</span> <span class="kw">as</span> <span class="ident">RoomMessageEventContent</span>, <span class="ident">MessageType</span>,
+                <span class="ident">VideoMessageEventContent</span>,
             },
             <span class="ident">EncryptedFile</span>,
         },
         <span class="ident">tag::TagInfo</span>,
-        <span class="ident">AnyMessageEventContent</span>, <span class="ident">AnyStateEventContent</span>, <span class="ident">EventContent</span>,
+        <span class="ident">MessageEventContent</span>, <span class="ident">StateEventContent</span>,
     },
     <span class="ident">receipt::ReceiptType</span>,
     <span class="ident">serde::Raw</span>,
@@ -1143,9 +1173,6 @@
     <span class="doccomment">/// If the encryption feature is enabled this method will transparently</span>
     <span class="doccomment">/// encrypt the room message if this room is encrypted.</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// **Note**: This method does not support sending custom events, the</span>
-    <span class="doccomment">/// [`send_raw()`] method can be used for that instead.</span>
-    <span class="doccomment">///</span>
     <span class="doccomment">/// # Arguments</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// * `content` - The content of the message event.</span>
@@ -1164,6 +1191,7 @@
     <span class="doccomment">///       events sent by our own device and/or to implement local echo.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// # Example</span>
+    <span class="doccomment">///</span>
     <span class="doccomment">/// ```no_run</span>
     <span class="doccomment">/// # use std::sync::{Arc, RwLock};</span>
     <span class="doccomment">/// # use matrix_sdk::{Client, config::SyncSettings};</span>
@@ -1171,12 +1199,16 @@
     <span class="doccomment">/// # use futures::executor::block_on;</span>
     <span class="doccomment">/// # use matrix_sdk::ruma::room_id;</span>
     <span class="doccomment">/// # use std::convert::TryFrom;</span>
+    <span class="doccomment">/// # use serde::{Deserialize, Serialize};</span>
     <span class="doccomment">/// use matrix_sdk::{</span>
     <span class="doccomment">///     uuid::Uuid,</span>
-    <span class="doccomment">///     ruma::events::{</span>
-    <span class="doccomment">///         AnyMessageEventContent,</span>
-    <span class="doccomment">///         room::message::{MessageEventContent, TextMessageEventContent},</span>
-    <span class="doccomment">///     }</span>
+    <span class="doccomment">///     ruma::{</span>
+    <span class="doccomment">///         events::{</span>
+    <span class="doccomment">///             macros::EventContent,</span>
+    <span class="doccomment">///             room::message::{MessageEventContent, TextMessageEventContent},</span>
+    <span class="doccomment">///         },</span>
+    <span class="doccomment">///         uint, MilliSecondsSinceUnixEpoch,</span>
+    <span class="doccomment">///     },</span>
     <span class="doccomment">/// };</span>
     <span class="doccomment">/// # block_on(async {</span>
     <span class="doccomment">/// # let homeserver = Url::parse(&quot;http://localhost:8080&quot;)?;</span>
@@ -1184,7 +1216,29 @@
     <span class="doccomment">/// # let room_id = room_id!(&quot;!test:localhost&quot;);</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// let content = MessageEventContent::text_plain(&quot;Hello world&quot;);</span>
+    <span class="doccomment">/// let txn_id = Uuid::new_v4();</span>
     <span class="doccomment">///</span>
+    <span class="doccomment">/// if let Some(room) = client.get_joined_room(&amp;room_id) {</span>
+    <span class="doccomment">///     room.send(content, Some(txn_id)).await?;</span>
+    <span class="doccomment">/// }</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// // Custom events work too:</span>
+    <span class="doccomment">/// #[derive(Clone, Debug, Deserialize, Serialize, EventContent)]</span>
+    <span class="doccomment">/// #[ruma_event(type = &quot;org.shiny_new_2fa.token&quot;, kind = Message)]</span>
+    <span class="doccomment">/// struct TokenEventContent {</span>
+    <span class="doccomment">///     token: String,</span>
+    <span class="doccomment">///     #[serde(rename = &quot;exp&quot;)]</span>
+    <span class="doccomment">///     expires_at: MilliSecondsSinceUnixEpoch,</span>
+    <span class="doccomment">/// }</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// # fn generate_token() -&gt; String { todo!() }</span>
+    <span class="doccomment">/// let content = TokenEventContent {</span>
+    <span class="doccomment">///     token: generate_token(),</span>
+    <span class="doccomment">///     expires_at: {</span>
+    <span class="doccomment">///         let now = MilliSecondsSinceUnixEpoch::now();</span>
+    <span class="doccomment">///         MilliSecondsSinceUnixEpoch(now.0 + uint!(30_000))</span>
+    <span class="doccomment">///     },</span>
+    <span class="doccomment">/// };</span>
     <span class="doccomment">/// let txn_id = Uuid::new_v4();</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// if let Some(room) = client.get_joined_room(&amp;room_id) {</span>
@@ -1193,20 +1247,18 @@
     <span class="doccomment">/// # matrix_sdk::Result::Ok(()) });</span>
     <span class="doccomment">/// ```</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// [`send_raw()`]: #method.send_raw</span>
     <span class="doccomment">/// [`SyncMessageEvent`]: ruma::events::SyncMessageEvent</span>
     <span class="doccomment">/// [`Unsigned`]: ruma::events::Unsigned</span>
     <span class="doccomment">/// [`transaction_id`]: ruma::events::Unsigned#structfield.transaction_id</span>
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">send</span>(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
-        <span class="ident">content</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">AnyMessageEventContent</span><span class="op">&gt;</span>,
+        <span class="ident">content</span>: <span class="kw">impl</span> <span class="ident">MessageEventContent</span>,
         <span class="ident">txn_id</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Uuid</span><span class="op">&gt;</span>,
     ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">send_message_event::Response</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">content</span> <span class="op">=</span> <span class="ident">content</span>.<span class="ident">into</span>();
-        <span class="kw">let</span> <span class="ident">event_type</span> <span class="op">=</span> <span class="ident">content</span>.<span class="ident">event_type</span>().<span class="ident">to_owned</span>();
-        <span class="kw">let</span> <span class="ident">content</span> <span class="op">=</span> <span class="ident">serde_json::to_value</span>(<span class="ident">content</span>)<span class="question-mark">?</span>;
-
-        <span class="self">self</span>.<span class="ident">send_raw</span>(<span class="ident">content</span>, <span class="kw-2">&amp;</span><span class="ident">event_type</span>, <span class="ident">txn_id</span>).<span class="kw">await</span>
+        <span class="kw">let</span> <span class="ident">txn_id</span> <span class="op">=</span> <span class="ident">txn_id</span>.<span class="ident">unwrap_or_else</span>(<span class="ident">Uuid::new_v4</span>).<span class="ident">to_string</span>();
+        <span class="kw">let</span> <span class="ident">request</span> <span class="op">=</span> <span class="ident">send_message_event::Request::new</span>(<span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">room_id</span>(), <span class="kw-2">&amp;</span><span class="ident">txn_id</span>, <span class="kw-2">&amp;</span><span class="ident">content</span>)<span class="question-mark">?</span>;
+        <span class="kw">let</span> <span class="ident">response</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">client</span>.<span class="ident">send</span>(<span class="ident">request</span>, <span class="prelude-val">None</span>).<span class="kw">await</span><span class="question-mark">?</span>;
+        <span class="prelude-val">Ok</span>(<span class="ident">response</span>)
     }
 
     <span class="doccomment">/// Send a room message to this room from a json `Value`.</span>
@@ -1275,7 +1327,7 @@
         <span class="kw">let</span> <span class="ident">txn_id</span> <span class="op">=</span> <span class="ident">txn_id</span>.<span class="ident">unwrap_or_else</span>(<span class="ident">Uuid::new_v4</span>).<span class="ident">to_string</span>();
 
         <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;encryption&quot;</span>))]</span>
-        <span class="kw">let</span> <span class="ident">content</span> <span class="op">=</span> <span class="ident">Raw::from_json</span>(<span class="ident">serde_json::value::to_raw_value</span>(<span class="kw-2">&amp;</span><span class="ident">content</span>)<span class="question-mark">?</span>);
+        <span class="kw">let</span> <span class="ident">content</span> <span class="op">=</span> <span class="ident">serde_json::value::to_raw_value</span>(<span class="kw-2">&amp;</span><span class="ident">content</span>)<span class="question-mark">?</span>;
 
         <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;encryption&quot;</span>)]</span>
         <span class="kw">let</span> (<span class="ident">content</span>, <span class="ident">event_type</span>) <span class="op">=</span> <span class="kw">if</span> <span class="self">self</span>.<span class="ident">is_encrypted</span>() {
@@ -1291,17 +1343,19 @@
 
             <span class="kw">let</span> <span class="ident">encrypted_content</span> <span class="op">=</span>
                 <span class="ident">olm</span>.<span class="ident">encrypt_raw</span>(<span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">room_id</span>(), <span class="ident">content</span>, <span class="ident">event_type</span>).<span class="kw">await</span><span class="question-mark">?</span>;
+            <span class="kw">let</span> <span class="ident">raw_content</span> <span class="op">=</span> <span class="ident">serde_json::value::to_raw_value</span>(<span class="kw-2">&amp;</span><span class="ident">encrypted_content</span>)
+                .<span class="ident">expect</span>(<span class="string">&quot;Failed to serialize encrypted event&quot;</span>);
 
-            (<span class="ident">AnyMessageEventContent::RoomEncrypted</span>(<span class="ident">encrypted_content</span>).<span class="ident">into</span>(), <span class="string">&quot;m.room.encrypted&quot;</span>)
+            (<span class="ident">raw_content</span>, <span class="string">&quot;m.room.encrypted&quot;</span>)
         } <span class="kw">else</span> {
-            (<span class="ident">Raw::from_json</span>(<span class="ident">serde_json::value::to_raw_value</span>(<span class="kw-2">&amp;</span><span class="ident">content</span>)<span class="question-mark">?</span>), <span class="ident">event_type</span>)
+            (<span class="ident">serde_json::value::to_raw_value</span>(<span class="kw-2">&amp;</span><span class="ident">content</span>)<span class="question-mark">?</span>, <span class="ident">event_type</span>)
         };
 
         <span class="kw">let</span> <span class="ident">request</span> <span class="op">=</span> <span class="ident">send_message_event::Request::new_raw</span>(
             <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">room_id</span>(),
             <span class="kw-2">&amp;</span><span class="ident">txn_id</span>,
             <span class="ident">event_type</span>,
-            <span class="ident">content</span>,
+            <span class="ident">Raw::from_json</span>(<span class="ident">content</span>),
         );
 
         <span class="kw">let</span> <span class="ident">response</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">client</span>.<span class="ident">send</span>(<span class="ident">request</span>, <span class="prelude-val">None</span>).<span class="kw">await</span><span class="question-mark">?</span>;
@@ -1420,8 +1474,7 @@
             )),
         };
 
-        <span class="self">self</span>.<span class="ident">send</span>(<span class="ident">AnyMessageEventContent::RoomMessage</span>(<span class="ident">MessageEventContent::new</span>(<span class="ident">content</span>)), <span class="ident">txn_id</span>)
-            .<span class="kw">await</span>
+        <span class="self">self</span>.<span class="ident">send</span>(<span class="ident">RoomMessageEventContent::new</span>(<span class="ident">content</span>), <span class="ident">txn_id</span>).<span class="kw">await</span>
     }
 
     <span class="doccomment">/// Send a room state event to the homeserver.</span>
@@ -1435,17 +1488,13 @@
     <span class="doccomment">/// * `state_key` - A unique key which defines the overwriting semantics for</span>
     <span class="doccomment">/// this piece of room state. This value is often a zero-length string.</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// **Note**: To send custom events use the raw variant of this method,</span>
-    <span class="doccomment">/// [`send_state_event_raw()`].</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`send_state_event_raw()`]: #method.send_state_event_raw</span>
-    <span class="doccomment">///</span>
     <span class="doccomment">/// # Example</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// ```no_run</span>
+    <span class="doccomment">/// # use serde::{Deserialize, Serialize};</span>
     <span class="doccomment">/// use matrix_sdk::ruma::{</span>
     <span class="doccomment">///     events::{</span>
-    <span class="doccomment">///         AnyStateEventContent,</span>
+    <span class="doccomment">///         macros::EventContent,</span>
     <span class="doccomment">///         room::member::{MemberEventContent, MembershipState},</span>
     <span class="doccomment">///     },</span>
     <span class="doccomment">///     assign, mxc_uri,</span>
@@ -1463,17 +1512,26 @@
     <span class="doccomment">/// if let Some(room) = client.get_joined_room(&amp;room_id) {</span>
     <span class="doccomment">///     room.send_state_event(content, &quot;&quot;).await?;</span>
     <span class="doccomment">/// }</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// // Custom event:</span>
+    <span class="doccomment">/// #[derive(Clone, Debug, Deserialize, Serialize, EventContent)]</span>
+    <span class="doccomment">/// #[ruma_event(type = &quot;org.matrix.msc_9000.xxx&quot;, kind = State)]</span>
+    <span class="doccomment">/// struct XxxStateEventContent { /* fields... */ }</span>
+    <span class="doccomment">/// let content: XxxStateEventContent = todo!();</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// if let Some(room) = client.get_joined_room(&amp;room_id) {</span>
+    <span class="doccomment">///     room.send_state_event(content, &quot;&quot;).await?;</span>
+    <span class="doccomment">/// }</span>
     <span class="doccomment">/// # matrix_sdk::Result::Ok(()) });</span>
     <span class="doccomment">/// ```</span>
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">send_state_event</span>(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
-        <span class="ident">content</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">AnyStateEventContent</span><span class="op">&gt;</span>,
+        <span class="ident">content</span>: <span class="kw">impl</span> <span class="ident">StateEventContent</span>,
         <span class="ident">state_key</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">HttpResult</span><span class="op">&lt;</span><span class="ident">send_state_event::Response</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">content</span> <span class="op">=</span> <span class="ident">content</span>.<span class="ident">into</span>();
-        <span class="kw">let</span> <span class="ident">request</span> <span class="op">=</span> <span class="ident">send_state_event::Request::new</span>(<span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">room_id</span>(), <span class="ident">state_key</span>, <span class="kw-2">&amp;</span><span class="ident">content</span>);
-
-        <span class="self">self</span>.<span class="ident">client</span>.<span class="ident">send</span>(<span class="ident">request</span>, <span class="prelude-val">None</span>).<span class="kw">await</span>
+    ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">send_state_event::Response</span><span class="op">&gt;</span> {
+        <span class="kw">let</span> <span class="ident">request</span> <span class="op">=</span> <span class="ident">send_state_event::Request::new</span>(<span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">room_id</span>(), <span class="ident">state_key</span>, <span class="kw-2">&amp;</span><span class="ident">content</span>)<span class="question-mark">?</span>;
+        <span class="kw">let</span> <span class="ident">response</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">client</span>.<span class="ident">send</span>(<span class="ident">request</span>, <span class="prelude-val">None</span>).<span class="kw">await</span><span class="question-mark">?</span>;
+        <span class="prelude-val">Ok</span>(<span class="ident">response</span>)
     }
 
     <span class="doccomment">/// Send a raw room state event to the homeserver.</span>

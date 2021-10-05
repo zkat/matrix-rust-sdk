@@ -797,14 +797,14 @@
 <span class="kw">use</span> <span class="ident">ruma</span>::{
     <span class="ident">events</span>::{
         <span class="ident">key::verification</span>::{
-            <span class="ident">accept</span>::{<span class="ident">AcceptEventContent</span>, <span class="ident">AcceptMethod</span>, <span class="ident">AcceptToDeviceEventContent</span>},
-            <span class="ident">cancel</span>::{<span class="ident">CancelCode</span>, <span class="ident">CancelEventContent</span>, <span class="ident">CancelToDeviceEventContent</span>},
-            <span class="ident">done</span>::{<span class="ident">DoneEventContent</span>, <span class="ident">DoneToDeviceEventContent</span>},
-            <span class="ident">key</span>::{<span class="ident">KeyEventContent</span>, <span class="ident">KeyToDeviceEventContent</span>},
-            <span class="ident">mac</span>::{<span class="ident">MacEventContent</span>, <span class="ident">MacToDeviceEventContent</span>},
-            <span class="ident">ready</span>::{<span class="ident">ReadyEventContent</span>, <span class="ident">ReadyToDeviceEventContent</span>},
-            <span class="ident">request::RequestToDeviceEventContent</span>,
-            <span class="ident">start</span>::{<span class="ident">StartEventContent</span>, <span class="ident">StartMethod</span>, <span class="ident">StartToDeviceEventContent</span>},
+            <span class="ident">accept</span>::{<span class="ident">AcceptEventContent</span>, <span class="ident">AcceptMethod</span>, <span class="ident">ToDeviceAcceptEventContent</span>},
+            <span class="ident">cancel</span>::{<span class="ident">CancelCode</span>, <span class="ident">CancelEventContent</span>, <span class="ident">ToDeviceCancelEventContent</span>},
+            <span class="ident">done</span>::{<span class="ident">DoneEventContent</span>, <span class="ident">ToDeviceDoneEventContent</span>},
+            <span class="ident">key</span>::{<span class="ident">KeyEventContent</span>, <span class="ident">ToDeviceKeyEventContent</span>},
+            <span class="ident">mac</span>::{<span class="ident">MacEventContent</span>, <span class="ident">ToDeviceMacEventContent</span>},
+            <span class="ident">ready</span>::{<span class="ident">ReadyEventContent</span>, <span class="ident">ToDeviceReadyEventContent</span>},
+            <span class="ident">request::ToDeviceRequestEventContent</span>,
+            <span class="ident">start</span>::{<span class="ident">StartEventContent</span>, <span class="ident">StartMethod</span>, <span class="ident">ToDeviceStartEventContent</span>},
             <span class="ident">VerificationMethod</span>,
         },
         <span class="ident">room::message</span>::{<span class="ident">KeyVerificationRequestEventContent</span>, <span class="ident">MessageType</span>},
@@ -1035,7 +1035,7 @@
 
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
 <span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">RequestContent</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="ident">ToDevice</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">RequestToDeviceEventContent</span>),
+    <span class="ident">ToDevice</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">ToDeviceRequestEventContent</span>),
     <span class="ident">Room</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">KeyVerificationRequestEventContent</span>),
 }
 
@@ -1057,7 +1057,7 @@
 
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
 <span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">ReadyContent</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="ident">ToDevice</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">ReadyToDeviceEventContent</span>),
+    <span class="ident">ToDevice</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">ToDeviceReadyEventContent</span>),
     <span class="ident">Room</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">ReadyEventContent</span>),
 }
 
@@ -1106,20 +1106,20 @@
 <span class="macro">from_for_enum!</span>(<span class="ident">KeyContent</span>, <span class="ident">Key</span>, <span class="ident">AnyVerificationContent</span>);
 <span class="macro">from_for_enum!</span>(<span class="ident">MacContent</span>, <span class="ident">Mac</span>, <span class="ident">AnyVerificationContent</span>);
 
-<span class="macro">from_borrow_for_enum!</span>(<span class="ident">RequestToDeviceEventContent</span>, <span class="ident">ToDevice</span>, <span class="ident">RequestContent</span>);
+<span class="macro">from_borrow_for_enum!</span>(<span class="ident">ToDeviceRequestEventContent</span>, <span class="ident">ToDevice</span>, <span class="ident">RequestContent</span>);
 <span class="macro">from_borrow_for_enum!</span>(<span class="ident">KeyVerificationRequestEventContent</span>, <span class="ident">Room</span>, <span class="ident">RequestContent</span>);
 <span class="macro">from_borrow_for_enum!</span>(<span class="ident">ReadyEventContent</span>, <span class="ident">Room</span>, <span class="ident">ReadyContent</span>);
-<span class="macro">from_borrow_for_enum!</span>(<span class="ident">ReadyToDeviceEventContent</span>, <span class="ident">ToDevice</span>, <span class="ident">ReadyContent</span>);
+<span class="macro">from_borrow_for_enum!</span>(<span class="ident">ToDeviceReadyEventContent</span>, <span class="ident">ToDevice</span>, <span class="ident">ReadyContent</span>);
 <span class="macro">from_borrow_for_enum!</span>(<span class="ident">StartEventContent</span>, <span class="ident">Room</span>, <span class="ident">StartContent</span>);
-<span class="macro">from_borrow_for_enum!</span>(<span class="ident">StartToDeviceEventContent</span>, <span class="ident">ToDevice</span>, <span class="ident">StartContent</span>);
+<span class="macro">from_borrow_for_enum!</span>(<span class="ident">ToDeviceStartEventContent</span>, <span class="ident">ToDevice</span>, <span class="ident">StartContent</span>);
 <span class="macro">from_borrow_for_enum!</span>(<span class="ident">AcceptEventContent</span>, <span class="ident">Room</span>, <span class="ident">AcceptContent</span>);
-<span class="macro">from_borrow_for_enum!</span>(<span class="ident">AcceptToDeviceEventContent</span>, <span class="ident">ToDevice</span>, <span class="ident">AcceptContent</span>);
+<span class="macro">from_borrow_for_enum!</span>(<span class="ident">ToDeviceAcceptEventContent</span>, <span class="ident">ToDevice</span>, <span class="ident">AcceptContent</span>);
 <span class="macro">from_borrow_for_enum!</span>(<span class="ident">KeyEventContent</span>, <span class="ident">Room</span>, <span class="ident">KeyContent</span>);
-<span class="macro">from_borrow_for_enum!</span>(<span class="ident">KeyToDeviceEventContent</span>, <span class="ident">ToDevice</span>, <span class="ident">KeyContent</span>);
+<span class="macro">from_borrow_for_enum!</span>(<span class="ident">ToDeviceKeyEventContent</span>, <span class="ident">ToDevice</span>, <span class="ident">KeyContent</span>);
 <span class="macro">from_borrow_for_enum!</span>(<span class="ident">MacEventContent</span>, <span class="ident">Room</span>, <span class="ident">MacContent</span>);
-<span class="macro">from_borrow_for_enum!</span>(<span class="ident">MacToDeviceEventContent</span>, <span class="ident">ToDevice</span>, <span class="ident">MacContent</span>);
+<span class="macro">from_borrow_for_enum!</span>(<span class="ident">ToDeviceMacEventContent</span>, <span class="ident">ToDevice</span>, <span class="ident">MacContent</span>);
 <span class="macro">from_borrow_for_enum!</span>(<span class="ident">CancelEventContent</span>, <span class="ident">Room</span>, <span class="ident">CancelContent</span>);
-<span class="macro">from_borrow_for_enum!</span>(<span class="ident">CancelToDeviceEventContent</span>, <span class="ident">ToDevice</span>, <span class="ident">CancelContent</span>);
+<span class="macro">from_borrow_for_enum!</span>(<span class="ident">ToDeviceCancelEventContent</span>, <span class="ident">ToDevice</span>, <span class="ident">CancelContent</span>);
 
 <span class="macro">macro_rules!</span> <span class="ident">try_from_outgoing_content</span> {
     (<span class="macro-nonterminal">$</span><span class="kw">type</span>: <span class="macro-nonterminal">ident</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">enum_variant</span>: <span class="ident">ident</span>) <span class="op">=</span><span class="op">&gt;</span> {
@@ -1185,7 +1185,7 @@
 
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
 <span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">StartContent</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="ident">ToDevice</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">StartToDeviceEventContent</span>),
+    <span class="ident">ToDevice</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">ToDeviceStartEventContent</span>),
     <span class="ident">Room</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">StartEventContent</span>),
 }
 
@@ -1232,7 +1232,7 @@
 
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
 <span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">DoneContent</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="ident">ToDevice</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">DoneToDeviceEventContent</span>),
+    <span class="ident">ToDevice</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">ToDeviceDoneEventContent</span>),
     <span class="ident">Room</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">DoneEventContent</span>),
 }
 
@@ -1242,8 +1242,8 @@
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">From</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">DoneToDeviceEventContent</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">DoneContent</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">c</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">DoneToDeviceEventContent</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">From</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">ToDeviceDoneEventContent</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">DoneContent</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">c</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">ToDeviceDoneEventContent</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
         <span class="ident"><span class="self">Self</span>::ToDevice</span>(<span class="ident">c</span>)
     }
 }
@@ -1259,7 +1259,7 @@
 
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>)]</span>
 <span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">AcceptContent</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="ident">ToDevice</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">AcceptToDeviceEventContent</span>),
+    <span class="ident">ToDevice</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">ToDeviceAcceptEventContent</span>),
     <span class="ident">Room</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">AcceptEventContent</span>),
 }
 
@@ -1290,7 +1290,7 @@
 
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>)]</span>
 <span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">KeyContent</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="ident">ToDevice</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">KeyToDeviceEventContent</span>),
+    <span class="ident">ToDevice</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">ToDeviceKeyEventContent</span>),
     <span class="ident">Room</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">KeyEventContent</span>),
 }
 
@@ -1312,7 +1312,7 @@
 
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>)]</span>
 <span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">MacContent</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="ident">ToDevice</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">MacToDeviceEventContent</span>),
+    <span class="ident">ToDevice</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">ToDeviceMacEventContent</span>),
     <span class="ident">Room</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">MacEventContent</span>),
 }
 
@@ -1341,7 +1341,7 @@
 
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>)]</span>
 <span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">CancelContent</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="ident">ToDevice</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">CancelToDeviceEventContent</span>),
+    <span class="ident">ToDevice</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">ToDeviceCancelEventContent</span>),
     <span class="ident">Room</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">CancelEventContent</span>),
 }
 
@@ -1356,7 +1356,7 @@
 
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>)]</span>
 <span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">OwnedStartContent</span> {
-    <span class="ident">ToDevice</span>(<span class="ident">StartToDeviceEventContent</span>),
+    <span class="ident">ToDevice</span>(<span class="ident">ToDeviceStartEventContent</span>),
     <span class="ident">Room</span>(<span class="ident">RoomId</span>, <span class="ident">StartEventContent</span>),
 }
 
@@ -1405,20 +1405,20 @@
     }
 }
 
-<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">StartToDeviceEventContent</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">OwnedStartContent</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">content</span>: <span class="ident">StartToDeviceEventContent</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">ToDeviceStartEventContent</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">OwnedStartContent</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">content</span>: <span class="ident">ToDeviceStartEventContent</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
         <span class="ident"><span class="self">Self</span>::ToDevice</span>(<span class="ident">content</span>)
     }
 }
 
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>)]</span>
 <span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">OwnedAcceptContent</span> {
-    <span class="ident">ToDevice</span>(<span class="ident">AcceptToDeviceEventContent</span>),
+    <span class="ident">ToDevice</span>(<span class="ident">ToDeviceAcceptEventContent</span>),
     <span class="ident">Room</span>(<span class="ident">RoomId</span>, <span class="ident">AcceptEventContent</span>),
 }
 
-<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">AcceptToDeviceEventContent</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">OwnedAcceptContent</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">content</span>: <span class="ident">AcceptToDeviceEventContent</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">ToDeviceAcceptEventContent</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">OwnedAcceptContent</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">content</span>: <span class="ident">ToDeviceAcceptEventContent</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
         <span class="ident"><span class="self">Self</span>::ToDevice</span>(<span class="ident">content</span>)
     }
 }

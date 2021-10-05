@@ -397,14 +397,6 @@
 <span id="397">397</span>
 <span id="398">398</span>
 <span id="399">399</span>
-<span id="400">400</span>
-<span id="401">401</span>
-<span id="402">402</span>
-<span id="403">403</span>
-<span id="404">404</span>
-<span id="405">405</span>
-<span id="406">406</span>
-<span id="407">407</span>
 </pre><pre class="rust"><code><span class="comment">// Copyright 2021 The Matrix.org Foundation C.I.C.</span>
 <span class="comment">//</span>
 <span class="comment">// Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);</span>
@@ -431,7 +423,6 @@
     <span class="ident">events</span>::{
         <span class="ident">key::verification::VerificationMethod</span>,
         <span class="ident">room::message</span>::{<span class="ident">MessageEventContent</span>, <span class="ident">MessageType</span>},
-        <span class="ident">AnyMessageEventContent</span>,
     },
     <span class="ident">UserId</span>,
 };
@@ -573,9 +564,7 @@
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         <span class="ident">methods</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">VerificationMethod</span><span class="op">&gt;</span>,
     ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">VerificationRequest</span>, <span class="ident">RequestVerificationError</span><span class="op">&gt;</span> {
-        <span class="kw">if</span> <span class="ident">methods</span>.<span class="ident">is_empty</span>() {
-            <span class="macro">panic!</span>(<span class="string">&quot;The list of verification methods can&#39;t be non-empty&quot;</span>);
-        }
+        <span class="macro">assert!</span>(<span class="op">!</span><span class="ident">methods</span>.<span class="ident">is_empty</span>(), <span class="string">&quot;The list of verification methods can&#39;t be non-empty&quot;</span>);
 
         <span class="kw">match</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">inner</span> {
             <span class="ident">UserIdentities::Own</span>(<span class="ident">i</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">i</span>.<span class="ident">request_verification</span>(<span class="prelude-val">Some</span>(<span class="ident">methods</span>)).<span class="kw">await</span>,
@@ -791,12 +780,7 @@
         };
 
         <span class="kw">let</span> <span class="ident">response</span> <span class="op">=</span> <span class="ident">room</span>
-            .<span class="ident">send</span>(
-                <span class="ident">AnyMessageEventContent::RoomMessage</span>(<span class="ident">MessageEventContent::new</span>(
-                    <span class="ident">MessageType::VerificationRequest</span>(<span class="ident">content</span>),
-                )),
-                <span class="prelude-val">None</span>,
-            )
+            .<span class="ident">send</span>(<span class="ident">MessageEventContent::new</span>(<span class="ident">MessageType::VerificationRequest</span>(<span class="ident">content</span>)), <span class="prelude-val">None</span>)
             .<span class="kw">await</span><span class="question-mark">?</span>;
 
         <span class="kw">let</span> <span class="ident">verification</span> <span class="op">=</span>

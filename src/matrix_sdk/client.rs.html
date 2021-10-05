@@ -3551,25 +3551,6 @@
 <span id="3551">3551</span>
 <span id="3552">3552</span>
 <span id="3553">3553</span>
-<span id="3554">3554</span>
-<span id="3555">3555</span>
-<span id="3556">3556</span>
-<span id="3557">3557</span>
-<span id="3558">3558</span>
-<span id="3559">3559</span>
-<span id="3560">3560</span>
-<span id="3561">3561</span>
-<span id="3562">3562</span>
-<span id="3563">3563</span>
-<span id="3564">3564</span>
-<span id="3565">3565</span>
-<span id="3566">3566</span>
-<span id="3567">3567</span>
-<span id="3568">3568</span>
-<span id="3569">3569</span>
-<span id="3570">3570</span>
-<span id="3571">3571</span>
-<span id="3572">3572</span>
 </pre><pre class="rust"><code><span class="comment">// Copyright 2020 Damir Jelić</span>
 <span class="comment">// Copyright 2020 The Matrix.org Foundation C.I.C.</span>
 <span class="comment">//</span>
@@ -4112,8 +4093,7 @@
     <span class="doccomment">///         events::{</span>
     <span class="doccomment">///             macros::EventContent,</span>
     <span class="doccomment">///             push_rules::PushRulesEvent,</span>
-    <span class="doccomment">///             room::{message::MessageEventContent, topic::TopicEventContent},</span>
-    <span class="doccomment">///             SyncMessageEvent, SyncStateEvent,</span>
+    <span class="doccomment">///             room::{message::SyncMessageEvent, topic::SyncTopicEvent},</span>
     <span class="doccomment">///         },</span>
     <span class="doccomment">///         Int, MilliSecondsSinceUnixEpoch,</span>
     <span class="doccomment">///     },</span>
@@ -4124,27 +4104,23 @@
     <span class="doccomment">/// # let _ = async {</span>
     <span class="doccomment">/// client</span>
     <span class="doccomment">///     .register_event_handler(</span>
-    <span class="doccomment">///         |ev: SyncMessageEvent&lt;MessageEventContent&gt;,</span>
-    <span class="doccomment">///          room: Room,</span>
-    <span class="doccomment">///          client: Client| async move {</span>
+    <span class="doccomment">///         |ev: SyncMessageEvent, room: Room, client: Client| async move {</span>
     <span class="doccomment">///             // Common usage: Room event plus room and client.</span>
     <span class="doccomment">///         },</span>
     <span class="doccomment">///     )</span>
     <span class="doccomment">///     .await</span>
     <span class="doccomment">///     .register_event_handler(</span>
-    <span class="doccomment">///         |ev: SyncMessageEvent&lt;MessageEventContent&gt;,</span>
-    <span class="doccomment">///          room: Room,</span>
-    <span class="doccomment">///          encryption_info: Option&lt;EncryptionInfo&gt;| async move {</span>
-    <span class="doccomment">///             // An `Option&lt;EncryptionInfo&gt;` parameter lets you distinguish between</span>
-    <span class="doccomment">///             // unencrypted events and events that were decrypted by the SDK.</span>
+    <span class="doccomment">///         |ev: SyncMessageEvent, room: Room, encryption_info: Option&lt;EncryptionInfo&gt;| {</span>
+    <span class="doccomment">///             async move {</span>
+    <span class="doccomment">///                 // An `Option&lt;EncryptionInfo&gt;` parameter lets you distinguish between</span>
+    <span class="doccomment">///                 // unencrypted events and events that were decrypted by the SDK.</span>
+    <span class="doccomment">///             }</span>
     <span class="doccomment">///         },</span>
     <span class="doccomment">///     )</span>
     <span class="doccomment">///     .await</span>
-    <span class="doccomment">///     .register_event_handler(</span>
-    <span class="doccomment">///         |ev: SyncStateEvent&lt;TopicEventContent&gt;| async move {</span>
-    <span class="doccomment">///             // You can omit any or all arguments after the first.</span>
-    <span class="doccomment">///         }</span>
-    <span class="doccomment">///     )</span>
+    <span class="doccomment">///     .register_event_handler(|ev: SyncTopicEvent| async move {</span>
+    <span class="doccomment">///         // You can omit any or all arguments after the first.</span>
+    <span class="doccomment">///     })</span>
     <span class="doccomment">///     .await;</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// // Custom events work exactly the same way, you just need to declare</span>
@@ -4157,18 +4133,16 @@
     <span class="doccomment">///     expires_at: MilliSecondsSinceUnixEpoch,</span>
     <span class="doccomment">/// }</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// client.register_event_handler(</span>
-    <span class="doccomment">///     |ev: SyncMessageEvent&lt;TokenEventContent&gt;, room: Room| async move {</span>
-    <span class="doccomment">///         todo!(&quot;Display the token&quot;);</span>
-    <span class="doccomment">///     },</span>
-    <span class="doccomment">/// ).await;</span>
+    <span class="doccomment">/// client.register_event_handler(|ev: SyncTokenEvent, room: Room| async move {</span>
+    <span class="doccomment">///     todo!(&quot;Display the token&quot;);</span>
+    <span class="doccomment">/// }).await;</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// // Adding your custom data to the handler can be done as well</span>
     <span class="doccomment">/// let data = &quot;MyCustomIdentifier&quot;.to_string();</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// client.register_event_handler({</span>
     <span class="doccomment">///     let data = data.clone();</span>
-    <span class="doccomment">///     move |ev: SyncMessageEvent&lt;MessageEventContent&gt; | {</span>
+    <span class="doccomment">///     move |ev: SyncMessageEvent | {</span>
     <span class="doccomment">///         let data = data.clone();</span>
     <span class="doccomment">///         async move {</span>
     <span class="doccomment">///             println!(&quot;Calling the handler with identifier {}&quot;, data);</span>
@@ -4393,10 +4367,10 @@
         <span class="kw">let</span> <span class="ident">homeserver</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">homeserver</span>().<span class="kw">await</span>;
         <span class="macro">info!</span>(<span class="ident">homeserver</span> <span class="op">=</span> <span class="ident">homeserver</span>.<span class="ident">as_str</span>(), <span class="ident">user</span> <span class="op">=</span> <span class="ident">user</span>.<span class="ident">as_ref</span>(), <span class="string">&quot;Logging in&quot;</span>);
 
-        <span class="kw">let</span> <span class="ident">login_info</span> <span class="op">=</span> <span class="ident">login::LoginInfo::Password</span> {
-            <span class="ident">identifier</span>: <span class="ident">UserIdentifier::MatrixId</span>(<span class="ident">user</span>.<span class="ident">as_ref</span>()),
+        <span class="kw">let</span> <span class="ident">login_info</span> <span class="op">=</span> <span class="ident">login::LoginInfo::Password</span>(<span class="ident">login::Password::new</span>(
+            <span class="ident">UserIdentifier::MatrixId</span>(<span class="ident">user</span>.<span class="ident">as_ref</span>()),
             <span class="ident">password</span>,
-        };
+        ));
 
         <span class="kw">let</span> <span class="ident">request</span> <span class="op">=</span> <span class="macro">assign!</span>(<span class="ident">login::Request::new</span>(<span class="ident">login_info</span>), {
             <span class="ident">device_id</span>: <span class="ident">device_id</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">d</span><span class="op">|</span> <span class="ident">d</span>.<span class="ident">into</span>()),
@@ -4676,7 +4650,7 @@
 
         <span class="kw">let</span> <span class="ident">request</span> <span class="op">=</span> <span class="macro">assign!</span>(
             <span class="ident">login::Request::new</span>(
-                <span class="ident">login::LoginInfo::Token</span> { <span class="ident">token</span> },
+                <span class="ident">login::LoginInfo::Token</span>(<span class="ident">login::Token::new</span>(<span class="ident">token</span>)),
             ), {
                 <span class="ident">device_id</span>: <span class="ident">device_id</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">d</span><span class="op">|</span> <span class="ident">d</span>.<span class="ident">into</span>()),
                 <span class="ident">initial_device_display_name</span>,
@@ -5366,7 +5340,7 @@
     <span class="doccomment">/// # let password = &quot;&quot;;</span>
     <span class="doccomment">/// use matrix_sdk::{</span>
     <span class="doccomment">///     Client, config::SyncSettings,</span>
-    <span class="doccomment">///     ruma::events::{SyncMessageEvent, room::message::MessageEventContent},</span>
+    <span class="doccomment">///     ruma::events::room::message::SyncMessageEvent,</span>
     <span class="doccomment">/// };</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// let client = Client::new(homeserver)?;</span>
@@ -5377,12 +5351,9 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// // Register our handler so we start responding once we receive a new</span>
     <span class="doccomment">/// // event.</span>
-    <span class="doccomment">/// client.register_event_handler(</span>
-    <span class="doccomment">///     |ev: SyncMessageEvent&lt;MessageEventContent&gt;|</span>
-    <span class="doccomment">///     async move {</span>
-    <span class="doccomment">///         println!(&quot;Received event {}: {:?}&quot;, ev.sender, ev.content);</span>
-    <span class="doccomment">///     },</span>
-    <span class="doccomment">/// ).await;</span>
+    <span class="doccomment">/// client.register_event_handler(|ev: SyncMessageEvent| async move {</span>
+    <span class="doccomment">///     println!(&quot;Received event {}: {:?}&quot;, ev.sender, ev.content);</span>
+    <span class="doccomment">/// }).await;</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// // Now keep on syncing forever. `sync()` will use the stored sync token</span>
     <span class="doccomment">/// // from our `sync_once()` call automatically.</span>
@@ -5463,7 +5434,7 @@
     <span class="doccomment">/// # let password = &quot;&quot;;</span>
     <span class="doccomment">/// use matrix_sdk::{</span>
     <span class="doccomment">///     Client, config::SyncSettings,</span>
-    <span class="doccomment">///     ruma::events::{SyncMessageEvent, room::message::MessageEventContent},</span>
+    <span class="doccomment">///     ruma::events::room::message::SyncMessageEvent,</span>
     <span class="doccomment">/// };</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// let client = Client::new(homeserver)?;</span>
@@ -5471,12 +5442,9 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// // Register our handler so we start responding once we receive a new</span>
     <span class="doccomment">/// // event.</span>
-    <span class="doccomment">/// client.register_event_handler(</span>
-    <span class="doccomment">///     |ev: SyncMessageEvent&lt;MessageEventContent&gt;|</span>
-    <span class="doccomment">///     async move {</span>
-    <span class="doccomment">///         println!(&quot;Received event {}: {:?}&quot;, ev.sender, ev.content);</span>
-    <span class="doccomment">///     },</span>
-    <span class="doccomment">/// ).await;</span>
+    <span class="doccomment">/// client.register_event_handler(|ev: SyncMessageEvent| async move {</span>
+    <span class="doccomment">///     println!(&quot;Received event {}: {:?}&quot;, ev.sender, ev.content);</span>
+    <span class="doccomment">/// }).await;</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// // Now keep on syncing forever. `sync()` will use the latest sync token</span>
     <span class="doccomment">/// // automatically.</span>
@@ -5895,7 +5863,7 @@
                 <span class="ident">message</span>::{<span class="ident">ImageMessageEventContent</span>, <span class="ident">MessageEventContent</span>},
                 <span class="ident">ImageInfo</span>,
             },
-            <span class="ident">AnyMessageEventContent</span>, <span class="ident">AnySyncStateEvent</span>, <span class="ident">EventType</span>,
+            <span class="ident">AnySyncStateEvent</span>, <span class="ident">EventType</span>,
         },
         <span class="ident">mxc_uri</span>, <span class="ident">room_id</span>, <span class="ident">thirdparty</span>, <span class="ident">uint</span>, <span class="ident">user_id</span>, <span class="ident">UserId</span>,
     };
@@ -5969,12 +5937,11 @@
             )
             .<span class="ident">create</span>();
 
-        <span class="kw">if</span> <span class="ident">Client::new_from_user_id</span>(<span class="kw-2">&amp;</span><span class="ident">alice</span>).<span class="kw">await</span>.<span class="ident">is_ok</span>() {
-            <span class="macro">panic!</span>(
-                <span class="string">&quot;Creating a client from a user ID should fail when the \
-                   .well-known server returns no version information.&quot;</span>
-            );
-        }
+        <span class="macro">assert!</span>(
+            <span class="ident">Client::new_from_user_id</span>(<span class="kw-2">&amp;</span><span class="ident">alice</span>).<span class="kw">await</span>.<span class="ident">is_err</span>(),
+            <span class="string">&quot;Creating a client from a user ID should fail when the \
+                .well-known server returns no version information.&quot;</span>
+        );
     }
 
     <span class="attribute">#[<span class="ident">tokio::test</span>]</span>
@@ -6576,10 +6543,7 @@
 
     <span class="attribute">#[<span class="ident">tokio::test</span>]</span>
     <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">room_state_event_send</span>() {
-        <span class="kw">use</span> <span class="ident">ruma::events</span>::{
-            <span class="ident">room::member</span>::{<span class="ident">MemberEventContent</span>, <span class="ident">MembershipState</span>},
-            <span class="ident">AnyStateEventContent</span>,
-        };
+        <span class="kw">use</span> <span class="ident">ruma::events::room::member</span>::{<span class="ident">MemberEventContent</span>, <span class="ident">MembershipState</span>};
 
         <span class="kw">let</span> <span class="ident">client</span> <span class="op">=</span> <span class="ident">logged_in_client</span>().<span class="kw">await</span>;
 
@@ -6607,8 +6571,7 @@
         <span class="kw">let</span> <span class="ident">member_event</span> <span class="op">=</span> <span class="macro">assign!</span>(<span class="ident">MemberEventContent::new</span>(<span class="ident">MembershipState::Join</span>), {
             <span class="ident">avatar_url</span>: <span class="prelude-val">Some</span>(<span class="ident">avatar_url</span>)
         });
-        <span class="kw">let</span> <span class="ident">content</span> <span class="op">=</span> <span class="ident">AnyStateEventContent::RoomMember</span>(<span class="ident">member_event</span>);
-        <span class="kw">let</span> <span class="ident">response</span> <span class="op">=</span> <span class="ident">room</span>.<span class="ident">send_state_event</span>(<span class="ident">content</span>, <span class="string">&quot;&quot;</span>).<span class="kw">await</span>.<span class="ident">unwrap</span>();
+        <span class="kw">let</span> <span class="ident">response</span> <span class="op">=</span> <span class="ident">room</span>.<span class="ident">send_state_event</span>(<span class="ident">member_event</span>, <span class="string">&quot;&quot;</span>).<span class="kw">await</span>.<span class="ident">unwrap</span>();
         <span class="macro">assert_eq!</span>(<span class="macro">event_id!</span>(<span class="string">&quot;$h29iv0s8:example.com&quot;</span>), <span class="ident">response</span>.<span class="ident">event_id</span>);
     }
 
@@ -6636,8 +6599,7 @@
 
         <span class="kw">let</span> <span class="ident">room</span> <span class="op">=</span> <span class="ident">client</span>.<span class="ident">get_joined_room</span>(<span class="kw-2">&amp;</span><span class="macro">room_id!</span>(<span class="string">&quot;!SVkFJHzfwvuaIEawgC:localhost&quot;</span>)).<span class="ident">unwrap</span>();
 
-        <span class="kw">let</span> <span class="ident">content</span> <span class="op">=</span>
-            <span class="ident">AnyMessageEventContent::RoomMessage</span>(<span class="ident">MessageEventContent::text_plain</span>(<span class="string">&quot;Hello world&quot;</span>));
+        <span class="kw">let</span> <span class="ident">content</span> <span class="op">=</span> <span class="ident">MessageEventContent::text_plain</span>(<span class="string">&quot;Hello world&quot;</span>);
         <span class="kw">let</span> <span class="ident">txn_id</span> <span class="op">=</span> <span class="ident">Uuid::new_v4</span>();
         <span class="kw">let</span> <span class="ident">response</span> <span class="op">=</span> <span class="ident">room</span>.<span class="ident">send</span>(<span class="ident">content</span>, <span class="prelude-val">Some</span>(<span class="ident">txn_id</span>)).<span class="kw">await</span>.<span class="ident">unwrap</span>();
 

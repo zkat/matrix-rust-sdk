@@ -344,9 +344,6 @@
 <span id="344">344</span>
 <span id="345">345</span>
 <span id="346">346</span>
-<span id="347">347</span>
-<span id="348">348</span>
-<span id="349">349</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">std</span>::{<span class="ident">collections::BTreeMap</span>, <span class="ident">convert::TryFrom</span>};
 
 <span class="kw">use</span> <span class="ident">ruma</span>::{
@@ -358,8 +355,11 @@
         },
     },
     <span class="ident">events</span>::{
-        <span class="ident">room::member::MemberEventContent</span>, <span class="ident">AnySyncRoomEvent</span>, <span class="ident">StateEvent</span>, <span class="ident">StrippedStateEvent</span>,
-        <span class="ident">SyncStateEvent</span>, <span class="ident">Unsigned</span>,
+        <span class="ident">room::member</span>::{
+            <span class="ident">MemberEvent</span> <span class="kw">as</span> <span class="ident">RumaMemberEvent</span>, <span class="ident">MemberEventContent</span>,
+            <span class="ident">StrippedMemberEvent</span> <span class="kw">as</span> <span class="ident">RumaStrippedMemberEvent</span>, <span class="ident">SyncMemberEvent</span> <span class="kw">as</span> <span class="ident">RumaSyncMemberEvent</span>,
+        },
+        <span class="ident">AnyRoomEvent</span>, <span class="ident">AnySyncRoomEvent</span>, <span class="ident">Unsigned</span>,
     },
     <span class="ident">serde::Raw</span>,
     <span class="ident">DeviceIdBox</span>, <span class="ident">DeviceKeyAlgorithm</span>, <span class="ident">EventId</span>, <span class="ident">MilliSecondsSinceUnixEpoch</span>, <span class="ident">RoomId</span>, <span class="ident">UserId</span>,
@@ -485,7 +485,7 @@
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">RoomEvent</span> {
     <span class="doccomment">/// The actual event.</span>
-    <span class="kw">pub</span> <span class="ident">event</span>: <span class="ident">Raw</span><span class="op">&lt;</span><span class="ident">ruma::events::AnyRoomEvent</span><span class="op">&gt;</span>,
+    <span class="kw">pub</span> <span class="ident">event</span>: <span class="ident">Raw</span><span class="op">&lt;</span><span class="ident">AnyRoomEvent</span><span class="op">&gt;</span>,
     <span class="doccomment">/// The encryption info about the event. Will be `None` if the event was not</span>
     <span class="doccomment">/// encrypted.</span>
     <span class="kw">pub</span> <span class="ident">encryption_info</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">EncryptionInfo</span><span class="op">&gt;</span>,
@@ -593,10 +593,7 @@
 }
 
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>)]</span>
-<span class="attribute">#[<span class="ident">serde</span>(
-    <span class="ident">try_from</span> <span class="op">=</span> <span class="string">&quot;SyncStateEvent&lt;MemberEventContent&gt;&quot;</span>,
-    <span class="ident">into</span> <span class="op">=</span> <span class="string">&quot;SyncStateEvent&lt;MemberEventContent&gt;&quot;</span>
-)]</span>
+<span class="attribute">#[<span class="ident">serde</span>(<span class="ident">try_from</span> <span class="op">=</span> <span class="string">&quot;RumaSyncMemberEvent&quot;</span>, <span class="ident">into</span> <span class="op">=</span> <span class="string">&quot;RumaSyncMemberEvent&quot;</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">MemberEvent</span> {
     <span class="kw">pub</span> <span class="ident">content</span>: <span class="ident">MemberEventContent</span>,
     <span class="kw">pub</span> <span class="ident">event_id</span>: <span class="ident">EventId</span>,
@@ -607,10 +604,10 @@
     <span class="kw">pub</span> <span class="ident">unsigned</span>: <span class="ident">Unsigned</span>,
 }
 
-<span class="kw">impl</span> <span class="ident">TryFrom</span><span class="op">&lt;</span><span class="ident">SyncStateEvent</span><span class="op">&lt;</span><span class="ident">MemberEventContent</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">MemberEvent</span> {
+<span class="kw">impl</span> <span class="ident">TryFrom</span><span class="op">&lt;</span><span class="ident">RumaSyncMemberEvent</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">MemberEvent</span> {
     <span class="kw">type</span> <span class="ident">Error</span> <span class="op">=</span> <span class="ident">ruma::identifiers::Error</span>;
 
-    <span class="kw">fn</span> <span class="ident">try_from</span>(<span class="ident">event</span>: <span class="ident">SyncStateEvent</span><span class="op">&lt;</span><span class="ident">MemberEventContent</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident"><span class="self">Self</span>::Error</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">try_from</span>(<span class="ident">event</span>: <span class="ident">RumaSyncMemberEvent</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident"><span class="self">Self</span>::Error</span><span class="op">&gt;</span> {
         <span class="prelude-val">Ok</span>(<span class="ident">MemberEvent</span> {
             <span class="ident">content</span>: <span class="ident">event</span>.<span class="ident">content</span>,
             <span class="ident">event_id</span>: <span class="ident">event</span>.<span class="ident">event_id</span>,
@@ -623,10 +620,10 @@
     }
 }
 
-<span class="kw">impl</span> <span class="ident">TryFrom</span><span class="op">&lt;</span><span class="ident">StateEvent</span><span class="op">&lt;</span><span class="ident">MemberEventContent</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">MemberEvent</span> {
+<span class="kw">impl</span> <span class="ident">TryFrom</span><span class="op">&lt;</span><span class="ident">RumaMemberEvent</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">MemberEvent</span> {
     <span class="kw">type</span> <span class="ident">Error</span> <span class="op">=</span> <span class="ident">ruma::identifiers::Error</span>;
 
-    <span class="kw">fn</span> <span class="ident">try_from</span>(<span class="ident">event</span>: <span class="ident">StateEvent</span><span class="op">&lt;</span><span class="ident">MemberEventContent</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident"><span class="self">Self</span>::Error</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">try_from</span>(<span class="ident">event</span>: <span class="ident">RumaMemberEvent</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident"><span class="self">Self</span>::Error</span><span class="op">&gt;</span> {
         <span class="prelude-val">Ok</span>(<span class="ident">MemberEvent</span> {
             <span class="ident">content</span>: <span class="ident">event</span>.<span class="ident">content</span>,
             <span class="ident">event_id</span>: <span class="ident">event</span>.<span class="ident">event_id</span>,
@@ -639,9 +636,9 @@
     }
 }
 
-<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">MemberEvent</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">SyncStateEvent</span><span class="op">&lt;</span><span class="ident">MemberEventContent</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">other</span>: <span class="ident">MemberEvent</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">SyncStateEvent</span><span class="op">&lt;</span><span class="ident">MemberEventContent</span><span class="op">&gt;</span> {
-        <span class="ident">SyncStateEvent</span> {
+<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">MemberEvent</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">RumaSyncMemberEvent</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">other</span>: <span class="ident">MemberEvent</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+        <span class="self">Self</span> {
             <span class="ident">content</span>: <span class="ident">other</span>.<span class="ident">content</span>,
             <span class="ident">event_id</span>: <span class="ident">other</span>.<span class="ident">event_id</span>,
             <span class="ident">sender</span>: <span class="ident">other</span>.<span class="ident">sender</span>,
@@ -654,20 +651,17 @@
 }
 
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>)]</span>
-<span class="attribute">#[<span class="ident">serde</span>(
-    <span class="ident">try_from</span> <span class="op">=</span> <span class="string">&quot;StrippedStateEvent&lt;MemberEventContent&gt;&quot;</span>,
-    <span class="ident">into</span> <span class="op">=</span> <span class="string">&quot;StrippedStateEvent&lt;MemberEventContent&gt;&quot;</span>
-)]</span>
+<span class="attribute">#[<span class="ident">serde</span>(<span class="ident">try_from</span> <span class="op">=</span> <span class="string">&quot;RumaStrippedMemberEvent&quot;</span>, <span class="ident">into</span> <span class="op">=</span> <span class="string">&quot;RumaStrippedMemberEvent&quot;</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">StrippedMemberEvent</span> {
     <span class="kw">pub</span> <span class="ident">content</span>: <span class="ident">MemberEventContent</span>,
     <span class="kw">pub</span> <span class="ident">sender</span>: <span class="ident">UserId</span>,
     <span class="kw">pub</span> <span class="ident">state_key</span>: <span class="ident">UserId</span>,
 }
 
-<span class="kw">impl</span> <span class="ident">TryFrom</span><span class="op">&lt;</span><span class="ident">StrippedStateEvent</span><span class="op">&lt;</span><span class="ident">MemberEventContent</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">StrippedMemberEvent</span> {
+<span class="kw">impl</span> <span class="ident">TryFrom</span><span class="op">&lt;</span><span class="ident">RumaStrippedMemberEvent</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">StrippedMemberEvent</span> {
     <span class="kw">type</span> <span class="ident">Error</span> <span class="op">=</span> <span class="ident">ruma::identifiers::Error</span>;
 
-    <span class="kw">fn</span> <span class="ident">try_from</span>(<span class="ident">event</span>: <span class="ident">StrippedStateEvent</span><span class="op">&lt;</span><span class="ident">MemberEventContent</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident"><span class="self">Self</span>::Error</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">try_from</span>(<span class="ident">event</span>: <span class="ident">RumaStrippedMemberEvent</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident"><span class="self">Self</span>::Error</span><span class="op">&gt;</span> {
         <span class="prelude-val">Ok</span>(<span class="ident">StrippedMemberEvent</span> {
             <span class="ident">content</span>: <span class="ident">event</span>.<span class="ident">content</span>,
             <span class="ident">sender</span>: <span class="ident">event</span>.<span class="ident">sender</span>,
@@ -676,7 +670,7 @@
     }
 }
 
-<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">StrippedMemberEvent</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">StrippedStateEvent</span><span class="op">&lt;</span><span class="ident">MemberEventContent</span><span class="op">&gt;</span> {
+<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">StrippedMemberEvent</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">RumaStrippedMemberEvent</span> {
     <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">other</span>: <span class="ident">StrippedMemberEvent</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
         <span class="self">Self</span> {
             <span class="ident">content</span>: <span class="ident">other</span>.<span class="ident">content</span>,

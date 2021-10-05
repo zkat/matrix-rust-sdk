@@ -1494,6 +1494,8 @@
 <span id="1494">1494</span>
 <span id="1495">1495</span>
 <span id="1496">1496</span>
+<span id="1497">1497</span>
+<span id="1498">1498</span>
 </pre><pre class="rust"><code><span class="comment">// Copyright 2020 The Matrix.org Foundation C.I.C.</span>
 <span class="comment">//</span>
 <span class="comment">// Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);</span>
@@ -1522,8 +1524,8 @@
     <span class="ident">events</span>::{
         <span class="ident">key::verification</span>::{
             <span class="ident">cancel::CancelCode</span>,
-            <span class="ident">ready</span>::{<span class="ident">ReadyEventContent</span>, <span class="ident">ReadyToDeviceEventContent</span>},
-            <span class="ident">request::RequestToDeviceEventContent</span>,
+            <span class="ident">ready</span>::{<span class="ident">ReadyEventContent</span>, <span class="ident">ToDeviceReadyEventContent</span>},
+            <span class="ident">request::ToDeviceRequestEventContent</span>,
             <span class="ident">start::StartMethod</span>,
             <span class="ident">Relation</span>, <span class="ident">VerificationMethod</span>,
         },
@@ -1653,7 +1655,7 @@
             <span class="ident">SUPPORTED_METHODS</span>.<span class="ident">to_vec</span>()
         };
 
-        <span class="kw">let</span> <span class="ident">content</span> <span class="op">=</span> <span class="ident">RequestToDeviceEventContent::new</span>(
+        <span class="kw">let</span> <span class="ident">content</span> <span class="op">=</span> <span class="ident">ToDeviceRequestEventContent::new</span>(
             <span class="self">self</span>.<span class="ident">account</span>.<span class="ident">device_id</span>().<span class="ident">into</span>(),
             <span class="self">self</span>.<span class="ident">flow_id</span>().<span class="ident">as_str</span>().<span class="ident">to_string</span>(),
             <span class="ident">methods</span>,
@@ -1808,10 +1810,7 @@
     <span class="doccomment">/// Generate a QR code that can be used by another client to start a QR code</span>
     <span class="doccomment">/// based verification.</span>
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">generate_qr_code</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">QrVerification</span><span class="op">&gt;</span>, <span class="ident">CryptoStoreError</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">inner</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">inner</span>
-            .<span class="ident">lock</span>()
-            .<span class="ident">unwrap</span>()
-            .<span class="ident">clone</span>();
+        <span class="kw">let</span> <span class="ident">inner</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">lock</span>().<span class="ident">unwrap</span>().<span class="ident">clone</span>();
 
         <span class="ident">inner</span>.<span class="ident">generate_qr_code</span>(<span class="self">self</span>.<span class="ident">we_started</span>, <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">clone</span>().<span class="ident">into</span>()).<span class="kw">await</span>
     }
@@ -1829,10 +1828,12 @@
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         <span class="ident">data</span>: <span class="ident">QrVerificationData</span>,
     ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">QrVerification</span><span class="op">&gt;</span>, <span class="ident">ScanError</span><span class="op">&gt;</span> {
+        <span class="comment">// Lint is buggy: https://github.com/rust-lang/rust/issues/89562</span>
+        <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">unknown_lints</span>, <span class="ident">must_not_suspend</span>)]</span>
         <span class="kw">let</span> <span class="ident">state</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">lock</span>().<span class="ident">unwrap</span>();
 
         <span class="kw">if</span> <span class="kw">let</span> <span class="ident">InnerRequest::Ready</span>(<span class="ident">r</span>) <span class="op">=</span> <span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="ident">state</span> {
-            <span class="kw">let</span> <span class="ident">qr_verification</span> <span class="op">=</span> <span class="ident">QrVerification::from_scan</span>(
+            <span class="kw">let</span> <span class="ident">fut</span> <span class="op">=</span> <span class="ident">QrVerification::from_scan</span>(
                 <span class="ident">r</span>.<span class="ident">store</span>.<span class="ident">clone</span>(),
                 <span class="ident">r</span>.<span class="ident">private_cross_signing_identity</span>.<span class="ident">clone</span>(),
                 <span class="ident">r</span>.<span class="ident">other_user_id</span>.<span class="ident">clone</span>(),
@@ -1841,9 +1842,12 @@
                 <span class="ident">data</span>,
                 <span class="self">self</span>.<span class="ident">we_started</span>,
                 <span class="prelude-val">Some</span>(<span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">clone</span>().<span class="ident">into</span>()),
-            )
-            .<span class="kw">await</span><span class="question-mark">?</span>;
+            );
 
+            <span class="comment">// Prevent mutex lock being held across `.await` point.</span>
+            <span class="ident">drop</span>(<span class="ident">state</span>);
+
+            <span class="kw">let</span> <span class="ident">qr_verification</span> <span class="op">=</span> <span class="ident">fut</span>.<span class="kw">await</span><span class="question-mark">?</span>;
             <span class="self">self</span>.<span class="ident">verification_cache</span>.<span class="ident">insert_qr</span>(<span class="ident">qr_verification</span>.<span class="ident">clone</span>());
 
             <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(<span class="ident">qr_verification</span>))
@@ -2403,7 +2407,7 @@
 
         <span class="kw">let</span> <span class="ident">content</span> <span class="op">=</span> <span class="kw">match</span> <span class="self">self</span>.<span class="ident">flow_id</span>.<span class="ident">as_ref</span>() {
             <span class="ident">FlowId::ToDevice</span>(<span class="ident">i</span>) <span class="op">=</span><span class="op">&gt;</span> {
-                <span class="ident">AnyToDeviceEventContent::KeyVerificationReady</span>(<span class="ident">ReadyToDeviceEventContent::new</span>(
+                <span class="ident">AnyToDeviceEventContent::KeyVerificationReady</span>(<span class="ident">ToDeviceReadyEventContent::new</span>(
                     <span class="ident">state</span>.<span class="ident">store</span>.<span class="ident">account</span>.<span class="ident">device_id</span>().<span class="ident">to_owned</span>(),
                     <span class="ident">methods</span>,
                     <span class="ident">i</span>.<span class="ident">to_owned</span>(),

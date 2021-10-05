@@ -562,8 +562,6 @@
 <span id="562">562</span>
 <span id="563">563</span>
 <span id="564">564</span>
-<span id="565">565</span>
-<span id="566">566</span>
 </pre><pre class="rust"><code><span class="comment">// Copyright 2021 Jonas Platte</span>
 <span class="comment">//</span>
 <span class="comment">// Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);</span>
@@ -1024,7 +1022,7 @@
 
     <span class="kw">use</span> <span class="ident">matrix_sdk_test</span>::{<span class="ident">EventBuilder</span>, <span class="ident">EventsJson</span>};
     <span class="kw">use</span> <span class="ident">ruma</span>::{
-        <span class="ident">events</span>::{<span class="ident">room::member::MemberEventContent</span>, <span class="ident">StrippedStateEvent</span>, <span class="ident">SyncStateEvent</span>},
+        <span class="ident">events::room::member</span>::{<span class="ident">StrippedMemberEvent</span>, <span class="ident">SyncMemberEvent</span>},
         <span class="ident">room_id</span>,
     };
     <span class="kw">use</span> <span class="ident">serde_json::json</span>;
@@ -1045,7 +1043,7 @@
         <span class="ident">client</span>
             .<span class="ident">register_event_handler</span>({
                 <span class="kw">let</span> <span class="ident">member_count</span> <span class="op">=</span> <span class="ident">member_count</span>.<span class="ident">clone</span>();
-                <span class="kw">move</span> <span class="op">|</span><span class="ident">_ev</span>: <span class="ident">SyncStateEvent</span><span class="op">&lt;</span><span class="ident">MemberEventContent</span><span class="op">&gt;</span>, <span class="ident">_room</span>: <span class="ident">room::Room</span><span class="op">|</span> {
+                <span class="kw">move</span> <span class="op">|</span><span class="ident">_ev</span>: <span class="ident">SyncMemberEvent</span>, <span class="ident">_room</span>: <span class="ident">room::Room</span><span class="op">|</span> {
                     <span class="ident">member_count</span>.<span class="ident">fetch_add</span>(<span class="number">1</span>, <span class="ident">SeqCst</span>);
                     <span class="ident">future::ready</span>(())
                 }
@@ -1053,7 +1051,7 @@
             .<span class="kw">await</span>
             .<span class="ident">register_event_handler</span>({
                 <span class="kw">let</span> <span class="ident">typing_count</span> <span class="op">=</span> <span class="ident">typing_count</span>.<span class="ident">clone</span>();
-                <span class="kw">move</span> <span class="op">|</span><span class="ident">_ev</span>: <span class="ident">SyncStateEvent</span><span class="op">&lt;</span><span class="ident">MemberEventContent</span><span class="op">&gt;</span><span class="op">|</span> {
+                <span class="kw">move</span> <span class="op">|</span><span class="ident">_ev</span>: <span class="ident">SyncMemberEvent</span><span class="op">|</span> {
                     <span class="ident">typing_count</span>.<span class="ident">fetch_add</span>(<span class="number">1</span>, <span class="ident">SeqCst</span>);
                     <span class="ident">future::ready</span>(())
                 }
@@ -1061,9 +1059,7 @@
             .<span class="kw">await</span>
             .<span class="ident">register_event_handler</span>({
                 <span class="kw">let</span> <span class="ident">power_levels_count</span> <span class="op">=</span> <span class="ident">power_levels_count</span>.<span class="ident">clone</span>();
-                <span class="kw">move</span> <span class="op">|</span><span class="ident">_ev</span>: <span class="ident">SyncStateEvent</span><span class="op">&lt;</span><span class="ident">MemberEventContent</span><span class="op">&gt;</span>,
-                      <span class="ident">_client</span>: <span class="ident">Client</span>,
-                      <span class="ident">_room</span>: <span class="ident">room::Room</span><span class="op">|</span> {
+                <span class="kw">move</span> <span class="op">|</span><span class="ident">_ev</span>: <span class="ident">SyncMemberEvent</span>, <span class="ident">_client</span>: <span class="ident">Client</span>, <span class="ident">_room</span>: <span class="ident">room::Room</span><span class="op">|</span> {
                     <span class="ident">power_levels_count</span>.<span class="ident">fetch_add</span>(<span class="number">1</span>, <span class="ident">SeqCst</span>);
                     <span class="ident">future::ready</span>(())
                 }
@@ -1071,7 +1067,7 @@
             .<span class="kw">await</span>
             .<span class="ident">register_event_handler</span>({
                 <span class="kw">let</span> <span class="ident">invited_member_count</span> <span class="op">=</span> <span class="ident">invited_member_count</span>.<span class="ident">clone</span>();
-                <span class="kw">move</span> <span class="op">|</span><span class="ident">_ev</span>: <span class="ident">StrippedStateEvent</span><span class="op">&lt;</span><span class="ident">MemberEventContent</span><span class="op">&gt;</span><span class="op">|</span> {
+                <span class="kw">move</span> <span class="op">|</span><span class="ident">_ev</span>: <span class="ident">StrippedMemberEvent</span><span class="op">|</span> {
                     <span class="ident">invited_member_count</span>.<span class="ident">fetch_add</span>(<span class="number">1</span>, <span class="ident">SeqCst</span>);
                     <span class="ident">future::ready</span>(())
                 }
