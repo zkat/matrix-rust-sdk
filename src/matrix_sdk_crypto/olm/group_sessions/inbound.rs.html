@@ -515,7 +515,7 @@
         <span class="ident">room_id</span>: <span class="kw-2">&amp;</span><span class="ident">RoomId</span>,
         <span class="ident">session_key</span>: <span class="ident">GroupSessionKey</span>,
         <span class="ident">history_visibility</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">HistoryVisibility</span><span class="op">&gt;</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">OlmGroupSessionError</span><span class="op">&gt;</span> {
+    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">OlmGroupSessionError</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">session</span> <span class="op">=</span> <span class="ident">OlmInboundGroupSession::new</span>(<span class="kw-2">&amp;</span><span class="ident">session_key</span>.<span class="number">0</span>)<span class="question-mark">?</span>;
         <span class="kw">let</span> <span class="ident">session_id</span> <span class="op">=</span> <span class="ident">session</span>.<span class="ident">session_id</span>();
         <span class="kw">let</span> <span class="ident">first_known_index</span> <span class="op">=</span> <span class="ident">session</span>.<span class="ident">first_known_index</span>();
@@ -547,7 +547,7 @@
     <span class="doccomment">/// [`export()`]: #method.export</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">from_export</span>(
         <span class="ident">exported_session</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">ExportedRoomKey</span><span class="op">&gt;</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">OlmGroupSessionError</span><span class="op">&gt;</span> {
+    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">OlmGroupSessionError</span><span class="op">&gt;</span> {
         <span class="ident"><span class="self">Self</span>::try_from</span>(<span class="ident">exported_session</span>.<span class="ident">into</span>())
     }
 
@@ -563,7 +563,7 @@
     <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">from_forwarded_key</span>(
         <span class="ident">sender_key</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>,
         <span class="ident">content</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">ToDeviceForwardedRoomKeyEventContent</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">OlmGroupSessionError</span><span class="op">&gt;</span> {
+    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">OlmGroupSessionError</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">key</span> <span class="op">=</span> <span class="ident">Zeroizing::from</span>(<span class="ident">mem::take</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">content</span>.<span class="ident">session_key</span>));
 
         <span class="kw">let</span> <span class="ident">session</span> <span class="op">=</span> <span class="ident">OlmInboundGroupSession::import</span>(<span class="kw-2">&amp;</span><span class="ident">key</span>)<span class="question-mark">?</span>;
@@ -595,7 +595,7 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// * `pickle_mode` - The mode that was used to pickle the group session,</span>
     <span class="doccomment">/// either an unencrypted mode or an encrypted using passphrase.</span>
-    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">pickle</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">pickle_mode</span>: <span class="ident">PicklingMode</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">PickledInboundGroupSession</span> {
+    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">pickle</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">pickle_mode</span>: <span class="ident">PicklingMode</span>) -&gt; <span class="ident">PickledInboundGroupSession</span> {
         <span class="kw">let</span> <span class="ident">pickle</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">lock</span>().<span class="kw">await</span>.<span class="ident">pickle</span>(<span class="ident">pickle_mode</span>);
 
         <span class="ident">PickledInboundGroupSession</span> {
@@ -614,17 +614,17 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// If only a limited part of this session should be exported use</span>
     <span class="doccomment">/// [`export_at_index()`](#method.export_at_index).</span>
-    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">export</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ExportedRoomKey</span> {
+    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">export</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">ExportedRoomKey</span> {
         <span class="self">self</span>.<span class="ident">export_at_index</span>(<span class="self">self</span>.<span class="ident">first_known_index</span>()).<span class="kw">await</span>
     }
 
     <span class="doccomment">/// Get the sender key that this session was received from.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">sender_key</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="ident">str</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">sender_key</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">str</span> {
         <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">sender_key</span>
     }
 
     <span class="doccomment">/// Get the map of signing keys this session was received from.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">signing_keys</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="ident">BTreeMap</span><span class="op">&lt;</span><span class="ident">DeviceKeyAlgorithm</span>, <span class="ident">String</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">signing_keys</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">BTreeMap</span><span class="op">&lt;</span><span class="ident">DeviceKeyAlgorithm</span>, <span class="ident">String</span><span class="op">&gt;</span> {
         <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">signing_keys</span>
     }
 
@@ -633,12 +633,12 @@
     <span class="doccomment">/// Each ed25519 key represents a single device. If device A forwards the</span>
     <span class="doccomment">/// session to device B and device B to C this list will contain the ed25519</span>
     <span class="doccomment">/// keys of A and B.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">forwarding_key_chain</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span>[<span class="ident">String</span>] {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">forwarding_key_chain</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>[<span class="ident">String</span>] {
         <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">forwarding_chains</span>
     }
 
     <span class="doccomment">/// Export this session at the given message index.</span>
-    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">export_at_index</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">message_index</span>: <span class="ident">u32</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ExportedRoomKey</span> {
+    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">export_at_index</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">message_index</span>: <span class="ident">u32</span>) -&gt; <span class="ident">ExportedRoomKey</span> {
         <span class="kw">let</span> <span class="ident">message_index</span> <span class="op">=</span> <span class="ident">std::cmp::max</span>(<span class="self">self</span>.<span class="ident">first_known_index</span>(), <span class="ident">message_index</span>);
 
         <span class="kw">let</span> <span class="ident">session_key</span> <span class="op">=</span> <span class="ident">ExportedGroupSessionKey</span>(
@@ -670,7 +670,7 @@
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">from_pickle</span>(
         <span class="ident">pickle</span>: <span class="ident">PickledInboundGroupSession</span>,
         <span class="ident">pickle_mode</span>: <span class="ident">PicklingMode</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">OlmGroupSessionError</span><span class="op">&gt;</span> {
+    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">OlmGroupSessionError</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">session</span> <span class="op">=</span> <span class="ident">OlmInboundGroupSession::unpickle</span>(<span class="ident">pickle</span>.<span class="ident">pickle</span>.<span class="number">0</span>, <span class="ident">pickle_mode</span>)<span class="question-mark">?</span>;
         <span class="kw">let</span> <span class="ident">first_known_index</span> <span class="op">=</span> <span class="ident">session</span>.<span class="ident">first_known_index</span>();
         <span class="kw">let</span> <span class="ident">session_id</span> <span class="op">=</span> <span class="ident">session</span>.<span class="ident">session_id</span>();
@@ -690,17 +690,17 @@
     }
 
     <span class="doccomment">/// The room where this session is used in.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">room_id</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="ident">RoomId</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">room_id</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">RoomId</span> {
         <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">room_id</span>
     }
 
     <span class="doccomment">/// Returns the unique identifier for this session.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">session_id</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="ident">str</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">session_id</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">str</span> {
         <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">session_id</span>
     }
 
     <span class="doccomment">/// Get the first message index we know how to decrypt.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">first_known_index</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">u32</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">first_known_index</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">u32</span> {
         <span class="self">self</span>.<span class="ident">first_known_index</span>
     }
 
@@ -715,7 +715,7 @@
     <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">decrypt_helper</span>(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         <span class="ident">message</span>: <span class="ident">String</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(<span class="ident">String</span>, <span class="ident">u32</span>), <span class="ident">OlmGroupSessionError</span><span class="op">&gt;</span> {
+    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(<span class="ident">String</span>, <span class="ident">u32</span>), <span class="ident">OlmGroupSessionError</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">lock</span>().<span class="kw">await</span>.<span class="ident">decrypt</span>(<span class="ident">message</span>)
     }
 
@@ -727,10 +727,10 @@
     <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">decrypt</span>(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         <span class="ident">event</span>: <span class="kw-2">&amp;</span><span class="ident">SyncEncryptedEvent</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">MegolmResult</span><span class="op">&lt;</span>(<span class="ident">Raw</span><span class="op">&lt;</span><span class="ident">AnySyncRoomEvent</span><span class="op">&gt;</span>, <span class="ident">u32</span>)<span class="op">&gt;</span> {
+    ) -&gt; <span class="ident">MegolmResult</span><span class="op">&lt;</span>(<span class="ident">Raw</span><span class="op">&lt;</span><span class="ident">AnySyncRoomEvent</span><span class="op">&gt;</span>, <span class="ident">u32</span>)<span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">content</span> <span class="op">=</span> <span class="kw">match</span> <span class="kw-2">&amp;</span><span class="ident">event</span>.<span class="ident">content</span>.<span class="ident">scheme</span> {
-            <span class="ident">EncryptedEventScheme::MegolmV1AesSha2</span>(<span class="ident">c</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">c</span>,
-            <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">EventError::UnsupportedAlgorithm</span>.<span class="ident">into</span>()),
+            <span class="ident">EncryptedEventScheme::MegolmV1AesSha2</span>(<span class="ident">c</span>) =&gt; <span class="ident">c</span>,
+            <span class="kw">_</span> =&gt; <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">EventError::UnsupportedAlgorithm</span>.<span class="ident">into</span>()),
         };
 
         <span class="kw">let</span> (<span class="ident">plaintext</span>, <span class="ident">message_index</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">decrypt_helper</span>(<span class="ident">content</span>.<span class="ident">ciphertext</span>.<span class="ident">clone</span>()).<span class="kw">await</span><span class="question-mark">?</span>;
@@ -776,14 +776,14 @@
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">tarpaulin_include</span>))]</span>
 <span class="kw">impl</span> <span class="ident">fmt::Debug</span> <span class="kw">for</span> <span class="ident">InboundGroupSession</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">fmt::Result</span> {
+    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
         <span class="ident">f</span>.<span class="ident">debug_struct</span>(<span class="string">&quot;InboundGroupSession&quot;</span>).<span class="ident">field</span>(<span class="string">&quot;session_id&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">session_id</span>()).<span class="ident">finish</span>()
     }
 }
 
 <span class="kw">impl</span> <span class="ident">PartialEq</span> <span class="kw">for</span> <span class="ident">InboundGroupSession</span> {
-    <span class="kw">fn</span> <span class="ident">eq</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">other</span>: <span class="kw-2">&amp;</span><span class="self">Self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">session_id</span>() <span class="op">=</span><span class="op">=</span> <span class="ident">other</span>.<span class="ident">session_id</span>()
+    <span class="kw">fn</span> <span class="ident">eq</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">other</span>: <span class="kw-2">&amp;</span><span class="self">Self</span>) -&gt; <span class="ident">bool</span> {
+        <span class="self">self</span>.<span class="ident">session_id</span>() <span class="op">==</span> <span class="ident">other</span>.<span class="ident">session_id</span>()
     }
 }
 
@@ -821,14 +821,14 @@
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">InboundGroupSessionPickle</span>(<span class="ident">String</span>);
 
 <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">InboundGroupSessionPickle</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">pickle_string</span>: <span class="ident">String</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">pickle_string</span>: <span class="ident">String</span>) -&gt; <span class="self">Self</span> {
         <span class="ident">InboundGroupSessionPickle</span>(<span class="ident">pickle_string</span>)
     }
 }
 
 <span class="kw">impl</span> <span class="ident">InboundGroupSessionPickle</span> {
     <span class="doccomment">/// Get the string representation of the pickle.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">as_str</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="ident">str</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">as_str</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">str</span> {
         <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="number">0</span>
     }
 }
@@ -836,7 +836,7 @@
 <span class="kw">impl</span> <span class="ident">TryFrom</span><span class="op">&lt;</span><span class="ident">ExportedRoomKey</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">InboundGroupSession</span> {
     <span class="kw">type</span> <span class="ident">Error</span> <span class="op">=</span> <span class="ident">OlmGroupSessionError</span>;
 
-    <span class="kw">fn</span> <span class="ident">try_from</span>(<span class="ident">key</span>: <span class="ident">ExportedRoomKey</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident"><span class="self">Self</span>::Error</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">try_from</span>(<span class="ident">key</span>: <span class="ident">ExportedRoomKey</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident"><span class="self">Self</span>::Error</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">session</span> <span class="op">=</span> <span class="ident">OlmInboundGroupSession::import</span>(<span class="kw-2">&amp;</span><span class="ident">key</span>.<span class="ident">session_key</span>.<span class="number">0</span>)<span class="question-mark">?</span>;
         <span class="kw">let</span> <span class="ident">first_known_index</span> <span class="op">=</span> <span class="ident">session</span>.<span class="ident">first_known_index</span>();
 

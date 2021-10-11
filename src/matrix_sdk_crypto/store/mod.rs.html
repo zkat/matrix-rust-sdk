@@ -816,7 +816,7 @@
 }
 
 <span class="kw">impl</span> <span class="ident">Debug</span> <span class="kw">for</span> <span class="ident">CrossSigningKeyExport</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">std::fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">std::fmt::Result</span> {
+    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">std::fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">std::fmt::Result</span> {
         <span class="ident">f</span>.<span class="ident">debug_struct</span>(<span class="string">&quot;CrossSigningKeyExport&quot;</span>)
             .<span class="ident">field</span>(<span class="string">&quot;master_key&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">master_key</span>.<span class="ident">is_some</span>())
             .<span class="ident">field</span>(<span class="string">&quot;self_signing_key&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">self_signing_key</span>.<span class="ident">is_some</span>())
@@ -850,15 +850,15 @@
         <span class="ident">identity</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">Mutex</span><span class="op">&lt;</span><span class="ident">PrivateCrossSigningIdentity</span><span class="op">&gt;</span><span class="op">&gt;</span>,
         <span class="ident">store</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">CryptoStore</span><span class="op">&gt;</span>,
         <span class="ident">verification_machine</span>: <span class="ident">VerificationMachine</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    ) -&gt; <span class="self">Self</span> {
         <span class="self">Self</span> { <span class="ident">user_id</span>, <span class="ident">identity</span>, <span class="ident">inner</span>: <span class="ident">store</span>, <span class="ident">verification_machine</span> }
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">user_id</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="ident">UserId</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">user_id</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">UserId</span> {
         <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">user_id</span>
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">device_id</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="ident">DeviceId</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">device_id</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">DeviceId</span> {
         <span class="self">self</span>.<span class="ident">verification_machine</span>.<span class="ident">own_device_id</span>()
     }
 
@@ -867,18 +867,18 @@
         <span class="self">self</span>.<span class="ident">identity</span>.<span class="ident">lock</span>().<span class="kw">await</span>.<span class="ident">reset</span>().<span class="kw">await</span>;
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">private_identity</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">Mutex</span><span class="op">&lt;</span><span class="ident">PrivateCrossSigningIdentity</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">private_identity</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">Mutex</span><span class="op">&lt;</span><span class="ident">PrivateCrossSigningIdentity</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">identity</span>.<span class="ident">clone</span>()
     }
 
-    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">save_sessions</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">sessions</span>: <span class="kw-2">&amp;</span>[<span class="ident">Session</span>]) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">save_sessions</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">sessions</span>: <span class="kw-2">&amp;</span>[<span class="ident">Session</span>]) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">changes</span> <span class="op">=</span> <span class="ident">Changes</span> { <span class="ident">sessions</span>: <span class="ident">sessions</span>.<span class="ident">to_vec</span>(), ..<span class="ident">Default::default</span>() };
 
         <span class="self">self</span>.<span class="ident">save_changes</span>(<span class="ident">changes</span>).<span class="kw">await</span>
     }
 
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">save_devices</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">devices</span>: <span class="kw-2">&amp;</span>[<span class="ident">ReadOnlyDevice</span>]) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">save_devices</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">devices</span>: <span class="kw-2">&amp;</span>[<span class="ident">ReadOnlyDevice</span>]) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">changes</span> <span class="op">=</span> <span class="ident">Changes</span> {
             <span class="ident">devices</span>: <span class="ident">DeviceChanges</span> { <span class="ident">changed</span>: <span class="ident">devices</span>.<span class="ident">to_vec</span>(), ..<span class="ident">Default::default</span>() },
             ..<span class="ident">Default::default</span>()
@@ -891,14 +891,14 @@
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">save_inbound_group_sessions</span>(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         <span class="ident">sessions</span>: <span class="kw-2">&amp;</span>[<span class="ident">InboundGroupSession</span>],
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">changes</span> <span class="op">=</span> <span class="ident">Changes</span> { <span class="ident">inbound_group_sessions</span>: <span class="ident">sessions</span>.<span class="ident">to_vec</span>(), ..<span class="ident">Default::default</span>() };
 
         <span class="self">self</span>.<span class="ident">save_changes</span>(<span class="ident">changes</span>).<span class="kw">await</span>
     }
 
     <span class="doccomment">/// Get the display name of our own device.</span>
-    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">device_display_name</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>, <span class="ident">CryptoStoreError</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">device_display_name</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>, <span class="ident">CryptoStoreError</span><span class="op">&gt;</span> {
         <span class="prelude-val">Ok</span>(<span class="self">self</span>
             .<span class="ident">inner</span>
             .<span class="ident">get_device</span>(<span class="self">self</span>.<span class="ident">user_id</span>(), <span class="self">self</span>.<span class="ident">device_id</span>())
@@ -913,8 +913,8 @@
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         <span class="ident">user_id</span>: <span class="kw-2">&amp;</span><span class="ident">UserId</span>,
         <span class="ident">device_id</span>: <span class="kw-2">&amp;</span><span class="ident">DeviceId</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ReadOnlyDevice</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="kw">if</span> <span class="ident">user_id</span> <span class="op">=</span><span class="op">=</span> <span class="self">self</span>.<span class="ident">user_id</span>() <span class="op">&amp;&amp;</span> <span class="ident">device_id</span> <span class="op">=</span><span class="op">=</span> <span class="self">self</span>.<span class="ident">device_id</span>() {
+    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ReadOnlyDevice</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+        <span class="kw">if</span> <span class="ident">user_id</span> <span class="op">==</span> <span class="self">self</span>.<span class="ident">user_id</span>() <span class="op">&amp;&amp;</span> <span class="ident">device_id</span> <span class="op">==</span> <span class="self">self</span>.<span class="ident">device_id</span>() {
             <span class="prelude-val">Ok</span>(<span class="prelude-val">None</span>)
         } <span class="kw">else</span> {
             <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">get_device</span>(<span class="ident">user_id</span>, <span class="ident">device_id</span>).<span class="kw">await</span>
@@ -927,9 +927,9 @@
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">get_readonly_devices</span>(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         <span class="ident">user_id</span>: <span class="kw-2">&amp;</span><span class="ident">UserId</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">HashMap</span><span class="op">&lt;</span><span class="ident">DeviceIdBox</span>, <span class="ident">ReadOnlyDevice</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">HashMap</span><span class="op">&lt;</span><span class="ident">DeviceIdBox</span>, <span class="ident">ReadOnlyDevice</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">get_user_devices</span>(<span class="ident">user_id</span>).<span class="kw">await</span>.<span class="ident">map</span>(<span class="op">|</span><span class="kw-2">mut</span> <span class="ident">d</span><span class="op">|</span> {
-            <span class="kw">if</span> <span class="ident">user_id</span> <span class="op">=</span><span class="op">=</span> <span class="self">self</span>.<span class="ident">user_id</span>() {
+            <span class="kw">if</span> <span class="ident">user_id</span> <span class="op">==</span> <span class="self">self</span>.<span class="ident">user_id</span>() {
                 <span class="ident">d</span>.<span class="ident">remove</span>(<span class="self">self</span>.<span class="ident">device_id</span>());
             }
             <span class="ident">d</span>
@@ -942,7 +942,7 @@
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">get_readonly_devices_unfiltered</span>(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         <span class="ident">user_id</span>: <span class="kw-2">&amp;</span><span class="ident">UserId</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">HashMap</span><span class="op">&lt;</span><span class="ident">DeviceIdBox</span>, <span class="ident">ReadOnlyDevice</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">HashMap</span><span class="op">&lt;</span><span class="ident">DeviceIdBox</span>, <span class="ident">ReadOnlyDevice</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">get_user_devices</span>(<span class="ident">user_id</span>).<span class="kw">await</span>
     }
 
@@ -953,18 +953,18 @@
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         <span class="ident">user_id</span>: <span class="kw-2">&amp;</span><span class="ident">UserId</span>,
         <span class="ident">curve_key</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Device</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Device</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">get_user_devices</span>(<span class="ident">user_id</span>).<span class="kw">await</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">d</span><span class="op">|</span> {
             <span class="ident">d</span>.<span class="ident">devices</span>().<span class="ident">find</span>(<span class="op">|</span><span class="ident">d</span><span class="op">|</span> {
-                <span class="ident">d</span>.<span class="ident">get_key</span>(<span class="ident">DeviceKeyAlgorithm::Curve25519</span>).<span class="ident">map_or</span>(<span class="bool-val">false</span>, <span class="op">|</span><span class="ident">k</span><span class="op">|</span> <span class="ident">k</span> <span class="op">=</span><span class="op">=</span> <span class="ident">curve_key</span>)
+                <span class="ident">d</span>.<span class="ident">get_key</span>(<span class="ident">DeviceKeyAlgorithm::Curve25519</span>).<span class="ident">map_or</span>(<span class="bool-val">false</span>, <span class="op">|</span><span class="ident">k</span><span class="op">|</span> <span class="ident">k</span> <span class="op">==</span> <span class="ident">curve_key</span>)
             })
         })
     }
 
-    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">get_user_devices</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">user_id</span>: <span class="kw-2">&amp;</span><span class="ident">UserId</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">UserDevices</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">get_user_devices</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">user_id</span>: <span class="kw-2">&amp;</span><span class="ident">UserId</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">UserDevices</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">devices</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">get_user_devices</span>(<span class="ident">user_id</span>).<span class="kw">await</span><span class="question-mark">?</span>;
 
-        <span class="kw">if</span> <span class="ident">user_id</span> <span class="op">=</span><span class="op">=</span> <span class="self">self</span>.<span class="ident">user_id</span>() {
+        <span class="kw">if</span> <span class="ident">user_id</span> <span class="op">==</span> <span class="self">self</span>.<span class="ident">user_id</span>() {
             <span class="ident">devices</span>.<span class="ident">remove</span>(<span class="self">self</span>.<span class="ident">device_id</span>());
         }
 
@@ -984,8 +984,8 @@
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         <span class="ident">user_id</span>: <span class="kw-2">&amp;</span><span class="ident">UserId</span>,
         <span class="ident">device_id</span>: <span class="kw-2">&amp;</span><span class="ident">DeviceId</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Device</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="kw">if</span> <span class="ident">user_id</span> <span class="op">=</span><span class="op">=</span> <span class="self">self</span>.<span class="ident">user_id</span>() <span class="op">&amp;&amp;</span> <span class="ident">device_id</span> <span class="op">=</span><span class="op">=</span> <span class="self">self</span>.<span class="ident">device_id</span>() {
+    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Device</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+        <span class="kw">if</span> <span class="ident">user_id</span> <span class="op">==</span> <span class="self">self</span>.<span class="ident">user_id</span>() <span class="op">&amp;&amp;</span> <span class="ident">device_id</span> <span class="op">==</span> <span class="self">self</span>.<span class="ident">device_id</span>() {
             <span class="prelude-val">Ok</span>(<span class="prelude-val">None</span>)
         } <span class="kw">else</span> {
             <span class="kw">let</span> <span class="ident">own_identity</span> <span class="op">=</span> <span class="self">self</span>
@@ -1005,17 +1005,17 @@
         }
     }
 
-    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">get_identity</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">user_id</span>: <span class="kw-2">&amp;</span><span class="ident">UserId</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">UserIdentities</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">get_identity</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">user_id</span>: <span class="kw-2">&amp;</span><span class="ident">UserId</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">UserIdentities</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="comment">// let own_identity =</span>
         <span class="comment">// self.inner.get_user_identity(self.user_id()).await?.and_then(|i| i.own());</span>
         <span class="prelude-val">Ok</span>(<span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">identity</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">get_user_identity</span>(<span class="ident">user_id</span>).<span class="kw">await</span><span class="question-mark">?</span> {
             <span class="prelude-val">Some</span>(<span class="kw">match</span> <span class="ident">identity</span> {
-                <span class="ident">ReadOnlyUserIdentities::Own</span>(<span class="ident">i</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">OwnUserIdentity</span> {
+                <span class="ident">ReadOnlyUserIdentities::Own</span>(<span class="ident">i</span>) =&gt; <span class="ident">OwnUserIdentity</span> {
                     <span class="ident">inner</span>: <span class="ident">i</span>,
                     <span class="ident">verification_machine</span>: <span class="self">self</span>.<span class="ident">verification_machine</span>.<span class="ident">clone</span>(),
                 }
                 .<span class="ident">into</span>(),
-                <span class="ident">ReadOnlyUserIdentities::Other</span>(<span class="ident">i</span>) <span class="op">=</span><span class="op">&gt;</span> {
+                <span class="ident">ReadOnlyUserIdentities::Other</span>(<span class="ident">i</span>) =&gt; {
                     <span class="kw">let</span> <span class="ident">own_identity</span> <span class="op">=</span>
                         <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">get_user_identity</span>(<span class="self">self</span>.<span class="ident">user_id</span>()).<span class="kw">await</span><span class="question-mark">?</span>.<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">i</span><span class="op">|</span> {
                             <span class="kw">if</span> <span class="kw">let</span> <span class="ident">ReadOnlyUserIdentities::Own</span>(<span class="ident">i</span>) <span class="op">=</span> <span class="ident">i</span> {
@@ -1045,15 +1045,15 @@
     <span class="doccomment">/// # Arguments</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// * `secret_name` - The name of the secret that should be exported.</span>
-    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">export_secret</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">secret_name</span>: <span class="kw-2">&amp;</span><span class="ident">SecretName</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">export_secret</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">secret_name</span>: <span class="kw-2">&amp;</span><span class="ident">SecretName</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span> {
         <span class="kw">match</span> <span class="ident">secret_name</span> {
             <span class="ident">SecretName::CrossSigningMasterKey</span>
             <span class="op">|</span> <span class="ident">SecretName::CrossSigningUserSigningKey</span>
-            <span class="op">|</span> <span class="ident">SecretName::CrossSigningSelfSigningKey</span> <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="op">|</span> <span class="ident">SecretName::CrossSigningSelfSigningKey</span> =&gt; {
                 <span class="self">self</span>.<span class="ident">identity</span>.<span class="ident">lock</span>().<span class="kw">await</span>.<span class="ident">export_secret</span>(<span class="ident">secret_name</span>).<span class="kw">await</span>
             }
-            <span class="ident">SecretName::RecoveryKey</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">None</span>,
-            <span class="ident">name</span> <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">SecretName::RecoveryKey</span> =&gt; <span class="prelude-val">None</span>,
+            <span class="ident">name</span> =&gt; {
                 <span class="macro">warn!</span>(<span class="ident">secret</span> <span class="op">=</span><span class="question-mark">?</span> <span class="ident">name</span>, <span class="string">&quot;Unknown secret was requested&quot;</span>);
                 <span class="prelude-val">None</span>
             }
@@ -1063,7 +1063,7 @@
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">import_cross_signing_keys</span>(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         <span class="ident">export</span>: <span class="ident">CrossSigningKeyExport</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">CrossSigningStatus</span>, <span class="ident">SecretImportError</span><span class="op">&gt;</span> {
+    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">CrossSigningStatus</span>, <span class="ident">SecretImportError</span><span class="op">&gt;</span> {
         <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">public_identity</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">get_identity</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">user_id</span>).<span class="kw">await</span><span class="question-mark">?</span>.<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">i</span><span class="op">|</span> <span class="ident">i</span>.<span class="ident">own</span>())
         {
             <span class="kw">let</span> <span class="ident">identity</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">identity</span>.<span class="ident">lock</span>().<span class="kw">await</span>;
@@ -1093,13 +1093,13 @@
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         <span class="ident">secret_name</span>: <span class="kw-2">&amp;</span><span class="ident">SecretName</span>,
         <span class="ident">secret</span>: <span class="ident">String</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">SecretImportError</span><span class="op">&gt;</span> {
+    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">SecretImportError</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">secret</span> <span class="op">=</span> <span class="ident">zeroize::Zeroizing::new</span>(<span class="ident">secret</span>);
 
         <span class="kw">match</span> <span class="ident">secret_name</span> {
             <span class="ident">SecretName::CrossSigningMasterKey</span>
             <span class="op">|</span> <span class="ident">SecretName::CrossSigningUserSigningKey</span>
-            <span class="op">|</span> <span class="ident">SecretName::CrossSigningSelfSigningKey</span> <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="op">|</span> <span class="ident">SecretName::CrossSigningSelfSigningKey</span> =&gt; {
                 <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">public_identity</span>) <span class="op">=</span>
                     <span class="self">self</span>.<span class="ident">get_identity</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">user_id</span>).<span class="kw">await</span><span class="question-mark">?</span>.<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">i</span><span class="op">|</span> <span class="ident">i</span>.<span class="ident">own</span>())
                 {
@@ -1117,8 +1117,8 @@
                     <span class="self">self</span>.<span class="ident">save_changes</span>(<span class="ident">changes</span>).<span class="kw">await</span><span class="question-mark">?</span>;
                 }
             }
-            <span class="ident">SecretName::RecoveryKey</span> <span class="op">=</span><span class="op">&gt;</span> (),
-            <span class="ident">name</span> <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">SecretName::RecoveryKey</span> =&gt; (),
+            <span class="ident">name</span> =&gt; {
                 <span class="macro">warn!</span>(<span class="ident">secret</span> <span class="op">=</span><span class="question-mark">?</span> <span class="ident">name</span>, <span class="string">&quot;Tried to import an unknown secret&quot;</span>);
             }
         }
@@ -1130,7 +1130,7 @@
 <span class="kw">impl</span> <span class="ident">Deref</span> <span class="kw">for</span> <span class="ident">Store</span> {
     <span class="kw">type</span> <span class="ident">Target</span> <span class="op">=</span> <span class="kw">dyn</span> <span class="ident">CryptoStore</span>;
 
-    <span class="kw">fn</span> <span class="ident">deref</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="ident"><span class="self">Self</span>::Target</span> {
+    <span class="kw">fn</span> <span class="ident">deref</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident"><span class="self">Self</span>::Target</span> {
         <span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="self">self</span>.<span class="ident">inner</span>
     }
 }
@@ -1187,31 +1187,31 @@
 <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">not</span>(<span class="ident">target_arch</span> <span class="op">=</span> <span class="string">&quot;wasm32&quot;</span>), <span class="ident">async_trait</span>)]</span>
 <span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">CryptoStore</span>: <span class="ident">AsyncTraitDeps</span> {
     <span class="doccomment">/// Load an account that was previously stored.</span>
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">load_account</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ReadOnlyAccount</span><span class="op">&gt;</span><span class="op">&gt;</span>;
+    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">load_account</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ReadOnlyAccount</span><span class="op">&gt;</span><span class="op">&gt;</span>;
 
     <span class="doccomment">/// Save the given account in the store.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// # Arguments</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// * `account` - The account that should be stored.</span>
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">save_account</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">account</span>: <span class="ident">ReadOnlyAccount</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span>;
+    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">save_account</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">account</span>: <span class="ident">ReadOnlyAccount</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span>;
 
     <span class="doccomment">/// Try to load a private cross signing identity, if one is stored.</span>
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">load_identity</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">PrivateCrossSigningIdentity</span><span class="op">&gt;</span><span class="op">&gt;</span>;
+    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">load_identity</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">PrivateCrossSigningIdentity</span><span class="op">&gt;</span><span class="op">&gt;</span>;
 
     <span class="doccomment">/// Save the set of changes to the store.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// # Arguments</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// * `changes` - The set of changes that should be stored.</span>
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">save_changes</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">changes</span>: <span class="ident">Changes</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span>;
+    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">save_changes</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">changes</span>: <span class="ident">Changes</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span>;
 
     <span class="doccomment">/// Get all the sessions that belong to the given sender key.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// # Arguments</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// * `sender_key` - The sender key that was used to establish the sessions.</span>
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">get_sessions</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">sender_key</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">Mutex</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Session</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span>;
+    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">get_sessions</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">sender_key</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">Mutex</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Session</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span>;
 
     <span class="doccomment">/// Get the inbound group session from our store.</span>
     <span class="doccomment">///</span>
@@ -1226,30 +1226,30 @@
         <span class="ident">room_id</span>: <span class="kw-2">&amp;</span><span class="ident">RoomId</span>,
         <span class="ident">sender_key</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>,
         <span class="ident">session_id</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">InboundGroupSession</span><span class="op">&gt;</span><span class="op">&gt;</span>;
+    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">InboundGroupSession</span><span class="op">&gt;</span><span class="op">&gt;</span>;
 
     <span class="doccomment">/// Get all the inbound group sessions we have stored.</span>
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">get_inbound_group_sessions</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">InboundGroupSession</span><span class="op">&gt;</span><span class="op">&gt;</span>;
+    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">get_inbound_group_sessions</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">InboundGroupSession</span><span class="op">&gt;</span><span class="op">&gt;</span>;
 
     <span class="doccomment">/// Get the outbound group sessions we have stored that is used for the</span>
     <span class="doccomment">/// given room.</span>
     <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">get_outbound_group_sessions</span>(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         <span class="ident">room_id</span>: <span class="kw-2">&amp;</span><span class="ident">RoomId</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">OutboundGroupSession</span><span class="op">&gt;</span><span class="op">&gt;</span>;
+    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">OutboundGroupSession</span><span class="op">&gt;</span><span class="op">&gt;</span>;
 
     <span class="doccomment">/// Is the given user already tracked.</span>
-    <span class="kw">fn</span> <span class="ident">is_user_tracked</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">user_id</span>: <span class="kw-2">&amp;</span><span class="ident">UserId</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span>;
+    <span class="kw">fn</span> <span class="ident">is_user_tracked</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">user_id</span>: <span class="kw-2">&amp;</span><span class="ident">UserId</span>) -&gt; <span class="ident">bool</span>;
 
     <span class="doccomment">/// Are there any tracked users that are marked as dirty.</span>
-    <span class="kw">fn</span> <span class="ident">has_users_for_key_query</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span>;
+    <span class="kw">fn</span> <span class="ident">has_users_for_key_query</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span>;
 
     <span class="doccomment">/// Set of users that we need to query keys for. This is a subset of</span>
     <span class="doccomment">/// the tracked users.</span>
-    <span class="kw">fn</span> <span class="ident">users_for_key_query</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">HashSet</span><span class="op">&lt;</span><span class="ident">UserId</span><span class="op">&gt;</span>;
+    <span class="kw">fn</span> <span class="ident">users_for_key_query</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">HashSet</span><span class="op">&lt;</span><span class="ident">UserId</span><span class="op">&gt;</span>;
 
     <span class="doccomment">/// Get all tracked users we know about.</span>
-    <span class="kw">fn</span> <span class="ident">tracked_users</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">HashSet</span><span class="op">&lt;</span><span class="ident">UserId</span><span class="op">&gt;</span>;
+    <span class="kw">fn</span> <span class="ident">tracked_users</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">HashSet</span><span class="op">&lt;</span><span class="ident">UserId</span><span class="op">&gt;</span>;
 
     <span class="doccomment">/// Add an user for tracking.</span>
     <span class="doccomment">///</span>
@@ -1260,7 +1260,7 @@
     <span class="doccomment">/// * `user` - The user that should be marked as tracked.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// * `dirty` - Should the user be also marked for a key query.</span>
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">update_tracked_user</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">user</span>: <span class="kw-2">&amp;</span><span class="ident">UserId</span>, <span class="ident">dirty</span>: <span class="ident">bool</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">bool</span><span class="op">&gt;</span>;
+    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">update_tracked_user</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">user</span>: <span class="kw-2">&amp;</span><span class="ident">UserId</span>, <span class="ident">dirty</span>: <span class="ident">bool</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">bool</span><span class="op">&gt;</span>;
 
     <span class="doccomment">/// Get the device for the given user with the given device id.</span>
     <span class="doccomment">///</span>
@@ -1273,7 +1273,7 @@
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         <span class="ident">user_id</span>: <span class="kw-2">&amp;</span><span class="ident">UserId</span>,
         <span class="ident">device_id</span>: <span class="kw-2">&amp;</span><span class="ident">DeviceId</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ReadOnlyDevice</span><span class="op">&gt;</span><span class="op">&gt;</span>;
+    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ReadOnlyDevice</span><span class="op">&gt;</span><span class="op">&gt;</span>;
 
     <span class="doccomment">/// Get all the devices of the given user.</span>
     <span class="doccomment">///</span>
@@ -1283,17 +1283,17 @@
     <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">get_user_devices</span>(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         <span class="ident">user_id</span>: <span class="kw-2">&amp;</span><span class="ident">UserId</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">HashMap</span><span class="op">&lt;</span><span class="ident">DeviceIdBox</span>, <span class="ident">ReadOnlyDevice</span><span class="op">&gt;</span><span class="op">&gt;</span>;
+    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">HashMap</span><span class="op">&lt;</span><span class="ident">DeviceIdBox</span>, <span class="ident">ReadOnlyDevice</span><span class="op">&gt;</span><span class="op">&gt;</span>;
 
     <span class="doccomment">/// Get the user identity that is attached to the given user id.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// # Arguments</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// * `user_id` - The user for which we should get the identity.</span>
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">get_user_identity</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">user_id</span>: <span class="kw-2">&amp;</span><span class="ident">UserId</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ReadOnlyUserIdentities</span><span class="op">&gt;</span><span class="op">&gt;</span>;
+    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">get_user_identity</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">user_id</span>: <span class="kw-2">&amp;</span><span class="ident">UserId</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ReadOnlyUserIdentities</span><span class="op">&gt;</span><span class="op">&gt;</span>;
 
     <span class="doccomment">/// Check if a hash for an Olm message stored in the database.</span>
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">is_message_known</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">message_hash</span>: <span class="kw-2">&amp;</span><span class="ident">OlmMessageHash</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">bool</span><span class="op">&gt;</span>;
+    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">is_message_known</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">message_hash</span>: <span class="kw-2">&amp;</span><span class="ident">OlmMessageHash</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">bool</span><span class="op">&gt;</span>;
 
     <span class="doccomment">/// Get an outgoing secret request that we created that matches the given</span>
     <span class="doccomment">/// request id.</span>
@@ -1303,7 +1303,7 @@
     <span class="doccomment">/// * `request_id` - The unique request id that identifies this outgoing</span>
     <span class="doccomment">/// secret request.</span>
     <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">get_outgoing_secret_requests</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">request_id</span>: <span class="ident">Uuid</span>)
-        <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">GossipRequest</span><span class="op">&gt;</span><span class="op">&gt;</span>;
+        -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">GossipRequest</span><span class="op">&gt;</span><span class="op">&gt;</span>;
 
     <span class="doccomment">/// Get an outgoing key request that we created that matches the given</span>
     <span class="doccomment">/// requested key info.</span>
@@ -1314,10 +1314,10 @@
     <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">get_secret_request_by_info</span>(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         <span class="ident">secret_info</span>: <span class="kw-2">&amp;</span><span class="ident">SecretInfo</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">GossipRequest</span><span class="op">&gt;</span><span class="op">&gt;</span>;
+    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">GossipRequest</span><span class="op">&gt;</span><span class="op">&gt;</span>;
 
     <span class="doccomment">/// Get all outgoing secret requests that we have in the store.</span>
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">get_unsent_secret_requests</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">GossipRequest</span><span class="op">&gt;</span><span class="op">&gt;</span>;
+    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">get_unsent_secret_requests</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">GossipRequest</span><span class="op">&gt;</span><span class="op">&gt;</span>;
 
     <span class="doccomment">/// Delete an outgoing key request that we created that matches the given</span>
     <span class="doccomment">/// request id.</span>
@@ -1326,7 +1326,7 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// * `request_id` - The unique request id that identifies this outgoing key</span>
     <span class="doccomment">/// request.</span>
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">delete_outgoing_secret_requests</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">request_id</span>: <span class="ident">Uuid</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span>;
+    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">delete_outgoing_secret_requests</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">request_id</span>: <span class="ident">Uuid</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span>;
 }
 </code></pre></div>
 </section><section id="search" class="content hidden"></section><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="matrix_sdk_crypto" data-search-index-js="../../../search-index.js" data-search-js="../../../search.js"></div>

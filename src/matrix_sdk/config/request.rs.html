@@ -172,7 +172,7 @@
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">tarpaulin_include</span>))]</span>
 <span class="kw">impl</span> <span class="ident">Debug</span> <span class="kw">for</span> <span class="ident">RequestConfig</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">fmt</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">fmt::Result</span> {
+    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">fmt</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">res</span> <span class="op">=</span> <span class="ident">fmt</span>.<span class="ident">debug_struct</span>(<span class="string">&quot;RequestConfig&quot;</span>);
 
         <span class="ident">res</span>.<span class="ident">field</span>(<span class="string">&quot;timeout&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">timeout</span>)
@@ -183,7 +183,7 @@
 }
 
 <span class="kw">impl</span> <span class="ident">Default</span> <span class="kw">for</span> <span class="ident">RequestConfig</span> {
-    <span class="kw">fn</span> <span class="ident">default</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">default</span>() -&gt; <span class="self">Self</span> {
         <span class="self">Self</span> {
             <span class="ident">timeout</span>: <span class="ident">DEFAULT_REQUEST_TIMEOUT</span>,
             <span class="ident">retry_limit</span>: <span class="ident">Default::default</span>(),
@@ -196,39 +196,39 @@
 
 <span class="kw">impl</span> <span class="ident">RequestConfig</span> {
     <span class="doccomment">/// Create a new default `RequestConfig`.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>() -&gt; <span class="self">Self</span> {
         <span class="ident">Default::default</span>()
     }
 
     <span class="doccomment">/// This is a convince method to disable the retries of a request. Setting</span>
     <span class="doccomment">/// the `retry_limit` to `0` has the same effect.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">disable_retry</span>(<span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">disable_retry</span>(<span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="self">Self</span> {
         <span class="self">self</span>.<span class="ident">retry_limit</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="number">0</span>);
         <span class="self">self</span>
     }
 
     <span class="doccomment">/// The number of times a request should be retried. The default is no limit</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">retry_limit</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">retry_limit</span>: <span class="ident">u64</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">retry_limit</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">retry_limit</span>: <span class="ident">u64</span>) -&gt; <span class="self">Self</span> {
         <span class="self">self</span>.<span class="ident">retry_limit</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">retry_limit</span>);
         <span class="self">self</span>
     }
 
     <span class="doccomment">/// Set the timeout duration for all HTTP requests.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">timeout</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">timeout</span>: <span class="ident">Duration</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">timeout</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">timeout</span>: <span class="ident">Duration</span>) -&gt; <span class="self">Self</span> {
         <span class="self">self</span>.<span class="ident">timeout</span> <span class="op">=</span> <span class="ident">timeout</span>;
         <span class="self">self</span>
     }
 
     <span class="doccomment">/// Set a timeout for how long a request should be retried. The default is</span>
     <span class="doccomment">/// no timeout, meaning requests are retried forever.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">retry_timeout</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">retry_timeout</span>: <span class="ident">Duration</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">retry_timeout</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">retry_timeout</span>: <span class="ident">Duration</span>) -&gt; <span class="self">Self</span> {
         <span class="self">self</span>.<span class="ident">retry_timeout</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">retry_timeout</span>);
         <span class="self">self</span>
     }
 
     <span class="doccomment">/// Force sending authorization even if the endpoint does not require it.</span>
     <span class="doccomment">/// Default is only sending authorization if it is required.</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">force_auth</span>(<span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">force_auth</span>(<span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="self">Self</span> {
         <span class="self">self</span>.<span class="ident">force_auth</span> <span class="op">=</span> <span class="bool-val">true</span>;
         <span class="self">self</span>
     }
@@ -241,7 +241,7 @@
     <span class="doccomment">/// [identity assertion]: https://spec.matrix.org/unstable/application-service-api/#identity-assertion</span>
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;appservice&quot;</span>)]</span>
     <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;docs&quot;</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">appservice</span>)))]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">assert_identity</span>(<span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">assert_identity</span>(<span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="self">Self</span> {
         <span class="self">self</span>.<span class="ident">assert_identity</span> <span class="op">=</span> <span class="bool-val">true</span>;
         <span class="self">self</span>
     }

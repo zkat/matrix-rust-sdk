@@ -326,7 +326,7 @@
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">tarpaulin_include</span>))]</span>
 <span class="kw">impl</span> <span class="ident">fmt::Debug</span> <span class="kw">for</span> <span class="ident">Session</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">fmt::Result</span> {
+    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
         <span class="ident">f</span>.<span class="ident">debug_struct</span>(<span class="string">&quot;Session&quot;</span>)
             .<span class="ident">field</span>(<span class="string">&quot;session_id&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">session_id</span>())
             .<span class="ident">field</span>(<span class="string">&quot;sender_key&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">sender_key</span>)
@@ -343,14 +343,14 @@
     <span class="doccomment">/// # Arguments</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// * `message` - The Olm message that should be decrypted.</span>
-    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">decrypt</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">message</span>: <span class="ident">OlmMessage</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">String</span>, <span class="ident">OlmSessionError</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">decrypt</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">message</span>: <span class="ident">OlmMessage</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">String</span>, <span class="ident">OlmSessionError</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">plaintext</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">lock</span>().<span class="kw">await</span>.<span class="ident">decrypt</span>(<span class="ident">message</span>)<span class="question-mark">?</span>;
         <span class="self">self</span>.<span class="ident">last_use_time</span> <span class="op">=</span> <span class="ident">Arc::new</span>(<span class="ident">Instant::now</span>());
         <span class="prelude-val">Ok</span>(<span class="ident">plaintext</span>)
     }
 
     <span class="doccomment">/// Get the sender key that was used to establish this Session.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">sender_key</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="ident">str</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">sender_key</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">str</span> {
         <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">sender_key</span>
     }
 
@@ -361,7 +361,7 @@
     <span class="doccomment">/// # Arguments</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// * `plaintext` - The plaintext that should be encrypted.</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">encrypt_helper</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">plaintext</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">OlmMessage</span> {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">encrypt_helper</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">plaintext</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">OlmMessage</span> {
         <span class="kw">let</span> <span class="ident">message</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">lock</span>().<span class="kw">await</span>.<span class="ident">encrypt</span>(<span class="ident">plaintext</span>);
         <span class="self">self</span>.<span class="ident">last_use_time</span> <span class="op">=</span> <span class="ident">Arc::new</span>(<span class="ident">Instant::now</span>());
         <span class="ident">message</span>
@@ -381,7 +381,7 @@
         <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>,
         <span class="ident">recipient_device</span>: <span class="kw-2">&amp;</span><span class="ident">ReadOnlyDevice</span>,
         <span class="ident">content</span>: <span class="ident">AnyToDeviceEventContent</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">OlmResult</span><span class="op">&lt;</span><span class="ident">ToDeviceEncryptedEventContent</span><span class="op">&gt;</span> {
+    ) -&gt; <span class="ident">OlmResult</span><span class="op">&lt;</span><span class="ident">ToDeviceEncryptedEventContent</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">recipient_signing_key</span> <span class="op">=</span> <span class="ident">recipient_device</span>
             .<span class="ident">get_key</span>(<span class="ident">DeviceKeyAlgorithm::Ed25519</span>)
             .<span class="ident">ok_or</span>(<span class="ident">EventError::MissingSigningKey</span>)<span class="question-mark">?</span>;
@@ -433,12 +433,12 @@
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         <span class="ident">their_identity_key</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>,
         <span class="ident">message</span>: <span class="ident">PreKeyMessage</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">bool</span>, <span class="ident">OlmSessionError</span><span class="op">&gt;</span> {
+    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">bool</span>, <span class="ident">OlmSessionError</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">lock</span>().<span class="kw">await</span>.<span class="ident">matches_inbound_session_from</span>(<span class="ident">their_identity_key</span>, <span class="ident">message</span>)
     }
 
     <span class="doccomment">/// Returns the unique identifier for this session.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">session_id</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="ident">str</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">session_id</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">str</span> {
         <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">session_id</span>
     }
 
@@ -448,7 +448,7 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// * `pickle_mode` - The mode that was used to pickle the session, either</span>
     <span class="doccomment">/// an unencrypted mode or an encrypted using passphrase.</span>
-    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">pickle</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">pickle_mode</span>: <span class="ident">PicklingMode</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">PickledSession</span> {
+    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">pickle</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">pickle_mode</span>: <span class="ident">PicklingMode</span>) -&gt; <span class="ident">PickledSession</span> {
         <span class="kw">let</span> <span class="ident">pickle</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">lock</span>().<span class="kw">await</span>.<span class="ident">pickle</span>(<span class="ident">pickle_mode</span>);
 
         <span class="ident">PickledSession</span> {
@@ -482,7 +482,7 @@
         <span class="ident">our_identity_keys</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">IdentityKeys</span><span class="op">&gt;</span>,
         <span class="ident">pickle</span>: <span class="ident">PickledSession</span>,
         <span class="ident">pickle_mode</span>: <span class="ident">PicklingMode</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">SessionUnpicklingError</span><span class="op">&gt;</span> {
+    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">SessionUnpicklingError</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">session</span> <span class="op">=</span> <span class="ident">OlmSession::unpickle</span>(<span class="ident">pickle</span>.<span class="ident">pickle</span>.<span class="number">0</span>, <span class="ident">pickle_mode</span>)<span class="question-mark">?</span>;
         <span class="kw">let</span> <span class="ident">session_id</span> <span class="op">=</span> <span class="ident">session</span>.<span class="ident">session_id</span>();
 
@@ -500,8 +500,8 @@
 }
 
 <span class="kw">impl</span> <span class="ident">PartialEq</span> <span class="kw">for</span> <span class="ident">Session</span> {
-    <span class="kw">fn</span> <span class="ident">eq</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">other</span>: <span class="kw-2">&amp;</span><span class="self">Self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">session_id</span>() <span class="op">=</span><span class="op">=</span> <span class="ident">other</span>.<span class="ident">session_id</span>()
+    <span class="kw">fn</span> <span class="ident">eq</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">other</span>: <span class="kw-2">&amp;</span><span class="self">Self</span>) -&gt; <span class="ident">bool</span> {
+        <span class="self">self</span>.<span class="ident">session_id</span>() <span class="op">==</span> <span class="ident">other</span>.<span class="ident">session_id</span>()
     }
 }
 
@@ -529,14 +529,14 @@
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">SessionPickle</span>(<span class="ident">String</span>);
 
 <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">SessionPickle</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">pickle_string</span>: <span class="ident">String</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">pickle_string</span>: <span class="ident">String</span>) -&gt; <span class="self">Self</span> {
         <span class="ident">SessionPickle</span>(<span class="ident">pickle_string</span>)
     }
 }
 
 <span class="kw">impl</span> <span class="ident">SessionPickle</span> {
     <span class="doccomment">/// Get the string representation of the pickle.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">as_str</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="ident">str</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">as_str</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">str</span> {
         <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="number">0</span>
     }
 }

@@ -407,7 +407,7 @@
 }
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">R</span>: <span class="lifetime">&#39;a</span> <span class="op">+</span> <span class="ident">Read</span> <span class="op">+</span> <span class="ident">std::fmt::Debug</span><span class="op">&gt;</span> <span class="ident">std::fmt::Debug</span> <span class="kw">for</span> <span class="ident">AttachmentDecryptor</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">R</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">std::fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">std::fmt::Result</span> {
+    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">std::fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">std::fmt::Result</span> {
         <span class="ident">f</span>.<span class="ident">debug_struct</span>(<span class="string">&quot;AttachmentDecryptor&quot;</span>)
             .<span class="ident">field</span>(<span class="string">&quot;inner&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">inner</span>)
             .<span class="ident">field</span>(<span class="string">&quot;expected_hash&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">expected_hash</span>)
@@ -416,13 +416,13 @@
 }
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">R</span>: <span class="ident">Read</span><span class="op">&gt;</span> <span class="ident">Read</span> <span class="kw">for</span> <span class="ident">AttachmentDecryptor</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">R</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">read</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">buf</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> [<span class="ident">u8</span>]) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">std::io::Result</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">read</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">buf</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> [<span class="ident">u8</span>]) -&gt; <span class="ident">std::io::Result</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">read_bytes</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">read</span>(<span class="ident">buf</span>)<span class="question-mark">?</span>;
 
-        <span class="kw">if</span> <span class="ident">read_bytes</span> <span class="op">=</span><span class="op">=</span> <span class="number">0</span> {
+        <span class="kw">if</span> <span class="ident">read_bytes</span> <span class="op">==</span> <span class="number">0</span> {
             <span class="kw">let</span> <span class="ident">hash</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">sha</span>.<span class="ident">finalize_reset</span>();
 
-            <span class="kw">if</span> <span class="ident">hash</span>.<span class="ident">as_slice</span>() <span class="op">=</span><span class="op">=</span> <span class="self">self</span>.<span class="ident">expected_hash</span>.<span class="ident">as_slice</span>() {
+            <span class="kw">if</span> <span class="ident">hash</span>.<span class="ident">as_slice</span>() <span class="op">==</span> <span class="self">self</span>.<span class="ident">expected_hash</span>.<span class="ident">as_slice</span>() {
                 <span class="prelude-val">Ok</span>(<span class="number">0</span>)
             } <span class="kw">else</span> {
                 <span class="prelude-val">Err</span>(<span class="ident">IoError::new</span>(<span class="ident">ErrorKind::Other</span>, <span class="string">&quot;Hash mismatch while decrypting&quot;</span>))
@@ -488,7 +488,7 @@
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(
         <span class="ident">input</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> <span class="ident">R</span>,
         <span class="ident">info</span>: <span class="ident">EncryptionInfo</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">AttachmentDecryptor</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">R</span><span class="op">&gt;</span>, <span class="ident">DecryptorError</span><span class="op">&gt;</span> {
+    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">AttachmentDecryptor</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">R</span><span class="op">&gt;</span>, <span class="ident">DecryptorError</span><span class="op">&gt;</span> {
         <span class="kw">if</span> <span class="ident">info</span>.<span class="ident">version</span> <span class="op">!</span><span class="op">=</span> <span class="ident">VERSION</span> {
             <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">DecryptorError::UnknownVersion</span>);
         }
@@ -518,7 +518,7 @@
 }
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">R</span>: <span class="lifetime">&#39;a</span> <span class="op">+</span> <span class="ident">Read</span> <span class="op">+</span> <span class="ident">std::fmt::Debug</span><span class="op">&gt;</span> <span class="ident">std::fmt::Debug</span> <span class="kw">for</span> <span class="ident">AttachmentEncryptor</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">R</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">std::fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">std::fmt::Result</span> {
+    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">std::fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">std::fmt::Result</span> {
         <span class="ident">f</span>.<span class="ident">debug_struct</span>(<span class="string">&quot;AttachmentEncryptor&quot;</span>)
             .<span class="ident">field</span>(<span class="string">&quot;inner&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">inner</span>)
             .<span class="ident">field</span>(<span class="string">&quot;finished&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">finished</span>)
@@ -527,10 +527,10 @@
 }
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">R</span>: <span class="ident">Read</span> <span class="op">+</span> <span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">Read</span> <span class="kw">for</span> <span class="ident">AttachmentEncryptor</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">R</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">read</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">buf</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> [<span class="ident">u8</span>]) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">std::io::Result</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">read</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">buf</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> [<span class="ident">u8</span>]) -&gt; <span class="ident">std::io::Result</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">read_bytes</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">read</span>(<span class="ident">buf</span>)<span class="question-mark">?</span>;
 
-        <span class="kw">if</span> <span class="ident">read_bytes</span> <span class="op">=</span><span class="op">=</span> <span class="number">0</span> {
+        <span class="kw">if</span> <span class="ident">read_bytes</span> <span class="op">==</span> <span class="number">0</span> {
             <span class="kw">let</span> <span class="ident">hash</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">sha</span>.<span class="ident">finalize_reset</span>();
             <span class="self">self</span>.<span class="ident">hashes</span>.<span class="ident">entry</span>(<span class="string">&quot;sha256&quot;</span>.<span class="ident">to_owned</span>()).<span class="ident">or_insert_with</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">encode</span>(<span class="ident">hash</span>));
             <span class="prelude-val">Ok</span>(<span class="number">0</span>)
@@ -572,7 +572,7 @@
     <span class="doccomment">/// encryptor.read_to_end(&amp;mut encrypted).unwrap();</span>
     <span class="doccomment">/// let key = encryptor.finish();</span>
     <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">reader</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> <span class="ident">R</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">reader</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> <span class="ident">R</span>) -&gt; <span class="self">Self</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">key</span> <span class="op">=</span> <span class="ident">Zeroizing::new</span>([<span class="number">0u8</span>; <span class="ident">KEY_SIZE</span>]);
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">iv</span> <span class="op">=</span> <span class="ident">Zeroizing::new</span>([<span class="number">0u8</span>; <span class="ident">IV_SIZE</span>]);
 
@@ -607,7 +607,7 @@
     }
 
     <span class="doccomment">/// Consume the encryptor and get the encryption key.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">finish</span>(<span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">EncryptionInfo</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">finish</span>(<span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="ident">EncryptionInfo</span> {
         <span class="kw">let</span> <span class="ident">hash</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">sha</span>.<span class="ident">finalize</span>();
         <span class="self">self</span>.<span class="ident">hashes</span>.<span class="ident">entry</span>(<span class="string">&quot;sha256&quot;</span>.<span class="ident">to_owned</span>()).<span class="ident">or_insert_with</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">encode</span>(<span class="ident">hash</span>));
 
@@ -636,7 +636,7 @@
 }
 
 <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">EncryptedFile</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">EncryptionInfo</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">file</span>: <span class="ident">EncryptedFile</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">file</span>: <span class="ident">EncryptedFile</span>) -&gt; <span class="self">Self</span> {
         <span class="self">Self</span> { <span class="ident">version</span>: <span class="ident">file</span>.<span class="ident">v</span>, <span class="ident">web_key</span>: <span class="ident">file</span>.<span class="ident">key</span>, <span class="ident">iv</span>: <span class="ident">file</span>.<span class="ident">iv</span>, <span class="ident">hashes</span>: <span class="ident">file</span>.<span class="ident">hashes</span> }
     }
 }
@@ -654,7 +654,7 @@
         <span class="number">172</span>, <span class="number">36</span>, <span class="number">26</span>, <span class="number">75</span>, <span class="number">47</span>, <span class="number">33</span>, <span class="number">160</span>,
     ];
 
-    <span class="kw">fn</span> <span class="ident">example_key</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident">EncryptionInfo</span> {
+    <span class="kw">fn</span> <span class="ident">example_key</span>() -&gt; <span class="ident">EncryptionInfo</span> {
         <span class="kw">let</span> <span class="ident">info</span> <span class="op">=</span> <span class="macro">json!</span>({
             <span class="string">&quot;v&quot;</span>: <span class="string">&quot;v2&quot;</span>,
             <span class="string">&quot;web_key&quot;</span>: {

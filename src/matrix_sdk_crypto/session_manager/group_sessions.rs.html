@@ -675,7 +675,7 @@
 }
 
 <span class="kw">impl</span> <span class="ident">GroupSessionCache</span> {
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">store</span>: <span class="ident">Store</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">store</span>: <span class="ident">Store</span>) -&gt; <span class="self">Self</span> {
         <span class="self">Self</span> { <span class="ident">store</span>, <span class="ident">sessions</span>: <span class="ident">Default::default</span>(), <span class="ident">sessions_being_shared</span>: <span class="ident">Default::default</span>() }
     }
 
@@ -689,7 +689,7 @@
     <span class="doccomment">/// # Arguments</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// * `room_id` - The id of the room this session is used for.</span>
-    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">get_or_load</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">room_id</span>: <span class="kw-2">&amp;</span><span class="ident">RoomId</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">StoreResult</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">OutboundGroupSession</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">get_or_load</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">room_id</span>: <span class="kw-2">&amp;</span><span class="ident">RoomId</span>) -&gt; <span class="ident">StoreResult</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">OutboundGroupSession</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="comment">// Get the cached session, if there isn&#39;t one load one from the store</span>
         <span class="comment">// and put it in the cache.</span>
         <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">s</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">sessions</span>.<span class="ident">get</span>(<span class="ident">room_id</span>) {
@@ -713,7 +713,7 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// * `room_id` - The id of the room for which we should get the outbound</span>
     <span class="doccomment">/// group session.</span>
-    <span class="kw">fn</span> <span class="ident">get</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">room_id</span>: <span class="kw-2">&amp;</span><span class="ident">RoomId</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">OutboundGroupSession</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">get</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">room_id</span>: <span class="kw-2">&amp;</span><span class="ident">RoomId</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">OutboundGroupSession</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">sessions</span>.<span class="ident">get</span>(<span class="ident">room_id</span>).<span class="ident">map</span>(<span class="op">|</span><span class="ident">s</span><span class="op">|</span> <span class="ident">s</span>.<span class="ident">clone</span>())
     }
 
@@ -725,8 +725,8 @@
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         <span class="ident">room_id</span>: <span class="kw-2">&amp;</span><span class="ident">RoomId</span>,
         <span class="ident">session_id</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">StoreResult</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">OutboundGroupSession</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="prelude-val">Ok</span>(<span class="self">self</span>.<span class="ident">get_or_load</span>(<span class="ident">room_id</span>).<span class="kw">await</span><span class="question-mark">?</span>.<span class="ident">filter</span>(<span class="op">|</span><span class="ident">o</span><span class="op">|</span> <span class="ident">session_id</span> <span class="op">=</span><span class="op">=</span> <span class="ident">o</span>.<span class="ident">session_id</span>()))
+    ) -&gt; <span class="ident">StoreResult</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">OutboundGroupSession</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+        <span class="prelude-val">Ok</span>(<span class="self">self</span>.<span class="ident">get_or_load</span>(<span class="ident">room_id</span>).<span class="kw">await</span><span class="question-mark">?</span>.<span class="ident">filter</span>(<span class="op">|</span><span class="ident">o</span><span class="op">|</span> <span class="ident">session_id</span> <span class="op">==</span> <span class="ident">o</span>.<span class="ident">session_id</span>()))
     }
 }
 
@@ -744,11 +744,11 @@
 <span class="kw">impl</span> <span class="ident">GroupSessionManager</span> {
     <span class="kw">const</span> <span class="ident">MAX_TO_DEVICE_MESSAGES</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="number">250</span>;
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">account</span>: <span class="ident">Account</span>, <span class="ident">store</span>: <span class="ident">Store</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">account</span>: <span class="ident">Account</span>, <span class="ident">store</span>: <span class="ident">Store</span>) -&gt; <span class="self">Self</span> {
         <span class="self">Self</span> { <span class="ident">account</span>, <span class="ident">store</span>: <span class="ident">store</span>.<span class="ident">clone</span>(), <span class="ident">sessions</span>: <span class="ident">GroupSessionCache::new</span>(<span class="ident">store</span>) }
     }
 
-    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">invalidate_group_session</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">room_id</span>: <span class="kw-2">&amp;</span><span class="ident">RoomId</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">StoreResult</span><span class="op">&lt;</span><span class="ident">bool</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">invalidate_group_session</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">room_id</span>: <span class="kw-2">&amp;</span><span class="ident">RoomId</span>) -&gt; <span class="ident">StoreResult</span><span class="op">&lt;</span><span class="ident">bool</span><span class="op">&gt;</span> {
         <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">s</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">sessions</span>.<span class="ident">get</span>(<span class="ident">room_id</span>) {
             <span class="ident">s</span>.<span class="ident">invalidate_session</span>();
 
@@ -762,7 +762,7 @@
         }
     }
 
-    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">mark_request_as_sent</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">request_id</span>: <span class="kw-2">&amp;</span><span class="ident">Uuid</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">StoreResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">mark_request_as_sent</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">request_id</span>: <span class="kw-2">&amp;</span><span class="ident">Uuid</span>) -&gt; <span class="ident">StoreResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>((<span class="kw">_</span>, <span class="ident">s</span>)) <span class="op">=</span> <span class="self">self</span>.<span class="ident">sessions</span>.<span class="ident">sessions_being_shared</span>.<span class="ident">remove</span>(<span class="ident">request_id</span>) {
             <span class="ident">s</span>.<span class="ident">mark_request_as_sent</span>(<span class="ident">request_id</span>);
 
@@ -775,7 +775,7 @@
     }
 
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_outbound_group_session</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">room_id</span>: <span class="kw-2">&amp;</span><span class="ident">RoomId</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">OutboundGroupSession</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_outbound_group_session</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">room_id</span>: <span class="kw-2">&amp;</span><span class="ident">RoomId</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">OutboundGroupSession</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">sessions</span>.<span class="ident">get</span>(<span class="ident">room_id</span>)
     }
 
@@ -784,7 +784,7 @@
         <span class="ident">room_id</span>: <span class="kw-2">&amp;</span><span class="ident">RoomId</span>,
         <span class="ident">content</span>: <span class="ident">Value</span>,
         <span class="ident">event_type</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">MegolmResult</span><span class="op">&lt;</span><span class="ident">EncryptedEventContent</span><span class="op">&gt;</span> {
+    ) -&gt; <span class="ident">MegolmResult</span><span class="op">&lt;</span><span class="ident">EncryptedEventContent</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">session</span> <span class="op">=</span> <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">s</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">sessions</span>.<span class="ident">get</span>(<span class="ident">room_id</span>) {
             <span class="ident">s</span>
         } <span class="kw">else</span> {
@@ -810,7 +810,7 @@
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         <span class="ident">room_id</span>: <span class="kw-2">&amp;</span><span class="ident">RoomId</span>,
         <span class="ident">settings</span>: <span class="ident">EncryptionSettings</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">OlmResult</span><span class="op">&lt;</span>(<span class="ident">OutboundGroupSession</span>, <span class="ident">InboundGroupSession</span>)<span class="op">&gt;</span> {
+    ) -&gt; <span class="ident">OlmResult</span><span class="op">&lt;</span>(<span class="ident">OutboundGroupSession</span>, <span class="ident">InboundGroupSession</span>)<span class="op">&gt;</span> {
         <span class="kw">let</span> (<span class="ident">outbound</span>, <span class="ident">inbound</span>) <span class="op">=</span> <span class="self">self</span>
             .<span class="ident">account</span>
             .<span class="ident">create_group_session_pair</span>(<span class="ident">room_id</span>, <span class="ident">settings</span>)
@@ -825,7 +825,7 @@
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         <span class="ident">room_id</span>: <span class="kw-2">&amp;</span><span class="ident">RoomId</span>,
         <span class="ident">settings</span>: <span class="ident">EncryptionSettings</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">OlmResult</span><span class="op">&lt;</span>(<span class="ident">OutboundGroupSession</span>, <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">InboundGroupSession</span><span class="op">&gt;</span>)<span class="op">&gt;</span> {
+    ) -&gt; <span class="ident">OlmResult</span><span class="op">&lt;</span>(<span class="ident">OutboundGroupSession</span>, <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">InboundGroupSession</span><span class="op">&gt;</span>)<span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">outbound_session</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">sessions</span>.<span class="ident">get_or_load</span>(<span class="ident">room_id</span>).<span class="kw">await</span><span class="question-mark">?</span>;
 
         <span class="comment">// If there is no session or the session has expired or is invalid,</span>
@@ -849,7 +849,7 @@
         <span class="ident">content</span>: <span class="ident">AnyToDeviceEventContent</span>,
         <span class="ident">devices</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Device</span><span class="op">&gt;</span>,
         <span class="ident">message_index</span>: <span class="ident">u32</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">OlmResult</span><span class="op">&lt;</span>(
+    ) -&gt; <span class="ident">OlmResult</span><span class="op">&lt;</span>(
         <span class="ident">Uuid</span>,
         <span class="ident">ToDeviceRequest</span>,
         <span class="ident">BTreeMap</span><span class="op">&lt;</span><span class="ident">UserId</span>, <span class="ident">BTreeMap</span><span class="op">&lt;</span><span class="ident">DeviceIdBox</span>, <span class="ident">ShareInfo</span><span class="op">&gt;</span><span class="op">&gt;</span>,
@@ -866,7 +866,7 @@
             <span class="kw">let</span> <span class="ident">encrypted</span> <span class="op">=</span> <span class="ident">device</span>.<span class="ident">encrypt</span>(<span class="ident">content</span>.<span class="ident">clone</span>()).<span class="kw">await</span>;
 
             <span class="kw">let</span> <span class="ident">used_session</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">encrypted</span> {
-                <span class="prelude-val">Ok</span>((<span class="ident">session</span>, <span class="ident">encrypted</span>)) <span class="op">=</span><span class="op">&gt;</span> {
+                <span class="prelude-val">Ok</span>((<span class="ident">session</span>, <span class="ident">encrypted</span>)) =&gt; {
                     <span class="ident">message</span>
                         .<span class="ident">entry</span>(<span class="ident">device</span>.<span class="ident">user_id</span>().<span class="ident">to_owned</span>())
                         .<span class="ident">or_insert_with</span>(<span class="ident">BTreeMap::new</span>)
@@ -890,8 +890,8 @@
                 }
                 <span class="comment">// TODO we&#39;ll want to create m.room_key.withheld here.</span>
                 <span class="prelude-val">Err</span>(<span class="ident">OlmError::MissingSession</span>)
-                <span class="op">|</span> <span class="prelude-val">Err</span>(<span class="ident">OlmError::EventError</span>(<span class="ident">EventError::MissingSenderKey</span>)) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">None</span>,
-                <span class="prelude-val">Err</span>(<span class="ident">e</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">e</span>),
+                <span class="op">|</span> <span class="prelude-val">Err</span>(<span class="ident">OlmError::EventError</span>(<span class="ident">EventError::MissingSenderKey</span>)) =&gt; <span class="prelude-val">None</span>,
+                <span class="prelude-val">Err</span>(<span class="ident">e</span>) =&gt; <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">e</span>),
             };
 
             <span class="prelude-val">Ok</span>((<span class="ident">used_session</span>, <span class="ident">share_infos</span>, <span class="ident">message</span>))
@@ -942,7 +942,7 @@
         <span class="ident">users</span>: <span class="kw">impl</span> <span class="ident">Iterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">UserId</span><span class="op">&gt;</span>,
         <span class="ident">history_visibility</span>: <span class="ident">HistoryVisibility</span>,
         <span class="ident">outbound</span>: <span class="kw-2">&amp;</span><span class="ident">OutboundGroupSession</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">OlmResult</span><span class="op">&lt;</span>(<span class="ident">bool</span>, <span class="ident">HashMap</span><span class="op">&lt;</span><span class="ident">UserId</span>, <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Device</span><span class="op">&gt;</span><span class="op">&gt;</span>)<span class="op">&gt;</span> {
+    ) -&gt; <span class="ident">OlmResult</span><span class="op">&lt;</span>(<span class="ident">bool</span>, <span class="ident">HashMap</span><span class="op">&lt;</span><span class="ident">UserId</span>, <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Device</span><span class="op">&gt;</span><span class="op">&gt;</span>)<span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">users</span>: <span class="ident">HashSet</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">UserId</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">users</span>.<span class="ident">collect</span>();
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">devices</span>: <span class="ident">HashMap</span><span class="op">&lt;</span><span class="ident">UserId</span>, <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Device</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">HashMap::new</span>();
 
@@ -1027,7 +1027,7 @@
         <span class="ident">outbound</span>: <span class="ident">OutboundGroupSession</span>,
         <span class="ident">message_index</span>: <span class="ident">u32</span>,
         <span class="ident">being_shared</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">DashMap</span><span class="op">&lt;</span><span class="ident">Uuid</span>, <span class="ident">OutboundGroupSession</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">OlmResult</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Session</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+    ) -&gt; <span class="ident">OlmResult</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Session</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="kw">let</span> (<span class="ident">id</span>, <span class="ident">request</span>, <span class="ident">share_infos</span>, <span class="ident">used_sessions</span>) <span class="op">=</span>
             <span class="ident"><span class="self">Self</span>::encrypt_session_for</span>(<span class="ident">content</span>.<span class="ident">clone</span>(), <span class="ident">chunk</span>, <span class="ident">message_index</span>).<span class="kw">await</span><span class="question-mark">?</span>;
 
@@ -1039,7 +1039,7 @@
         <span class="prelude-val">Ok</span>(<span class="ident">used_sessions</span>)
     }
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">session_cache</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">GroupSessionCache</span> {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">session_cache</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">GroupSessionCache</span> {
         <span class="self">self</span>.<span class="ident">sessions</span>.<span class="ident">clone</span>()
     }
 
@@ -1059,7 +1059,7 @@
         <span class="ident">room_id</span>: <span class="kw-2">&amp;</span><span class="ident">RoomId</span>,
         <span class="ident">users</span>: <span class="kw">impl</span> <span class="ident">Iterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">UserId</span><span class="op">&gt;</span>,
         <span class="ident">encryption_settings</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">EncryptionSettings</span><span class="op">&gt;</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">OlmResult</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">ToDeviceRequest</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+    ) -&gt; <span class="ident">OlmResult</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">ToDeviceRequest</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="macro">debug!</span>(<span class="ident">room_id</span> <span class="op">=</span> <span class="ident">room_id</span>.<span class="ident">as_str</span>(), <span class="string">&quot;Checking if a room key needs to be shared&quot;</span>,);
 
         <span class="kw">let</span> <span class="ident">encryption_settings</span> <span class="op">=</span> <span class="ident">encryption_settings</span>.<span class="ident">into</span>();
@@ -1192,15 +1192,15 @@
 
     <span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">EncryptionSettings</span>, <span class="ident">OlmMachine</span>};
 
-    <span class="kw">fn</span> <span class="ident">alice_id</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident">UserId</span> {
+    <span class="kw">fn</span> <span class="ident">alice_id</span>() -&gt; <span class="ident">UserId</span> {
         <span class="macro">user_id!</span>(<span class="string">&quot;@alice:example.org&quot;</span>)
     }
 
-    <span class="kw">fn</span> <span class="ident">alice_device_id</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident">DeviceIdBox</span> {
+    <span class="kw">fn</span> <span class="ident">alice_device_id</span>() -&gt; <span class="ident">DeviceIdBox</span> {
         <span class="string">&quot;JLAFKJWSCS&quot;</span>.<span class="ident">into</span>()
     }
 
-    <span class="kw">fn</span> <span class="ident">keys_query_response</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident">get_keys::Response</span> {
+    <span class="kw">fn</span> <span class="ident">keys_query_response</span>() -&gt; <span class="ident">get_keys::Response</span> {
         <span class="kw">let</span> <span class="ident">data</span> <span class="op">=</span> <span class="macro">include_bytes!</span>(<span class="string">&quot;../../benches/keys_query.json&quot;</span>);
         <span class="kw">let</span> <span class="ident">data</span>: <span class="ident">Value</span> <span class="op">=</span> <span class="ident">serde_json::from_slice</span>(<span class="ident">data</span>).<span class="ident">unwrap</span>();
         <span class="kw">let</span> <span class="ident">data</span> <span class="op">=</span> <span class="ident">response_from_file</span>(<span class="kw-2">&amp;</span><span class="ident">data</span>);
@@ -1208,7 +1208,7 @@
             .<span class="ident">expect</span>(<span class="string">&quot;Can&#39;t parse the keys upload response&quot;</span>)
     }
 
-    <span class="kw">fn</span> <span class="ident">keys_claim_response</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident">claim_keys::Response</span> {
+    <span class="kw">fn</span> <span class="ident">keys_claim_response</span>() -&gt; <span class="ident">claim_keys::Response</span> {
         <span class="kw">let</span> <span class="ident">data</span> <span class="op">=</span> <span class="macro">include_bytes!</span>(<span class="string">&quot;../../benches/keys_claim.json&quot;</span>);
         <span class="kw">let</span> <span class="ident">data</span>: <span class="ident">Value</span> <span class="op">=</span> <span class="ident">serde_json::from_slice</span>(<span class="ident">data</span>).<span class="ident">unwrap</span>();
         <span class="kw">let</span> <span class="ident">data</span> <span class="op">=</span> <span class="ident">response_from_file</span>(<span class="kw-2">&amp;</span><span class="ident">data</span>);
@@ -1216,7 +1216,7 @@
             .<span class="ident">expect</span>(<span class="string">&quot;Can&#39;t parse the keys upload response&quot;</span>)
     }
 
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">machine</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident">OlmMachine</span> {
+    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">machine</span>() -&gt; <span class="ident">OlmMachine</span> {
         <span class="kw">let</span> <span class="ident">keys_query</span> <span class="op">=</span> <span class="ident">keys_query_response</span>();
         <span class="kw">let</span> <span class="ident">keys_claim</span> <span class="op">=</span> <span class="ident">keys_claim_response</span>();
         <span class="kw">let</span> <span class="ident">uuid</span> <span class="op">=</span> <span class="ident">Uuid::new_v4</span>();

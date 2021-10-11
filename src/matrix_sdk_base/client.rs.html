@@ -1363,8 +1363,6 @@
 <span id="1363">1363</span>
 <span id="1364">1364</span>
 <span id="1365">1365</span>
-<span id="1366">1366</span>
-<span id="1367">1367</span>
 </pre><pre class="rust"><code><span class="comment">// Copyright 2020 Damir Jelić</span>
 <span class="comment">// Copyright 2020 The Matrix.org Foundation C.I.C.</span>
 <span class="comment">//</span>
@@ -1462,7 +1460,7 @@
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">tarpaulin_include</span>))]</span>
 <span class="kw">impl</span> <span class="ident">fmt::Debug</span> <span class="kw">for</span> <span class="ident">BaseClient</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">fmt::Result</span> {
+    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
         <span class="ident">f</span>.<span class="ident">debug_struct</span>(<span class="string">&quot;Client&quot;</span>)
             .<span class="ident">field</span>(<span class="string">&quot;session&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">session</span>)
             .<span class="ident">field</span>(<span class="string">&quot;sync_token&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">sync_token</span>)
@@ -1491,14 +1489,14 @@
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">tarpaulin_include</span>))]</span>
 <span class="kw">impl</span> <span class="ident">std::fmt::Debug</span> <span class="kw">for</span> <span class="ident">BaseClientConfig</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">fmt</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">std::fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">StdResult</span><span class="op">&lt;</span>(), <span class="ident">std::fmt::Error</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">fmt</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">std::fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">StdResult</span><span class="op">&lt;</span>(), <span class="ident">std::fmt::Error</span><span class="op">&gt;</span> {
         <span class="ident">fmt</span>.<span class="ident">debug_struct</span>(<span class="string">&quot;BaseClientConfig&quot;</span>).<span class="ident">finish</span>()
     }
 }
 
 <span class="kw">impl</span> <span class="ident">BaseClientConfig</span> {
     <span class="doccomment">/// Create a new default `BaseClientConfig`.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>() -&gt; <span class="self">Self</span> {
         <span class="ident">Default::default</span>()
     }
 
@@ -1506,7 +1504,7 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// The crypto store should be opened before being set.</span>
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;encryption&quot;</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">crypto_store</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">store</span>: <span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">CryptoStore</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">crypto_store</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">store</span>: <span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">CryptoStore</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
         <span class="self">self</span>.<span class="ident">crypto_store</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">store</span>);
         <span class="self">self</span>
     }
@@ -1522,7 +1520,7 @@
     <span class="doccomment">/// implementations for the crypto store and the state store. It will use</span>
     <span class="doccomment">/// the given path to open the stores. If no path is provided no store will</span>
     <span class="doccomment">/// be opened</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">store_path</span><span class="op">&lt;</span><span class="ident">P</span>: <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">Path</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">path</span>: <span class="ident">P</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">store_path</span><span class="op">&lt;</span><span class="ident">P</span>: <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">Path</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">path</span>: <span class="ident">P</span>) -&gt; <span class="self">Self</span> {
         <span class="self">self</span>.<span class="ident">store_path</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">path</span>.<span class="ident">as_ref</span>().<span class="ident">into</span>());
         <span class="self">self</span>
     }
@@ -1535,7 +1533,7 @@
     <span class="doccomment">/// the cryptostore.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// This is only used if no custom cryptostore is set.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">passphrase</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">passphrase</span>: <span class="ident">String</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">passphrase</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">passphrase</span>: <span class="ident">String</span>) -&gt; <span class="self">Self</span> {
         <span class="self">self</span>.<span class="ident">passphrase</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">Zeroizing::new</span>(<span class="ident">passphrase</span>));
         <span class="self">self</span>
     }
@@ -1543,7 +1541,7 @@
 
 <span class="kw">impl</span> <span class="ident">BaseClient</span> {
     <span class="doccomment">/// Create a new default client.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>() -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
         <span class="ident">BaseClient::new_with_config</span>(<span class="ident">BaseClientConfig::default</span>())
     }
 
@@ -1553,7 +1551,7 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// * `config` - An optional session if the user already has one from a</span>
     <span class="doccomment">/// previous login call.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new_with_config</span>(<span class="ident">config</span>: <span class="ident">BaseClientConfig</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new_with_config</span>(<span class="ident">config</span>: <span class="ident">BaseClientConfig</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
         <span class="attribute">#[<span class="ident">cfg_attr</span>(
             <span class="ident">not</span>(<span class="ident">any</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;sled_state_store&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;sled_cryptostore&quot;</span>)),
             <span class="ident">allow</span>(<span class="ident">unused_variables</span>)
@@ -1616,17 +1614,17 @@
 
     <span class="doccomment">/// The current client session containing our user id, device id and access</span>
     <span class="doccomment">/// token.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">session</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">RwLock</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Session</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">session</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">RwLock</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Session</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">session</span>
     }
 
     <span class="doccomment">/// Get a reference to the store.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">store</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="ident">Store</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">store</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">Store</span> {
         <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">store</span>
     }
 
     <span class="doccomment">/// Is the client logged in.</span>
-    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">logged_in</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">logged_in</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
         <span class="comment">// TODO turn this into a atomic bool so this method doesn&#39;t need to be</span>
         <span class="comment">// async.</span>
         <span class="self">self</span>.<span class="ident">session</span>.<span class="ident">read</span>().<span class="kw">await</span>.<span class="ident">is_some</span>()
@@ -1642,7 +1640,7 @@
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">receive_login_response</span>(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         <span class="ident">response</span>: <span class="kw-2">&amp;</span><span class="ident">api::session::login::Response</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">session</span> <span class="op">=</span> <span class="ident">Session</span> {
             <span class="ident">access_token</span>: <span class="ident">response</span>.<span class="ident">access_token</span>.<span class="ident">clone</span>(),
             <span class="ident">device_id</span>: <span class="ident">response</span>.<span class="ident">device_id</span>.<span class="ident">clone</span>(),
@@ -1657,7 +1655,7 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// * `session` - An session that the user already has from a</span>
     <span class="doccomment">/// previous login call.</span>
-    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">restore_login</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">session</span>: <span class="ident">Session</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">restore_login</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">session</span>: <span class="ident">Session</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">store</span>.<span class="ident">restore_session</span>(<span class="ident">session</span>.<span class="ident">clone</span>()).<span class="kw">await</span><span class="question-mark">?</span>;
 
         <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;encryption&quot;</span>)]</span>
@@ -1706,7 +1704,7 @@
 
     <span class="doccomment">/// Get the current, if any, sync token of the client.</span>
     <span class="doccomment">/// This will be None if the client didn&#39;t sync at least once.</span>
-    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">sync_token</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">sync_token</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">sync_token</span>.<span class="ident">read</span>().<span class="kw">await</span>.<span class="ident">clone</span>()
     }
 
@@ -1720,7 +1718,7 @@
         <span class="ident">changes</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">StateChanges</span>,
         <span class="ident">ambiguity_cache</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">AmbiguityCache</span>,
         <span class="ident">user_ids</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">BTreeSet</span><span class="op">&lt;</span><span class="ident">UserId</span><span class="op">&gt;</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Timeline</span><span class="op">&gt;</span> {
+    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Timeline</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">room_id</span> <span class="op">=</span> <span class="ident">room</span>.<span class="ident">room_id</span>();
         <span class="kw">let</span> <span class="ident">user_id</span> <span class="op">=</span> <span class="ident">room</span>.<span class="ident">own_user_id</span>();
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">timeline</span> <span class="op">=</span> <span class="ident">Timeline::new</span>(<span class="ident">ruma_timeline</span>.<span class="ident">limited</span>, <span class="ident">ruma_timeline</span>.<span class="ident">prev_batch</span>.<span class="ident">clone</span>());
@@ -1731,19 +1729,19 @@
             <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">event</span>: <span class="ident">SyncRoomEvent</span> <span class="op">=</span> <span class="ident">event</span>.<span class="ident">into</span>();
 
             <span class="kw">match</span> <span class="ident">event</span>.<span class="ident">event</span>.<span class="ident">deserialize</span>() {
-                <span class="prelude-val">Ok</span>(<span class="ident">e</span>) <span class="op">=</span><span class="op">&gt;</span> {
+                <span class="prelude-val">Ok</span>(<span class="ident">e</span>) =&gt; {
                     <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy::single_match</span>)]</span>
                     <span class="kw">match</span> <span class="kw-2">&amp;</span><span class="ident">e</span> {
-                        <span class="ident">AnySyncRoomEvent::State</span>(<span class="ident">s</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="kw">match</span> <span class="ident">s</span> {
-                            <span class="ident">AnySyncStateEvent::RoomMember</span>(<span class="ident">member</span>) <span class="op">=</span><span class="op">&gt;</span> {
+                        <span class="ident">AnySyncRoomEvent::State</span>(<span class="ident">s</span>) =&gt; <span class="kw">match</span> <span class="ident">s</span> {
+                            <span class="ident">AnySyncStateEvent::RoomMember</span>(<span class="ident">member</span>) =&gt; {
                                 <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Ok</span>(<span class="ident">member</span>) <span class="op">=</span> <span class="ident">MemberEvent::try_from</span>(<span class="ident">member</span>.<span class="ident">clone</span>()) {
                                     <span class="ident">ambiguity_cache</span>.<span class="ident">handle_event</span>(<span class="ident">changes</span>, <span class="ident">room_id</span>, <span class="kw-2">&amp;</span><span class="ident">member</span>).<span class="kw">await</span><span class="question-mark">?</span>;
 
                                     <span class="kw">match</span> <span class="ident">member</span>.<span class="ident">content</span>.<span class="ident">membership</span> {
-                                        <span class="ident">MembershipState::Join</span> <span class="op">|</span> <span class="ident">MembershipState::Invite</span> <span class="op">=</span><span class="op">&gt;</span> {
+                                        <span class="ident">MembershipState::Join</span> <span class="op">|</span> <span class="ident">MembershipState::Invite</span> =&gt; {
                                             <span class="ident">user_ids</span>.<span class="ident">insert</span>(<span class="ident">member</span>.<span class="ident">state_key</span>.<span class="ident">clone</span>());
                                         }
-                                        <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> {
+                                        <span class="kw">_</span> =&gt; {
                                             <span class="ident">user_ids</span>.<span class="ident">remove</span>(<span class="kw-2">&amp;</span><span class="ident">member</span>.<span class="ident">state_key</span>);
                                         }
                                     }
@@ -1752,7 +1750,7 @@
                                     <span class="comment">// of profiles that the member set themselves to avoid</span>
                                     <span class="comment">// having confusing profile changes when a member gets</span>
                                     <span class="comment">// kicked/banned.</span>
-                                    <span class="kw">if</span> <span class="ident">member</span>.<span class="ident">state_key</span> <span class="op">=</span><span class="op">=</span> <span class="ident">member</span>.<span class="ident">sender</span> {
+                                    <span class="kw">if</span> <span class="ident">member</span>.<span class="ident">state_key</span> <span class="op">==</span> <span class="ident">member</span>.<span class="ident">sender</span> {
                                         <span class="ident">changes</span>
                                             .<span class="ident">profiles</span>
                                             .<span class="ident">entry</span>(<span class="ident">room_id</span>.<span class="ident">clone</span>())
@@ -1767,7 +1765,7 @@
                                         .<span class="ident">insert</span>(<span class="ident">member</span>.<span class="ident">state_key</span>.<span class="ident">clone</span>(), <span class="ident">member</span>);
                                 }
                             }
-                            <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> {
+                            <span class="kw">_</span> =&gt; {
                                 <span class="ident">room_info</span>.<span class="ident">handle_state_event</span>(<span class="kw-2">&amp;</span><span class="ident">s</span>.<span class="ident">content</span>());
                                 <span class="kw">let</span> <span class="ident">raw_event</span>: <span class="ident">Raw</span><span class="op">&lt;</span><span class="ident">AnySyncStateEvent</span><span class="op">&gt;</span> <span class="op">=</span>
                                     <span class="ident">Raw::from_json</span>(<span class="ident">event</span>.<span class="ident">event</span>.<span class="ident">clone</span>().<span class="ident">into_json</span>());
@@ -1778,7 +1776,7 @@
                         <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;encryption&quot;</span>)]</span>
                         <span class="ident">AnySyncRoomEvent::Message</span>(<span class="ident">AnySyncMessageEvent::RoomEncrypted</span>(
                             <span class="ident">encrypted</span>,
-                        )) <span class="op">=</span><span class="op">&gt;</span> {
+                        )) =&gt; {
                             <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">olm</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">olm_machine</span>().<span class="kw">await</span> {
                                 <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Ok</span>(<span class="ident">decrypted</span>) <span class="op">=</span>
                                     <span class="ident">olm</span>.<span class="ident">decrypt_room_event</span>(<span class="ident">encrypted</span>, <span class="ident">room_id</span>).<span class="kw">await</span>
@@ -1791,7 +1789,7 @@
                         <span class="comment">// event type and state key, add a method to get the</span>
                         <span class="comment">// requests that are needed to be called to heal this</span>
                         <span class="comment">// redacted state.</span>
-                        <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> (),
+                        <span class="kw">_</span> =&gt; (),
                     }
 
                     <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">context</span>) <span class="op">=</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">push_context</span> {
@@ -1825,7 +1823,7 @@
                         <span class="comment">// store them.</span>
                     }
                 }
-                <span class="prelude-val">Err</span>(<span class="ident">e</span>) <span class="op">=</span><span class="op">&gt;</span> {
+                <span class="prelude-val">Err</span>(<span class="ident">e</span>) =&gt; {
                     <span class="macro">warn!</span>(<span class="string">&quot;Error deserializing event {:?}&quot;</span>, <span class="ident">e</span>);
                 }
             }
@@ -1841,7 +1839,7 @@
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         <span class="ident">events</span>: <span class="kw-2">&amp;</span>[<span class="ident">Raw</span><span class="op">&lt;</span><span class="ident">AnyStrippedStateEvent</span><span class="op">&gt;</span>],
         <span class="ident">room_info</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">RoomInfo</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> (
+    ) -&gt; (
         <span class="ident">BTreeMap</span><span class="op">&lt;</span><span class="ident">UserId</span>, <span class="ident">StrippedMemberEvent</span><span class="op">&gt;</span>,
         <span class="ident">BTreeMap</span><span class="op">&lt;</span><span class="ident">String</span>, <span class="ident">BTreeMap</span><span class="op">&lt;</span><span class="ident">String</span>, <span class="ident">Raw</span><span class="op">&lt;</span><span class="ident">AnyStrippedStateEvent</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span>,
     ) {
@@ -1849,14 +1847,14 @@
             (<span class="ident">BTreeMap::new</span>(), <span class="ident">BTreeMap::new</span>()),
             <span class="op">|</span>(<span class="kw-2">mut</span> <span class="ident">members</span>, <span class="kw-2">mut</span> <span class="ident">state_events</span>), <span class="ident">raw_event</span><span class="op">|</span> {
                 <span class="kw">match</span> <span class="ident">raw_event</span>.<span class="ident">deserialize</span>() {
-                    <span class="prelude-val">Ok</span>(<span class="ident">e</span>) <span class="op">=</span><span class="op">&gt;</span> {
+                    <span class="prelude-val">Ok</span>(<span class="ident">e</span>) =&gt; {
 
                         <span class="kw">if</span> <span class="kw">let</span> <span class="ident">AnyStrippedStateEvent::RoomMember</span>(<span class="ident">member</span>) <span class="op">=</span> <span class="ident">e</span> {
                             <span class="kw">match</span> <span class="ident">StrippedMemberEvent::try_from</span>(<span class="ident">member</span>) {
-                                <span class="prelude-val">Ok</span>(<span class="ident">m</span>) <span class="op">=</span><span class="op">&gt;</span> {
+                                <span class="prelude-val">Ok</span>(<span class="ident">m</span>) =&gt; {
                                     <span class="ident">members</span>.<span class="ident">insert</span>(<span class="ident">m</span>.<span class="ident">state_key</span>.<span class="ident">clone</span>(), <span class="ident">m</span>);
                                 }
-                                <span class="prelude-val">Err</span>(<span class="ident">e</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="macro">warn!</span>(
+                                <span class="prelude-val">Err</span>(<span class="ident">e</span>) =&gt; <span class="macro">warn!</span>(
                                     <span class="string">&quot;Stripped member event in room {} has an invalid state key {:?}&quot;</span>,
                                     <span class="ident">room_info</span>.<span class="ident">room_id</span>, <span class="ident">e</span>
                                 ),
@@ -1869,7 +1867,7 @@
                                 .<span class="ident">insert</span>(<span class="ident">e</span>.<span class="ident">state_key</span>().<span class="ident">to_owned</span>(), <span class="ident">raw_event</span>.<span class="ident">clone</span>());
                         }
                     }
-                    <span class="prelude-val">Err</span>(<span class="ident">err</span>) <span class="op">=</span><span class="op">&gt;</span> {
+                    <span class="prelude-val">Err</span>(<span class="ident">err</span>) =&gt; {
                         <span class="macro">warn!</span>(
                             <span class="string">&quot;Couldn&#39;t deserialize stripped state event for room {}: {:?}&quot;</span>,
                             <span class="ident">room_info</span>.<span class="ident">room_id</span>, <span class="ident">err</span>
@@ -1887,7 +1885,7 @@
         <span class="ident">ambiguity_cache</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">AmbiguityCache</span>,
         <span class="ident">events</span>: <span class="kw-2">&amp;</span>[<span class="ident">Raw</span><span class="op">&lt;</span><span class="ident">AnySyncStateEvent</span><span class="op">&gt;</span>],
         <span class="ident">room_info</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">RoomInfo</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">StoreResult</span><span class="op">&lt;</span><span class="ident">BTreeSet</span><span class="op">&lt;</span><span class="ident">UserId</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+    ) -&gt; <span class="ident">StoreResult</span><span class="op">&lt;</span><span class="ident">BTreeSet</span><span class="op">&lt;</span><span class="ident">UserId</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">members</span> <span class="op">=</span> <span class="ident">BTreeMap::new</span>();
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">state_events</span> <span class="op">=</span> <span class="ident">BTreeMap::new</span>();
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">user_ids</span> <span class="op">=</span> <span class="ident">BTreeSet::new</span>();
@@ -1897,8 +1895,8 @@
 
         <span class="kw">for</span> <span class="ident">raw_event</span> <span class="kw">in</span> <span class="ident">events</span> {
             <span class="kw">let</span> <span class="ident">event</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">raw_event</span>.<span class="ident">deserialize</span>() {
-                <span class="prelude-val">Ok</span>(<span class="ident">e</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">e</span>,
-                <span class="prelude-val">Err</span>(<span class="ident">e</span>) <span class="op">=</span><span class="op">&gt;</span> {
+                <span class="prelude-val">Ok</span>(<span class="ident">e</span>) =&gt; <span class="ident">e</span>,
+                <span class="prelude-val">Err</span>(<span class="ident">e</span>) =&gt; {
                     <span class="macro">warn!</span>(
                         <span class="string">&quot;Couldn&#39;t deserialize state event for room {}: {:?} {:#?}&quot;</span>,
                         <span class="ident">room_id</span>, <span class="ident">e</span>, <span class="ident">raw_event</span>
@@ -1911,27 +1909,27 @@
 
             <span class="kw">if</span> <span class="kw">let</span> <span class="ident">AnySyncStateEvent::RoomMember</span>(<span class="ident">member</span>) <span class="op">=</span> <span class="ident">event</span> {
                 <span class="kw">match</span> <span class="ident">MemberEvent::try_from</span>(<span class="ident">member</span>) {
-                    <span class="prelude-val">Ok</span>(<span class="ident">m</span>) <span class="op">=</span><span class="op">&gt;</span> {
+                    <span class="prelude-val">Ok</span>(<span class="ident">m</span>) =&gt; {
                         <span class="ident">ambiguity_cache</span>.<span class="ident">handle_event</span>(<span class="ident">changes</span>, <span class="kw-2">&amp;</span><span class="ident">room_id</span>, <span class="kw-2">&amp;</span><span class="ident">m</span>).<span class="kw">await</span><span class="question-mark">?</span>;
 
                         <span class="kw">match</span> <span class="ident">m</span>.<span class="ident">content</span>.<span class="ident">membership</span> {
-                            <span class="ident">MembershipState::Join</span> <span class="op">|</span> <span class="ident">MembershipState::Invite</span> <span class="op">=</span><span class="op">&gt;</span> {
+                            <span class="ident">MembershipState::Join</span> <span class="op">|</span> <span class="ident">MembershipState::Invite</span> =&gt; {
                                 <span class="ident">user_ids</span>.<span class="ident">insert</span>(<span class="ident">m</span>.<span class="ident">state_key</span>.<span class="ident">clone</span>());
                             }
-                            <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> (),
+                            <span class="kw">_</span> =&gt; (),
                         }
 
                         <span class="comment">// Senders can fake the profile easily so we keep track</span>
                         <span class="comment">// of profiles that the member set themselves to avoid</span>
                         <span class="comment">// having confusing profile changes when a member gets</span>
                         <span class="comment">// kicked/banned.</span>
-                        <span class="kw">if</span> <span class="ident">m</span>.<span class="ident">state_key</span> <span class="op">=</span><span class="op">=</span> <span class="ident">m</span>.<span class="ident">sender</span> {
+                        <span class="kw">if</span> <span class="ident">m</span>.<span class="ident">state_key</span> <span class="op">==</span> <span class="ident">m</span>.<span class="ident">sender</span> {
                             <span class="ident">profiles</span>.<span class="ident">insert</span>(<span class="ident">m</span>.<span class="ident">sender</span>.<span class="ident">clone</span>(), <span class="ident">m</span>.<span class="ident">content</span>.<span class="ident">clone</span>());
                         }
 
                         <span class="ident">members</span>.<span class="ident">insert</span>(<span class="ident">m</span>.<span class="ident">state_key</span>.<span class="ident">clone</span>(), <span class="ident">m</span>);
                     }
-                    <span class="prelude-val">Err</span>(<span class="ident">e</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="macro">warn!</span>(
+                    <span class="prelude-val">Err</span>(<span class="ident">e</span>) =&gt; <span class="macro">warn!</span>(
                         <span class="string">&quot;Member event in room {} has an invalid state key {:?}&quot;</span>,
                         <span class="ident">room_info</span>.<span class="ident">room_id</span>, <span class="ident">e</span>
                     ),
@@ -1973,8 +1971,8 @@
 
         <span class="kw">for</span> <span class="ident">raw_event</span> <span class="kw">in</span> <span class="ident">events</span> {
             <span class="kw">let</span> <span class="ident">event</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">raw_event</span>.<span class="ident">deserialize</span>() {
-                <span class="prelude-val">Ok</span>(<span class="ident">e</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">e</span>,
-                <span class="prelude-val">Err</span>(<span class="ident">e</span>) <span class="op">=</span><span class="op">&gt;</span> {
+                <span class="prelude-val">Ok</span>(<span class="ident">e</span>) =&gt; <span class="ident">e</span>,
+                <span class="prelude-val">Err</span>(<span class="ident">e</span>) =&gt; {
                     <span class="macro">warn!</span>(<span class="ident">error</span> <span class="op">=</span><span class="question-mark">?</span> <span class="ident">e</span>, <span class="string">&quot;Failed to deserialize a global account data event&quot;</span>);
                     <span class="kw">continue</span>;
                 }
@@ -2014,9 +2012,7 @@
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">receive_sync_response</span>(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         <span class="ident">response</span>: <span class="ident">api::sync::sync_events::Response</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">SyncResponse</span><span class="op">&gt;</span> {
-        <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">unknown_lints</span>)]</span> <span class="comment">// New lint to be released in 1.57.0</span>
-        <span class="attribute">#[<span class="ident">warn</span>(<span class="ident">non_exhaustive_omitted_patterns</span>)]</span>
+    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">SyncResponse</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">api::sync::sync_events::Response</span> {
             <span class="ident">next_batch</span>,
             <span class="ident">rooms</span>,
@@ -2031,7 +2027,7 @@
         <span class="comment">// The server might respond multiple times with the same sync token, in</span>
         <span class="comment">// that case we already received this response and there&#39;s nothing to</span>
         <span class="comment">// do.</span>
-        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">sync_token</span>.<span class="ident">read</span>().<span class="kw">await</span>.<span class="ident">as_ref</span>() <span class="op">=</span><span class="op">=</span> <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="ident">next_batch</span>) {
+        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">sync_token</span>.<span class="ident">read</span>().<span class="kw">await</span>.<span class="ident">as_ref</span>() <span class="op">==</span> <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="ident">next_batch</span>) {
             <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="ident">SyncResponse::new</span>(<span class="ident">next_batch</span>));
         }
 
@@ -2081,8 +2077,8 @@
 
             <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">event</span>) <span class="op">=</span>
                 <span class="ident">new_info</span>.<span class="ident">ephemeral</span>.<span class="ident">events</span>.<span class="ident">iter</span>().<span class="ident">find_map</span>(<span class="op">|</span><span class="ident">e</span><span class="op">|</span> <span class="kw">match</span> <span class="ident">e</span>.<span class="ident">deserialize</span>() {
-                    <span class="prelude-val">Ok</span>(<span class="ident">AnySyncEphemeralRoomEvent::Receipt</span>(<span class="ident">event</span>)) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="ident">event</span>.<span class="ident">content</span>),
-                    <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">None</span>,
+                    <span class="prelude-val">Ok</span>(<span class="ident">AnySyncEphemeralRoomEvent::Receipt</span>(<span class="ident">event</span>)) =&gt; <span class="prelude-val">Some</span>(<span class="ident">event</span>.<span class="ident">content</span>),
+                    <span class="kw">_</span> =&gt; <span class="prelude-val">None</span>,
                 })
             {
                 <span class="ident">changes</span>.<span class="ident">add_receipts</span>(<span class="kw-2">&amp;</span><span class="ident">room_id</span>, <span class="ident">event</span>);
@@ -2260,7 +2256,7 @@
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         <span class="ident">room_id</span>: <span class="kw-2">&amp;</span><span class="ident">RoomId</span>,
         <span class="ident">response</span>: <span class="kw-2">&amp;</span><span class="ident">api::membership::get_member_events::Response</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">MembersResponse</span><span class="op">&gt;</span> {
+    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">MembersResponse</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">members</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">MemberEvent</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">response</span>
             .<span class="ident">chunk</span>
             .<span class="ident">iter</span>()
@@ -2281,15 +2277,15 @@
                 <span class="kw">if</span> <span class="self">self</span>.<span class="ident">store</span>.<span class="ident">get_member_event</span>(<span class="ident">room_id</span>, <span class="kw-2">&amp;</span><span class="ident">member</span>.<span class="ident">state_key</span>).<span class="kw">await</span><span class="question-mark">?</span>.<span class="ident">is_none</span>() {
                     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;encryption&quot;</span>)]</span>
                     <span class="kw">match</span> <span class="ident">member</span>.<span class="ident">content</span>.<span class="ident">membership</span> {
-                        <span class="ident">MembershipState::Join</span> <span class="op">|</span> <span class="ident">MembershipState::Invite</span> <span class="op">=</span><span class="op">&gt;</span> {
+                        <span class="ident">MembershipState::Join</span> <span class="op">|</span> <span class="ident">MembershipState::Invite</span> =&gt; {
                             <span class="ident">user_ids</span>.<span class="ident">insert</span>(<span class="ident">member</span>.<span class="ident">state_key</span>.<span class="ident">clone</span>());
                         }
-                        <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> (),
+                        <span class="kw">_</span> =&gt; (),
                     }
 
                     <span class="ident">ambiguity_cache</span>.<span class="ident">handle_event</span>(<span class="kw-2">&amp;</span><span class="ident">changes</span>, <span class="ident">room_id</span>, <span class="ident">member</span>).<span class="kw">await</span><span class="question-mark">?</span>;
 
-                    <span class="kw">if</span> <span class="ident">member</span>.<span class="ident">state_key</span> <span class="op">=</span><span class="op">=</span> <span class="ident">member</span>.<span class="ident">sender</span> {
+                    <span class="kw">if</span> <span class="ident">member</span>.<span class="ident">state_key</span> <span class="op">==</span> <span class="ident">member</span>.<span class="ident">sender</span> {
                         <span class="ident">changes</span>
                             .<span class="ident">profiles</span>
                             .<span class="ident">entry</span>(<span class="ident">room_id</span>.<span class="ident">clone</span>())
@@ -2345,7 +2341,7 @@
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         <span class="ident">filter_name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>,
         <span class="ident">response</span>: <span class="kw-2">&amp;</span><span class="ident">api::filter::create_filter::Response</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="prelude-val">Ok</span>(<span class="self">self</span>.<span class="ident">store</span>.<span class="ident">save_filter</span>(<span class="ident">filter_name</span>, <span class="kw-2">&amp;</span><span class="ident">response</span>.<span class="ident">filter_id</span>).<span class="kw">await</span><span class="question-mark">?</span>)
     }
 
@@ -2360,7 +2356,7 @@
     <span class="doccomment">/// persist the filter.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// [`receive_filter_upload`]: #method.receive_filter_upload</span>
-    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">get_filter</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">filter_name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">StoreResult</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">get_filter</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">filter_name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">StoreResult</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">store</span>.<span class="ident">get_filter</span>(<span class="ident">filter_name</span>).<span class="kw">await</span>
     }
 
@@ -2373,12 +2369,12 @@
     <span class="doccomment">/// [`mark_request_as_sent`]: #method.mark_request_as_sent</span>
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;encryption&quot;</span>)]</span>
     <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;docs&quot;</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">encryption</span>)))]</span>
-    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">outgoing_requests</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">OutgoingRequest</span><span class="op">&gt;</span>, <span class="ident">CryptoStoreError</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">outgoing_requests</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">OutgoingRequest</span><span class="op">&gt;</span>, <span class="ident">CryptoStoreError</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">olm</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">olm</span>.<span class="ident">lock</span>().<span class="kw">await</span>;
 
         <span class="kw">match</span> <span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="ident">olm</span> {
-            <span class="prelude-val">Some</span>(<span class="ident">o</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">o</span>.<span class="ident">outgoing_requests</span>().<span class="kw">await</span>,
-            <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="macro">vec!</span>[]),
+            <span class="prelude-val">Some</span>(<span class="ident">o</span>) =&gt; <span class="ident">o</span>.<span class="ident">outgoing_requests</span>().<span class="kw">await</span>,
+            <span class="prelude-val">None</span> =&gt; <span class="prelude-val">Ok</span>(<span class="macro">vec!</span>[]),
         }
     }
 
@@ -2397,12 +2393,12 @@
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         <span class="ident">request_id</span>: <span class="kw-2">&amp;</span><span class="ident">Uuid</span>,
         <span class="ident">response</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">IncomingResponse</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">olm</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">olm</span>.<span class="ident">lock</span>().<span class="kw">await</span>;
 
         <span class="kw">match</span> <span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="ident">olm</span> {
-            <span class="prelude-val">Some</span>(<span class="ident">o</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">o</span>.<span class="ident">mark_request_as_sent</span>(<span class="ident">request_id</span>, <span class="ident">response</span>).<span class="kw">await</span><span class="question-mark">?</span>),
-            <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(()),
+            <span class="prelude-val">Some</span>(<span class="ident">o</span>) =&gt; <span class="prelude-val">Ok</span>(<span class="ident">o</span>.<span class="ident">mark_request_as_sent</span>(<span class="ident">request_id</span>, <span class="ident">response</span>).<span class="kw">await</span><span class="question-mark">?</span>),
+            <span class="prelude-val">None</span> =&gt; <span class="prelude-val">Ok</span>(()),
         }
     }
 
@@ -2414,23 +2410,23 @@
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">get_missing_sessions</span>(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         <span class="ident">users</span>: <span class="kw">impl</span> <span class="ident">Iterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">UserId</span><span class="op">&gt;</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span>(<span class="ident">Uuid</span>, <span class="ident">KeysClaimRequest</span>)<span class="op">&gt;</span><span class="op">&gt;</span> {
+    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span>(<span class="ident">Uuid</span>, <span class="ident">KeysClaimRequest</span>)<span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">olm</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">olm</span>.<span class="ident">lock</span>().<span class="kw">await</span>;
 
         <span class="kw">match</span> <span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="ident">olm</span> {
-            <span class="prelude-val">Some</span>(<span class="ident">o</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">o</span>.<span class="ident">get_missing_sessions</span>(<span class="ident">users</span>).<span class="kw">await</span><span class="question-mark">?</span>),
-            <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="prelude-val">None</span>),
+            <span class="prelude-val">Some</span>(<span class="ident">o</span>) =&gt; <span class="prelude-val">Ok</span>(<span class="ident">o</span>.<span class="ident">get_missing_sessions</span>(<span class="ident">users</span>).<span class="kw">await</span><span class="question-mark">?</span>),
+            <span class="prelude-val">None</span> =&gt; <span class="prelude-val">Ok</span>(<span class="prelude-val">None</span>),
         }
     }
 
     <span class="doccomment">/// Get a to-device request that will share a group session for a room.</span>
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;encryption&quot;</span>)]</span>
     <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;docs&quot;</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">encryption</span>)))]</span>
-    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">share_group_session</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">room_id</span>: <span class="kw-2">&amp;</span><span class="ident">RoomId</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">ToDeviceRequest</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">share_group_session</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">room_id</span>: <span class="kw-2">&amp;</span><span class="ident">RoomId</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">ToDeviceRequest</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">olm</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">olm</span>.<span class="ident">lock</span>().<span class="kw">await</span>;
 
         <span class="kw">match</span> <span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="ident">olm</span> {
-            <span class="prelude-val">Some</span>(<span class="ident">o</span>) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="prelude-val">Some</span>(<span class="ident">o</span>) =&gt; {
                 <span class="kw">let</span> (<span class="ident">history_visibility</span>, <span class="ident">settings</span>) <span class="op">=</span> <span class="self">self</span>
                     .<span class="ident">get_room</span>(<span class="ident">room_id</span>)
                     .<span class="ident">map</span>(<span class="op">|</span><span class="ident">r</span><span class="op">|</span> (<span class="ident">r</span>.<span class="ident">history_visibility</span>(), <span class="ident">r</span>.<span class="ident">encryption_settings</span>()))
@@ -2441,7 +2437,7 @@
 
                 <span class="comment">// Don&#39;t share the group session with members that are invited</span>
                 <span class="comment">// if the history visibility is set to `Joined`</span>
-                <span class="kw">let</span> <span class="ident">members</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">history_visibility</span> <span class="op">=</span><span class="op">=</span> <span class="ident">HistoryVisibility::Joined</span> {
+                <span class="kw">let</span> <span class="ident">members</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">history_visibility</span> <span class="op">==</span> <span class="ident">HistoryVisibility::Joined</span> {
                     <span class="ident">joined</span>.<span class="ident">iter</span>().<span class="ident">chain</span>(<span class="kw-2">&amp;</span>[])
                 } <span class="kw">else</span> {
                     <span class="ident">joined</span>.<span class="ident">iter</span>().<span class="ident">chain</span>(<span class="kw-2">&amp;</span><span class="ident">invited</span>)
@@ -2452,7 +2448,7 @@
 
                 <span class="prelude-val">Ok</span>(<span class="ident">o</span>.<span class="ident">share_group_session</span>(<span class="ident">room_id</span>, <span class="ident">members</span>, <span class="ident">settings</span>).<span class="kw">await</span><span class="question-mark">?</span>)
             }
-            <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">panic!</span>(<span class="string">&quot;Olm machine wasn&#39;t started&quot;</span>),
+            <span class="prelude-val">None</span> =&gt; <span class="macro">panic!</span>(<span class="string">&quot;Olm machine wasn&#39;t started&quot;</span>),
         }
     }
 
@@ -2461,7 +2457,7 @@
     <span class="doccomment">/// # Arguments</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// * `room_id` - The id of the room that should be fetched.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_room</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">room_id</span>: <span class="kw-2">&amp;</span><span class="ident">RoomId</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Room</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_room</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">room_id</span>: <span class="kw-2">&amp;</span><span class="ident">RoomId</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Room</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">store</span>.<span class="ident">get_room</span>(<span class="ident">room_id</span>)
     }
 
@@ -2472,12 +2468,12 @@
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         <span class="ident">room_id</span>: <span class="kw-2">&amp;</span><span class="ident">RoomId</span>,
         <span class="ident">content</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">AnyMessageEventContent</span><span class="op">&gt;</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">EncryptedEventContent</span><span class="op">&gt;</span> {
+    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">EncryptedEventContent</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">olm</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">olm</span>.<span class="ident">lock</span>().<span class="kw">await</span>;
 
         <span class="kw">match</span> <span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="ident">olm</span> {
-            <span class="prelude-val">Some</span>(<span class="ident">o</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">o</span>.<span class="ident">encrypt</span>(<span class="ident">room_id</span>, <span class="ident">content</span>.<span class="ident">into</span>()).<span class="kw">await</span><span class="question-mark">?</span>),
-            <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">panic!</span>(<span class="string">&quot;Olm machine wasn&#39;t started&quot;</span>),
+            <span class="prelude-val">Some</span>(<span class="ident">o</span>) =&gt; <span class="prelude-val">Ok</span>(<span class="ident">o</span>.<span class="ident">encrypt</span>(<span class="ident">room_id</span>, <span class="ident">content</span>.<span class="ident">into</span>()).<span class="kw">await</span><span class="question-mark">?</span>),
+            <span class="prelude-val">None</span> =&gt; <span class="macro">panic!</span>(<span class="string">&quot;Olm machine wasn&#39;t started&quot;</span>),
         }
     }
 
@@ -2491,12 +2487,12 @@
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">invalidate_group_session</span>(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         <span class="ident">room_id</span>: <span class="kw-2">&amp;</span><span class="ident">RoomId</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">bool</span>, <span class="ident">CryptoStoreError</span><span class="op">&gt;</span> {
+    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">bool</span>, <span class="ident">CryptoStoreError</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">olm</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">olm</span>.<span class="ident">lock</span>().<span class="kw">await</span>;
 
         <span class="kw">match</span> <span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="ident">olm</span> {
-            <span class="prelude-val">Some</span>(<span class="ident">o</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">o</span>.<span class="ident">invalidate_group_session</span>(<span class="ident">room_id</span>).<span class="kw">await</span>,
-            <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="bool-val">false</span>),
+            <span class="prelude-val">Some</span>(<span class="ident">o</span>) =&gt; <span class="ident">o</span>.<span class="ident">invalidate_group_session</span>(<span class="ident">room_id</span>).<span class="kw">await</span>,
+            <span class="prelude-val">None</span> =&gt; <span class="prelude-val">Ok</span>(<span class="bool-val">false</span>),
         }
     }
 
@@ -2534,7 +2530,7 @@
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         <span class="ident">user_id</span>: <span class="kw-2">&amp;</span><span class="ident">UserId</span>,
         <span class="ident">device_id</span>: <span class="kw-2">&amp;</span><span class="ident">DeviceId</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">StdResult</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Device</span><span class="op">&gt;</span>, <span class="ident">CryptoStoreError</span><span class="op">&gt;</span> {
+    ) -&gt; <span class="ident">StdResult</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Device</span><span class="op">&gt;</span>, <span class="ident">CryptoStoreError</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">olm</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">olm</span>.<span class="ident">lock</span>().<span class="kw">await</span>;
 
         <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">olm</span>) <span class="op">=</span> <span class="ident">olm</span>.<span class="ident">as_ref</span>() {
@@ -2552,7 +2548,7 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// Returns a session object if the client is logged in. Otherwise returns</span>
     <span class="doccomment">/// `None`.</span>
-    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">get_session</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Session</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">get_session</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Session</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">session</span>.<span class="ident">read</span>().<span class="kw">await</span>.<span class="ident">clone</span>()
     }
 
@@ -2592,7 +2588,7 @@
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">get_user_devices</span>(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         <span class="ident">user_id</span>: <span class="kw-2">&amp;</span><span class="ident">UserId</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">StdResult</span><span class="op">&lt;</span><span class="ident">UserDevices</span>, <span class="ident">CryptoStoreError</span><span class="op">&gt;</span> {
+    ) -&gt; <span class="ident">StdResult</span><span class="op">&lt;</span><span class="ident">UserDevices</span>, <span class="ident">CryptoStoreError</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">olm</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">olm</span>.<span class="ident">lock</span>().<span class="kw">await</span>;
 
         <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">olm</span>) <span class="op">=</span> <span class="ident">olm</span>.<span class="ident">as_ref</span>() {
@@ -2606,7 +2602,7 @@
     <span class="doccomment">/// Get the olm machine.</span>
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;encryption&quot;</span>)]</span>
     <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;docs&quot;</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">encryption</span>)))]</span>
-    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">olm_machine</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">OlmMachine</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">olm_machine</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">OlmMachine</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">olm</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">olm</span>.<span class="ident">lock</span>().<span class="kw">await</span>;
         <span class="ident">olm</span>.<span class="ident">as_ref</span>().<span class="ident">cloned</span>()
     }
@@ -2616,7 +2612,7 @@
     <span class="doccomment">/// Gets the push rules from `changes` if they have been updated, otherwise</span>
     <span class="doccomment">/// get them from the store. As a fallback, uses</span>
     <span class="doccomment">/// `Ruleset::server_default` if the user is logged in.</span>
-    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">get_push_rules</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">changes</span>: <span class="kw-2">&amp;</span><span class="ident">StateChanges</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Ruleset</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">get_push_rules</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">changes</span>: <span class="kw-2">&amp;</span><span class="ident">StateChanges</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Ruleset</span><span class="op">&gt;</span> {
         <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">AnyGlobalAccountDataEvent::PushRules</span>(<span class="ident">event</span>)) <span class="op">=</span> <span class="ident">changes</span>
             .<span class="ident">account_data</span>
             .<span class="ident">get</span>(<span class="ident">EventType::PushRules</span>.<span class="ident">as_str</span>())
@@ -2649,7 +2645,7 @@
         <span class="ident">room</span>: <span class="kw-2">&amp;</span><span class="ident">Room</span>,
         <span class="ident">room_info</span>: <span class="kw-2">&amp;</span><span class="ident">RoomInfo</span>,
         <span class="ident">changes</span>: <span class="kw-2">&amp;</span><span class="ident">StateChanges</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">PushConditionRoomCtx</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">PushConditionRoomCtx</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">room_id</span> <span class="op">=</span> <span class="ident">room</span>.<span class="ident">room_id</span>();
         <span class="kw">let</span> <span class="ident">user_id</span> <span class="op">=</span> <span class="ident">room</span>.<span class="ident">own_user_id</span>();
 

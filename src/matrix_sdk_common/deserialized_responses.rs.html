@@ -445,7 +445,7 @@
 }
 
 <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">Raw</span><span class="op">&lt;</span><span class="ident">AnySyncRoomEvent</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">SyncRoomEvent</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">inner</span>: <span class="ident">Raw</span><span class="op">&lt;</span><span class="ident">AnySyncRoomEvent</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">inner</span>: <span class="ident">Raw</span><span class="op">&lt;</span><span class="ident">AnySyncRoomEvent</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
         <span class="self">Self</span> { <span class="ident">encryption_info</span>: <span class="prelude-val">None</span>, <span class="ident">event</span>: <span class="ident">inner</span> }
     }
 }
@@ -477,7 +477,7 @@
 }
 
 <span class="kw">impl</span> <span class="ident">SyncResponse</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">next_batch</span>: <span class="ident">String</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">next_batch</span>: <span class="ident">String</span>) -&gt; <span class="self">Self</span> {
         <span class="self">Self</span> { <span class="ident">next_batch</span>, ..<span class="ident">Default::default</span>() }
     }
 }
@@ -527,7 +527,7 @@
         <span class="ident">account_data</span>: <span class="ident">RoomAccountData</span>,
         <span class="ident">ephemeral</span>: <span class="ident">Ephemeral</span>,
         <span class="ident">unread_notifications</span>: <span class="ident">UnreadNotificationsCount</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    ) -&gt; <span class="self">Self</span> {
         <span class="self">Self</span> { <span class="ident">unread_notifications</span>, <span class="ident">timeline</span>, <span class="ident">state</span>, <span class="ident">account_data</span>, <span class="ident">ephemeral</span> }
     }
 }
@@ -543,7 +543,7 @@
 }
 
 <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">RumaUnreadNotificationsCount</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">UnreadNotificationsCount</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">notifications</span>: <span class="ident">RumaUnreadNotificationsCount</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">notifications</span>: <span class="ident">RumaUnreadNotificationsCount</span>) -&gt; <span class="self">Self</span> {
         <span class="self">Self</span> {
             <span class="ident">highlight_count</span>: <span class="ident">notifications</span>.<span class="ident">highlight_count</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">c</span><span class="op">|</span> <span class="ident">c</span>.<span class="ident">into</span>()).<span class="ident">unwrap_or</span>(<span class="number">0</span>),
             <span class="ident">notification_count</span>: <span class="ident">notifications</span>.<span class="ident">notification_count</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">c</span><span class="op">|</span> <span class="ident">c</span>.<span class="ident">into</span>()).<span class="ident">unwrap_or</span>(<span class="number">0</span>),
@@ -566,7 +566,7 @@
 }
 
 <span class="kw">impl</span> <span class="ident">LeftRoom</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">timeline</span>: <span class="ident">Timeline</span>, <span class="ident">state</span>: <span class="ident">State</span>, <span class="ident">account_data</span>: <span class="ident">RoomAccountData</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">timeline</span>: <span class="ident">Timeline</span>, <span class="ident">state</span>: <span class="ident">State</span>, <span class="ident">account_data</span>: <span class="ident">RoomAccountData</span>) -&gt; <span class="self">Self</span> {
         <span class="self">Self</span> { <span class="ident">timeline</span>, <span class="ident">state</span>, <span class="ident">account_data</span> }
     }
 }
@@ -587,7 +587,7 @@
 }
 
 <span class="kw">impl</span> <span class="ident">Timeline</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">limited</span>: <span class="ident">bool</span>, <span class="ident">prev_batch</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">limited</span>: <span class="ident">bool</span>, <span class="ident">prev_batch</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
         <span class="self">Self</span> { <span class="ident">limited</span>, <span class="ident">prev_batch</span>, ..<span class="ident">Default::default</span>() }
     }
 }
@@ -607,7 +607,7 @@
 <span class="kw">impl</span> <span class="ident">TryFrom</span><span class="op">&lt;</span><span class="ident">RumaSyncMemberEvent</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">MemberEvent</span> {
     <span class="kw">type</span> <span class="ident">Error</span> <span class="op">=</span> <span class="ident">ruma::identifiers::Error</span>;
 
-    <span class="kw">fn</span> <span class="ident">try_from</span>(<span class="ident">event</span>: <span class="ident">RumaSyncMemberEvent</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident"><span class="self">Self</span>::Error</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">try_from</span>(<span class="ident">event</span>: <span class="ident">RumaSyncMemberEvent</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident"><span class="self">Self</span>::Error</span><span class="op">&gt;</span> {
         <span class="prelude-val">Ok</span>(<span class="ident">MemberEvent</span> {
             <span class="ident">content</span>: <span class="ident">event</span>.<span class="ident">content</span>,
             <span class="ident">event_id</span>: <span class="ident">event</span>.<span class="ident">event_id</span>,
@@ -623,7 +623,7 @@
 <span class="kw">impl</span> <span class="ident">TryFrom</span><span class="op">&lt;</span><span class="ident">RumaMemberEvent</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">MemberEvent</span> {
     <span class="kw">type</span> <span class="ident">Error</span> <span class="op">=</span> <span class="ident">ruma::identifiers::Error</span>;
 
-    <span class="kw">fn</span> <span class="ident">try_from</span>(<span class="ident">event</span>: <span class="ident">RumaMemberEvent</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident"><span class="self">Self</span>::Error</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">try_from</span>(<span class="ident">event</span>: <span class="ident">RumaMemberEvent</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident"><span class="self">Self</span>::Error</span><span class="op">&gt;</span> {
         <span class="prelude-val">Ok</span>(<span class="ident">MemberEvent</span> {
             <span class="ident">content</span>: <span class="ident">event</span>.<span class="ident">content</span>,
             <span class="ident">event_id</span>: <span class="ident">event</span>.<span class="ident">event_id</span>,
@@ -637,7 +637,7 @@
 }
 
 <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">MemberEvent</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">RumaSyncMemberEvent</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">other</span>: <span class="ident">MemberEvent</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">other</span>: <span class="ident">MemberEvent</span>) -&gt; <span class="self">Self</span> {
         <span class="self">Self</span> {
             <span class="ident">content</span>: <span class="ident">other</span>.<span class="ident">content</span>,
             <span class="ident">event_id</span>: <span class="ident">other</span>.<span class="ident">event_id</span>,
@@ -661,7 +661,7 @@
 <span class="kw">impl</span> <span class="ident">TryFrom</span><span class="op">&lt;</span><span class="ident">RumaStrippedMemberEvent</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">StrippedMemberEvent</span> {
     <span class="kw">type</span> <span class="ident">Error</span> <span class="op">=</span> <span class="ident">ruma::identifiers::Error</span>;
 
-    <span class="kw">fn</span> <span class="ident">try_from</span>(<span class="ident">event</span>: <span class="ident">RumaStrippedMemberEvent</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident"><span class="self">Self</span>::Error</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">try_from</span>(<span class="ident">event</span>: <span class="ident">RumaStrippedMemberEvent</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident"><span class="self">Self</span>::Error</span><span class="op">&gt;</span> {
         <span class="prelude-val">Ok</span>(<span class="ident">StrippedMemberEvent</span> {
             <span class="ident">content</span>: <span class="ident">event</span>.<span class="ident">content</span>,
             <span class="ident">sender</span>: <span class="ident">event</span>.<span class="ident">sender</span>,
@@ -671,7 +671,7 @@
 }
 
 <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">StrippedMemberEvent</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">RumaStrippedMemberEvent</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">other</span>: <span class="ident">StrippedMemberEvent</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">other</span>: <span class="ident">StrippedMemberEvent</span>) -&gt; <span class="self">Self</span> {
         <span class="self">Self</span> {
             <span class="ident">content</span>: <span class="ident">other</span>.<span class="ident">content</span>,
             <span class="ident">sender</span>: <span class="ident">other</span>.<span class="ident">sender</span>,

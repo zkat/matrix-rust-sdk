@@ -787,41 +787,41 @@
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         <span class="ident">user_id</span>: <span class="kw-2">&amp;</span><span class="ident">UserId</span>,
         <span class="ident">device_id</span>: <span class="kw-2">&amp;</span><span class="ident">DeviceId</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ReadOnlyDevice</span><span class="op">&gt;</span>, <span class="ident">CryptoStoreError</span><span class="op">&gt;</span> {
+    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ReadOnlyDevice</span><span class="op">&gt;</span>, <span class="ident">CryptoStoreError</span><span class="op">&gt;</span> {
         <span class="prelude-val">Ok</span>(<span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">get_device</span>(<span class="ident">user_id</span>, <span class="ident">device_id</span>).<span class="kw">await</span><span class="question-mark">?</span>.<span class="ident">filter</span>(<span class="op">|</span><span class="ident">d</span><span class="op">|</span> {
-            <span class="op">!</span>(<span class="ident">d</span>.<span class="ident">user_id</span>() <span class="op">=</span><span class="op">=</span> <span class="self">self</span>.<span class="ident">account</span>.<span class="ident">user_id</span>() <span class="op">&amp;&amp;</span> <span class="ident">d</span>.<span class="ident">device_id</span>() <span class="op">=</span><span class="op">=</span> <span class="self">self</span>.<span class="ident">account</span>.<span class="ident">device_id</span>())
+            <span class="op">!</span>(<span class="ident">d</span>.<span class="ident">user_id</span>() <span class="op">==</span> <span class="self">self</span>.<span class="ident">account</span>.<span class="ident">user_id</span>() <span class="op">&amp;&amp;</span> <span class="ident">d</span>.<span class="ident">device_id</span>() <span class="op">==</span> <span class="self">self</span>.<span class="ident">account</span>.<span class="ident">device_id</span>())
         }))
     }
 
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">get_user_identity</span>(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         <span class="ident">user_id</span>: <span class="kw-2">&amp;</span><span class="ident">UserId</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ReadOnlyUserIdentities</span><span class="op">&gt;</span>, <span class="ident">CryptoStoreError</span><span class="op">&gt;</span> {
+    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ReadOnlyUserIdentities</span><span class="op">&gt;</span>, <span class="ident">CryptoStoreError</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">get_user_identity</span>(<span class="ident">user_id</span>).<span class="kw">await</span>
     }
 
-    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">save_changes</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">changes</span>: <span class="ident">Changes</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">CryptoStoreError</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">save_changes</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">changes</span>: <span class="ident">Changes</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">CryptoStoreError</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">save_changes</span>(<span class="ident">changes</span>).<span class="kw">await</span>
     }
 
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">get_user_devices</span>(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         <span class="ident">user_id</span>: <span class="kw-2">&amp;</span><span class="ident">UserId</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">HashMap</span><span class="op">&lt;</span><span class="ident">DeviceIdBox</span>, <span class="ident">ReadOnlyDevice</span><span class="op">&gt;</span>, <span class="ident">CryptoStoreError</span><span class="op">&gt;</span> {
+    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">HashMap</span><span class="op">&lt;</span><span class="ident">DeviceIdBox</span>, <span class="ident">ReadOnlyDevice</span><span class="op">&gt;</span>, <span class="ident">CryptoStoreError</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">get_user_devices</span>(<span class="ident">user_id</span>).<span class="kw">await</span>
     }
 
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">get_sessions</span>(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         <span class="ident">sender_key</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">Mutex</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Session</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span>, <span class="ident">CryptoStoreError</span><span class="op">&gt;</span> {
+    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">Mutex</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Session</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span>, <span class="ident">CryptoStoreError</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">get_sessions</span>(<span class="ident">sender_key</span>).<span class="kw">await</span>
     }
 
     <span class="doccomment">/// Get the signatures that have signed our own device.</span>
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">device_signatures</span>(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">BTreeMap</span><span class="op">&lt;</span><span class="ident">UserId</span>, <span class="ident">BTreeMap</span><span class="op">&lt;</span><span class="ident">DeviceKeyId</span>, <span class="ident">String</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span>, <span class="ident">CryptoStoreError</span><span class="op">&gt;</span> {
+    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">BTreeMap</span><span class="op">&lt;</span><span class="ident">UserId</span>, <span class="ident">BTreeMap</span><span class="op">&lt;</span><span class="ident">DeviceKeyId</span>, <span class="ident">String</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span>, <span class="ident">CryptoStoreError</span><span class="op">&gt;</span> {
         <span class="prelude-val">Ok</span>(<span class="self">self</span>
             .<span class="ident">inner</span>
             .<span class="ident">get_device</span>(<span class="self">self</span>.<span class="ident">account</span>.<span class="ident">user_id</span>(), <span class="self">self</span>.<span class="ident">account</span>.<span class="ident">device_id</span>())
@@ -829,7 +829,7 @@
             .<span class="ident">map</span>(<span class="op">|</span><span class="ident">d</span><span class="op">|</span> <span class="ident">d</span>.<span class="ident">signatures</span>().<span class="ident">to_owned</span>()))
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">inner</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="kw">dyn</span> <span class="ident">CryptoStore</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">inner</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="kw">dyn</span> <span class="ident">CryptoStore</span> {
         <span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="self">self</span>.<span class="ident">inner</span>
     }
 }
@@ -847,7 +847,7 @@
 
 <span class="kw">impl</span> <span class="ident">Verification</span> {
     <span class="doccomment">/// Try to deconstruct this verification enum into a SAS verification.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">sas_v1</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Sas</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">sas_v1</span>(<span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Sas</span><span class="op">&gt;</span> {
         <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">irrefutable_let_patterns</span>)]</span>
         <span class="kw">if</span> <span class="kw">let</span> <span class="ident">Verification::SasV1</span>(<span class="ident">sas</span>) <span class="op">=</span> <span class="self">self</span> {
             <span class="prelude-val">Some</span>(<span class="ident">sas</span>)
@@ -859,7 +859,7 @@
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;qrcode&quot;</span>)]</span>
     <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;docs&quot;</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">qrcode</span>)))]</span>
     <span class="doccomment">/// Try to deconstruct this verification enum into a QR code verification.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">qr_v1</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">QrVerification</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">qr_v1</span>(<span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">QrVerification</span><span class="op">&gt;</span> {
         <span class="kw">if</span> <span class="kw">let</span> <span class="ident">Verification::QrV1</span>(<span class="ident">qr</span>) <span class="op">=</span> <span class="self">self</span> {
             <span class="prelude-val">Some</span>(<span class="ident">qr</span>)
         } <span class="kw">else</span> {
@@ -868,62 +868,62 @@
     }
 
     <span class="doccomment">/// Has this verification finished.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_done</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_done</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
         <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">Verification::SasV1</span>(<span class="ident">s</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">s</span>.<span class="ident">is_done</span>(),
+            <span class="ident">Verification::SasV1</span>(<span class="ident">s</span>) =&gt; <span class="ident">s</span>.<span class="ident">is_done</span>(),
             <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;qrcode&quot;</span>)]</span>
-            <span class="ident">Verification::QrV1</span>(<span class="ident">qr</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">qr</span>.<span class="ident">is_done</span>(),
+            <span class="ident">Verification::QrV1</span>(<span class="ident">qr</span>) =&gt; <span class="ident">qr</span>.<span class="ident">is_done</span>(),
         }
     }
 
     <span class="doccomment">/// Get the ID that uniquely identifies this verification flow.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">flow_id</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="ident">str</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">flow_id</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">str</span> {
         <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">Verification::SasV1</span>(<span class="ident">s</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">s</span>.<span class="ident">flow_id</span>().<span class="ident">as_str</span>(),
+            <span class="ident">Verification::SasV1</span>(<span class="ident">s</span>) =&gt; <span class="ident">s</span>.<span class="ident">flow_id</span>().<span class="ident">as_str</span>(),
             <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;qrcode&quot;</span>)]</span>
-            <span class="ident">Verification::QrV1</span>(<span class="ident">qr</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">qr</span>.<span class="ident">flow_id</span>().<span class="ident">as_str</span>(),
+            <span class="ident">Verification::QrV1</span>(<span class="ident">qr</span>) =&gt; <span class="ident">qr</span>.<span class="ident">flow_id</span>().<span class="ident">as_str</span>(),
         }
     }
 
     <span class="doccomment">/// Has the verification been cancelled.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_cancelled</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_cancelled</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
         <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">Verification::SasV1</span>(<span class="ident">s</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">s</span>.<span class="ident">is_cancelled</span>(),
+            <span class="ident">Verification::SasV1</span>(<span class="ident">s</span>) =&gt; <span class="ident">s</span>.<span class="ident">is_cancelled</span>(),
             <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;qrcode&quot;</span>)]</span>
-            <span class="ident">Verification::QrV1</span>(<span class="ident">qr</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">qr</span>.<span class="ident">is_cancelled</span>(),
+            <span class="ident">Verification::QrV1</span>(<span class="ident">qr</span>) =&gt; <span class="ident">qr</span>.<span class="ident">is_cancelled</span>(),
         }
     }
 
     <span class="doccomment">/// Get our own user id that is participating in this verification.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">user_id</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="ident">UserId</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">user_id</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">UserId</span> {
         <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">Verification::SasV1</span>(<span class="ident">v</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">v</span>.<span class="ident">user_id</span>(),
+            <span class="ident">Verification::SasV1</span>(<span class="ident">v</span>) =&gt; <span class="ident">v</span>.<span class="ident">user_id</span>(),
             <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;qrcode&quot;</span>)]</span>
-            <span class="ident">Verification::QrV1</span>(<span class="ident">v</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">v</span>.<span class="ident">user_id</span>(),
+            <span class="ident">Verification::QrV1</span>(<span class="ident">v</span>) =&gt; <span class="ident">v</span>.<span class="ident">user_id</span>(),
         }
     }
 
     <span class="doccomment">/// Get the other user id that is participating in this verification.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">other_user</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="ident">UserId</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">other_user</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">UserId</span> {
         <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">Verification::SasV1</span>(<span class="ident">s</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">s</span>.<span class="ident">other_user_id</span>(),
+            <span class="ident">Verification::SasV1</span>(<span class="ident">s</span>) =&gt; <span class="ident">s</span>.<span class="ident">other_user_id</span>(),
             <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;qrcode&quot;</span>)]</span>
-            <span class="ident">Verification::QrV1</span>(<span class="ident">qr</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">qr</span>.<span class="ident">other_user_id</span>(),
+            <span class="ident">Verification::QrV1</span>(<span class="ident">qr</span>) =&gt; <span class="ident">qr</span>.<span class="ident">other_user_id</span>(),
         }
     }
 
     <span class="doccomment">/// Is this a verification verifying a device that belongs to us.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_self_verification</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_self_verification</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
         <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">Verification::SasV1</span>(<span class="ident">v</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">v</span>.<span class="ident">is_self_verification</span>(),
+            <span class="ident">Verification::SasV1</span>(<span class="ident">v</span>) =&gt; <span class="ident">v</span>.<span class="ident">is_self_verification</span>(),
             <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;qrcode&quot;</span>)]</span>
-            <span class="ident">Verification::QrV1</span>(<span class="ident">v</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">v</span>.<span class="ident">is_self_verification</span>(),
+            <span class="ident">Verification::QrV1</span>(<span class="ident">v</span>) =&gt; <span class="ident">v</span>.<span class="ident">is_self_verification</span>(),
         }
     }
 }
 
 <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">Sas</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Verification</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">sas</span>: <span class="ident">Sas</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">sas</span>: <span class="ident">Sas</span>) -&gt; <span class="self">Self</span> {
         <span class="ident"><span class="self">Self</span>::SasV1</span>(<span class="ident">sas</span>)
     }
 }
@@ -931,7 +931,7 @@
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;qrcode&quot;</span>)]</span>
 <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;docs&quot;</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">qrcode</span>)))]</span>
 <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">QrVerification</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Verification</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">qr</span>: <span class="ident">QrVerification</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">qr</span>: <span class="ident">QrVerification</span>) -&gt; <span class="self">Self</span> {
         <span class="ident"><span class="self">Self</span>::QrV1</span>(<span class="ident">qr</span>)
     }
 }
@@ -948,13 +948,13 @@
 }
 
 <span class="kw">impl</span> <span class="ident">Done</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">as_content</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">flow_id</span>: <span class="kw-2">&amp;</span><span class="ident">FlowId</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">OutgoingContent</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">as_content</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">flow_id</span>: <span class="kw-2">&amp;</span><span class="ident">FlowId</span>) -&gt; <span class="ident">OutgoingContent</span> {
         <span class="kw">match</span> <span class="ident">flow_id</span> {
-            <span class="ident">FlowId::ToDevice</span>(<span class="ident">t</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">AnyToDeviceEventContent::KeyVerificationDone</span>(
+            <span class="ident">FlowId::ToDevice</span>(<span class="ident">t</span>) =&gt; <span class="ident">AnyToDeviceEventContent::KeyVerificationDone</span>(
                 <span class="ident">ToDeviceDoneEventContent::new</span>(<span class="ident">t</span>.<span class="ident">to_owned</span>()),
             )
             .<span class="ident">into</span>(),
-            <span class="ident">FlowId::InRoom</span>(<span class="ident">r</span>, <span class="ident">e</span>) <span class="op">=</span><span class="op">&gt;</span> (
+            <span class="ident">FlowId::InRoom</span>(<span class="ident">r</span>, <span class="ident">e</span>) =&gt; (
                 <span class="ident">r</span>.<span class="ident">to_owned</span>(),
                 <span class="ident">AnyMessageEventContent::KeyVerificationDone</span>(<span class="ident">DoneEventContent::new</span>(<span class="ident">Relation::new</span>(
                     <span class="ident">e</span>.<span class="ident">to_owned</span>(),
@@ -976,23 +976,23 @@
 
 <span class="kw">impl</span> <span class="ident">CancelInfo</span> {
     <span class="doccomment">/// Get the human readable reason of the cancellation.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">reason</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">reason</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span> {
         <span class="self">self</span>.<span class="ident">reason</span>
     }
 
     <span class="doccomment">/// Get the `CancelCode` that cancelled this verification.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">cancel_code</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="ident">CancelCode</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">cancel_code</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">CancelCode</span> {
         <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">cancel_code</span>
     }
 
     <span class="doccomment">/// Was the verification cancelled by us?</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">cancelled_by_us</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">cancelled_by_us</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
         <span class="self">self</span>.<span class="ident">cancelled_by_us</span>
     }
 }
 
 <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">Cancelled</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">CancelInfo</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">c</span>: <span class="ident">Cancelled</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">c</span>: <span class="ident">Cancelled</span>) -&gt; <span class="self">Self</span> {
         <span class="self">Self</span> { <span class="ident">cancelled_by_us</span>: <span class="ident">c</span>.<span class="ident">cancelled_by_us</span>, <span class="ident">cancel_code</span>: <span class="ident">c</span>.<span class="ident">cancel_code</span>, <span class="ident">reason</span>: <span class="ident">c</span>.<span class="ident">reason</span> }
     }
 }
@@ -1005,32 +1005,32 @@
 }
 
 <span class="kw">impl</span> <span class="ident">Cancelled</span> {
-    <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">cancelled_by_us</span>: <span class="ident">bool</span>, <span class="ident">code</span>: <span class="ident">CancelCode</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">cancelled_by_us</span>: <span class="ident">bool</span>, <span class="ident">code</span>: <span class="ident">CancelCode</span>) -&gt; <span class="self">Self</span> {
         <span class="kw">let</span> <span class="ident">reason</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">code</span> {
-            <span class="ident">CancelCode::Accepted</span> <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">CancelCode::Accepted</span> =&gt; {
                 <span class="string">&quot;A m.key.verification.request was accepted by a different device.&quot;</span>
             }
-            <span class="ident">CancelCode::InvalidMessage</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;The received message was invalid.&quot;</span>,
-            <span class="ident">CancelCode::KeyMismatch</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;The expected key did not match the verified one&quot;</span>,
-            <span class="ident">CancelCode::Timeout</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;The verification process timed out.&quot;</span>,
-            <span class="ident">CancelCode::UnexpectedMessage</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;The device received an unexpected message.&quot;</span>,
-            <span class="ident">CancelCode::UnknownMethod</span> <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">CancelCode::InvalidMessage</span> =&gt; <span class="string">&quot;The received message was invalid.&quot;</span>,
+            <span class="ident">CancelCode::KeyMismatch</span> =&gt; <span class="string">&quot;The expected key did not match the verified one&quot;</span>,
+            <span class="ident">CancelCode::Timeout</span> =&gt; <span class="string">&quot;The verification process timed out.&quot;</span>,
+            <span class="ident">CancelCode::UnexpectedMessage</span> =&gt; <span class="string">&quot;The device received an unexpected message.&quot;</span>,
+            <span class="ident">CancelCode::UnknownMethod</span> =&gt; {
                 <span class="string">&quot;The device does not know how to handle the requested method.&quot;</span>
             }
-            <span class="ident">CancelCode::UnknownTransaction</span> <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">CancelCode::UnknownTransaction</span> =&gt; {
                 <span class="string">&quot;The device does not know about the given transaction ID.&quot;</span>
             }
-            <span class="ident">CancelCode::User</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;The user cancelled the verification.&quot;</span>,
-            <span class="ident">CancelCode::UserMismatch</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;The expected user did not match the verified user&quot;</span>,
-            <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;Unknown cancel reason&quot;</span>,
+            <span class="ident">CancelCode::User</span> =&gt; <span class="string">&quot;The user cancelled the verification.&quot;</span>,
+            <span class="ident">CancelCode::UserMismatch</span> =&gt; <span class="string">&quot;The expected user did not match the verified user&quot;</span>,
+            <span class="kw">_</span> =&gt; <span class="string">&quot;Unknown cancel reason&quot;</span>,
         };
 
         <span class="self">Self</span> { <span class="ident">cancelled_by_us</span>, <span class="ident">cancel_code</span>: <span class="ident">code</span>, <span class="ident">reason</span> }
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">as_content</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">flow_id</span>: <span class="kw-2">&amp;</span><span class="ident">FlowId</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">OutgoingContent</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">as_content</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">flow_id</span>: <span class="kw-2">&amp;</span><span class="ident">FlowId</span>) -&gt; <span class="ident">OutgoingContent</span> {
         <span class="kw">match</span> <span class="ident">flow_id</span> {
-            <span class="ident">FlowId::ToDevice</span>(<span class="ident">s</span>) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">FlowId::ToDevice</span>(<span class="ident">s</span>) =&gt; {
                 <span class="ident">AnyToDeviceEventContent::KeyVerificationCancel</span>(<span class="ident">ToDeviceCancelEventContent::new</span>(
                     <span class="ident">s</span>.<span class="ident">clone</span>(),
                     <span class="self">self</span>.<span class="ident">reason</span>.<span class="ident">to_string</span>(),
@@ -1039,7 +1039,7 @@
                 .<span class="ident">into</span>()
             }
 
-            <span class="ident">FlowId::InRoom</span>(<span class="ident">r</span>, <span class="ident">e</span>) <span class="op">=</span><span class="op">&gt;</span> (
+            <span class="ident">FlowId::InRoom</span>(<span class="ident">r</span>, <span class="ident">e</span>) =&gt; (
                 <span class="ident">r</span>.<span class="ident">clone</span>(),
                 <span class="ident">AnyMessageEventContent::KeyVerificationCancel</span>(<span class="ident">CancelEventContent::new</span>(
                     <span class="self">self</span>.<span class="ident">reason</span>.<span class="ident">to_string</span>(),
@@ -1059,7 +1059,7 @@
 }
 
 <span class="kw">impl</span> <span class="ident">FlowId</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">room_id</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">RoomId</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">room_id</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">RoomId</span><span class="op">&gt;</span> {
         <span class="kw">if</span> <span class="kw">let</span> <span class="ident">FlowId::InRoom</span>(<span class="ident">r</span>, <span class="kw">_</span>) <span class="op">=</span> <span class="kw-2">&amp;</span><span class="self">self</span> {
             <span class="prelude-val">Some</span>(<span class="ident">r</span>)
         } <span class="kw">else</span> {
@@ -1067,28 +1067,28 @@
         }
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">as_str</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="ident">str</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">as_str</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">str</span> {
         <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">FlowId::InRoom</span>(<span class="kw">_</span>, <span class="ident">r</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">r</span>.<span class="ident">as_str</span>(),
-            <span class="ident">FlowId::ToDevice</span>(<span class="ident">t</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">t</span>.<span class="ident">as_str</span>(),
+            <span class="ident">FlowId::InRoom</span>(<span class="kw">_</span>, <span class="ident">r</span>) =&gt; <span class="ident">r</span>.<span class="ident">as_str</span>(),
+            <span class="ident">FlowId::ToDevice</span>(<span class="ident">t</span>) =&gt; <span class="ident">t</span>.<span class="ident">as_str</span>(),
         }
     }
 }
 
 <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">FlowId</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">transaction_id</span>: <span class="ident">String</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">transaction_id</span>: <span class="ident">String</span>) -&gt; <span class="self">Self</span> {
         <span class="ident">FlowId::ToDevice</span>(<span class="ident">transaction_id</span>)
     }
 }
 
 <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span>(<span class="ident">RoomId</span>, <span class="ident">EventId</span>)<span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">FlowId</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">ids</span>: (<span class="ident">RoomId</span>, <span class="ident">EventId</span>)) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">ids</span>: (<span class="ident">RoomId</span>, <span class="ident">EventId</span>)) -&gt; <span class="self">Self</span> {
         <span class="ident">FlowId::InRoom</span>(<span class="ident">ids</span>.<span class="number">0</span>, <span class="ident">ids</span>.<span class="number">1</span>)
     }
 }
 
 <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span>(<span class="kw-2">&amp;</span><span class="ident">RoomId</span>, <span class="kw-2">&amp;</span><span class="ident">EventId</span>)<span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">FlowId</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">ids</span>: (<span class="kw-2">&amp;</span><span class="ident">RoomId</span>, <span class="kw-2">&amp;</span><span class="ident">EventId</span>)) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">ids</span>: (<span class="kw-2">&amp;</span><span class="ident">RoomId</span>, <span class="kw-2">&amp;</span><span class="ident">EventId</span>)) -&gt; <span class="self">Self</span> {
         <span class="ident">FlowId::InRoom</span>(<span class="ident">ids</span>.<span class="number">0</span>.<span class="ident">to_owned</span>(), <span class="ident">ids</span>.<span class="number">1</span>.<span class="ident">to_owned</span>())
     }
 }
@@ -1114,27 +1114,27 @@
 
 <span class="kw">impl</span> <span class="ident">IdentitiesBeingVerified</span> {
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;qrcode&quot;</span>)]</span>
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">can_sign_devices</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">can_sign_devices</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
         <span class="self">self</span>.<span class="ident">private_identity</span>.<span class="ident">can_sign_devices</span>().<span class="kw">await</span>
     }
 
-    <span class="kw">fn</span> <span class="ident">user_id</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="ident">UserId</span> {
+    <span class="kw">fn</span> <span class="ident">user_id</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">UserId</span> {
         <span class="self">self</span>.<span class="ident">private_identity</span>.<span class="ident">user_id</span>()
     }
 
-    <span class="kw">fn</span> <span class="ident">is_self_verification</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">user_id</span>() <span class="op">=</span><span class="op">=</span> <span class="self">self</span>.<span class="ident">other_user_id</span>()
+    <span class="kw">fn</span> <span class="ident">is_self_verification</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
+        <span class="self">self</span>.<span class="ident">user_id</span>() <span class="op">==</span> <span class="self">self</span>.<span class="ident">other_user_id</span>()
     }
 
-    <span class="kw">fn</span> <span class="ident">other_user_id</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="ident">UserId</span> {
+    <span class="kw">fn</span> <span class="ident">other_user_id</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">UserId</span> {
         <span class="self">self</span>.<span class="ident">device_being_verified</span>.<span class="ident">user_id</span>()
     }
 
-    <span class="kw">fn</span> <span class="ident">other_device_id</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="ident">DeviceId</span> {
+    <span class="kw">fn</span> <span class="ident">other_device_id</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">DeviceId</span> {
         <span class="self">self</span>.<span class="ident">device_being_verified</span>.<span class="ident">device_id</span>()
     }
 
-    <span class="kw">fn</span> <span class="ident">other_device</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="ident">ReadOnlyDevice</span> {
+    <span class="kw">fn</span> <span class="ident">other_device</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">ReadOnlyDevice</span> {
         <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">device_being_verified</span>
     }
 
@@ -1142,7 +1142,7 @@
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         <span class="ident">verified_devices</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span>[<span class="ident">ReadOnlyDevice</span>]<span class="op">&gt;</span>,
         <span class="ident">verified_identities</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span>[<span class="ident">ReadOnlyUserIdentities</span>]<span class="op">&gt;</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">VerificationResult</span>, <span class="ident">CryptoStoreError</span><span class="op">&gt;</span> {
+    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">VerificationResult</span>, <span class="ident">CryptoStoreError</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">device</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">mark_device_as_verified</span>(<span class="ident">verified_devices</span>).<span class="kw">await</span><span class="question-mark">?</span>;
         <span class="kw">let</span> (<span class="ident">identity</span>, <span class="ident">should_request_secrets</span>) <span class="op">=</span>
             <span class="self">self</span>.<span class="ident">mark_identity_as_verified</span>(<span class="ident">verified_identities</span>).<span class="kw">await</span><span class="question-mark">?</span>;
@@ -1157,10 +1157,10 @@
 
         <span class="kw">let</span> <span class="ident">signature_request</span> <span class="op">=</span> <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">device</span>) <span class="op">=</span> <span class="ident">device</span> {
             <span class="comment">// We only sign devices of our own user here.</span>
-            <span class="kw">let</span> <span class="ident">signature_request</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">device</span>.<span class="ident">user_id</span>() <span class="op">=</span><span class="op">=</span> <span class="self">self</span>.<span class="ident">user_id</span>() {
+            <span class="kw">let</span> <span class="ident">signature_request</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">device</span>.<span class="ident">user_id</span>() <span class="op">==</span> <span class="self">self</span>.<span class="ident">user_id</span>() {
                 <span class="kw">match</span> <span class="self">self</span>.<span class="ident">private_identity</span>.<span class="ident">sign_device</span>(<span class="kw-2">&amp;</span><span class="ident">device</span>).<span class="kw">await</span> {
-                    <span class="prelude-val">Ok</span>(<span class="ident">r</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="ident">r</span>),
-                    <span class="prelude-val">Err</span>(<span class="ident">SignatureError::MissingSigningKey</span>) <span class="op">=</span><span class="op">&gt;</span> {
+                    <span class="prelude-val">Ok</span>(<span class="ident">r</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">r</span>),
+                    <span class="prelude-val">Err</span>(<span class="ident">SignatureError::MissingSigningKey</span>) =&gt; {
                         <span class="macro">warn!</span>(
                             <span class="string">&quot;Can&#39;t sign the device keys for {} {}, \
                                   no private device signing key found&quot;</span>,
@@ -1170,7 +1170,7 @@
 
                         <span class="prelude-val">None</span>
                     }
-                    <span class="prelude-val">Err</span>(<span class="ident">e</span>) <span class="op">=</span><span class="op">&gt;</span> {
+                    <span class="prelude-val">Err</span>(<span class="ident">e</span>) =&gt; {
                         <span class="macro">error!</span>(
                             <span class="string">&quot;Error signing device keys for {} {} {:?}&quot;</span>,
                             <span class="ident">device</span>.<span class="ident">user_id</span>(),
@@ -1195,8 +1195,8 @@
             <span class="kw">let</span> <span class="ident">request</span> <span class="op">=</span> <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">i</span>) <span class="op">=</span> <span class="ident">i</span>.<span class="ident">other</span>() {
                 <span class="comment">// Signing can fail if the user signing key is missing.</span>
                 <span class="kw">match</span> <span class="self">self</span>.<span class="ident">private_identity</span>.<span class="ident">sign_user</span>(<span class="ident">i</span>).<span class="kw">await</span> {
-                    <span class="prelude-val">Ok</span>(<span class="ident">r</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="ident">r</span>),
-                    <span class="prelude-val">Err</span>(<span class="ident">SignatureError::MissingSigningKey</span>) <span class="op">=</span><span class="op">&gt;</span> {
+                    <span class="prelude-val">Ok</span>(<span class="ident">r</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">r</span>),
+                    <span class="prelude-val">Err</span>(<span class="ident">SignatureError::MissingSigningKey</span>) =&gt; {
                         <span class="macro">warn!</span>(
                             <span class="string">&quot;Can&#39;t sign the public cross signing keys for {}, \
                               no private user signing key found&quot;</span>,
@@ -1204,7 +1204,7 @@
                         );
                         <span class="prelude-val">None</span>
                     }
-                    <span class="prelude-val">Err</span>(<span class="ident">e</span>) <span class="op">=</span><span class="op">&gt;</span> {
+                    <span class="prelude-val">Err</span>(<span class="ident">e</span>) =&gt; {
                         <span class="macro">error!</span>(
                             <span class="string">&quot;Error signing the public cross signing keys for {} {:?}&quot;</span>,
                             <span class="ident">i</span>.<span class="ident">user_id</span>(),
@@ -1252,7 +1252,7 @@
             .<span class="ident">unwrap_or</span>(<span class="ident">VerificationResult::Ok</span>))
     }
 
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">request_missing_secrets</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">GossipRequest</span><span class="op">&gt;</span> {
+    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">request_missing_secrets</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">GossipRequest</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">secrets</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">private_identity</span>.<span class="ident">get_missing_secrets</span>().<span class="kw">await</span>;
         <span class="ident">GossipMachine::request_missing_secrets</span>(<span class="self">self</span>.<span class="ident">user_id</span>(), <span class="ident">secrets</span>)
     }
@@ -1260,7 +1260,7 @@
     <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">mark_identity_as_verified</span>(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         <span class="ident">verified_identities</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span>[<span class="ident">ReadOnlyUserIdentities</span>]<span class="op">&gt;</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(<span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ReadOnlyUserIdentities</span><span class="op">&gt;</span>, <span class="ident">bool</span>), <span class="ident">CryptoStoreError</span><span class="op">&gt;</span> {
+    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(<span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ReadOnlyUserIdentities</span><span class="op">&gt;</span>, <span class="ident">bool</span>), <span class="ident">CryptoStoreError</span><span class="op">&gt;</span> {
         <span class="comment">// If there wasn&#39;t an identity available during the verification flow</span>
         <span class="comment">// return early as there&#39;s nothing to do.</span>
         <span class="kw">if</span> <span class="self">self</span>.<span class="ident">identity_being_verified</span>.<span class="ident">is_none</span>() {
@@ -1273,7 +1273,7 @@
             <span class="kw">if</span> <span class="self">self</span>
                 .<span class="ident">identity_being_verified</span>
                 .<span class="ident">as_ref</span>()
-                .<span class="ident">map_or</span>(<span class="bool-val">false</span>, <span class="op">|</span><span class="ident">i</span><span class="op">|</span> <span class="ident">i</span>.<span class="ident">master_key</span>() <span class="op">=</span><span class="op">=</span> <span class="ident">identity</span>.<span class="ident">master_key</span>())
+                .<span class="ident">map_or</span>(<span class="bool-val">false</span>, <span class="op">|</span><span class="ident">i</span><span class="op">|</span> <span class="ident">i</span>.<span class="ident">master_key</span>() <span class="op">==</span> <span class="ident">identity</span>.<span class="ident">master_key</span>())
             {
                 <span class="kw">if</span> <span class="ident">verified_identities</span>.<span class="ident">map_or</span>(<span class="bool-val">false</span>, <span class="op">|</span><span class="ident">i</span><span class="op">|</span> <span class="ident">i</span>.<span class="ident">contains</span>(<span class="kw-2">&amp;</span><span class="ident">identity</span>)) {
                     <span class="macro">trace!</span>(
@@ -1321,11 +1321,11 @@
     <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">mark_device_as_verified</span>(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         <span class="ident">verified_devices</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span>[<span class="ident">ReadOnlyDevice</span>]<span class="op">&gt;</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ReadOnlyDevice</span><span class="op">&gt;</span>, <span class="ident">CryptoStoreError</span><span class="op">&gt;</span> {
+    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ReadOnlyDevice</span><span class="op">&gt;</span>, <span class="ident">CryptoStoreError</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">device</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">store</span>.<span class="ident">get_device</span>(<span class="self">self</span>.<span class="ident">other_user_id</span>(), <span class="self">self</span>.<span class="ident">other_device_id</span>()).<span class="kw">await</span><span class="question-mark">?</span>;
 
         <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">device</span>) <span class="op">=</span> <span class="ident">device</span> {
-            <span class="kw">if</span> <span class="ident">device</span>.<span class="ident">keys</span>() <span class="op">=</span><span class="op">=</span> <span class="self">self</span>.<span class="ident">device_being_verified</span>.<span class="ident">keys</span>() {
+            <span class="kw">if</span> <span class="ident">device</span>.<span class="ident">keys</span>() <span class="op">==</span> <span class="self">self</span>.<span class="ident">device_being_verified</span>.<span class="ident">keys</span>() {
                 <span class="kw">if</span> <span class="ident">verified_devices</span>.<span class="ident">map_or</span>(<span class="bool-val">false</span>, <span class="op">|</span><span class="ident">v</span><span class="op">|</span> <span class="ident">v</span>.<span class="ident">contains</span>(<span class="kw-2">&amp;</span><span class="ident">device</span>)) {
                     <span class="macro">trace!</span>(
                         <span class="ident">user_id</span> <span class="op">=</span> <span class="ident">device</span>.<span class="ident">user_id</span>().<span class="ident">as_str</span>(),
@@ -1388,7 +1388,7 @@
     <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">request_to_event</span>(
         <span class="ident">sender</span>: <span class="kw-2">&amp;</span><span class="ident">UserId</span>,
         <span class="ident">request</span>: <span class="kw-2">&amp;</span><span class="ident">OutgoingVerificationRequest</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">AnyToDeviceEvent</span> {
+    ) -&gt; <span class="ident">AnyToDeviceEvent</span> {
         <span class="kw">let</span> <span class="ident">content</span> <span class="op">=</span>
             <span class="ident">request</span>.<span class="ident">to_owned</span>().<span class="ident">try_into</span>().<span class="ident">expect</span>(<span class="string">&quot;Can&#39;t fetch content out of the request&quot;</span>);
         <span class="ident">wrap_any_to_device_content</span>(<span class="ident">sender</span>, <span class="ident">content</span>)
@@ -1397,46 +1397,46 @@
     <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">outgoing_request_to_event</span>(
         <span class="ident">sender</span>: <span class="kw-2">&amp;</span><span class="ident">UserId</span>,
         <span class="ident">request</span>: <span class="kw-2">&amp;</span><span class="ident">OutgoingRequest</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">AnyToDeviceEvent</span> {
+    ) -&gt; <span class="ident">AnyToDeviceEvent</span> {
         <span class="kw">match</span> <span class="ident">request</span>.<span class="ident">request</span>() {
-            <span class="ident">OutgoingRequests::ToDeviceRequest</span>(<span class="ident">r</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">request_to_event</span>(<span class="ident">sender</span>, <span class="kw-2">&amp;</span><span class="ident">r</span>.<span class="ident">clone</span>().<span class="ident">into</span>()),
-            <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">panic!</span>(<span class="string">&quot;Unsupported outgoing request&quot;</span>),
+            <span class="ident">OutgoingRequests::ToDeviceRequest</span>(<span class="ident">r</span>) =&gt; <span class="ident">request_to_event</span>(<span class="ident">sender</span>, <span class="kw-2">&amp;</span><span class="ident">r</span>.<span class="ident">clone</span>().<span class="ident">into</span>()),
+            <span class="kw">_</span> =&gt; <span class="macro">panic!</span>(<span class="string">&quot;Unsupported outgoing request&quot;</span>),
         }
     }
 
     <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">wrap_any_to_device_content</span>(
         <span class="ident">sender</span>: <span class="kw-2">&amp;</span><span class="ident">UserId</span>,
         <span class="ident">content</span>: <span class="ident">OutgoingContent</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">AnyToDeviceEvent</span> {
+    ) -&gt; <span class="ident">AnyToDeviceEvent</span> {
         <span class="kw">let</span> <span class="ident">content</span> <span class="op">=</span> <span class="kw">if</span> <span class="kw">let</span> <span class="ident">OutgoingContent::ToDevice</span>(<span class="ident">c</span>) <span class="op">=</span> <span class="ident">content</span> { <span class="ident">c</span> } <span class="kw">else</span> { <span class="macro">unreachable!</span>() };
 
         <span class="kw">match</span> <span class="ident">content</span> {
-            <span class="ident">AnyToDeviceEventContent::KeyVerificationKey</span>(<span class="ident">c</span>) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">AnyToDeviceEventContent::KeyVerificationKey</span>(<span class="ident">c</span>) =&gt; {
                 <span class="ident">AnyToDeviceEvent::KeyVerificationKey</span>(<span class="ident">ToDeviceEvent</span> {
                     <span class="ident">sender</span>: <span class="ident">sender</span>.<span class="ident">clone</span>(),
                     <span class="ident">content</span>: <span class="ident">c</span>,
                 })
             }
-            <span class="ident">AnyToDeviceEventContent::KeyVerificationStart</span>(<span class="ident">c</span>) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">AnyToDeviceEventContent::KeyVerificationStart</span>(<span class="ident">c</span>) =&gt; {
                 <span class="ident">AnyToDeviceEvent::KeyVerificationStart</span>(<span class="ident">ToDeviceEvent</span> {
                     <span class="ident">sender</span>: <span class="ident">sender</span>.<span class="ident">clone</span>(),
                     <span class="ident">content</span>: <span class="ident">c</span>,
                 })
             }
-            <span class="ident">AnyToDeviceEventContent::KeyVerificationAccept</span>(<span class="ident">c</span>) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">AnyToDeviceEventContent::KeyVerificationAccept</span>(<span class="ident">c</span>) =&gt; {
                 <span class="ident">AnyToDeviceEvent::KeyVerificationAccept</span>(<span class="ident">ToDeviceEvent</span> {
                     <span class="ident">sender</span>: <span class="ident">sender</span>.<span class="ident">clone</span>(),
                     <span class="ident">content</span>: <span class="ident">c</span>,
                 })
             }
-            <span class="ident">AnyToDeviceEventContent::KeyVerificationMac</span>(<span class="ident">c</span>) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">AnyToDeviceEventContent::KeyVerificationMac</span>(<span class="ident">c</span>) =&gt; {
                 <span class="ident">AnyToDeviceEvent::KeyVerificationMac</span>(<span class="ident">ToDeviceEvent</span> {
                     <span class="ident">sender</span>: <span class="ident">sender</span>.<span class="ident">clone</span>(),
                     <span class="ident">content</span>: <span class="ident">c</span>,
                 })
             }
 
-            <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">unreachable!</span>(),
+            <span class="kw">_</span> =&gt; <span class="macro">unreachable!</span>(),
         }
     }
 }

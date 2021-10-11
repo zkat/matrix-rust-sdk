@@ -3633,12 +3633,12 @@
 <span class="kw">const</span> <span class="ident">MIN_UPLOAD_REQUEST_TIMEOUT</span>: <span class="ident">Duration</span> <span class="op">=</span> <span class="ident">Duration::from_secs</span>(<span class="number">60</span> <span class="op">*</span> <span class="number">5</span>);
 
 <span class="kw">type</span> <span class="ident">EventHandlerFut</span> <span class="op">=</span> <span class="ident">Pin</span><span class="op">&lt;</span><span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">Future</span><span class="op">&lt;</span><span class="ident">Output</span> <span class="op">=</span> ()<span class="op">&gt;</span> <span class="op">+</span> <span class="ident">Send</span><span class="op">&gt;</span><span class="op">&gt;</span>;
-<span class="kw">type</span> <span class="ident">EventHandlerFn</span> <span class="op">=</span> <span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">Fn</span>(<span class="ident">EventHandlerData</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">EventHandlerFut</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span><span class="op">&gt;</span>;
+<span class="kw">type</span> <span class="ident">EventHandlerFn</span> <span class="op">=</span> <span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">Fn</span>(<span class="ident">EventHandlerData</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">EventHandlerFut</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span><span class="op">&gt;</span>;
 <span class="kw">type</span> <span class="ident">EventHandlerMap</span> <span class="op">=</span> <span class="ident">BTreeMap</span><span class="op">&lt;</span>(<span class="ident">EventKind</span>, <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>), <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">EventHandlerFn</span><span class="op">&gt;</span><span class="op">&gt;</span>;
 
 <span class="kw">type</span> <span class="ident">NotificationHandlerFut</span> <span class="op">=</span> <span class="ident">EventHandlerFut</span>;
 <span class="kw">type</span> <span class="ident">NotificationHandlerFn</span> <span class="op">=</span>
-    <span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">Fn</span>(<span class="ident">Notification</span>, <span class="ident">room::Room</span>, <span class="ident">Client</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">NotificationHandlerFut</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span><span class="op">&gt;</span>;
+    <span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">Fn</span>(<span class="ident">Notification</span>, <span class="ident">room::Room</span>, <span class="ident">Client</span>) -&gt; <span class="ident">NotificationHandlerFut</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span><span class="op">&gt;</span>;
 
 <span class="doccomment">/// Enum controlling if a loop running callbacks should continue or abort.</span>
 <span class="doccomment">///</span>
@@ -3692,7 +3692,7 @@
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">tarpaulin_include</span>))]</span>
 <span class="kw">impl</span> <span class="ident">Debug</span> <span class="kw">for</span> <span class="ident">Client</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">fmt</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">StdResult</span><span class="op">&lt;</span>(), <span class="ident">fmt::Error</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">fmt</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">StdResult</span><span class="op">&lt;</span>(), <span class="ident">fmt::Error</span><span class="op">&gt;</span> {
         <span class="macro">write!</span>(<span class="ident">fmt</span>, <span class="string">&quot;Client&quot;</span>)
     }
 }
@@ -3703,7 +3703,7 @@
     <span class="doccomment">/// # Arguments</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// * `homeserver_url` - The homeserver that the client should connect to.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">homeserver_url</span>: <span class="ident">Url</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">homeserver_url</span>: <span class="ident">Url</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">config</span> <span class="op">=</span> <span class="ident">ClientConfig::new</span>();
         <span class="ident">Client::new_with_config</span>(<span class="ident">homeserver_url</span>, <span class="ident">config</span>)
     }
@@ -3716,7 +3716,7 @@
     <span class="doccomment">/// * `homeserver_url` - The homeserver that the client should connect to.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// * `config` - Configuration for the client.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new_with_config</span>(<span class="ident">homeserver_url</span>: <span class="ident">Url</span>, <span class="ident">config</span>: <span class="ident">ClientConfig</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new_with_config</span>(<span class="ident">homeserver_url</span>: <span class="ident">Url</span>, <span class="ident">config</span>: <span class="ident">ClientConfig</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">homeserver</span> <span class="op">=</span> <span class="ident">Arc::new</span>(<span class="ident">RwLock::new</span>(<span class="ident">homeserver_url</span>));
 
         <span class="kw">let</span> <span class="ident">client</span> <span class="op">=</span> <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">client</span>) <span class="op">=</span> <span class="ident">config</span>.<span class="ident">client</span> {
@@ -3778,7 +3778,7 @@
     <span class="doccomment">/// ```</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// [spec]: https://spec.matrix.org/unstable/client-server-api/#well-known-uri</span>
-    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">new_from_user_id</span>(<span class="ident">user_id</span>: <span class="kw-2">&amp;</span><span class="ident">UserId</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">new_from_user_id</span>(<span class="ident">user_id</span>: <span class="kw-2">&amp;</span><span class="ident">UserId</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">config</span> <span class="op">=</span> <span class="ident">ClientConfig::new</span>();
         <span class="ident">Client::new_from_user_id_with_config</span>(<span class="ident">user_id</span>, <span class="ident">config</span>).<span class="kw">await</span>
     }
@@ -3800,7 +3800,7 @@
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">new_from_user_id_with_config</span>(
         <span class="ident">user_id</span>: <span class="kw-2">&amp;</span><span class="ident">UserId</span>,
         <span class="ident">config</span>: <span class="ident">ClientConfig</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
+    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">homeserver</span> <span class="op">=</span> <span class="ident">Client::homeserver_from_user_id</span>(<span class="ident">user_id</span>)<span class="question-mark">?</span>;
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">client</span> <span class="op">=</span> <span class="ident">Client::new_with_config</span>(<span class="ident">homeserver</span>, <span class="ident">config</span>)<span class="question-mark">?</span>;
 
@@ -3811,7 +3811,7 @@
         <span class="prelude-val">Ok</span>(<span class="ident">client</span>)
     }
 
-    <span class="kw">fn</span> <span class="ident">homeserver_from_user_id</span>(<span class="ident">user_id</span>: <span class="kw-2">&amp;</span><span class="ident">UserId</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Url</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">homeserver_from_user_id</span>(<span class="ident">user_id</span>: <span class="kw-2">&amp;</span><span class="ident">UserId</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Url</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">homeserver</span> <span class="op">=</span> <span class="macro">format!</span>(<span class="string">&quot;https://{}&quot;</span>, <span class="ident">user_id</span>.<span class="ident">server_name</span>());
         <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">unused_mut</span>)]</span>
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">result</span> <span class="op">=</span> <span class="ident">Url::parse</span>(<span class="ident">homeserver</span>.<span class="ident">as_str</span>())<span class="question-mark">?</span>;
@@ -3822,7 +3822,7 @@
         <span class="prelude-val">Ok</span>(<span class="ident">result</span>)
     }
 
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">discover_homeserver</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">HttpResult</span><span class="op">&lt;</span><span class="ident">discover_homeserver::Response</span><span class="op">&gt;</span> {
+    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">discover_homeserver</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">HttpResult</span><span class="op">&lt;</span><span class="ident">discover_homeserver::Response</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">send</span>(<span class="ident">discover_homeserver::Request::new</span>(), <span class="prelude-val">Some</span>(<span class="ident">RequestConfig::new</span>().<span class="ident">disable_retry</span>()))
             .<span class="kw">await</span>
     }
@@ -3837,7 +3837,7 @@
         <span class="kw-2">*</span><span class="ident">homeserver</span> <span class="op">=</span> <span class="ident">homeserver_url</span>;
     }
 
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">get_supported_versions</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">HttpResult</span><span class="op">&lt;</span><span class="ident">get_supported_versions::Response</span><span class="op">&gt;</span> {
+    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">get_supported_versions</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">HttpResult</span><span class="op">&lt;</span><span class="ident">get_supported_versions::Response</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">send</span>(
             <span class="ident">get_supported_versions::Request::new</span>(),
             <span class="prelude-val">Some</span>(<span class="ident">RequestConfig::new</span>().<span class="ident">disable_retry</span>()),
@@ -3858,7 +3858,7 @@
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">receive_transaction</span>(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         <span class="ident">incoming_transaction</span>: <span class="ident">ruma::api::appservice::event::push_events::v1::IncomingRequest</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">txn_id</span> <span class="op">=</span> <span class="ident">incoming_transaction</span>.<span class="ident">txn_id</span>.<span class="ident">clone</span>();
         <span class="kw">let</span> <span class="ident">response</span> <span class="op">=</span> <span class="ident">incoming_transaction</span>.<span class="ident">try_into_sync_response</span>(<span class="ident">txn_id</span>)<span class="question-mark">?</span>;
         <span class="self">self</span>.<span class="ident">process_sync</span>(<span class="ident">response</span>).<span class="kw">await</span><span class="question-mark">?</span>;
@@ -3867,23 +3867,23 @@
     }
 
     <span class="doccomment">/// Is the client logged in.</span>
-    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">logged_in</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">logged_in</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
         <span class="self">self</span>.<span class="ident">base_client</span>.<span class="ident">logged_in</span>().<span class="kw">await</span>
     }
 
     <span class="doccomment">/// The Homeserver of the client.</span>
-    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">homeserver</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Url</span> {
+    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">homeserver</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Url</span> {
         <span class="self">self</span>.<span class="ident">homeserver</span>.<span class="ident">read</span>().<span class="kw">await</span>.<span class="ident">clone</span>()
     }
 
     <span class="doccomment">/// Get the user id of the current owner of the client.</span>
-    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">user_id</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">UserId</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">user_id</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">UserId</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">session</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">base_client</span>.<span class="ident">session</span>().<span class="ident">read</span>().<span class="kw">await</span>;
         <span class="ident">session</span>.<span class="ident">as_ref</span>().<span class="ident">cloned</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">s</span><span class="op">|</span> <span class="ident">s</span>.<span class="ident">user_id</span>)
     }
 
     <span class="doccomment">/// Get the device id that identifies the current session.</span>
-    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">device_id</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">DeviceIdBox</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">device_id</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">DeviceIdBox</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">session</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">base_client</span>.<span class="ident">session</span>().<span class="ident">read</span>().<span class="kw">await</span>;
         <span class="ident">session</span>.<span class="ident">as_ref</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">s</span><span class="op">|</span> <span class="ident">s</span>.<span class="ident">device_id</span>.<span class="ident">clone</span>())
     }
@@ -3894,7 +3894,7 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// Can be used with [`Client::restore_login`] to restore a previously</span>
     <span class="doccomment">/// logged in session.</span>
-    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">session</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Session</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">session</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Session</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">base_client</span>.<span class="ident">session</span>().<span class="ident">read</span>().<span class="kw">await</span>.<span class="ident">clone</span>()
     }
 
@@ -3916,7 +3916,7 @@
     <span class="doccomment">/// }</span>
     <span class="doccomment">/// # })</span>
     <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">display_name</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">display_name</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">user_id</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">user_id</span>().<span class="kw">await</span>.<span class="ident">ok_or</span>(<span class="ident">Error::AuthenticationRequired</span>)<span class="question-mark">?</span>;
         <span class="kw">let</span> <span class="ident">request</span> <span class="op">=</span> <span class="ident">get_display_name::Request::new</span>(<span class="kw-2">&amp;</span><span class="ident">user_id</span>);
         <span class="kw">let</span> <span class="ident">response</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">send</span>(<span class="ident">request</span>, <span class="prelude-val">None</span>).<span class="kw">await</span><span class="question-mark">?</span>;
@@ -3939,7 +3939,7 @@
     <span class="doccomment">/// client.set_display_name(Some(&quot;Alice&quot;)).await.expect(&quot;Failed setting display name&quot;);</span>
     <span class="doccomment">/// # })</span>
     <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">set_display_name</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">name</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">set_display_name</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">name</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">user_id</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">user_id</span>().<span class="kw">await</span>.<span class="ident">ok_or</span>(<span class="ident">Error::AuthenticationRequired</span>)<span class="question-mark">?</span>;
         <span class="kw">let</span> <span class="ident">request</span> <span class="op">=</span> <span class="ident">set_display_name::Request::new</span>(<span class="kw-2">&amp;</span><span class="ident">user_id</span>, <span class="ident">name</span>);
         <span class="self">self</span>.<span class="ident">send</span>(<span class="ident">request</span>, <span class="prelude-val">None</span>).<span class="kw">await</span><span class="question-mark">?</span>;
@@ -3964,7 +3964,7 @@
     <span class="doccomment">/// }</span>
     <span class="doccomment">/// # })</span>
     <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">avatar_url</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">MxcUri</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">avatar_url</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">MxcUri</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">user_id</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">user_id</span>().<span class="kw">await</span>.<span class="ident">ok_or</span>(<span class="ident">Error::AuthenticationRequired</span>)<span class="question-mark">?</span>;
         <span class="kw">let</span> <span class="ident">request</span> <span class="op">=</span> <span class="ident">get_avatar_url::Request::new</span>(<span class="kw-2">&amp;</span><span class="ident">user_id</span>);
 
@@ -4006,7 +4006,7 @@
     <span class="doccomment">/// }</span>
     <span class="doccomment">/// # })</span>
     <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">avatar</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">format</span>: <span class="ident">MediaFormat</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">avatar</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">format</span>: <span class="ident">MediaFormat</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">url</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">avatar_url</span>().<span class="kw">await</span><span class="question-mark">?</span> {
             <span class="kw">let</span> <span class="ident">request</span> <span class="op">=</span> <span class="ident">MediaRequest</span> { <span class="ident">media_type</span>: <span class="ident">MediaType::Uri</span>(<span class="ident">url</span>), <span class="ident">format</span> };
             <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(<span class="self">self</span>.<span class="ident">get_media_content</span>(<span class="kw-2">&amp;</span><span class="ident">request</span>, <span class="bool-val">true</span>).<span class="kw">await</span><span class="question-mark">?</span>))
@@ -4016,13 +4016,13 @@
     }
 
     <span class="doccomment">/// Get a reference to the store.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">store</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="ident">Store</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">store</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">Store</span> {
         <span class="self">self</span>.<span class="ident">base_client</span>.<span class="ident">store</span>()
     }
 
     <span class="doccomment">/// Sets the mxc avatar url of the client&#39;s owner. The avatar gets unset if</span>
     <span class="doccomment">/// `url` is `None`.</span>
-    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">set_avatar_url</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">url</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">MxcUri</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">set_avatar_url</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">url</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">MxcUri</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">user_id</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">user_id</span>().<span class="kw">await</span>.<span class="ident">ok_or</span>(<span class="ident">Error::AuthenticationRequired</span>)<span class="question-mark">?</span>;
         <span class="kw">let</span> <span class="ident">request</span> <span class="op">=</span> <span class="ident">set_avatar_url::Request::new</span>(<span class="kw-2">&amp;</span><span class="ident">user_id</span>, <span class="ident">url</span>);
         <span class="self">self</span>.<span class="ident">send</span>(<span class="ident">request</span>, <span class="prelude-val">None</span>).<span class="kw">await</span><span class="question-mark">?</span>;
@@ -4053,7 +4053,7 @@
     <span class="doccomment">/// client.upload_avatar(&amp;mime::IMAGE_JPEG, &amp;mut image).await.expect(&quot;Can&#39;t set avatar&quot;);</span>
     <span class="doccomment">/// # })</span>
     <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">upload_avatar</span><span class="op">&lt;</span><span class="ident">R</span>: <span class="ident">Read</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">content_type</span>: <span class="kw-2">&amp;</span><span class="ident">Mime</span>, <span class="ident">reader</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">R</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">upload_avatar</span><span class="op">&lt;</span><span class="ident">R</span>: <span class="ident">Read</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">content_type</span>: <span class="kw-2">&amp;</span><span class="ident">Mime</span>, <span class="ident">reader</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">R</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">upload_response</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">upload</span>(<span class="ident">content_type</span>, <span class="ident">reader</span>).<span class="kw">await</span><span class="question-mark">?</span>;
         <span class="self">self</span>.<span class="ident">set_avatar_url</span>(<span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="ident">upload_response</span>.<span class="ident">content_uri</span>)).<span class="kw">await</span><span class="question-mark">?</span>;
         <span class="prelude-val">Ok</span>(())
@@ -4151,7 +4151,7 @@
     <span class="doccomment">/// }).await;</span>
     <span class="doccomment">/// # };</span>
     <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">register_event_handler</span><span class="op">&lt;</span><span class="ident">Ev</span>, <span class="ident">Ctx</span>, <span class="ident">H</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">handler</span>: <span class="ident">H</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="self">Self</span>
+    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">register_event_handler</span><span class="op">&lt;</span><span class="ident">Ev</span>, <span class="ident">Ctx</span>, <span class="ident">H</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">handler</span>: <span class="ident">H</span>) -&gt; <span class="kw-2">&amp;</span><span class="self">Self</span>
     <span class="kw">where</span>
         <span class="ident">Ev</span>: <span class="ident">SyncEvent</span> <span class="op">+</span> <span class="ident">DeserializeOwned</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
         <span class="ident">H</span>: <span class="ident">EventHandler</span><span class="op">&lt;</span><span class="ident">Ev</span>, <span class="ident">Ctx</span><span class="op">&gt;</span>,
@@ -4164,13 +4164,13 @@
 
             <span class="kw">async</span> <span class="kw">move</span> {
                 <span class="kw">match</span> <span class="ident">maybe_fut</span> {
-                    <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(<span class="ident">fut</span>)) <span class="op">=</span><span class="op">&gt;</span> {
+                    <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(<span class="ident">fut</span>)) =&gt; {
                         <span class="ident">fut</span>.<span class="kw">await</span>.<span class="ident">print_error</span>(<span class="ident">event_type</span>);
                     }
-                    <span class="prelude-val">Ok</span>(<span class="prelude-val">None</span>) <span class="op">=</span><span class="op">&gt;</span> {
+                    <span class="prelude-val">Ok</span>(<span class="prelude-val">None</span>) =&gt; {
                         <span class="macro">error!</span>(<span class="string">&quot;Event handler for {} has an invalid context argument&quot;</span>, <span class="ident">event_type</span>);
                     }
-                    <span class="prelude-val">Err</span>(<span class="ident">e</span>) <span class="op">=</span><span class="op">&gt;</span> {
+                    <span class="prelude-val">Err</span>(<span class="ident">e</span>) =&gt; {
                         <span class="macro">warn!</span>(
                             <span class="string">&quot;Failed to deserialize `{}` event, skipping event handler.\n\
                                  Deserialization error: {}&quot;</span>,
@@ -4190,9 +4190,9 @@
     <span class="doccomment">/// Similar to [`Client::register_event_handler`], but only allows functions</span>
     <span class="doccomment">/// or closures with exactly the three arguments [`Notification`],</span>
     <span class="doccomment">/// [`room::Room`], [`Client`] for now.</span>
-    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">register_notification_handler</span><span class="op">&lt;</span><span class="ident">H</span>, <span class="ident">Fut</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">handler</span>: <span class="ident">H</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="self">Self</span>
+    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">register_notification_handler</span><span class="op">&lt;</span><span class="ident">H</span>, <span class="ident">Fut</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">handler</span>: <span class="ident">H</span>) -&gt; <span class="kw-2">&amp;</span><span class="self">Self</span>
     <span class="kw">where</span>
-        <span class="ident">H</span>: <span class="ident">Fn</span>(<span class="ident">Notification</span>, <span class="ident">room::Room</span>, <span class="ident">Client</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Fut</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
+        <span class="ident">H</span>: <span class="ident">Fn</span>(<span class="ident">Notification</span>, <span class="ident">room::Room</span>, <span class="ident">Client</span>) -&gt; <span class="ident">Fut</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
         <span class="ident">Fut</span>: <span class="ident">Future</span><span class="op">&lt;</span><span class="ident">Output</span> <span class="op">=</span> ()<span class="op">&gt;</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
     {
         <span class="self">self</span>.<span class="ident">notification_handlers</span>.<span class="ident">write</span>().<span class="kw">await</span>.<span class="ident">push</span>(<span class="ident">Box::new</span>(
@@ -4205,7 +4205,7 @@
     <span class="doccomment">/// Get all the rooms the client knows about.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// This will return the list of joined, invited, and left rooms.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">rooms</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">room::Room</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">rooms</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">room::Room</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">store</span>()
             .<span class="ident">get_rooms</span>()
             .<span class="ident">into_iter</span>()
@@ -4214,7 +4214,7 @@
     }
 
     <span class="doccomment">/// Returns the joined rooms this client knows about.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">joined_rooms</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">room::Joined</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">joined_rooms</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">room::Joined</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">store</span>()
             .<span class="ident">get_rooms</span>()
             .<span class="ident">into_iter</span>()
@@ -4223,7 +4223,7 @@
     }
 
     <span class="doccomment">/// Returns the invited rooms this client knows about.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">invited_rooms</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">room::Invited</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">invited_rooms</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">room::Invited</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">store</span>()
             .<span class="ident">get_rooms</span>()
             .<span class="ident">into_iter</span>()
@@ -4232,7 +4232,7 @@
     }
 
     <span class="doccomment">/// Returns the left rooms this client knows about.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">left_rooms</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">room::Left</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">left_rooms</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">room::Left</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">store</span>()
             .<span class="ident">get_rooms</span>()
             .<span class="ident">into_iter</span>()
@@ -4245,7 +4245,7 @@
     <span class="doccomment">/// # Arguments</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// `room_id` - The unique id of the room that should be fetched.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_room</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">room_id</span>: <span class="kw-2">&amp;</span><span class="ident">RoomId</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">room::Room</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_room</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">room_id</span>: <span class="kw-2">&amp;</span><span class="ident">RoomId</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">room::Room</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">store</span>().<span class="ident">get_room</span>(<span class="ident">room_id</span>).<span class="ident">map</span>(<span class="op">|</span><span class="ident">room</span><span class="op">|</span> <span class="ident">room::Common::new</span>(<span class="self">self</span>.<span class="ident">clone</span>(), <span class="ident">room</span>).<span class="ident">into</span>())
     }
 
@@ -4254,7 +4254,7 @@
     <span class="doccomment">/// # Arguments</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// `room_id` - The unique id of the room that should be fetched.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_joined_room</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">room_id</span>: <span class="kw-2">&amp;</span><span class="ident">RoomId</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">room::Joined</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_joined_room</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">room_id</span>: <span class="kw-2">&amp;</span><span class="ident">RoomId</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">room::Joined</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">store</span>().<span class="ident">get_room</span>(<span class="ident">room_id</span>).<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">room</span><span class="op">|</span> <span class="ident">room::Joined::new</span>(<span class="self">self</span>.<span class="ident">clone</span>(), <span class="ident">room</span>))
     }
 
@@ -4263,7 +4263,7 @@
     <span class="doccomment">/// # Arguments</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// `room_id` - The unique id of the room that should be fetched.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_invited_room</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">room_id</span>: <span class="kw-2">&amp;</span><span class="ident">RoomId</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">room::Invited</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_invited_room</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">room_id</span>: <span class="kw-2">&amp;</span><span class="ident">RoomId</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">room::Invited</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">store</span>().<span class="ident">get_room</span>(<span class="ident">room_id</span>).<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">room</span><span class="op">|</span> <span class="ident">room::Invited::new</span>(<span class="self">self</span>.<span class="ident">clone</span>(), <span class="ident">room</span>))
     }
 
@@ -4272,7 +4272,7 @@
     <span class="doccomment">/// # Arguments</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// `room_id` - The unique id of the room that should be fetched.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_left_room</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">room_id</span>: <span class="kw-2">&amp;</span><span class="ident">RoomId</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">room::Left</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_left_room</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">room_id</span>: <span class="kw-2">&amp;</span><span class="ident">RoomId</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">room::Left</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">store</span>().<span class="ident">get_room</span>(<span class="ident">room_id</span>).<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">room</span><span class="op">|</span> <span class="ident">room::Left::new</span>(<span class="self">self</span>.<span class="ident">clone</span>(), <span class="ident">room</span>))
     }
 
@@ -4280,7 +4280,7 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// This should be the first step when trying to login so you can call the</span>
     <span class="doccomment">/// appropriate method for the next step.</span>
-    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">get_login_types</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">HttpResult</span><span class="op">&lt;</span><span class="ident">get_login_types::Response</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">get_login_types</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">HttpResult</span><span class="op">&lt;</span><span class="ident">get_login_types::Response</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">request</span> <span class="op">=</span> <span class="ident">get_login_types::Request::new</span>();
         <span class="self">self</span>.<span class="ident">send</span>(<span class="ident">request</span>, <span class="prelude-val">None</span>).<span class="kw">await</span>
     }
@@ -4299,15 +4299,15 @@
     <span class="doccomment">///   successful SSO login.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// [`login_with_token`]: #method.login_with_token</span>
-    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">get_sso_login_url</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">redirect_url</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">get_sso_login_url</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">redirect_url</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">homeserver</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">homeserver</span>().<span class="kw">await</span>;
 
         <span class="kw">let</span> <span class="ident">request</span> <span class="op">=</span> <span class="ident">sso_login::Request::new</span>(<span class="ident">redirect_url</span>)
             .<span class="ident">try_into_http_request</span>::<span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="ident">homeserver</span>.<span class="ident">as_str</span>(), <span class="ident">SendAccessToken::None</span>);
 
         <span class="kw">match</span> <span class="ident">request</span> {
-            <span class="prelude-val">Ok</span>(<span class="ident">req</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">req</span>.<span class="ident">uri</span>().<span class="ident">to_string</span>()),
-            <span class="prelude-val">Err</span>(<span class="ident">err</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Err</span>(<span class="ident">Error::from</span>(<span class="ident">HttpError::from</span>(<span class="ident">err</span>))),
+            <span class="prelude-val">Ok</span>(<span class="ident">req</span>) =&gt; <span class="prelude-val">Ok</span>(<span class="ident">req</span>.<span class="ident">uri</span>().<span class="ident">to_string</span>()),
+            <span class="prelude-val">Err</span>(<span class="ident">err</span>) =&gt; <span class="prelude-val">Err</span>(<span class="ident">Error::from</span>(<span class="ident">HttpError::from</span>(<span class="ident">err</span>))),
         }
     }
 
@@ -4363,7 +4363,7 @@
         <span class="ident">password</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>,
         <span class="ident">device_id</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span>,
         <span class="ident">initial_device_display_name</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">login::Response</span><span class="op">&gt;</span> {
+    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">login::Response</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">homeserver</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">homeserver</span>().<span class="kw">await</span>;
         <span class="macro">info!</span>(<span class="ident">homeserver</span> <span class="op">=</span> <span class="ident">homeserver</span>.<span class="ident">as_str</span>(), <span class="ident">user</span> <span class="op">=</span> <span class="ident">user</span>.<span class="ident">as_ref</span>(), <span class="string">&quot;Logging in&quot;</span>);
 
@@ -4466,12 +4466,12 @@
     <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;docs&quot;</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">sso_login</span>, <span class="ident">not</span>(<span class="ident">target_arch</span> <span class="op">=</span> <span class="string">&quot;wasm32&quot;</span>)))))]</span>
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">login_with_sso</span><span class="op">&lt;</span><span class="ident">C</span><span class="op">&gt;</span>(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
-        <span class="ident">use_sso_login_url</span>: <span class="kw">impl</span> <span class="ident">Fn</span>(<span class="ident">String</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">C</span>,
+        <span class="ident">use_sso_login_url</span>: <span class="kw">impl</span> <span class="ident">Fn</span>(<span class="ident">String</span>) -&gt; <span class="ident">C</span>,
         <span class="ident">server_url</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span>,
         <span class="ident">server_response</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span>,
         <span class="ident">device_id</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span>,
         <span class="ident">initial_device_display_name</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">login::Response</span><span class="op">&gt;</span>
+    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">login::Response</span><span class="op">&gt;</span>
     <span class="kw">where</span>
         <span class="ident">C</span>: <span class="ident">Future</span><span class="op">&lt;</span><span class="ident">Output</span> <span class="op">=</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span><span class="op">&gt;</span>,
     {
@@ -4495,18 +4495,18 @@
         <span class="kw">let</span> <span class="ident">data_tx_mutex</span> <span class="op">=</span> <span class="ident">Arc::new</span>(<span class="ident">std::sync::Mutex::new</span>(<span class="prelude-val">Some</span>(<span class="ident">data_tx</span>)));
 
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">redirect_url</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">server_url</span> {
-            <span class="prelude-val">Some</span>(<span class="ident">s</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="kw">match</span> <span class="ident">Url::parse</span>(<span class="ident">s</span>) {
-                <span class="prelude-val">Ok</span>(<span class="ident">url</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">url</span>,
-                <span class="prelude-val">Err</span>(<span class="ident">err</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">IoError::new</span>(<span class="ident">IoErrorKind::InvalidData</span>, <span class="ident">err</span>).<span class="ident">into</span>()),
+            <span class="prelude-val">Some</span>(<span class="ident">s</span>) =&gt; <span class="kw">match</span> <span class="ident">Url::parse</span>(<span class="ident">s</span>) {
+                <span class="prelude-val">Ok</span>(<span class="ident">url</span>) =&gt; <span class="ident">url</span>,
+                <span class="prelude-val">Err</span>(<span class="ident">err</span>) =&gt; <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">IoError::new</span>(<span class="ident">IoErrorKind::InvalidData</span>, <span class="ident">err</span>).<span class="ident">into</span>()),
             },
-            <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="prelude-val">None</span> =&gt; {
                 <span class="ident">Url::parse</span>(<span class="string">&quot;http://localhost:0/&quot;</span>).<span class="ident">expect</span>(<span class="string">&quot;Couldn&#39;t parse good known localhost URL&quot;</span>)
             }
         };
 
         <span class="kw">let</span> <span class="ident">response</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">server_response</span> {
-            <span class="prelude-val">Some</span>(<span class="ident">s</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">s</span>.<span class="ident">to_string</span>(),
-            <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">String::from</span>(
+            <span class="prelude-val">Some</span>(<span class="ident">s</span>) =&gt; <span class="ident">s</span>.<span class="ident">to_string</span>(),
+            <span class="prelude-val">None</span> =&gt; <span class="ident">String::from</span>(
                 <span class="string">&quot;The Single Sign-On login process is complete. You can close this page now.&quot;</span>,
             ),
         };
@@ -4525,7 +4525,7 @@
         );
 
         <span class="kw">let</span> <span class="ident">listener</span> <span class="op">=</span> {
-            <span class="kw">if</span> <span class="ident">redirect_url</span>.<span class="ident">port</span>().<span class="ident">expect</span>(<span class="string">&quot;The redirect URL doesn&#39;t include a port&quot;</span>) <span class="op">=</span><span class="op">=</span> <span class="number">0</span> {
+            <span class="kw">if</span> <span class="ident">redirect_url</span>.<span class="ident">port</span>().<span class="ident">expect</span>(<span class="string">&quot;The redirect URL doesn&#39;t include a port&quot;</span>) <span class="op">==</span> <span class="number">0</span> {
                 <span class="kw">let</span> <span class="ident">host</span> <span class="op">=</span> <span class="ident">redirect_url</span>.<span class="ident">host_str</span>().<span class="ident">expect</span>(<span class="string">&quot;The redirect URL doesn&#39;t have a host&quot;</span>);
                 <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">n</span> <span class="op">=</span> <span class="number">0u8</span>;
                 <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">port</span> <span class="op">=</span> <span class="number">0u16</span>;
@@ -4538,18 +4538,18 @@
                     <span class="ident">n</span> <span class="op">+</span><span class="op">=</span> <span class="number">1</span>;
                 }
                 <span class="kw">match</span> <span class="ident">res</span> {
-                    <span class="prelude-val">Ok</span>(<span class="ident">s</span>) <span class="op">=</span><span class="op">&gt;</span> {
+                    <span class="prelude-val">Ok</span>(<span class="ident">s</span>) =&gt; {
                         <span class="ident">redirect_url</span>
                             .<span class="ident">set_port</span>(<span class="prelude-val">Some</span>(<span class="ident">port</span>))
                             .<span class="ident">expect</span>(<span class="string">&quot;Could not set new port on redirect URL&quot;</span>);
                         <span class="ident">s</span>
                     }
-                    <span class="prelude-val">Err</span>(<span class="ident">err</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">err</span>.<span class="ident">into</span>()),
+                    <span class="prelude-val">Err</span>(<span class="ident">err</span>) =&gt; <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">err</span>.<span class="ident">into</span>()),
                 }
             } <span class="kw">else</span> {
                 <span class="kw">match</span> <span class="ident">tokio::net::TcpListener::bind</span>(<span class="ident">redirect_url</span>.<span class="ident">as_str</span>()).<span class="kw">await</span> {
-                    <span class="prelude-val">Ok</span>(<span class="ident">s</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">s</span>,
-                    <span class="prelude-val">Err</span>(<span class="ident">err</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">err</span>.<span class="ident">into</span>()),
+                    <span class="prelude-val">Ok</span>(<span class="ident">s</span>) =&gt; <span class="ident">s</span>,
+                    <span class="prelude-val">Err</span>(<span class="ident">err</span>) =&gt; <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">err</span>.<span class="ident">into</span>()),
                 }
             }
         };
@@ -4566,16 +4566,16 @@
         <span class="kw">let</span> <span class="ident">sso_url</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">get_sso_login_url</span>(<span class="ident">redirect_url</span>.<span class="ident">as_str</span>()).<span class="kw">await</span><span class="question-mark">?</span>;
 
         <span class="kw">match</span> <span class="ident">use_sso_login_url</span>(<span class="ident">sso_url</span>).<span class="kw">await</span> {
-            <span class="prelude-val">Ok</span>(<span class="ident">t</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">t</span>,
-            <span class="prelude-val">Err</span>(<span class="ident">err</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">err</span>),
+            <span class="prelude-val">Ok</span>(<span class="ident">t</span>) =&gt; <span class="ident">t</span>,
+            <span class="prelude-val">Err</span>(<span class="ident">err</span>) =&gt; <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">err</span>),
         };
 
         <span class="kw">let</span> <span class="ident">token</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">data_rx</span>.<span class="kw">await</span> {
-            <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(<span class="ident">t</span>)) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">t</span>,
-            <span class="prelude-val">Ok</span>(<span class="prelude-val">None</span>) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(<span class="ident">t</span>)) =&gt; <span class="ident">t</span>,
+            <span class="prelude-val">Ok</span>(<span class="prelude-val">None</span>) =&gt; {
                 <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">IoError::new</span>(<span class="ident">IoErrorKind::Other</span>, <span class="string">&quot;Could not get the loginToken&quot;</span>).<span class="ident">into</span>())
             }
-            <span class="prelude-val">Err</span>(<span class="ident">err</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">IoError::new</span>(<span class="ident">IoErrorKind::Other</span>, <span class="macro">format!</span>(<span class="string">&quot;{}&quot;</span>, <span class="ident">err</span>)).<span class="ident">into</span>()),
+            <span class="prelude-val">Err</span>(<span class="ident">err</span>) =&gt; <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">IoError::new</span>(<span class="ident">IoErrorKind::Other</span>, <span class="macro">format!</span>(<span class="string">&quot;{}&quot;</span>, <span class="ident">err</span>)).<span class="ident">into</span>()),
         };
 
         <span class="kw">let</span> <span class="kw">_</span> <span class="op">=</span> <span class="ident">signal_tx</span>.<span class="ident">send</span>(());
@@ -4645,7 +4645,7 @@
         <span class="ident">token</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>,
         <span class="ident">device_id</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span>,
         <span class="ident">initial_device_display_name</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">login::Response</span><span class="op">&gt;</span> {
+    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">login::Response</span><span class="op">&gt;</span> {
         <span class="macro">info!</span>(<span class="string">&quot;Logging in to {}&quot;</span>, <span class="self">self</span>.<span class="ident">homeserver</span>().<span class="kw">await</span>);
 
         <span class="kw">let</span> <span class="ident">request</span> <span class="op">=</span> <span class="macro">assign!</span>(
@@ -4677,7 +4677,7 @@
     <span class="doccomment">/// previous login call.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// [`login`]: #method.login</span>
-    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">restore_login</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">session</span>: <span class="ident">Session</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">restore_login</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">session</span>: <span class="ident">Session</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="prelude-val">Ok</span>(<span class="self">self</span>.<span class="ident">base_client</span>.<span class="ident">restore_login</span>(<span class="ident">session</span>).<span class="kw">await</span><span class="question-mark">?</span>)
     }
 
@@ -4721,7 +4721,7 @@
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">register</span>(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         <span class="ident">registration</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">register::Request</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">HttpResult</span><span class="op">&lt;</span><span class="ident">register::Response</span><span class="op">&gt;</span> {
+    ) -&gt; <span class="ident">HttpResult</span><span class="op">&lt;</span><span class="ident">register::Response</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">homeserver</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">homeserver</span>().<span class="kw">await</span>;
         <span class="macro">info!</span>(<span class="string">&quot;Registering to {}&quot;</span>, <span class="ident">homeserver</span>);
 
@@ -4790,7 +4790,7 @@
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         <span class="ident">filter_name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>,
         <span class="ident">definition</span>: <span class="ident">FilterDefinition</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span> {
+    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span> {
         <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">filter</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">base_client</span>.<span class="ident">get_filter</span>(<span class="ident">filter_name</span>).<span class="kw">await</span><span class="question-mark">?</span> {
             <span class="prelude-val">Ok</span>(<span class="ident">filter</span>)
         } <span class="kw">else</span> {
@@ -4812,7 +4812,7 @@
     <span class="doccomment">/// # Arguments</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// * `room_id` - The `RoomId` of the room to be joined.</span>
-    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">join_room_by_id</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">room_id</span>: <span class="kw-2">&amp;</span><span class="ident">RoomId</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">HttpResult</span><span class="op">&lt;</span><span class="ident">join_room_by_id::Response</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">join_room_by_id</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">room_id</span>: <span class="kw-2">&amp;</span><span class="ident">RoomId</span>) -&gt; <span class="ident">HttpResult</span><span class="op">&lt;</span><span class="ident">join_room_by_id::Response</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">request</span> <span class="op">=</span> <span class="ident">join_room_by_id::Request::new</span>(<span class="ident">room_id</span>);
         <span class="self">self</span>.<span class="ident">send</span>(<span class="ident">request</span>, <span class="prelude-val">None</span>).<span class="kw">await</span>
     }
@@ -4830,7 +4830,7 @@
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         <span class="ident">alias</span>: <span class="kw-2">&amp;</span><span class="ident">RoomIdOrAliasId</span>,
         <span class="ident">server_names</span>: <span class="kw-2">&amp;</span>[<span class="ident">Box</span><span class="op">&lt;</span><span class="ident">ServerName</span><span class="op">&gt;</span>],
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">HttpResult</span><span class="op">&lt;</span><span class="ident">join_room_by_id_or_alias::Response</span><span class="op">&gt;</span> {
+    ) -&gt; <span class="ident">HttpResult</span><span class="op">&lt;</span><span class="ident">join_room_by_id_or_alias::Response</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">request</span> <span class="op">=</span> <span class="macro">assign!</span>(<span class="ident">join_room_by_id_or_alias::Request::new</span>(<span class="ident">alias</span>), {
             <span class="ident">server_name</span>: <span class="ident">server_names</span>,
         });
@@ -4873,7 +4873,7 @@
         <span class="ident">limit</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span>,
         <span class="ident">since</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span>,
         <span class="ident">server</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">ServerName</span><span class="op">&gt;</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">HttpResult</span><span class="op">&lt;</span><span class="ident">get_public_rooms::Response</span><span class="op">&gt;</span> {
+    ) -&gt; <span class="ident">HttpResult</span><span class="op">&lt;</span><span class="ident">get_public_rooms::Response</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">limit</span> <span class="op">=</span> <span class="ident">limit</span>.<span class="ident">map</span>(<span class="ident">UInt::from</span>);
 
         <span class="kw">let</span> <span class="ident">request</span> <span class="op">=</span> <span class="macro">assign!</span>(<span class="ident">get_public_rooms::Request::new</span>(), {
@@ -4914,7 +4914,7 @@
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">create_room</span>(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         <span class="ident">room</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">create_room::Request</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">HttpResult</span><span class="op">&lt;</span><span class="ident">create_room::Response</span><span class="op">&gt;</span> {
+    ) -&gt; <span class="ident">HttpResult</span><span class="op">&lt;</span><span class="ident">create_room::Response</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">request</span> <span class="op">=</span> <span class="ident">room</span>.<span class="ident">into</span>();
         <span class="self">self</span>.<span class="ident">send</span>(<span class="ident">request</span>, <span class="prelude-val">None</span>).<span class="kw">await</span>
     }
@@ -4957,7 +4957,7 @@
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">public_rooms_filtered</span>(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         <span class="ident">room_search</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">get_public_rooms_filtered::Request</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">HttpResult</span><span class="op">&lt;</span><span class="ident">get_public_rooms_filtered::Response</span><span class="op">&gt;</span> {
+    ) -&gt; <span class="ident">HttpResult</span><span class="op">&lt;</span><span class="ident">get_public_rooms_filtered::Response</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">request</span> <span class="op">=</span> <span class="ident">room_search</span>.<span class="ident">into</span>();
         <span class="self">self</span>.<span class="ident">send</span>(<span class="ident">request</span>, <span class="prelude-val">None</span>).<span class="kw">await</span>
     }
@@ -4997,7 +4997,7 @@
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         <span class="ident">content_type</span>: <span class="kw-2">&amp;</span><span class="ident">Mime</span>,
         <span class="ident">reader</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="kw">impl</span> <span class="ident">Read</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">create_content::Response</span><span class="op">&gt;</span> {
+    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">create_content::Response</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">data</span> <span class="op">=</span> <span class="ident">Vec::new</span>();
         <span class="ident">reader</span>.<span class="ident">read_to_end</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">data</span>)<span class="question-mark">?</span>;
 
@@ -5058,7 +5058,7 @@
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         <span class="ident">request</span>: <span class="ident">Request</span>,
         <span class="ident">config</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">RequestConfig</span><span class="op">&gt;</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">HttpResult</span><span class="op">&lt;</span><span class="ident">Request::IncomingResponse</span><span class="op">&gt;</span>
+    ) -&gt; <span class="ident">HttpResult</span><span class="op">&lt;</span><span class="ident">Request::IncomingResponse</span><span class="op">&gt;</span>
     <span class="kw">where</span>
         <span class="ident">Request</span>: <span class="ident">OutgoingRequest</span> <span class="op">+</span> <span class="ident">Debug</span>,
         <span class="ident">HttpError</span>: <span class="ident">From</span><span class="op">&lt;</span><span class="ident">FromHttpResponseError</span><span class="op">&lt;</span><span class="ident">Request::EndpointError</span><span class="op">&gt;</span><span class="op">&gt;</span>,
@@ -5089,7 +5089,7 @@
     <span class="doccomment">/// }</span>
     <span class="doccomment">/// # matrix_sdk::Result::Ok(()) });</span>
     <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">devices</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">HttpResult</span><span class="op">&lt;</span><span class="ident">get_devices::Response</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">devices</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">HttpResult</span><span class="op">&lt;</span><span class="ident">get_devices::Response</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">request</span> <span class="op">=</span> <span class="ident">get_devices::Request::new</span>();
 
         <span class="self">self</span>.<span class="ident">send</span>(<span class="ident">request</span>, <span class="prelude-val">None</span>).<span class="kw">await</span>
@@ -5145,7 +5145,7 @@
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         <span class="ident">devices</span>: <span class="kw-2">&amp;</span>[<span class="ident">DeviceIdBox</span>],
         <span class="ident">auth_data</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">AuthData</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">HttpResult</span><span class="op">&lt;</span><span class="ident">delete_devices::Response</span><span class="op">&gt;</span> {
+    ) -&gt; <span class="ident">HttpResult</span><span class="op">&lt;</span><span class="ident">delete_devices::Response</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">request</span> <span class="op">=</span> <span class="ident">delete_devices::Request::new</span>(<span class="ident">devices</span>);
         <span class="ident">request</span>.<span class="ident">auth</span> <span class="op">=</span> <span class="ident">auth_data</span>;
 
@@ -5155,7 +5155,7 @@
     <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">process_sync</span>(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         <span class="ident">response</span>: <span class="ident">sync_events::Response</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">SyncResponse</span><span class="op">&gt;</span> {
+    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">SyncResponse</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">response</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">base_client</span>.<span class="ident">receive_sync_response</span>(<span class="ident">response</span>).<span class="kw">await</span><span class="question-mark">?</span>;
         <span class="kw">let</span> <span class="ident">SyncResponse</span> {
             <span class="ident">next_batch</span>: <span class="kw">_</span>,
@@ -5225,8 +5225,8 @@
         <span class="kw">for</span> <span class="ident">handler</span> <span class="kw">in</span> <span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="self">self</span>.<span class="ident">notification_handlers</span>.<span class="ident">read</span>().<span class="kw">await</span> {
             <span class="kw">for</span> (<span class="ident">room_id</span>, <span class="ident">room_notifications</span>) <span class="kw">in</span> <span class="ident">notifications</span> {
                 <span class="kw">let</span> <span class="ident">room</span> <span class="op">=</span> <span class="kw">match</span> <span class="self">self</span>.<span class="ident">get_room</span>(<span class="ident">room_id</span>) {
-                    <span class="prelude-val">Some</span>(<span class="ident">room</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">room</span>,
-                    <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> {
+                    <span class="prelude-val">Some</span>(<span class="ident">room</span>) =&gt; <span class="ident">room</span>,
+                    <span class="prelude-val">None</span> =&gt; {
                         <span class="macro">warn!</span>(<span class="string">&quot;Can&#39;t call notification handler, room {} not found&quot;</span>, <span class="ident">room_id</span>);
                         <span class="kw">continue</span>;
                     }
@@ -5250,15 +5250,15 @@
     <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">sync_loop_helper</span>(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         <span class="ident">sync_settings</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident"><span class="kw">crate</span>::config::SyncSettings</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">SyncResponse</span><span class="op">&gt;</span> {
+    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">SyncResponse</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">response</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">sync_once</span>(<span class="ident">sync_settings</span>.<span class="ident">clone</span>()).<span class="kw">await</span>;
 
         <span class="kw">match</span> <span class="ident">response</span> {
-            <span class="prelude-val">Ok</span>(<span class="ident">r</span>) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="prelude-val">Ok</span>(<span class="ident">r</span>) =&gt; {
                 <span class="ident">sync_settings</span>.<span class="ident">token</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">r</span>.<span class="ident">next_batch</span>.<span class="ident">clone</span>());
                 <span class="prelude-val">Ok</span>(<span class="ident">r</span>)
             }
-            <span class="prelude-val">Err</span>(<span class="ident">e</span>) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="prelude-val">Err</span>(<span class="ident">e</span>) =&gt; {
                 <span class="macro">error!</span>(<span class="string">&quot;Received an invalid response: {}&quot;</span>, <span class="ident">e</span>);
                 <span class="ident">sleep::new</span>(<span class="ident">Duration::from_secs</span>(<span class="number">1</span>)).<span class="kw">await</span>;
                 <span class="prelude-val">Err</span>(<span class="ident">e</span>)
@@ -5376,7 +5376,7 @@
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">sync_once</span>(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         <span class="ident">sync_settings</span>: <span class="ident"><span class="kw">crate</span>::config::SyncSettings</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">SyncResponse</span><span class="op">&gt;</span> {
+    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">SyncResponse</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">request</span> <span class="op">=</span> <span class="macro">assign!</span>(<span class="ident">sync_events::Request::new</span>(), {
             <span class="ident">filter</span>: <span class="ident">sync_settings</span>.<span class="ident">filter</span>.<span class="ident">as_ref</span>(),
             <span class="ident">since</span>: <span class="ident">sync_settings</span>.<span class="ident">token</span>.<span class="ident">as_deref</span>(),
@@ -5518,7 +5518,7 @@
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">sync_with_callback</span><span class="op">&lt;</span><span class="ident">C</span><span class="op">&gt;</span>(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         <span class="kw-2">mut</span> <span class="ident">sync_settings</span>: <span class="ident"><span class="kw">crate</span>::config::SyncSettings</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>,
-        <span class="ident">callback</span>: <span class="kw">impl</span> <span class="ident">Fn</span>(<span class="ident">SyncResponse</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">C</span>,
+        <span class="ident">callback</span>: <span class="kw">impl</span> <span class="ident">Fn</span>(<span class="ident">SyncResponse</span>) -&gt; <span class="ident">C</span>,
     ) <span class="kw">where</span>
         <span class="ident">C</span>: <span class="ident">Future</span><span class="op">&lt;</span><span class="ident">Output</span> <span class="op">=</span> <span class="ident">LoopCtrl</span><span class="op">&gt;</span>,
     {
@@ -5532,7 +5532,7 @@
             <span class="comment">// TODO we should abort the sync loop if the error is a storage error or</span>
             <span class="comment">// the access token got invalid.</span>
             <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Ok</span>(<span class="ident">r</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">sync_loop_helper</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">sync_settings</span>).<span class="kw">await</span> {
-                <span class="kw">if</span> <span class="ident">callback</span>(<span class="ident">r</span>).<span class="kw">await</span> <span class="op">=</span><span class="op">=</span> <span class="ident">LoopCtrl::Break</span> {
+                <span class="kw">if</span> <span class="ident">callback</span>(<span class="ident">r</span>).<span class="kw">await</span> <span class="op">==</span> <span class="ident">LoopCtrl::Break</span> {
                     <span class="kw">return</span>;
                 }
             } <span class="kw">else</span> {
@@ -5591,7 +5591,7 @@
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">sync_stream</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(
         <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="self">self</span>,
         <span class="kw-2">mut</span> <span class="ident">sync_settings</span>: <span class="ident"><span class="kw">crate</span>::config::SyncSettings</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="kw">impl</span> <span class="ident">futures::stream::Stream</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">SyncResponse</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="op">+</span> <span class="lifetime">&#39;a</span> {
+    ) -&gt; <span class="kw">impl</span> <span class="ident">futures::stream::Stream</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">SyncResponse</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="op">+</span> <span class="lifetime">&#39;a</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">last_sync_time</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Instant</span><span class="op">&gt;</span> <span class="op">=</span> <span class="prelude-val">None</span>;
 
         <span class="kw">if</span> <span class="ident">sync_settings</span>.<span class="ident">token</span>.<span class="ident">is_none</span>() {
@@ -5613,7 +5613,7 @@
 
     <span class="doccomment">/// Get the current, if any, sync token of the client.</span>
     <span class="doccomment">/// This will be None if the client didn&#39;t sync at least once.</span>
-    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">sync_token</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">sync_token</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">base_client</span>.<span class="ident">sync_token</span>().<span class="kw">await</span>
     }
 
@@ -5631,7 +5631,7 @@
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         <span class="ident">request</span>: <span class="kw-2">&amp;</span><span class="ident">MediaRequest</span>,
         <span class="ident">use_cache</span>: <span class="ident">bool</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">content</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">use_cache</span> {
             <span class="self">self</span>.<span class="ident">base_client</span>.<span class="ident">store</span>().<span class="ident">get_media_content</span>(<span class="ident">request</span>).<span class="kw">await</span><span class="question-mark">?</span>
         } <span class="kw">else</span> {
@@ -5642,7 +5642,7 @@
             <span class="prelude-val">Ok</span>(<span class="ident">content</span>)
         } <span class="kw">else</span> {
             <span class="kw">let</span> <span class="ident">content</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span> <span class="op">=</span> <span class="kw">match</span> <span class="kw-2">&amp;</span><span class="ident">request</span>.<span class="ident">media_type</span> {
-                <span class="ident">MediaType::Encrypted</span>(<span class="ident">file</span>) <span class="op">=</span><span class="op">&gt;</span> {
+                <span class="ident">MediaType::Encrypted</span>(<span class="ident">file</span>) =&gt; {
                     <span class="kw">let</span> <span class="ident">content</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span> <span class="op">=</span>
                         <span class="self">self</span>.<span class="ident">send</span>(<span class="ident">get_content::Request::from_url</span>(<span class="kw-2">&amp;</span><span class="ident">file</span>.<span class="ident">url</span>)<span class="question-mark">?</span>, <span class="prelude-val">None</span>).<span class="kw">await</span><span class="question-mark">?</span>.<span class="ident">file</span>;
 
@@ -5662,7 +5662,7 @@
 
                     <span class="ident">content</span>
                 }
-                <span class="ident">MediaType::Uri</span>(<span class="ident">uri</span>) <span class="op">=</span><span class="op">&gt;</span> {
+                <span class="ident">MediaType::Uri</span>(<span class="ident">uri</span>) =&gt; {
                     <span class="kw">if</span> <span class="kw">let</span> <span class="ident">MediaFormat::Thumbnail</span>(<span class="ident">size</span>) <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">request</span>.<span class="ident">format</span> {
                         <span class="self">self</span>.<span class="ident">send</span>(
                             <span class="ident">get_content_thumbnail::Request::from_url</span>(<span class="ident">uri</span>, <span class="ident">size</span>.<span class="ident">width</span>, <span class="ident">size</span>.<span class="ident">height</span>)<span class="question-mark">?</span>,
@@ -5689,7 +5689,7 @@
     <span class="doccomment">/// # Arguments</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// * `request` - The `MediaRequest` of the content.</span>
-    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">remove_media_content</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">request</span>: <span class="kw-2">&amp;</span><span class="ident">MediaRequest</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">remove_media_content</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">request</span>: <span class="kw-2">&amp;</span><span class="ident">MediaRequest</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="prelude-val">Ok</span>(<span class="self">self</span>.<span class="ident">base_client</span>.<span class="ident">store</span>().<span class="ident">remove_media_content</span>(<span class="ident">request</span>).<span class="kw">await</span><span class="question-mark">?</span>)
     }
 
@@ -5699,7 +5699,7 @@
     <span class="doccomment">/// # Arguments</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// * `uri` - The `MxcUri` of the files.</span>
-    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">remove_media_content_for_uri</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">uri</span>: <span class="kw-2">&amp;</span><span class="ident">MxcUri</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">remove_media_content_for_uri</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">uri</span>: <span class="kw-2">&amp;</span><span class="ident">MxcUri</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="prelude-val">Ok</span>(<span class="self">self</span>.<span class="ident">base_client</span>.<span class="ident">store</span>().<span class="ident">remove_media_content_for_uri</span>(<span class="ident">uri</span>).<span class="kw">await</span><span class="question-mark">?</span>)
     }
 
@@ -5722,7 +5722,7 @@
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         <span class="ident">event_content</span>: <span class="kw">impl</span> <span class="ident">MediaEventContent</span>,
         <span class="ident">use_cache</span>: <span class="ident">bool</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">media_type</span>) <span class="op">=</span> <span class="ident">event_content</span>.<span class="ident">file</span>() {
             <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(
                 <span class="self">self</span>.<span class="ident">get_media_content</span>(
@@ -5744,7 +5744,7 @@
     <span class="doccomment">/// # Arguments</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// * `event_content` - The media event content.</span>
-    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">remove_file</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">event_content</span>: <span class="kw">impl</span> <span class="ident">MediaEventContent</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">remove_file</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">event_content</span>: <span class="kw">impl</span> <span class="ident">MediaEventContent</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">media_type</span>) <span class="op">=</span> <span class="ident">event_content</span>.<span class="ident">file</span>() {
             <span class="self">self</span>.<span class="ident">remove_media_content</span>(<span class="kw-2">&amp;</span><span class="ident">MediaRequest</span> { <span class="ident">media_type</span>, <span class="ident">format</span>: <span class="ident">MediaFormat::File</span> })
                 .<span class="kw">await</span><span class="question-mark">?</span>
@@ -5776,7 +5776,7 @@
         <span class="ident">event_content</span>: <span class="kw">impl</span> <span class="ident">MediaEventContent</span>,
         <span class="ident">size</span>: <span class="ident">MediaThumbnailSize</span>,
         <span class="ident">use_cache</span>: <span class="ident">bool</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">media_type</span>) <span class="op">=</span> <span class="ident">event_content</span>.<span class="ident">thumbnail</span>() {
             <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(
                 <span class="self">self</span>.<span class="ident">get_media_content</span>(
@@ -5805,7 +5805,7 @@
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         <span class="ident">event_content</span>: <span class="kw">impl</span> <span class="ident">MediaEventContent</span>,
         <span class="ident">size</span>: <span class="ident">MediaThumbnailSize</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">media_type</span>) <span class="op">=</span> <span class="ident">event_content</span>.<span class="ident">file</span>() {
             <span class="self">self</span>.<span class="ident">remove_media_content</span>(<span class="kw-2">&amp;</span><span class="ident">MediaRequest</span> {
                 <span class="ident">media_type</span>,
@@ -5818,7 +5818,7 @@
     }
 
     <span class="doccomment">/// Gets information about the owner of a given access token.</span>
-    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">whoami</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">HttpResult</span><span class="op">&lt;</span><span class="ident">whoami::Response</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">whoami</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">HttpResult</span><span class="op">&lt;</span><span class="ident">whoami::Response</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">request</span> <span class="op">=</span> <span class="ident">whoami::Request::new</span>();
         <span class="self">self</span>.<span class="ident">send</span>(<span class="ident">request</span>, <span class="prelude-val">None</span>).<span class="kw">await</span>
     }
@@ -5875,7 +5875,7 @@
         <span class="ident">HttpError</span>, <span class="ident">RoomMember</span>,
     };
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">logged_in_client</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Client</span> {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">logged_in_client</span>() -&gt; <span class="ident">Client</span> {
         <span class="kw">let</span> <span class="ident">session</span> <span class="op">=</span> <span class="ident">Session</span> {
             <span class="ident">access_token</span>: <span class="string">&quot;1234&quot;</span>.<span class="ident">to_owned</span>(),
             <span class="ident">user_id</span>: <span class="macro">user_id!</span>(<span class="string">&quot;@example:localhost&quot;</span>),
@@ -5992,7 +5992,7 @@
                     <span class="kw">let</span> <span class="ident">sso_url</span> <span class="op">=</span> <span class="ident">Url::parse</span>(<span class="ident">sso_url</span>.<span class="ident">as_str</span>()).<span class="ident">unwrap</span>();
 
                     <span class="kw">let</span> (<span class="kw">_</span>, <span class="ident">redirect</span>) <span class="op">=</span>
-                        <span class="ident">sso_url</span>.<span class="ident">query_pairs</span>().<span class="ident">find</span>(<span class="op">|</span>(<span class="ident">key</span>, <span class="kw">_</span>)<span class="op">|</span> <span class="ident">key</span> <span class="op">=</span><span class="op">=</span> <span class="string">&quot;redirectUrl&quot;</span>).<span class="ident">unwrap</span>();
+                        <span class="ident">sso_url</span>.<span class="ident">query_pairs</span>().<span class="ident">find</span>(<span class="op">|</span>(<span class="ident">key</span>, <span class="kw">_</span>)<span class="op">|</span> <span class="ident">key</span> <span class="op">==</span> <span class="string">&quot;redirectUrl&quot;</span>).<span class="ident">unwrap</span>();
 
                     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">redirect_url</span> <span class="op">=</span> <span class="ident">Url::parse</span>(<span class="ident">redirect</span>.<span class="ident">into_owned</span>().<span class="ident">as_str</span>()).<span class="ident">unwrap</span>();
                     <span class="ident">redirect_url</span>.<span class="ident">set_query</span>(<span class="prelude-val">Some</span>(<span class="string">&quot;loginToken=tinytoken&quot;</span>));
@@ -6872,7 +6872,7 @@
     <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">retry_limit_http_requests</span>() {
         <span class="kw">let</span> <span class="ident">homeserver</span> <span class="op">=</span> <span class="ident">Url::from_str</span>(<span class="kw-2">&amp;</span><span class="ident">mockito::server_url</span>()).<span class="ident">unwrap</span>();
         <span class="kw">let</span> <span class="ident">config</span> <span class="op">=</span> <span class="ident">ClientConfig::default</span>().<span class="ident">request_config</span>(<span class="ident">RequestConfig::new</span>().<span class="ident">retry_limit</span>(<span class="number">3</span>));
-        <span class="macro">assert!</span>(<span class="ident">config</span>.<span class="ident">request_config</span>.<span class="ident">retry_limit</span>.<span class="ident">unwrap</span>() <span class="op">=</span><span class="op">=</span> <span class="number">3</span>);
+        <span class="macro">assert!</span>(<span class="ident">config</span>.<span class="ident">request_config</span>.<span class="ident">retry_limit</span>.<span class="ident">unwrap</span>() <span class="op">==</span> <span class="number">3</span>);
         <span class="kw">let</span> <span class="ident">client</span> <span class="op">=</span> <span class="ident">Client::new_with_config</span>(<span class="ident">homeserver</span>, <span class="ident">config</span>).<span class="ident">unwrap</span>();
 
         <span class="kw">let</span> <span class="ident">m</span> <span class="op">=</span> <span class="ident">mock</span>(<span class="string">&quot;POST&quot;</span>, <span class="string">&quot;/_matrix/client/r0/login&quot;</span>).<span class="ident">with_status</span>(<span class="number">501</span>).<span class="ident">expect</span>(<span class="number">3</span>).<span class="ident">create</span>();
@@ -6891,7 +6891,7 @@
         <span class="kw">let</span> <span class="ident">retry_timeout</span> <span class="op">=</span> <span class="ident">Duration::from_secs</span>(<span class="number">5</span>);
         <span class="kw">let</span> <span class="ident">config</span> <span class="op">=</span> <span class="ident">ClientConfig::default</span>()
             .<span class="ident">request_config</span>(<span class="ident">RequestConfig::new</span>().<span class="ident">retry_timeout</span>(<span class="ident">retry_timeout</span>));
-        <span class="macro">assert!</span>(<span class="ident">config</span>.<span class="ident">request_config</span>.<span class="ident">retry_timeout</span>.<span class="ident">unwrap</span>() <span class="op">=</span><span class="op">=</span> <span class="ident">retry_timeout</span>);
+        <span class="macro">assert!</span>(<span class="ident">config</span>.<span class="ident">request_config</span>.<span class="ident">retry_timeout</span>.<span class="ident">unwrap</span>() <span class="op">==</span> <span class="ident">retry_timeout</span>);
         <span class="kw">let</span> <span class="ident">client</span> <span class="op">=</span> <span class="ident">Client::new_with_config</span>(<span class="ident">homeserver</span>, <span class="ident">config</span>).<span class="ident">unwrap</span>();
 
         <span class="kw">let</span> <span class="ident">m</span> <span class="op">=</span>
@@ -6908,7 +6908,7 @@
     <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">no_retry_http_requests</span>() {
         <span class="kw">let</span> <span class="ident">homeserver</span> <span class="op">=</span> <span class="ident">Url::from_str</span>(<span class="kw-2">&amp;</span><span class="ident">mockito::server_url</span>()).<span class="ident">unwrap</span>();
         <span class="kw">let</span> <span class="ident">config</span> <span class="op">=</span> <span class="ident">ClientConfig::default</span>().<span class="ident">request_config</span>(<span class="ident">RequestConfig::new</span>().<span class="ident">disable_retry</span>());
-        <span class="macro">assert!</span>(<span class="ident">config</span>.<span class="ident">request_config</span>.<span class="ident">retry_limit</span>.<span class="ident">unwrap</span>() <span class="op">=</span><span class="op">=</span> <span class="number">0</span>);
+        <span class="macro">assert!</span>(<span class="ident">config</span>.<span class="ident">request_config</span>.<span class="ident">retry_limit</span>.<span class="ident">unwrap</span>() <span class="op">==</span> <span class="number">0</span>);
         <span class="kw">let</span> <span class="ident">client</span> <span class="op">=</span> <span class="ident">Client::new_with_config</span>(<span class="ident">homeserver</span>, <span class="ident">config</span>).<span class="ident">unwrap</span>();
 
         <span class="kw">let</span> <span class="ident">m</span> <span class="op">=</span> <span class="ident">mock</span>(<span class="string">&quot;POST&quot;</span>, <span class="string">&quot;/_matrix/client/r0/login&quot;</span>).<span class="ident">with_status</span>(<span class="number">501</span>).<span class="ident">create</span>();

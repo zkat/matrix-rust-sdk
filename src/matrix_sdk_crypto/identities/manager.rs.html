@@ -724,11 +724,11 @@
 <span class="kw">impl</span> <span class="ident">IdentityManager</span> {
     <span class="kw">const</span> <span class="ident">MAX_KEY_QUERY_USERS</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="number">250</span>;
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">user_id</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">UserId</span><span class="op">&gt;</span>, <span class="ident">device_id</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">DeviceId</span><span class="op">&gt;</span>, <span class="ident">store</span>: <span class="ident">Store</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">user_id</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">UserId</span><span class="op">&gt;</span>, <span class="ident">device_id</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">DeviceId</span><span class="op">&gt;</span>, <span class="ident">store</span>: <span class="ident">Store</span>) -&gt; <span class="self">Self</span> {
         <span class="ident">IdentityManager</span> { <span class="ident">user_id</span>, <span class="ident">device_id</span>, <span class="ident">store</span> }
     }
 
-    <span class="kw">fn</span> <span class="ident">user_id</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="ident">UserId</span> {
+    <span class="kw">fn</span> <span class="ident">user_id</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">UserId</span> {
         <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">user_id</span>
     }
 
@@ -744,7 +744,7 @@
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">receive_keys_query_response</span>(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         <span class="ident">response</span>: <span class="kw-2">&amp;</span><span class="ident">KeysQueryResponse</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">OlmResult</span><span class="op">&lt;</span>(<span class="ident">DeviceChanges</span>, <span class="ident">IdentityChanges</span>)<span class="op">&gt;</span> {
+    ) -&gt; <span class="ident">OlmResult</span><span class="op">&lt;</span>(<span class="ident">DeviceChanges</span>, <span class="ident">IdentityChanges</span>)<span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">changed_devices</span> <span class="op">=</span>
             <span class="self">self</span>.<span class="ident">handle_devices_from_key_query</span>(<span class="ident">response</span>.<span class="ident">device_keys</span>.<span class="ident">clone</span>()).<span class="kw">await</span><span class="question-mark">?</span>;
         <span class="kw">let</span> (<span class="ident">changed_identities</span>, <span class="ident">cross_signing_identity</span>) <span class="op">=</span>
@@ -771,7 +771,7 @@
     <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">update_or_create_device</span>(
         <span class="ident">store</span>: <span class="ident">Store</span>,
         <span class="ident">device_keys</span>: <span class="ident">DeviceKeys</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">StoreResult</span><span class="op">&lt;</span><span class="ident">DeviceChange</span><span class="op">&gt;</span> {
+    ) -&gt; <span class="ident">StoreResult</span><span class="op">&lt;</span><span class="ident">DeviceChange</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">old_device</span> <span class="op">=</span>
             <span class="ident">store</span>.<span class="ident">get_readonly_device</span>(<span class="kw-2">&amp;</span><span class="ident">device_keys</span>.<span class="ident">user_id</span>, <span class="kw-2">&amp;</span><span class="ident">device_keys</span>.<span class="ident">device_id</span>).<span class="kw">await</span><span class="question-mark">?</span>;
 
@@ -789,11 +789,11 @@
             }
         } <span class="kw">else</span> {
             <span class="kw">match</span> <span class="ident">ReadOnlyDevice::try_from</span>(<span class="kw-2">&amp;</span><span class="ident">device_keys</span>) {
-                <span class="prelude-val">Ok</span>(<span class="ident">d</span>) <span class="op">=</span><span class="op">&gt;</span> {
+                <span class="prelude-val">Ok</span>(<span class="ident">d</span>) =&gt; {
                     <span class="macro">trace!</span>(<span class="string">&quot;Adding a new device to the device store {:?}&quot;</span>, <span class="ident">d</span>);
                     <span class="prelude-val">Ok</span>(<span class="ident">DeviceChange::New</span>(<span class="ident">d</span>))
                 }
-                <span class="prelude-val">Err</span>(<span class="ident">e</span>) <span class="op">=</span><span class="op">&gt;</span> {
+                <span class="prelude-val">Err</span>(<span class="ident">e</span>) =&gt; {
                     <span class="macro">warn!</span>(
                         <span class="string">&quot;Failed to create a new device for {} {}: {:?}&quot;</span>,
                         <span class="ident">device_keys</span>.<span class="ident">user_id</span>, <span class="ident">device_keys</span>.<span class="ident">device_id</span>, <span class="ident">e</span>
@@ -810,7 +810,7 @@
         <span class="ident">own_device_id</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">DeviceId</span><span class="op">&gt;</span>,
         <span class="ident">user_id</span>: <span class="ident">UserId</span>,
         <span class="ident">device_map</span>: <span class="ident">BTreeMap</span><span class="op">&lt;</span><span class="ident">DeviceIdBox</span>, <span class="ident">DeviceKeys</span><span class="op">&gt;</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">StoreResult</span><span class="op">&lt;</span><span class="ident">DeviceChanges</span><span class="op">&gt;</span> {
+    ) -&gt; <span class="ident">StoreResult</span><span class="op">&lt;</span><span class="ident">DeviceChanges</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">own_device_id</span> <span class="op">=</span> (<span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="ident">own_device_id</span>).<span class="ident">to_owned</span>();
 
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">changes</span> <span class="op">=</span> <span class="ident">DeviceChanges::default</span>();
@@ -838,9 +838,9 @@
             <span class="kw">let</span> <span class="ident">device</span> <span class="op">=</span> <span class="ident">device</span>.<span class="ident">expect</span>(<span class="string">&quot;Creating or updating a device panicked&quot;</span>)<span class="question-mark">?</span>;
 
             <span class="kw">match</span> <span class="ident">device</span> {
-                <span class="ident">DeviceChange::New</span>(<span class="ident">d</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">changes</span>.<span class="ident">new</span>.<span class="ident">push</span>(<span class="ident">d</span>),
-                <span class="ident">DeviceChange::Updated</span>(<span class="ident">d</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">changes</span>.<span class="ident">changed</span>.<span class="ident">push</span>(<span class="ident">d</span>),
-                <span class="ident">DeviceChange::None</span> <span class="op">=</span><span class="op">&gt;</span> (),
+                <span class="ident">DeviceChange::New</span>(<span class="ident">d</span>) =&gt; <span class="ident">changes</span>.<span class="ident">new</span>.<span class="ident">push</span>(<span class="ident">d</span>),
+                <span class="ident">DeviceChange::Updated</span>(<span class="ident">d</span>) =&gt; <span class="ident">changes</span>.<span class="ident">changed</span>.<span class="ident">push</span>(<span class="ident">d</span>),
+                <span class="ident">DeviceChange::None</span> =&gt; (),
             }
         }
 
@@ -850,7 +850,7 @@
         <span class="kw">let</span> <span class="ident">deleted_devices_set</span> <span class="op">=</span> <span class="ident">stored_devices_set</span>.<span class="ident">difference</span>(<span class="kw-2">&amp;</span><span class="ident">current_devices</span>);
 
         <span class="kw">for</span> <span class="ident">device_id</span> <span class="kw">in</span> <span class="ident">deleted_devices_set</span> {
-            <span class="kw">if</span> <span class="ident">user_id</span> <span class="op">=</span><span class="op">=</span> <span class="kw-2">*</span><span class="ident">own_user_id</span> <span class="op">&amp;&amp;</span> <span class="kw-2">*</span><span class="ident">device_id</span> <span class="op">=</span><span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">own_device_id</span> {
+            <span class="kw">if</span> <span class="ident">user_id</span> <span class="op">==</span> <span class="kw-2">*</span><span class="ident">own_user_id</span> <span class="op">&amp;&amp;</span> <span class="kw-2">*</span><span class="ident">device_id</span> <span class="op">==</span> <span class="kw-2">&amp;</span><span class="ident">own_device_id</span> {
                 <span class="macro">warn!</span>(<span class="string">&quot;Our own device has been deleted&quot;</span>);
             } <span class="kw">else</span> <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">device</span>) <span class="op">=</span> <span class="ident">stored_devices</span>.<span class="ident">get</span>(<span class="kw-2">*</span><span class="ident">device_id</span>) {
                 <span class="ident">device</span>.<span class="ident">mark_as_deleted</span>();
@@ -873,7 +873,7 @@
     <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">handle_devices_from_key_query</span>(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         <span class="ident">device_keys_map</span>: <span class="ident">BTreeMap</span><span class="op">&lt;</span><span class="ident">UserId</span>, <span class="ident">BTreeMap</span><span class="op">&lt;</span><span class="ident">DeviceIdBox</span>, <span class="ident">DeviceKeys</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">StoreResult</span><span class="op">&lt;</span><span class="ident">DeviceChanges</span><span class="op">&gt;</span> {
+    ) -&gt; <span class="ident">StoreResult</span><span class="op">&lt;</span><span class="ident">DeviceChanges</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">changes</span> <span class="op">=</span> <span class="ident">DeviceChanges::default</span>();
 
         <span class="kw">let</span> <span class="ident">tasks</span> <span class="op">=</span> <span class="ident">device_keys_map</span>.<span class="ident">into_iter</span>().<span class="ident">map</span>(<span class="op">|</span>(<span class="ident">user_id</span>, <span class="ident">device_keys_map</span>)<span class="op">|</span> {
@@ -908,7 +908,7 @@
     <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">handle_cross_singing_keys</span>(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         <span class="ident">response</span>: <span class="kw-2">&amp;</span><span class="ident">KeysQueryResponse</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">StoreResult</span><span class="op">&lt;</span>(<span class="ident">IdentityChanges</span>, <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">PrivateCrossSigningIdentity</span><span class="op">&gt;</span>)<span class="op">&gt;</span> {
+    ) -&gt; <span class="ident">StoreResult</span><span class="op">&lt;</span>(<span class="ident">IdentityChanges</span>, <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">PrivateCrossSigningIdentity</span><span class="op">&gt;</span>)<span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">changes</span> <span class="op">=</span> <span class="ident">IdentityChanges::default</span>();
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">changed_identity</span> <span class="op">=</span> <span class="prelude-val">None</span>;
 
@@ -927,7 +927,7 @@
 
             <span class="kw">let</span> <span class="ident">result</span> <span class="op">=</span> <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="kw-2">mut</span> <span class="ident">i</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">store</span>.<span class="ident">get_user_identity</span>(<span class="ident">user_id</span>).<span class="kw">await</span><span class="question-mark">?</span> {
                 <span class="kw">match</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">i</span> {
-                    <span class="ident">ReadOnlyUserIdentities::Own</span>(<span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="ident">identity</span>) <span class="op">=</span><span class="op">&gt;</span> {
+                    <span class="ident">ReadOnlyUserIdentities::Own</span>(<span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="ident">identity</span>) =&gt; {
                         <span class="kw">let</span> <span class="ident">user_signing</span> <span class="op">=</span> <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">s</span>) <span class="op">=</span> <span class="ident">response</span>.<span class="ident">user_signing_keys</span>.<span class="ident">get</span>(<span class="ident">user_id</span>)
                         {
                             <span class="ident">UserSigningPubkey::from</span>(<span class="ident">s</span>)
@@ -942,11 +942,11 @@
 
                         <span class="ident">identity</span>.<span class="ident">update</span>(<span class="ident">master_key</span>, <span class="ident">self_signing</span>, <span class="ident">user_signing</span>).<span class="ident">map</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> (<span class="ident">i</span>, <span class="bool-val">false</span>))
                     }
-                    <span class="ident">ReadOnlyUserIdentities::Other</span>(<span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="ident">identity</span>) <span class="op">=</span><span class="op">&gt;</span> {
+                    <span class="ident">ReadOnlyUserIdentities::Other</span>(<span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="ident">identity</span>) =&gt; {
                         <span class="ident">identity</span>.<span class="ident">update</span>(<span class="ident">master_key</span>, <span class="ident">self_signing</span>).<span class="ident">map</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> (<span class="ident">i</span>, <span class="bool-val">false</span>))
                     }
                 }
-            } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">user_id</span> <span class="op">=</span><span class="op">=</span> <span class="self">self</span>.<span class="ident">user_id</span>() {
+            } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">user_id</span> <span class="op">==</span> <span class="self">self</span>.<span class="ident">user_id</span>() {
                 <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">s</span>) <span class="op">=</span> <span class="ident">response</span>.<span class="ident">user_signing_keys</span>.<span class="ident">get</span>(<span class="ident">user_id</span>) {
                     <span class="kw">let</span> <span class="ident">user_signing</span> <span class="op">=</span> <span class="ident">UserSigningPubkey::from</span>(<span class="ident">s</span>);
 
@@ -980,7 +980,7 @@
             };
 
             <span class="kw">match</span> <span class="ident">result</span> {
-                <span class="prelude-val">Ok</span>((<span class="ident">i</span>, <span class="ident">new</span>)) <span class="op">=</span><span class="op">&gt;</span> {
+                <span class="prelude-val">Ok</span>((<span class="ident">i</span>, <span class="ident">new</span>)) =&gt; {
                     <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">identity</span>) <span class="op">=</span> <span class="ident">i</span>.<span class="ident">own</span>() {
                         <span class="kw">let</span> <span class="ident">private_identity</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">store</span>.<span class="ident">private_identity</span>();
                         <span class="kw">let</span> <span class="ident">private_identity</span> <span class="op">=</span> <span class="ident">private_identity</span>.<span class="ident">lock</span>().<span class="kw">await</span>;
@@ -1001,7 +1001,7 @@
                         <span class="ident">changes</span>.<span class="ident">changed</span>.<span class="ident">push</span>(<span class="ident">i</span>);
                     }
                 }
-                <span class="prelude-val">Err</span>(<span class="ident">e</span>) <span class="op">=</span><span class="op">&gt;</span> {
+                <span class="prelude-val">Err</span>(<span class="ident">e</span>) =&gt; {
                     <span class="macro">warn!</span>(
                         <span class="ident">user_id</span> <span class="op">=</span> <span class="ident">user_id</span>.<span class="ident">as_str</span>(),
                         <span class="ident">error</span> <span class="op">=</span><span class="question-mark">?</span> <span class="ident">e</span>,
@@ -1025,7 +1025,7 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// [`OlmMachine`]: struct.OlmMachine.html</span>
     <span class="doccomment">/// [`receive_keys_query_response`]: #method.receive_keys_query_response</span>
-    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">users_for_key_query</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">KeysQueryRequest</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">users_for_key_query</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">KeysQueryRequest</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">users</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">store</span>.<span class="ident">users_for_key_query</span>();
 
         <span class="kw">if</span> <span class="ident">users</span>.<span class="ident">is_empty</span>() {
@@ -1049,7 +1049,7 @@
     <span class="doccomment">/// key query.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// Returns true if the user was queued up for a key query, false otherwise.</span>
-    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">mark_user_as_changed</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">user_id</span>: <span class="kw-2">&amp;</span><span class="ident">UserId</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">StoreResult</span><span class="op">&lt;</span><span class="ident">bool</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">mark_user_as_changed</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">user_id</span>: <span class="kw-2">&amp;</span><span class="ident">UserId</span>) -&gt; <span class="ident">StoreResult</span><span class="op">&lt;</span><span class="ident">bool</span><span class="op">&gt;</span> {
         <span class="kw">if</span> <span class="self">self</span>.<span class="ident">store</span>.<span class="ident">is_user_tracked</span>(<span class="ident">user_id</span>) {
             <span class="self">self</span>.<span class="ident">store</span>.<span class="ident">update_tracked_user</span>(<span class="ident">user_id</span>, <span class="bool-val">true</span>).<span class="kw">await</span><span class="question-mark">?</span>;
             <span class="prelude-val">Ok</span>(<span class="bool-val">true</span>)
@@ -1103,19 +1103,19 @@
         <span class="ident">verification::VerificationMachine</span>,
     };
 
-    <span class="kw">fn</span> <span class="ident">user_id</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident">UserId</span> {
+    <span class="kw">fn</span> <span class="ident">user_id</span>() -&gt; <span class="ident">UserId</span> {
         <span class="macro">user_id!</span>(<span class="string">&quot;@example:localhost&quot;</span>)
     }
 
-    <span class="kw">fn</span> <span class="ident">other_user_id</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident">UserId</span> {
+    <span class="kw">fn</span> <span class="ident">other_user_id</span>() -&gt; <span class="ident">UserId</span> {
         <span class="macro">user_id!</span>(<span class="string">&quot;@example2:localhost&quot;</span>)
     }
 
-    <span class="kw">fn</span> <span class="ident">device_id</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident">DeviceIdBox</span> {
+    <span class="kw">fn</span> <span class="ident">device_id</span>() -&gt; <span class="ident">DeviceIdBox</span> {
         <span class="string">&quot;WSKKLTJZCL&quot;</span>.<span class="ident">into</span>()
     }
 
-    <span class="kw">fn</span> <span class="ident">manager</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident">IdentityManager</span> {
+    <span class="kw">fn</span> <span class="ident">manager</span>() -&gt; <span class="ident">IdentityManager</span> {
         <span class="kw">let</span> <span class="ident">identity</span> <span class="op">=</span> <span class="ident">Arc::new</span>(<span class="ident">Mutex::new</span>(<span class="ident">PrivateCrossSigningIdentity::empty</span>(<span class="ident">user_id</span>())));
         <span class="kw">let</span> <span class="ident">user_id</span> <span class="op">=</span> <span class="ident">Arc::new</span>(<span class="ident">user_id</span>());
         <span class="kw">let</span> <span class="ident">account</span> <span class="op">=</span> <span class="ident">ReadOnlyAccount::new</span>(<span class="kw-2">&amp;</span><span class="ident">user_id</span>, <span class="kw-2">&amp;</span><span class="ident">device_id</span>());
@@ -1126,7 +1126,7 @@
         <span class="ident">IdentityManager::new</span>(<span class="ident">user_id</span>, <span class="ident">device_id</span>().<span class="ident">into</span>(), <span class="ident">store</span>)
     }
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">other_key_query</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident">KeyQueryResponse</span> {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">other_key_query</span>() -&gt; <span class="ident">KeyQueryResponse</span> {
         <span class="kw">let</span> <span class="ident">data</span> <span class="op">=</span> <span class="ident">response_from_file</span>(<span class="kw-2">&amp;</span><span class="macro">json!</span>({
             <span class="string">&quot;device_keys&quot;</span>: {
                 <span class="string">&quot;@example2:localhost&quot;</span>: {
@@ -1185,7 +1185,7 @@
             .<span class="ident">expect</span>(<span class="string">&quot;Can&#39;t parse the keys upload response&quot;</span>)
     }
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">own_key_query</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident">KeyQueryResponse</span> {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">own_key_query</span>() -&gt; <span class="ident">KeyQueryResponse</span> {
         <span class="kw">let</span> <span class="ident">data</span> <span class="op">=</span> <span class="ident">response_from_file</span>(<span class="kw-2">&amp;</span><span class="macro">json!</span>({
           <span class="string">&quot;device_keys&quot;</span>: {
             <span class="string">&quot;@example:localhost&quot;</span>: {

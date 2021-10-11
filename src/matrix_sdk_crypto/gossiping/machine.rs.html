@@ -1738,7 +1738,7 @@
         <span class="ident">store</span>: <span class="ident">Store</span>,
         <span class="ident">outbound_group_sessions</span>: <span class="ident">GroupSessionCache</span>,
         <span class="ident">users_for_key_claim</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">DashMap</span><span class="op">&lt;</span><span class="ident">UserId</span>, <span class="ident">DashSet</span><span class="op">&lt;</span><span class="ident">DeviceIdBox</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    ) -&gt; <span class="self">Self</span> {
         <span class="self">Self</span> {
             <span class="ident">user_id</span>,
             <span class="ident">device_id</span>,
@@ -1752,7 +1752,7 @@
     }
 
     <span class="doccomment">/// Load stored outgoing requests that were not yet sent out.</span>
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">load_outgoing_requests</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">OutgoingRequest</span><span class="op">&gt;</span>, <span class="ident">CryptoStoreError</span><span class="op">&gt;</span> {
+    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">load_outgoing_requests</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">OutgoingRequest</span><span class="op">&gt;</span>, <span class="ident">CryptoStoreError</span><span class="op">&gt;</span> {
         <span class="prelude-val">Ok</span>(<span class="self">self</span>
             .<span class="ident">store</span>
             .<span class="ident">get_unsent_secret_requests</span>()
@@ -1764,18 +1764,18 @@
     }
 
     <span class="doccomment">/// Our own user id.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">user_id</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="ident">UserId</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">user_id</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">UserId</span> {
         <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">user_id</span>
     }
 
     <span class="doccomment">/// Our own device id.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">device_id</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="ident">DeviceId</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">device_id</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">DeviceId</span> {
         <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">device_id</span>
     }
 
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">outgoing_to_device_requests</span>(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">OutgoingRequest</span><span class="op">&gt;</span>, <span class="ident">CryptoStoreError</span><span class="op">&gt;</span> {
+    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">OutgoingRequest</span><span class="op">&gt;</span>, <span class="ident">CryptoStoreError</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">key_requests</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">load_outgoing_requests</span>().<span class="kw">await</span><span class="question-mark">?</span>;
         <span class="kw">let</span> <span class="ident">key_forwards</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">OutgoingRequest</span><span class="op">&gt;</span> <span class="op">=</span>
             <span class="self">self</span>.<span class="ident">outgoing_requests</span>.<span class="ident">iter</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">i</span><span class="op">|</span> <span class="ident">i</span>.<span class="ident">value</span>().<span class="ident">clone</span>()).<span class="ident">collect</span>();
@@ -1817,7 +1817,7 @@
         <span class="comment">//</span>
         <span class="comment">// Check if we&#39;re the sender of this request event and ignore it if</span>
         <span class="comment">// so.</span>
-        <span class="kw">if</span> <span class="ident">event</span>.<span class="ident">sender</span>() <span class="op">=</span><span class="op">=</span> <span class="self">self</span>.<span class="ident">user_id</span>() <span class="op">&amp;&amp;</span> <span class="ident">event</span>.<span class="ident">requesting_device_id</span>() <span class="op">=</span><span class="op">=</span> <span class="self">self</span>.<span class="ident">device_id</span>() {
+        <span class="kw">if</span> <span class="ident">event</span>.<span class="ident">sender</span>() <span class="op">==</span> <span class="self">self</span>.<span class="ident">user_id</span>() <span class="op">&amp;&amp;</span> <span class="ident">event</span>.<span class="ident">requesting_device_id</span>() <span class="op">==</span> <span class="self">self</span>.<span class="ident">device_id</span>() {
             <span class="macro">trace!</span>(<span class="string">&quot;Received a secret request event from ourselves, ignoring&quot;</span>)
         } <span class="kw">else</span> {
             <span class="kw">let</span> <span class="ident">request_info</span> <span class="op">=</span> <span class="ident">event</span>.<span class="ident">to_request_info</span>();
@@ -1831,15 +1831,15 @@
 
     <span class="doccomment">/// Handle all the incoming key requests that are queued up and empty our</span>
     <span class="doccomment">/// key request queue.</span>
-    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">collect_incoming_key_requests</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">OlmResult</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Session</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">collect_incoming_key_requests</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">OlmResult</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Session</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">changed_sessions</span> <span class="op">=</span> <span class="ident">Vec::new</span>();
 
         <span class="kw">for</span> <span class="ident">item</span> <span class="kw">in</span> <span class="self">self</span>.<span class="ident">incoming_key_requests</span>.<span class="ident">iter</span>() {
             <span class="kw">let</span> <span class="ident">event</span> <span class="op">=</span> <span class="ident">item</span>.<span class="ident">value</span>();
 
             <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">s</span>) <span class="op">=</span> <span class="kw">match</span> <span class="ident">event</span> {
-                <span class="ident">RequestEvent::KeyShare</span>(<span class="ident">e</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="self">self</span>.<span class="ident">handle_key_request</span>(<span class="ident">e</span>).<span class="kw">await</span><span class="question-mark">?</span>,
-                <span class="ident">RequestEvent::Secret</span>(<span class="ident">e</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="self">self</span>.<span class="ident">handle_secret_request</span>(<span class="ident">e</span>).<span class="kw">await</span><span class="question-mark">?</span>,
+                <span class="ident">RequestEvent::KeyShare</span>(<span class="ident">e</span>) =&gt; <span class="self">self</span>.<span class="ident">handle_key_request</span>(<span class="ident">e</span>).<span class="kw">await</span><span class="question-mark">?</span>,
+                <span class="ident">RequestEvent::Secret</span>(<span class="ident">e</span>) =&gt; <span class="self">self</span>.<span class="ident">handle_secret_request</span>(<span class="ident">e</span>).<span class="kw">await</span><span class="question-mark">?</span>,
             } {
                 <span class="ident">changed_sessions</span>.<span class="ident">push</span>(<span class="ident">s</span>);
             }
@@ -1892,12 +1892,12 @@
     <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">handle_secret_request</span>(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         <span class="ident">event</span>: <span class="kw-2">&amp;</span><span class="ident">SecretRequestEvent</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">OlmResult</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Session</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+    ) -&gt; <span class="ident">OlmResult</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Session</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">secret_name</span> <span class="op">=</span> <span class="kw">match</span> <span class="kw-2">&amp;</span><span class="ident">event</span>.<span class="ident">content</span>.<span class="ident">action</span> {
-            <span class="ident">RequestAction::Request</span>(<span class="ident">s</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">s</span>,
+            <span class="ident">RequestAction::Request</span>(<span class="ident">s</span>) =&gt; <span class="ident">s</span>,
             <span class="comment">// We ignore cancellations here since there&#39;s nothing to serve.</span>
-            <span class="ident">RequestAction::RequestCancellation</span> <span class="op">=</span><span class="op">&gt;</span> <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="prelude-val">None</span>),
-            <span class="ident">action</span> <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">RequestAction::RequestCancellation</span> =&gt; <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="prelude-val">None</span>),
+            <span class="ident">action</span> =&gt; {
                 <span class="macro">warn!</span>(<span class="ident">action</span> <span class="op">=</span><span class="question-mark">?</span> <span class="ident">action</span>, <span class="string">&quot;Unknown secret request action&quot;</span>);
                 <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="prelude-val">None</span>);
             }
@@ -1914,7 +1914,7 @@
             <span class="self">self</span>.<span class="ident">store</span>.<span class="ident">get_device</span>(<span class="kw-2">&amp;</span><span class="ident">event</span>.<span class="ident">sender</span>, <span class="kw-2">&amp;</span><span class="ident">event</span>.<span class="ident">content</span>.<span class="ident">requesting_device_id</span>).<span class="kw">await</span><span class="question-mark">?</span>;
 
         <span class="prelude-val">Ok</span>(<span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">device</span>) <span class="op">=</span> <span class="ident">device</span> {
-            <span class="kw">if</span> <span class="ident">device</span>.<span class="ident">user_id</span>() <span class="op">=</span><span class="op">=</span> <span class="self">self</span>.<span class="ident">user_id</span>() {
+            <span class="kw">if</span> <span class="ident">device</span>.<span class="ident">user_id</span>() <span class="op">==</span> <span class="self">self</span>.<span class="ident">user_id</span>() {
                 <span class="kw">if</span> <span class="ident">device</span>.<span class="ident">verified</span>() {
                     <span class="macro">info!</span>(
                         <span class="ident">user_id</span> <span class="op">=</span> <span class="ident">device</span>.<span class="ident">user_id</span>().<span class="ident">as_str</span>(),
@@ -1924,8 +1924,8 @@
                     );
 
                     <span class="kw">match</span> <span class="self">self</span>.<span class="ident">share_secret</span>(<span class="kw-2">&amp;</span><span class="ident">device</span>, <span class="ident">content</span>).<span class="kw">await</span> {
-                        <span class="prelude-val">Ok</span>(<span class="ident">s</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(<span class="ident">s</span>)),
-                        <span class="prelude-val">Err</span>(<span class="ident">OlmError::MissingSession</span>) <span class="op">=</span><span class="op">&gt;</span> {
+                        <span class="prelude-val">Ok</span>(<span class="ident">s</span>) =&gt; <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(<span class="ident">s</span>)),
+                        <span class="prelude-val">Err</span>(<span class="ident">OlmError::MissingSession</span>) =&gt; {
                             <span class="macro">info!</span>(
                                 <span class="ident">user_id</span> <span class="op">=</span> <span class="ident">device</span>.<span class="ident">user_id</span>().<span class="ident">as_str</span>(),
                                 <span class="ident">device_id</span> <span class="op">=</span> <span class="ident">device</span>.<span class="ident">device_id</span>().<span class="ident">as_str</span>(),
@@ -1937,7 +1937,7 @@
 
                             <span class="prelude-val">Ok</span>(<span class="prelude-val">None</span>)
                         }
-                        <span class="prelude-val">Err</span>(<span class="ident">e</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Err</span>(<span class="ident">e</span>),
+                        <span class="prelude-val">Err</span>(<span class="ident">e</span>) =&gt; <span class="prelude-val">Err</span>(<span class="ident">e</span>),
                     }<span class="question-mark">?</span>
                 } <span class="kw">else</span> {
                     <span class="macro">info!</span>(
@@ -1976,9 +1976,9 @@
     <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">handle_key_request</span>(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         <span class="ident">event</span>: <span class="kw-2">&amp;</span><span class="ident">ToDeviceRoomKeyRequestEvent</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">OlmResult</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Session</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+    ) -&gt; <span class="ident">OlmResult</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Session</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">key_info</span> <span class="op">=</span> <span class="kw">match</span> <span class="kw-2">&amp;</span><span class="ident">event</span>.<span class="ident">content</span>.<span class="ident">action</span> {
-            <span class="ident">Action::Request</span> <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">Action::Request</span> =&gt; {
                 <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">info</span>) <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">event</span>.<span class="ident">content</span>.<span class="ident">body</span> {
                     <span class="ident">info</span>
                 } <span class="kw">else</span> {
@@ -1992,8 +1992,8 @@
                 }
             }
             <span class="comment">// We ignore cancellations here since there&#39;s nothing to serve.</span>
-            <span class="ident">Action::CancelRequest</span> <span class="op">=</span><span class="op">&gt;</span> <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="prelude-val">None</span>),
-            <span class="ident">action</span> <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">Action::CancelRequest</span> =&gt; <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="prelude-val">None</span>),
+            <span class="ident">action</span> =&gt; {
                 <span class="macro">warn!</span>(
                     <span class="ident">sender</span> <span class="op">=</span> <span class="ident">event</span>.<span class="ident">sender</span>.<span class="ident">as_str</span>(),
                     <span class="ident">requesting_device_id</span> <span class="op">=</span> <span class="ident">event</span>.<span class="ident">content</span>.<span class="ident">requesting_device_id</span>.<span class="ident">as_str</span>(),
@@ -2031,7 +2031,7 @@
 
         <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">device</span>) <span class="op">=</span> <span class="ident">device</span> {
             <span class="kw">match</span> <span class="self">self</span>.<span class="ident">should_share_key</span>(<span class="kw-2">&amp;</span><span class="ident">device</span>, <span class="kw-2">&amp;</span><span class="ident">session</span>).<span class="kw">await</span> {
-                <span class="prelude-val">Err</span>(<span class="ident">e</span>) <span class="op">=</span><span class="op">&gt;</span> {
+                <span class="prelude-val">Err</span>(<span class="ident">e</span>) =&gt; {
                     <span class="kw">if</span> <span class="kw">let</span> <span class="ident">KeyForwardDecision::ChangedSenderKey</span> <span class="op">=</span> <span class="ident">e</span> {
                         <span class="macro">warn!</span>(
                             <span class="ident">user_id</span> <span class="op">=</span> <span class="ident">device</span>.<span class="ident">user_id</span>().<span class="ident">as_str</span>(),
@@ -2050,7 +2050,7 @@
 
                     <span class="prelude-val">Ok</span>(<span class="prelude-val">None</span>)
                 }
-                <span class="prelude-val">Ok</span>(<span class="ident">message_index</span>) <span class="op">=</span><span class="op">&gt;</span> {
+                <span class="prelude-val">Ok</span>(<span class="ident">message_index</span>) =&gt; {
                     <span class="macro">info!</span>(
                         <span class="ident">user_id</span> <span class="op">=</span> <span class="ident">device</span>.<span class="ident">user_id</span>().<span class="ident">as_str</span>(),
                         <span class="ident">device_id</span> <span class="op">=</span> <span class="ident">device</span>.<span class="ident">device_id</span>().<span class="ident">as_str</span>(),
@@ -2061,8 +2061,8 @@
                     );
 
                     <span class="kw">match</span> <span class="self">self</span>.<span class="ident">share_session</span>(<span class="kw-2">&amp;</span><span class="ident">session</span>, <span class="kw-2">&amp;</span><span class="ident">device</span>, <span class="ident">message_index</span>).<span class="kw">await</span> {
-                        <span class="prelude-val">Ok</span>(<span class="ident">s</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(<span class="ident">s</span>)),
-                        <span class="prelude-val">Err</span>(<span class="ident">OlmError::MissingSession</span>) <span class="op">=</span><span class="op">&gt;</span> {
+                        <span class="prelude-val">Ok</span>(<span class="ident">s</span>) =&gt; <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(<span class="ident">s</span>)),
+                        <span class="prelude-val">Err</span>(<span class="ident">OlmError::MissingSession</span>) =&gt; {
                             <span class="macro">info!</span>(
                                 <span class="ident">user_id</span> <span class="op">=</span> <span class="ident">device</span>.<span class="ident">user_id</span>().<span class="ident">as_str</span>(),
                                 <span class="ident">device_id</span> <span class="op">=</span> <span class="ident">device</span>.<span class="ident">device_id</span>().<span class="ident">as_str</span>(),
@@ -2074,7 +2074,7 @@
 
                             <span class="prelude-val">Ok</span>(<span class="prelude-val">None</span>)
                         }
-                        <span class="prelude-val">Err</span>(<span class="ident">e</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Err</span>(<span class="ident">e</span>),
+                        <span class="prelude-val">Err</span>(<span class="ident">e</span>) =&gt; <span class="prelude-val">Err</span>(<span class="ident">e</span>),
                     }
                 }
             }
@@ -2094,7 +2094,7 @@
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         <span class="ident">device</span>: <span class="kw-2">&amp;</span><span class="ident">Device</span>,
         <span class="ident">content</span>: <span class="ident">SecretSendEventContent</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">OlmResult</span><span class="op">&lt;</span><span class="ident">Session</span><span class="op">&gt;</span> {
+    ) -&gt; <span class="ident">OlmResult</span><span class="op">&lt;</span><span class="ident">Session</span><span class="op">&gt;</span> {
         <span class="kw">let</span> (<span class="ident">used_session</span>, <span class="ident">content</span>) <span class="op">=</span>
             <span class="ident">device</span>.<span class="ident">encrypt</span>(<span class="ident">AnyToDeviceEventContent::SecretSend</span>(<span class="ident">content</span>)).<span class="kw">await</span><span class="question-mark">?</span>;
 
@@ -2116,7 +2116,7 @@
         <span class="ident">session</span>: <span class="kw-2">&amp;</span><span class="ident">InboundGroupSession</span>,
         <span class="ident">device</span>: <span class="kw-2">&amp;</span><span class="ident">Device</span>,
         <span class="ident">message_index</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">OlmResult</span><span class="op">&lt;</span><span class="ident">Session</span><span class="op">&gt;</span> {
+    ) -&gt; <span class="ident">OlmResult</span><span class="op">&lt;</span><span class="ident">Session</span><span class="op">&gt;</span> {
         <span class="kw">let</span> (<span class="ident">used_session</span>, <span class="ident">content</span>) <span class="op">=</span>
             <span class="ident">device</span>.<span class="ident">encrypt_session</span>(<span class="ident">session</span>.<span class="ident">clone</span>(), <span class="ident">message_index</span>).<span class="kw">await</span><span class="question-mark">?</span>;
 
@@ -2169,7 +2169,7 @@
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         <span class="ident">device</span>: <span class="kw-2">&amp;</span><span class="ident">Device</span>,
         <span class="ident">session</span>: <span class="kw-2">&amp;</span><span class="ident">InboundGroupSession</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span>, <span class="ident">KeyForwardDecision</span><span class="op">&gt;</span> {
+    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span>, <span class="ident">KeyForwardDecision</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">outbound_session</span> <span class="op">=</span> <span class="self">self</span>
             .<span class="ident">outbound_group_sessions</span>
             .<span class="ident">get_with_id</span>(<span class="ident">session</span>.<span class="ident">room_id</span>(), <span class="ident">session</span>.<span class="ident">session_id</span>())
@@ -2179,7 +2179,7 @@
 
         <span class="comment">// If this is our own, verified device, we share the entire session from the</span>
         <span class="comment">// earliest known index.</span>
-        <span class="kw">if</span> <span class="ident">device</span>.<span class="ident">user_id</span>() <span class="op">=</span><span class="op">=</span> <span class="self">self</span>.<span class="ident">user_id</span>() <span class="op">&amp;&amp;</span> <span class="ident">device</span>.<span class="ident">verified</span>() {
+        <span class="kw">if</span> <span class="ident">device</span>.<span class="ident">user_id</span>() <span class="op">==</span> <span class="self">self</span>.<span class="ident">user_id</span>() <span class="op">&amp;&amp;</span> <span class="ident">device</span>.<span class="ident">verified</span>() {
             <span class="prelude-val">Ok</span>(<span class="prelude-val">None</span>)
         <span class="comment">// Otherwise, if the records show we previously shared with this device,</span>
         <span class="comment">// we&#39;ll reshare the session from the index we previously shared</span>
@@ -2187,13 +2187,13 @@
         <span class="comment">// information is recorded there.</span>
         } <span class="kw">else</span> <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">outbound</span>) <span class="op">=</span> <span class="ident">outbound_session</span> {
             <span class="kw">match</span> <span class="ident">outbound</span>.<span class="ident">is_shared_with</span>(<span class="ident">device</span>) {
-                <span class="ident">ShareState::Shared</span>(<span class="ident">message_index</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(<span class="ident">message_index</span>)),
-                <span class="ident">ShareState::SharedButChangedSenderKey</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Err</span>(<span class="ident">KeyForwardDecision::ChangedSenderKey</span>),
-                <span class="ident">ShareState::NotShared</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Err</span>(<span class="ident">KeyForwardDecision::OutboundSessionNotShared</span>),
+                <span class="ident">ShareState::Shared</span>(<span class="ident">message_index</span>) =&gt; <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(<span class="ident">message_index</span>)),
+                <span class="ident">ShareState::SharedButChangedSenderKey</span> =&gt; <span class="prelude-val">Err</span>(<span class="ident">KeyForwardDecision::ChangedSenderKey</span>),
+                <span class="ident">ShareState::NotShared</span> =&gt; <span class="prelude-val">Err</span>(<span class="ident">KeyForwardDecision::OutboundSessionNotShared</span>),
             }
         <span class="comment">// Otherwise, there&#39;s not enough info to decide if we can safely share</span>
         <span class="comment">// the session.</span>
-        } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">device</span>.<span class="ident">user_id</span>() <span class="op">=</span><span class="op">=</span> <span class="self">self</span>.<span class="ident">user_id</span>() {
+        } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">device</span>.<span class="ident">user_id</span>() <span class="op">==</span> <span class="self">self</span>.<span class="ident">user_id</span>() {
             <span class="prelude-val">Err</span>(<span class="ident">KeyForwardDecision::UntrustedDevice</span>)
         } <span class="kw">else</span> {
             <span class="prelude-val">Err</span>(<span class="ident">KeyForwardDecision::MissingOutboundSession</span>)
@@ -2207,7 +2207,7 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// * `key_info` - The info of our key request containing information about</span>
     <span class="doccomment">/// the key we wish to request.</span>
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">should_request_key</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">key_info</span>: <span class="kw-2">&amp;</span><span class="ident">SecretInfo</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">bool</span>, <span class="ident">CryptoStoreError</span><span class="op">&gt;</span> {
+    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">should_request_key</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">key_info</span>: <span class="kw-2">&amp;</span><span class="ident">SecretInfo</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">bool</span>, <span class="ident">CryptoStoreError</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">request</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">store</span>.<span class="ident">get_secret_request_by_info</span>(<span class="ident">key_info</span>).<span class="kw">await</span><span class="question-mark">?</span>;
 
         <span class="comment">// Don&#39;t send out duplicate requests, users can re-request them if they</span>
@@ -2251,7 +2251,7 @@
         <span class="ident">room_id</span>: <span class="kw-2">&amp;</span><span class="ident">RoomId</span>,
         <span class="ident">sender_key</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>,
         <span class="ident">session_id</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(<span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">OutgoingRequest</span><span class="op">&gt;</span>, <span class="ident">OutgoingRequest</span>), <span class="ident">CryptoStoreError</span><span class="op">&gt;</span> {
+    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(<span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">OutgoingRequest</span><span class="op">&gt;</span>, <span class="ident">OutgoingRequest</span>), <span class="ident">CryptoStoreError</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">key_info</span> <span class="op">=</span> <span class="ident">RequestedKeyInfo::new</span>(
             <span class="ident">EventEncryptionAlgorithm::MegolmV1AesSha2</span>,
             <span class="ident">room_id</span>.<span class="ident">to_owned</span>(),
@@ -2278,7 +2278,7 @@
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">request_missing_secrets</span>(
         <span class="ident">own_user_id</span>: <span class="kw-2">&amp;</span><span class="ident">UserId</span>,
         <span class="ident">secret_names</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">SecretName</span><span class="op">&gt;</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">GossipRequest</span><span class="op">&gt;</span> {
+    ) -&gt; <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">GossipRequest</span><span class="op">&gt;</span> {
         <span class="kw">if</span> <span class="op">!</span><span class="ident">secret_names</span>.<span class="ident">is_empty</span>() {
             <span class="macro">info!</span>(<span class="ident">secret_names</span> <span class="op">=</span><span class="question-mark">?</span> <span class="ident">secret_names</span>, <span class="string">&quot;Creating new outgoing secret requests&quot;</span>);
 
@@ -2295,7 +2295,7 @@
     <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">request_key_helper</span>(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         <span class="ident">key_info</span>: <span class="ident">SecretInfo</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">OutgoingRequest</span>, <span class="ident">CryptoStoreError</span><span class="op">&gt;</span> {
+    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">OutgoingRequest</span>, <span class="ident">CryptoStoreError</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">request</span> <span class="op">=</span> <span class="ident">GossipRequest</span> {
             <span class="ident">request_recipient</span>: <span class="self">self</span>.<span class="ident">user_id</span>().<span class="ident">to_owned</span>(),
             <span class="ident">request_id</span>: <span class="ident">Uuid::new_v4</span>(),
@@ -2328,7 +2328,7 @@
         <span class="ident">room_id</span>: <span class="kw-2">&amp;</span><span class="ident">RoomId</span>,
         <span class="ident">sender_key</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>,
         <span class="ident">session_id</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">CryptoStoreError</span><span class="op">&gt;</span> {
+    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">CryptoStoreError</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">key_info</span> <span class="op">=</span> <span class="ident">RequestedKeyInfo::new</span>(
             <span class="ident">EventEncryptionAlgorithm::MegolmV1AesSha2</span>,
             <span class="ident">room_id</span>.<span class="ident">to_owned</span>(),
@@ -2345,7 +2345,7 @@
     }
 
     <span class="doccomment">/// Save an outgoing key info.</span>
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">save_outgoing_key_info</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">info</span>: <span class="ident">GossipRequest</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">CryptoStoreError</span><span class="op">&gt;</span> {
+    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">save_outgoing_key_info</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">info</span>: <span class="ident">GossipRequest</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">CryptoStoreError</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">changes</span> <span class="op">=</span> <span class="ident">Changes::default</span>();
         <span class="ident">changes</span>.<span class="ident">key_requests</span>.<span class="ident">push</span>(<span class="ident">info</span>);
         <span class="self">self</span>.<span class="ident">store</span>.<span class="ident">save_changes</span>(<span class="ident">changes</span>).<span class="kw">await</span><span class="question-mark">?</span>;
@@ -2357,7 +2357,7 @@
     <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">get_key_info</span>(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         <span class="ident">content</span>: <span class="kw-2">&amp;</span><span class="ident">ToDeviceForwardedRoomKeyEventContent</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">GossipRequest</span><span class="op">&gt;</span>, <span class="ident">CryptoStoreError</span><span class="op">&gt;</span> {
+    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">GossipRequest</span><span class="op">&gt;</span>, <span class="ident">CryptoStoreError</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">info</span> <span class="op">=</span> <span class="ident">RequestedKeyInfo::new</span>(
             <span class="ident">content</span>.<span class="ident">algorithm</span>.<span class="ident">clone</span>(),
             <span class="ident">content</span>.<span class="ident">room_id</span>.<span class="ident">clone</span>(),
@@ -2370,12 +2370,12 @@
     }
 
     <span class="doccomment">/// Delete the given outgoing key info.</span>
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">delete_key_info</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">info</span>: <span class="kw-2">&amp;</span><span class="ident">GossipRequest</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">CryptoStoreError</span><span class="op">&gt;</span> {
+    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">delete_key_info</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">info</span>: <span class="kw-2">&amp;</span><span class="ident">GossipRequest</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">CryptoStoreError</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">store</span>.<span class="ident">delete_outgoing_secret_requests</span>(<span class="ident">info</span>.<span class="ident">request_id</span>).<span class="kw">await</span>
     }
 
     <span class="doccomment">/// Mark the outgoing request as sent.</span>
-    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">mark_outgoing_request_as_sent</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">id</span>: <span class="ident">Uuid</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">CryptoStoreError</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">mark_outgoing_request_as_sent</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">id</span>: <span class="ident">Uuid</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">CryptoStoreError</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">info</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">store</span>.<span class="ident">get_outgoing_secret_requests</span>(<span class="ident">id</span>).<span class="kw">await</span><span class="question-mark">?</span>;
 
         <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="kw-2">mut</span> <span class="ident">info</span>) <span class="op">=</span> <span class="ident">info</span> {
@@ -2397,7 +2397,7 @@
     <span class="doccomment">/// Mark the given outgoing key info as done.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// This will queue up a request cancellation.</span>
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">mark_as_done</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">key_info</span>: <span class="ident">GossipRequest</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">CryptoStoreError</span><span class="op">&gt;</span> {
+    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">mark_as_done</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">key_info</span>: <span class="ident">GossipRequest</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">CryptoStoreError</span><span class="op">&gt;</span> {
         <span class="macro">trace!</span>(
             <span class="ident">recipient</span> <span class="op">=</span> <span class="ident">key_info</span>.<span class="ident">request_recipient</span>.<span class="ident">as_str</span>(),
             <span class="ident">request_type</span> <span class="op">=</span> <span class="ident">key_info</span>.<span class="ident">request_type</span>(),
@@ -2420,7 +2420,7 @@
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         <span class="ident">sender_key</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>,
         <span class="ident">event</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">SecretSendEvent</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">AnyToDeviceEvent</span><span class="op">&gt;</span>, <span class="ident">CryptoStoreError</span><span class="op">&gt;</span> {
+    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">AnyToDeviceEvent</span><span class="op">&gt;</span>, <span class="ident">CryptoStoreError</span><span class="op">&gt;</span> {
         <span class="macro">debug!</span>(
             <span class="ident">sender</span> <span class="op">=</span> <span class="ident">event</span>.<span class="ident">sender</span>.<span class="ident">as_str</span>(),
             <span class="ident">request_id</span> <span class="op">=</span> <span class="ident">event</span>.<span class="ident">content</span>.<span class="ident">request_id</span>.<span class="ident">as_str</span>(),
@@ -2436,14 +2436,14 @@
 
         <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">request</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">store</span>.<span class="ident">get_outgoing_secret_requests</span>(<span class="ident">request_id</span>).<span class="kw">await</span><span class="question-mark">?</span> {
             <span class="kw">match</span> <span class="kw-2">&amp;</span><span class="ident">request</span>.<span class="ident">info</span> {
-                <span class="ident">SecretInfo::KeyRequest</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> {
+                <span class="ident">SecretInfo::KeyRequest</span>(<span class="kw">_</span>) =&gt; {
                     <span class="macro">warn!</span>(
                         <span class="ident">sender</span> <span class="op">=</span> <span class="ident">event</span>.<span class="ident">sender</span>.<span class="ident">as_str</span>(),
                         <span class="ident">request_id</span> <span class="op">=</span> <span class="ident">event</span>.<span class="ident">content</span>.<span class="ident">request_id</span>.<span class="ident">as_str</span>(),
                         <span class="string">&quot;Received a m.secret.send event but the request was for a room key&quot;</span>
                     );
                 }
-                <span class="ident">SecretInfo::SecretRequest</span>(<span class="ident">secret_name</span>) <span class="op">=</span><span class="op">&gt;</span> {
+                <span class="ident">SecretInfo::SecretRequest</span>(<span class="ident">secret_name</span>) =&gt; {
                     <span class="macro">debug!</span>(
                         <span class="ident">sender</span> <span class="op">=</span> <span class="ident">event</span>.<span class="ident">sender</span>.<span class="ident">as_str</span>(),
                         <span class="ident">request_id</span> <span class="op">=</span> <span class="ident">event</span>.<span class="ident">content</span>.<span class="ident">request_id</span>.<span class="ident">as_str</span>(),
@@ -2463,8 +2463,8 @@
                                 )
                                 .<span class="kw">await</span>
                             {
-                                <span class="prelude-val">Ok</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="self">self</span>.<span class="ident">mark_as_done</span>(<span class="ident">request</span>).<span class="kw">await</span><span class="question-mark">?</span>,
-                                <span class="prelude-val">Err</span>(<span class="ident">e</span>) <span class="op">=</span><span class="op">&gt;</span> {
+                                <span class="prelude-val">Ok</span>(<span class="kw">_</span>) =&gt; <span class="self">self</span>.<span class="ident">mark_as_done</span>(<span class="ident">request</span>).<span class="kw">await</span><span class="question-mark">?</span>,
+                                <span class="prelude-val">Err</span>(<span class="ident">e</span>) =&gt; {
                                     <span class="comment">// If this is a store error propagate it up</span>
                                     <span class="comment">// the call stack.</span>
                                     <span class="kw">if</span> <span class="kw">let</span> <span class="ident">SecretImportError::Store</span>(<span class="ident">e</span>) <span class="op">=</span> <span class="ident">e</span> {
@@ -2509,7 +2509,7 @@
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         <span class="ident">sender_key</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>,
         <span class="ident">event</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">ToDeviceForwardedRoomKeyEvent</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(<span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">AnyToDeviceEvent</span><span class="op">&gt;</span>, <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">InboundGroupSession</span><span class="op">&gt;</span>), <span class="ident">CryptoStoreError</span><span class="op">&gt;</span> {
+    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(<span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">AnyToDeviceEvent</span><span class="op">&gt;</span>, <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">InboundGroupSession</span><span class="op">&gt;</span>), <span class="ident">CryptoStoreError</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">key_info</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">get_key_info</span>(<span class="kw-2">&amp;</span><span class="ident">event</span>.<span class="ident">content</span>).<span class="kw">await</span><span class="question-mark">?</span>;
 
         <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">info</span>) <span class="op">=</span> <span class="ident">key_info</span> {
@@ -2593,43 +2593,43 @@
         <span class="ident">OutgoingRequests</span>,
     };
 
-    <span class="kw">fn</span> <span class="ident">alice_id</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident">UserId</span> {
+    <span class="kw">fn</span> <span class="ident">alice_id</span>() -&gt; <span class="ident">UserId</span> {
         <span class="macro">user_id!</span>(<span class="string">&quot;@alice:example.org&quot;</span>)
     }
 
-    <span class="kw">fn</span> <span class="ident">alice_device_id</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident">DeviceIdBox</span> {
+    <span class="kw">fn</span> <span class="ident">alice_device_id</span>() -&gt; <span class="ident">DeviceIdBox</span> {
         <span class="string">&quot;JLAFKJWSCS&quot;</span>.<span class="ident">into</span>()
     }
 
-    <span class="kw">fn</span> <span class="ident">bob_id</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident">UserId</span> {
+    <span class="kw">fn</span> <span class="ident">bob_id</span>() -&gt; <span class="ident">UserId</span> {
         <span class="macro">user_id!</span>(<span class="string">&quot;@bob:example.org&quot;</span>)
     }
 
-    <span class="kw">fn</span> <span class="ident">bob_device_id</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident">DeviceIdBox</span> {
+    <span class="kw">fn</span> <span class="ident">bob_device_id</span>() -&gt; <span class="ident">DeviceIdBox</span> {
         <span class="string">&quot;ILMLKASTES&quot;</span>.<span class="ident">into</span>()
     }
 
-    <span class="kw">fn</span> <span class="ident">alice2_device_id</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident">DeviceIdBox</span> {
+    <span class="kw">fn</span> <span class="ident">alice2_device_id</span>() -&gt; <span class="ident">DeviceIdBox</span> {
         <span class="string">&quot;ILMLKASTES&quot;</span>.<span class="ident">into</span>()
     }
 
-    <span class="kw">fn</span> <span class="ident">room_id</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident">RoomId</span> {
+    <span class="kw">fn</span> <span class="ident">room_id</span>() -&gt; <span class="ident">RoomId</span> {
         <span class="macro">room_id!</span>(<span class="string">&quot;!test:example.org&quot;</span>)
     }
 
-    <span class="kw">fn</span> <span class="ident">account</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ReadOnlyAccount</span> {
+    <span class="kw">fn</span> <span class="ident">account</span>() -&gt; <span class="ident">ReadOnlyAccount</span> {
         <span class="ident">ReadOnlyAccount::new</span>(<span class="kw-2">&amp;</span><span class="ident">alice_id</span>(), <span class="kw-2">&amp;</span><span class="ident">alice_device_id</span>())
     }
 
-    <span class="kw">fn</span> <span class="ident">bob_account</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ReadOnlyAccount</span> {
+    <span class="kw">fn</span> <span class="ident">bob_account</span>() -&gt; <span class="ident">ReadOnlyAccount</span> {
         <span class="ident">ReadOnlyAccount::new</span>(<span class="kw-2">&amp;</span><span class="ident">bob_id</span>(), <span class="kw-2">&amp;</span><span class="ident">bob_device_id</span>())
     }
 
-    <span class="kw">fn</span> <span class="ident">alice_2_account</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ReadOnlyAccount</span> {
+    <span class="kw">fn</span> <span class="ident">alice_2_account</span>() -&gt; <span class="ident">ReadOnlyAccount</span> {
         <span class="ident">ReadOnlyAccount::new</span>(<span class="kw-2">&amp;</span><span class="ident">alice_id</span>(), <span class="kw-2">&amp;</span><span class="ident">alice2_device_id</span>())
     }
 
-    <span class="kw">fn</span> <span class="ident">bob_machine</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident">GossipMachine</span> {
+    <span class="kw">fn</span> <span class="ident">bob_machine</span>() -&gt; <span class="ident">GossipMachine</span> {
         <span class="kw">let</span> <span class="ident">user_id</span> <span class="op">=</span> <span class="ident">Arc::new</span>(<span class="ident">bob_id</span>());
         <span class="kw">let</span> <span class="ident">account</span> <span class="op">=</span> <span class="ident">ReadOnlyAccount::new</span>(<span class="kw-2">&amp;</span><span class="ident">user_id</span>, <span class="kw-2">&amp;</span><span class="ident">alice_device_id</span>());
         <span class="kw">let</span> <span class="ident">store</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">CryptoStore</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">Arc::new</span>(<span class="ident">MemoryStore::new</span>());
@@ -2647,7 +2647,7 @@
         )
     }
 
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">get_machine</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident">GossipMachine</span> {
+    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">get_machine</span>() -&gt; <span class="ident">GossipMachine</span> {
         <span class="kw">let</span> <span class="ident">user_id</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">UserId</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">alice_id</span>().<span class="ident">into</span>();
         <span class="kw">let</span> <span class="ident">account</span> <span class="op">=</span> <span class="ident">ReadOnlyAccount::new</span>(<span class="kw-2">&amp;</span><span class="ident">user_id</span>, <span class="kw-2">&amp;</span><span class="ident">alice_device_id</span>());
         <span class="kw">let</span> <span class="ident">device</span> <span class="op">=</span> <span class="ident">ReadOnlyDevice::from_account</span>(<span class="kw-2">&amp;</span><span class="ident">account</span>).<span class="kw">await</span>;

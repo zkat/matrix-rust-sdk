@@ -1357,32 +1357,32 @@
 
 <span class="kw">trait</span> <span class="ident">EncodeKey</span> {
     <span class="kw">const</span> <span class="ident">SEPARATOR</span>: <span class="ident">u8</span> <span class="op">=</span> <span class="number">0xff</span>;
-    <span class="kw">fn</span> <span class="ident">encode</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>;
+    <span class="kw">fn</span> <span class="ident">encode</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>;
 }
 
 <span class="kw">impl</span> <span class="ident">EncodeKey</span> <span class="kw">for</span> <span class="ident">Uuid</span> {
-    <span class="kw">fn</span> <span class="ident">encode</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">encode</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">as_u128</span>().<span class="ident">to_be_bytes</span>().<span class="ident">to_vec</span>()
     }
 }
 
 <span class="kw">impl</span> <span class="ident">EncodeKey</span> <span class="kw">for</span> <span class="ident">SecretName</span> {
-    <span class="kw">fn</span> <span class="ident">encode</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">encode</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span> {
         [<span class="self">self</span>.<span class="ident">as_ref</span>().<span class="ident">as_bytes</span>(), <span class="kw-2">&amp;</span>[<span class="ident"><span class="self">Self</span>::SEPARATOR</span>]].<span class="ident">concat</span>()
     }
 }
 
 <span class="kw">impl</span> <span class="ident">EncodeKey</span> <span class="kw">for</span> <span class="ident">SecretInfo</span> {
-    <span class="kw">fn</span> <span class="ident">encode</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">encode</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span> {
         <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">SecretInfo::KeyRequest</span>(<span class="ident">k</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">k</span>.<span class="ident">encode</span>(),
-            <span class="ident">SecretInfo::SecretRequest</span>(<span class="ident">s</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">s</span>.<span class="ident">encode</span>(),
+            <span class="ident">SecretInfo::KeyRequest</span>(<span class="ident">k</span>) =&gt; <span class="ident">k</span>.<span class="ident">encode</span>(),
+            <span class="ident">SecretInfo::SecretRequest</span>(<span class="ident">s</span>) =&gt; <span class="ident">s</span>.<span class="ident">encode</span>(),
         }
     }
 }
 
 <span class="kw">impl</span> <span class="ident">EncodeKey</span> <span class="kw">for</span> <span class="kw-2">&amp;</span><span class="ident">RequestedKeyInfo</span> {
-    <span class="kw">fn</span> <span class="ident">encode</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">encode</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span> {
         [
             <span class="self">self</span>.<span class="ident">room_id</span>.<span class="ident">as_bytes</span>(),
             <span class="kw-2">&amp;</span>[<span class="ident"><span class="self">Self</span>::SEPARATOR</span>],
@@ -1398,31 +1398,31 @@
 }
 
 <span class="kw">impl</span> <span class="ident">EncodeKey</span> <span class="kw">for</span> <span class="kw-2">&amp;</span><span class="ident">UserId</span> {
-    <span class="kw">fn</span> <span class="ident">encode</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">encode</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">as_str</span>().<span class="ident">encode</span>()
     }
 }
 
 <span class="kw">impl</span> <span class="ident">EncodeKey</span> <span class="kw">for</span> <span class="kw-2">&amp;</span><span class="ident">RoomId</span> {
-    <span class="kw">fn</span> <span class="ident">encode</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">encode</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">as_str</span>().<span class="ident">encode</span>()
     }
 }
 
 <span class="kw">impl</span> <span class="ident">EncodeKey</span> <span class="kw">for</span> <span class="kw-2">&amp;</span><span class="ident">str</span> {
-    <span class="kw">fn</span> <span class="ident">encode</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">encode</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span> {
         [<span class="self">self</span>.<span class="ident">as_bytes</span>(), <span class="kw-2">&amp;</span>[<span class="ident"><span class="self">Self</span>::SEPARATOR</span>]].<span class="ident">concat</span>()
     }
 }
 
 <span class="kw">impl</span> <span class="ident">EncodeKey</span> <span class="kw">for</span> (<span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="kw-2">&amp;</span><span class="ident">str</span>) {
-    <span class="kw">fn</span> <span class="ident">encode</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">encode</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span> {
         [<span class="self">self</span>.<span class="number">0</span>.<span class="ident">as_bytes</span>(), <span class="kw-2">&amp;</span>[<span class="ident"><span class="self">Self</span>::SEPARATOR</span>], <span class="self">self</span>.<span class="number">1</span>.<span class="ident">as_bytes</span>(), <span class="kw-2">&amp;</span>[<span class="ident"><span class="self">Self</span>::SEPARATOR</span>]].<span class="ident">concat</span>()
     }
 }
 
 <span class="kw">impl</span> <span class="ident">EncodeKey</span> <span class="kw">for</span> (<span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="kw-2">&amp;</span><span class="ident">str</span>) {
-    <span class="kw">fn</span> <span class="ident">encode</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">encode</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span> {
         [
             <span class="self">self</span>.<span class="number">0</span>.<span class="ident">as_bytes</span>(),
             <span class="kw-2">&amp;</span>[<span class="ident"><span class="self">Self</span>::SEPARATOR</span>],
@@ -1473,7 +1473,7 @@
 }
 
 <span class="kw">impl</span> <span class="ident">std::fmt::Debug</span> <span class="kw">for</span> <span class="ident">SledStore</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">std::fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">std::fmt::Result</span> {
+    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">std::fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">std::fmt::Result</span> {
         <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">path</span>) <span class="op">=</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">path</span> {
             <span class="ident">f</span>.<span class="ident">debug_struct</span>(<span class="string">&quot;SledStore&quot;</span>).<span class="ident">field</span>(<span class="string">&quot;path&quot;</span>, <span class="kw-2">&amp;</span><span class="ident">path</span>).<span class="ident">finish</span>()
         } <span class="kw">else</span> {
@@ -1483,10 +1483,10 @@
 }
 
 <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">TransactionError</span><span class="op">&lt;</span><span class="ident">serde_json::Error</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">CryptoStoreError</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">e</span>: <span class="ident">TransactionError</span><span class="op">&lt;</span><span class="ident">serde_json::Error</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">e</span>: <span class="ident">TransactionError</span><span class="op">&lt;</span><span class="ident">serde_json::Error</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
         <span class="kw">match</span> <span class="ident">e</span> {
-            <span class="ident">TransactionError::Abort</span>(<span class="ident">e</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">CryptoStoreError::Serialization</span>(<span class="ident">e</span>),
-            <span class="ident">TransactionError::Storage</span>(<span class="ident">e</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">CryptoStoreError::Database</span>(<span class="ident">e</span>),
+            <span class="ident">TransactionError::Abort</span>(<span class="ident">e</span>) =&gt; <span class="ident">CryptoStoreError::Serialization</span>(<span class="ident">e</span>),
+            <span class="ident">TransactionError::Storage</span>(<span class="ident">e</span>) =&gt; <span class="ident">CryptoStoreError::Database</span>(<span class="ident">e</span>),
         }
     }
 }
@@ -1494,7 +1494,7 @@
 <span class="kw">impl</span> <span class="ident">SledStore</span> {
     <span class="doccomment">/// Open the sled based cryptostore at the given path using the given</span>
     <span class="doccomment">/// passphrase to encrypt private data.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">open_with_passphrase</span>(<span class="ident">path</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">Path</span><span class="op">&gt;</span>, <span class="ident">passphrase</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">open_with_passphrase</span>(<span class="ident">path</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">Path</span><span class="op">&gt;</span>, <span class="ident">passphrase</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">path</span> <span class="op">=</span> <span class="ident">path</span>.<span class="ident">as_ref</span>().<span class="ident">join</span>(<span class="string">&quot;matrix-sdk-crypto&quot;</span>);
         <span class="kw">let</span> <span class="ident">db</span> <span class="op">=</span> <span class="ident">Config::new</span>().<span class="ident">temporary</span>(<span class="bool-val">false</span>).<span class="ident">path</span>(<span class="kw-2">&amp;</span><span class="ident">path</span>).<span class="ident">open</span>()<span class="question-mark">?</span>;
 
@@ -1503,15 +1503,15 @@
 
     <span class="doccomment">/// Create a sled based cryptostore using the given sled database.</span>
     <span class="doccomment">/// The given passphrase will be used to encrypt private data.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">open_with_database</span>(<span class="ident">db</span>: <span class="ident">Db</span>, <span class="ident">passphrase</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">open_with_database</span>(<span class="ident">db</span>: <span class="ident">Db</span>, <span class="ident">passphrase</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
         <span class="ident">SledStore::open_helper</span>(<span class="ident">db</span>, <span class="prelude-val">None</span>, <span class="ident">passphrase</span>)
     }
 
-    <span class="kw">fn</span> <span class="ident">get_account_info</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">AccountInfo</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">get_account_info</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">AccountInfo</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">account_info</span>.<span class="ident">read</span>().<span class="ident">unwrap</span>().<span class="ident">clone</span>()
     }
 
-    <span class="kw">fn</span> <span class="ident">upgrade_databse</span>(<span class="ident">db</span>: <span class="kw-2">&amp;</span><span class="ident">Db</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">upgrade_database</span>(<span class="ident">db</span>: <span class="kw-2">&amp;</span><span class="ident">Db</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">version</span> <span class="op">=</span> <span class="ident">db</span>
             .<span class="ident">get</span>(<span class="string">&quot;version&quot;</span>)<span class="question-mark">?</span>
             .<span class="ident">map</span>(<span class="op">|</span><span class="ident">v</span><span class="op">|</span> {
@@ -1528,7 +1528,7 @@
             );
         }
 
-        <span class="kw">if</span> <span class="ident">version</span> <span class="op">=</span><span class="op">=</span> <span class="number">0</span> {
+        <span class="kw">if</span> <span class="ident">version</span> <span class="op">==</span> <span class="number">0</span> {
             <span class="comment">// We changed the schema but migrating this isn&#39;t important since we</span>
             <span class="comment">// rotate the group sessions relatively often anyways so we just</span>
             <span class="comment">// drop it.</span>
@@ -1540,8 +1540,8 @@
         <span class="prelude-val">Ok</span>(())
     }
 
-    <span class="kw">fn</span> <span class="ident">open_helper</span>(<span class="ident">db</span>: <span class="ident">Db</span>, <span class="ident">path</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">PathBuf</span><span class="op">&gt;</span>, <span class="ident">passphrase</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
-        <span class="ident"><span class="self">Self</span>::upgrade_databse</span>(<span class="kw-2">&amp;</span><span class="ident">db</span>)<span class="question-mark">?</span>;
+    <span class="kw">fn</span> <span class="ident">open_helper</span>(<span class="ident">db</span>: <span class="ident">Db</span>, <span class="ident">path</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">PathBuf</span><span class="op">&gt;</span>, <span class="ident">passphrase</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
+        <span class="ident"><span class="self">Self</span>::upgrade_database</span>(<span class="kw-2">&amp;</span><span class="ident">db</span>)<span class="question-mark">?</span>;
         <span class="kw">let</span> <span class="ident">account</span> <span class="op">=</span> <span class="ident">db</span>.<span class="ident">open_tree</span>(<span class="string">&quot;account&quot;</span>)<span class="question-mark">?</span>;
         <span class="kw">let</span> <span class="ident">private_identity</span> <span class="op">=</span> <span class="ident">db</span>.<span class="ident">open_tree</span>(<span class="string">&quot;private_identity&quot;</span>)<span class="question-mark">?</span>;
 
@@ -1592,7 +1592,7 @@
         })
     }
 
-    <span class="kw">fn</span> <span class="ident">get_or_create_pickle_key</span>(<span class="ident">passphrase</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">database</span>: <span class="kw-2">&amp;</span><span class="ident">Db</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">PickleKey</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">get_or_create_pickle_key</span>(<span class="ident">passphrase</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">database</span>: <span class="kw-2">&amp;</span><span class="ident">Db</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">PickleKey</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">key</span> <span class="op">=</span> <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">key</span>) <span class="op">=</span>
             <span class="ident">database</span>.<span class="ident">get</span>(<span class="string">&quot;pickle_key&quot;</span>.<span class="ident">encode</span>())<span class="question-mark">?</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">v</span><span class="op">|</span> <span class="ident">serde_json::from_slice</span>(<span class="kw-2">&amp;</span><span class="ident">v</span>))
         {
@@ -1608,19 +1608,19 @@
         <span class="prelude-val">Ok</span>(<span class="ident">key</span>)
     }
 
-    <span class="kw">fn</span> <span class="ident">get_pickle_mode</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">PicklingMode</span> {
+    <span class="kw">fn</span> <span class="ident">get_pickle_mode</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">PicklingMode</span> {
         <span class="self">self</span>.<span class="ident">pickle_key</span>.<span class="ident">pickle_mode</span>()
     }
 
-    <span class="kw">fn</span> <span class="ident">get_pickle_key</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span>[<span class="ident">u8</span>] {
+    <span class="kw">fn</span> <span class="ident">get_pickle_key</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>[<span class="ident">u8</span>] {
         <span class="self">self</span>.<span class="ident">pickle_key</span>.<span class="ident">key</span>()
     }
 
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">load_tracked_users</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">load_tracked_users</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="kw">for</span> <span class="ident">value</span> <span class="kw">in</span> <span class="self">self</span>.<span class="ident">tracked_users</span>.<span class="ident">iter</span>() {
             <span class="kw">let</span> (<span class="ident">user</span>, <span class="ident">dirty</span>) <span class="op">=</span> <span class="ident">value</span><span class="question-mark">?</span>;
             <span class="kw">let</span> <span class="ident">user</span> <span class="op">=</span> <span class="ident">UserId::try_from</span>(<span class="ident">String::from_utf8_lossy</span>(<span class="kw-2">&amp;</span><span class="ident">user</span>).<span class="ident">to_string</span>())<span class="question-mark">?</span>;
-            <span class="kw">let</span> <span class="ident">dirty</span> <span class="op">=</span> <span class="ident">dirty</span>.<span class="ident">get</span>(<span class="number">0</span>).<span class="ident">map</span>(<span class="op">|</span><span class="ident">d</span><span class="op">|</span> <span class="kw-2">*</span><span class="ident">d</span> <span class="op">=</span><span class="op">=</span> <span class="number">1</span>).<span class="ident">unwrap_or</span>(<span class="bool-val">true</span>);
+            <span class="kw">let</span> <span class="ident">dirty</span> <span class="op">=</span> <span class="ident">dirty</span>.<span class="ident">get</span>(<span class="number">0</span>).<span class="ident">map</span>(<span class="op">|</span><span class="ident">d</span><span class="op">|</span> <span class="kw-2">*</span><span class="ident">d</span> <span class="op">==</span> <span class="number">1</span>).<span class="ident">unwrap_or</span>(<span class="bool-val">true</span>);
 
             <span class="self">self</span>.<span class="ident">tracked_users_cache</span>.<span class="ident">insert</span>(<span class="ident">user</span>.<span class="ident">clone</span>());
 
@@ -1635,7 +1635,7 @@
     <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">load_outbound_group_session</span>(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         <span class="ident">room_id</span>: <span class="kw-2">&amp;</span><span class="ident">RoomId</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">OutboundGroupSession</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">OutboundGroupSession</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">account_info</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">get_account_info</span>().<span class="ident">ok_or</span>(<span class="ident">CryptoStoreError::AccountUnset</span>)<span class="question-mark">?</span>;
 
         <span class="self">self</span>.<span class="ident">outbound_group_sessions</span>
@@ -1654,7 +1654,7 @@
             .<span class="ident">transpose</span>()
     }
 
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">save_changes</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">changes</span>: <span class="ident">Changes</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">save_changes</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">changes</span>: <span class="ident">Changes</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">account_pickle</span> <span class="op">=</span> <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">a</span>) <span class="op">=</span> <span class="ident">changes</span>.<span class="ident">account</span> {
             <span class="prelude-val">Some</span>(<span class="ident">a</span>.<span class="ident">pickle</span>(<span class="self">self</span>.<span class="ident">get_pickle_mode</span>()).<span class="kw">await</span>)
         } <span class="kw">else</span> {
@@ -1834,7 +1834,7 @@
         <span class="prelude-val">Ok</span>(())
     }
 
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">get_outgoing_key_request_helper</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">id</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">GossipRequest</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">get_outgoing_key_request_helper</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">id</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">GossipRequest</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">request</span> <span class="op">=</span> <span class="self">self</span>
             .<span class="ident">outgoing_secret_requests</span>
             .<span class="ident">get</span>(<span class="ident">id</span>)<span class="question-mark">?</span>
@@ -1853,7 +1853,7 @@
 
 <span class="attribute">#[<span class="ident">async_trait</span>]</span>
 <span class="kw">impl</span> <span class="ident">CryptoStore</span> <span class="kw">for</span> <span class="ident">SledStore</span> {
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">load_account</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ReadOnlyAccount</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">load_account</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ReadOnlyAccount</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">pickle</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">account</span>.<span class="ident">get</span>(<span class="string">&quot;account&quot;</span>.<span class="ident">encode</span>())<span class="question-mark">?</span> {
             <span class="kw">let</span> <span class="ident">pickle</span> <span class="op">=</span> <span class="ident">serde_json::from_slice</span>(<span class="kw-2">&amp;</span><span class="ident">pickle</span>)<span class="question-mark">?</span>;
 
@@ -1875,7 +1875,7 @@
         }
     }
 
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">save_account</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">account</span>: <span class="ident">ReadOnlyAccount</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">save_account</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">account</span>: <span class="ident">ReadOnlyAccount</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">account_info</span> <span class="op">=</span> <span class="ident">AccountInfo</span> {
             <span class="ident">user_id</span>: <span class="ident">account</span>.<span class="ident">user_id</span>.<span class="ident">clone</span>(),
             <span class="ident">device_id</span>: <span class="ident">account</span>.<span class="ident">device_id</span>.<span class="ident">clone</span>(),
@@ -1889,7 +1889,7 @@
         <span class="self">self</span>.<span class="ident">save_changes</span>(<span class="ident">changes</span>).<span class="kw">await</span>
     }
 
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">load_identity</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">PrivateCrossSigningIdentity</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">load_identity</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">PrivateCrossSigningIdentity</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">i</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">private_identity</span>.<span class="ident">get</span>(<span class="string">&quot;identity&quot;</span>.<span class="ident">encode</span>())<span class="question-mark">?</span> {
             <span class="kw">let</span> <span class="ident">pickle</span> <span class="op">=</span> <span class="ident">serde_json::from_slice</span>(<span class="kw-2">&amp;</span><span class="ident">i</span>)<span class="question-mark">?</span>;
             <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(
@@ -1902,11 +1902,11 @@
         }
     }
 
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">save_changes</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">changes</span>: <span class="ident">Changes</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">save_changes</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">changes</span>: <span class="ident">Changes</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">save_changes</span>(<span class="ident">changes</span>).<span class="kw">await</span>
     }
 
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">get_sessions</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">sender_key</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">Mutex</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Session</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">get_sessions</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">sender_key</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">Mutex</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Session</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">account_info</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">get_account_info</span>().<span class="ident">ok_or</span>(<span class="ident">CryptoStoreError::AccountUnset</span>)<span class="question-mark">?</span>;
 
         <span class="kw">if</span> <span class="self">self</span>.<span class="ident">session_cache</span>.<span class="ident">get</span>(<span class="ident">sender_key</span>).<span class="ident">is_none</span>() {
@@ -1937,7 +1937,7 @@
         <span class="ident">room_id</span>: <span class="kw-2">&amp;</span><span class="ident">RoomId</span>,
         <span class="ident">sender_key</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>,
         <span class="ident">session_id</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">InboundGroupSession</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">InboundGroupSession</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">key</span> <span class="op">=</span> (<span class="ident">room_id</span>.<span class="ident">as_str</span>(), <span class="ident">sender_key</span>, <span class="ident">session_id</span>).<span class="ident">encode</span>();
         <span class="kw">let</span> <span class="ident">pickle</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">inbound_group_sessions</span>.<span class="ident">get</span>(<span class="kw-2">&amp;</span><span class="ident">key</span>)<span class="question-mark">?</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">p</span><span class="op">|</span> <span class="ident">serde_json::from_slice</span>(<span class="kw-2">&amp;</span><span class="ident">p</span>));
 
@@ -1948,7 +1948,7 @@
         }
     }
 
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">get_inbound_group_sessions</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">InboundGroupSession</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">get_inbound_group_sessions</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">InboundGroupSession</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">pickles</span>: <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">PickledInboundGroupSession</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="op">=</span> <span class="self">self</span>
             .<span class="ident">inbound_group_sessions</span>
             .<span class="ident">iter</span>()
@@ -1964,27 +1964,27 @@
     <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">get_outbound_group_sessions</span>(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         <span class="ident">room_id</span>: <span class="kw-2">&amp;</span><span class="ident">RoomId</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">OutboundGroupSession</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">OutboundGroupSession</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">load_outbound_group_session</span>(<span class="ident">room_id</span>).<span class="kw">await</span>
     }
 
-    <span class="kw">fn</span> <span class="ident">is_user_tracked</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">user_id</span>: <span class="kw-2">&amp;</span><span class="ident">UserId</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+    <span class="kw">fn</span> <span class="ident">is_user_tracked</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">user_id</span>: <span class="kw-2">&amp;</span><span class="ident">UserId</span>) -&gt; <span class="ident">bool</span> {
         <span class="self">self</span>.<span class="ident">tracked_users_cache</span>.<span class="ident">contains</span>(<span class="ident">user_id</span>)
     }
 
-    <span class="kw">fn</span> <span class="ident">has_users_for_key_query</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+    <span class="kw">fn</span> <span class="ident">has_users_for_key_query</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
         <span class="op">!</span><span class="self">self</span>.<span class="ident">users_for_key_query_cache</span>.<span class="ident">is_empty</span>()
     }
 
-    <span class="kw">fn</span> <span class="ident">tracked_users</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">HashSet</span><span class="op">&lt;</span><span class="ident">UserId</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">tracked_users</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">HashSet</span><span class="op">&lt;</span><span class="ident">UserId</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">tracked_users_cache</span>.<span class="ident">to_owned</span>().<span class="ident">iter</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">u</span><span class="op">|</span> <span class="ident">u</span>.<span class="ident">clone</span>()).<span class="ident">collect</span>()
     }
 
-    <span class="kw">fn</span> <span class="ident">users_for_key_query</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">HashSet</span><span class="op">&lt;</span><span class="ident">UserId</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">users_for_key_query</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">HashSet</span><span class="op">&lt;</span><span class="ident">UserId</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">users_for_key_query_cache</span>.<span class="ident">iter</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">u</span><span class="op">|</span> <span class="ident">u</span>.<span class="ident">clone</span>()).<span class="ident">collect</span>()
     }
 
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">update_tracked_user</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">user</span>: <span class="kw-2">&amp;</span><span class="ident">UserId</span>, <span class="ident">dirty</span>: <span class="ident">bool</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">bool</span><span class="op">&gt;</span> {
+    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">update_tracked_user</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">user</span>: <span class="kw-2">&amp;</span><span class="ident">UserId</span>, <span class="ident">dirty</span>: <span class="ident">bool</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">bool</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">already_added</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">tracked_users_cache</span>.<span class="ident">insert</span>(<span class="ident">user</span>.<span class="ident">clone</span>());
 
         <span class="kw">if</span> <span class="ident">dirty</span> {
@@ -2002,7 +2002,7 @@
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         <span class="ident">user_id</span>: <span class="kw-2">&amp;</span><span class="ident">UserId</span>,
         <span class="ident">device_id</span>: <span class="kw-2">&amp;</span><span class="ident">DeviceId</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ReadOnlyDevice</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ReadOnlyDevice</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">key</span> <span class="op">=</span> (<span class="ident">user_id</span>.<span class="ident">as_str</span>(), <span class="ident">device_id</span>.<span class="ident">as_str</span>()).<span class="ident">encode</span>();
         <span class="prelude-val">Ok</span>(<span class="self">self</span>.<span class="ident">devices</span>.<span class="ident">get</span>(<span class="ident">key</span>)<span class="question-mark">?</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">d</span><span class="op">|</span> <span class="ident">serde_json::from_slice</span>(<span class="kw-2">&amp;</span><span class="ident">d</span>)).<span class="ident">transpose</span>()<span class="question-mark">?</span>)
     }
@@ -2010,7 +2010,7 @@
     <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">get_user_devices</span>(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         <span class="ident">user_id</span>: <span class="kw-2">&amp;</span><span class="ident">UserId</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">HashMap</span><span class="op">&lt;</span><span class="ident">DeviceIdBox</span>, <span class="ident">ReadOnlyDevice</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">HashMap</span><span class="op">&lt;</span><span class="ident">DeviceIdBox</span>, <span class="ident">ReadOnlyDevice</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">devices</span>
             .<span class="ident">scan_prefix</span>(<span class="ident">user_id</span>.<span class="ident">encode</span>())
             .<span class="ident">map</span>(<span class="op">|</span><span class="ident">d</span><span class="op">|</span> <span class="ident">serde_json::from_slice</span>(<span class="kw-2">&amp;</span><span class="ident">d</span><span class="question-mark">?</span>.<span class="number">1</span>).<span class="ident">map_err</span>(<span class="ident">CryptoStoreError::Serialization</span>))
@@ -2021,7 +2021,7 @@
             .<span class="ident">collect</span>()
     }
 
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">get_user_identity</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">user_id</span>: <span class="kw-2">&amp;</span><span class="ident">UserId</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ReadOnlyUserIdentities</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">get_user_identity</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">user_id</span>: <span class="kw-2">&amp;</span><span class="ident">UserId</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ReadOnlyUserIdentities</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="prelude-val">Ok</span>(<span class="self">self</span>
             .<span class="ident">identities</span>
             .<span class="ident">get</span>(<span class="ident">user_id</span>.<span class="ident">encode</span>())<span class="question-mark">?</span>
@@ -2029,14 +2029,14 @@
             .<span class="ident">transpose</span>()<span class="question-mark">?</span>)
     }
 
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">is_message_known</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">message_hash</span>: <span class="kw-2">&amp;</span><span class="ident"><span class="kw">crate</span>::olm::OlmMessageHash</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">bool</span><span class="op">&gt;</span> {
+    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">is_message_known</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">message_hash</span>: <span class="kw-2">&amp;</span><span class="ident"><span class="kw">crate</span>::olm::OlmMessageHash</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">bool</span><span class="op">&gt;</span> {
         <span class="prelude-val">Ok</span>(<span class="self">self</span>.<span class="ident">olm_hashes</span>.<span class="ident">contains_key</span>(<span class="ident">serde_json::to_vec</span>(<span class="ident">message_hash</span>)<span class="question-mark">?</span>)<span class="question-mark">?</span>)
     }
 
     <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">get_outgoing_secret_requests</span>(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         <span class="ident">request_id</span>: <span class="ident">Uuid</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">GossipRequest</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">GossipRequest</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">request_id</span> <span class="op">=</span> <span class="ident">request_id</span>.<span class="ident">encode</span>();
 
         <span class="self">self</span>.<span class="ident">get_outgoing_key_request_helper</span>(<span class="kw-2">&amp;</span><span class="ident">request_id</span>).<span class="kw">await</span>
@@ -2045,7 +2045,7 @@
     <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">get_secret_request_by_info</span>(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         <span class="ident">key_info</span>: <span class="kw-2">&amp;</span><span class="ident">SecretInfo</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">GossipRequest</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">GossipRequest</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">id</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">secret_requests_by_info</span>.<span class="ident">get</span>(<span class="ident">key_info</span>.<span class="ident">encode</span>())<span class="question-mark">?</span>;
 
         <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">id</span>) <span class="op">=</span> <span class="ident">id</span> {
@@ -2055,7 +2055,7 @@
         }
     }
 
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">get_unsent_secret_requests</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">GossipRequest</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">get_unsent_secret_requests</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">GossipRequest</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">requests</span>: <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">GossipRequest</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="op">=</span> <span class="self">self</span>
             .<span class="ident">unsent_secret_requests</span>
             .<span class="ident">iter</span>()
@@ -2065,7 +2065,7 @@
         <span class="ident">requests</span>
     }
 
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">delete_outgoing_secret_requests</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">request_id</span>: <span class="ident">Uuid</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">delete_outgoing_secret_requests</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">request_id</span>: <span class="ident">Uuid</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">ret</span>: <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">TransactionError</span><span class="op">&lt;</span><span class="ident">serde_json::Error</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="op">=</span> (
             <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">outgoing_secret_requests</span>,
             <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">unsent_secret_requests</span>,
@@ -2131,23 +2131,23 @@
         <span class="ident">store</span>::{<span class="ident">Changes</span>, <span class="ident">DeviceChanges</span>, <span class="ident">IdentityChanges</span>},
     };
 
-    <span class="kw">fn</span> <span class="ident">alice_id</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident">UserId</span> {
+    <span class="kw">fn</span> <span class="ident">alice_id</span>() -&gt; <span class="ident">UserId</span> {
         <span class="macro">user_id!</span>(<span class="string">&quot;@alice:example.org&quot;</span>)
     }
 
-    <span class="kw">fn</span> <span class="ident">alice_device_id</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Box</span><span class="op">&lt;</span><span class="ident">DeviceId</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">alice_device_id</span>() -&gt; <span class="ident">Box</span><span class="op">&lt;</span><span class="ident">DeviceId</span><span class="op">&gt;</span> {
         <span class="string">&quot;ALICEDEVICE&quot;</span>.<span class="ident">into</span>()
     }
 
-    <span class="kw">fn</span> <span class="ident">bob_id</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident">UserId</span> {
+    <span class="kw">fn</span> <span class="ident">bob_id</span>() -&gt; <span class="ident">UserId</span> {
         <span class="macro">user_id!</span>(<span class="string">&quot;@bob:example.org&quot;</span>)
     }
 
-    <span class="kw">fn</span> <span class="ident">bob_device_id</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Box</span><span class="op">&lt;</span><span class="ident">DeviceId</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">bob_device_id</span>() -&gt; <span class="ident">Box</span><span class="op">&lt;</span><span class="ident">DeviceId</span><span class="op">&gt;</span> {
         <span class="string">&quot;BOBDEVICE&quot;</span>.<span class="ident">into</span>()
     }
 
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">get_store</span>(<span class="ident">passphrase</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> (<span class="ident">SledStore</span>, <span class="ident">tempfile::TempDir</span>) {
+    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">get_store</span>(<span class="ident">passphrase</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span>) -&gt; (<span class="ident">SledStore</span>, <span class="ident">tempfile::TempDir</span>) {
         <span class="kw">let</span> <span class="ident">tmpdir</span> <span class="op">=</span> <span class="ident">tempdir</span>().<span class="ident">unwrap</span>();
         <span class="kw">let</span> <span class="ident">tmpdir_path</span> <span class="op">=</span> <span class="ident">tmpdir</span>.<span class="ident">path</span>().<span class="ident">to_str</span>().<span class="ident">unwrap</span>();
 
@@ -2157,7 +2157,7 @@
         (<span class="ident">store</span>, <span class="ident">tmpdir</span>)
     }
 
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">get_loaded_store</span>() <span class="op">-</span><span class="op">&gt;</span> (<span class="ident">ReadOnlyAccount</span>, <span class="ident">SledStore</span>, <span class="ident">tempfile::TempDir</span>) {
+    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">get_loaded_store</span>() -&gt; (<span class="ident">ReadOnlyAccount</span>, <span class="ident">SledStore</span>, <span class="ident">tempfile::TempDir</span>) {
         <span class="kw">let</span> (<span class="ident">store</span>, <span class="ident">dir</span>) <span class="op">=</span> <span class="ident">get_store</span>(<span class="prelude-val">None</span>).<span class="kw">await</span>;
         <span class="kw">let</span> <span class="ident">account</span> <span class="op">=</span> <span class="ident">get_account</span>();
         <span class="ident">store</span>.<span class="ident">save_account</span>(<span class="ident">account</span>.<span class="ident">clone</span>()).<span class="kw">await</span>.<span class="ident">expect</span>(<span class="string">&quot;Can&#39;t save account&quot;</span>);
@@ -2165,11 +2165,11 @@
         (<span class="ident">account</span>, <span class="ident">store</span>, <span class="ident">dir</span>)
     }
 
-    <span class="kw">fn</span> <span class="ident">get_account</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ReadOnlyAccount</span> {
+    <span class="kw">fn</span> <span class="ident">get_account</span>() -&gt; <span class="ident">ReadOnlyAccount</span> {
         <span class="ident">ReadOnlyAccount::new</span>(<span class="kw-2">&amp;</span><span class="ident">alice_id</span>(), <span class="kw-2">&amp;</span><span class="ident">alice_device_id</span>())
     }
 
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">get_account_and_session</span>() <span class="op">-</span><span class="op">&gt;</span> (<span class="ident">ReadOnlyAccount</span>, <span class="ident">Session</span>) {
+    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">get_account_and_session</span>() -&gt; (<span class="ident">ReadOnlyAccount</span>, <span class="ident">Session</span>) {
         <span class="kw">let</span> <span class="ident">alice</span> <span class="op">=</span> <span class="ident">ReadOnlyAccount::new</span>(<span class="kw-2">&amp;</span><span class="ident">alice_id</span>(), <span class="kw-2">&amp;</span><span class="ident">alice_device_id</span>());
         <span class="kw">let</span> <span class="ident">bob</span> <span class="op">=</span> <span class="ident">ReadOnlyAccount::new</span>(<span class="kw-2">&amp;</span><span class="ident">bob_id</span>(), <span class="kw-2">&amp;</span><span class="ident">bob_device_id</span>());
 

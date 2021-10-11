@@ -393,20 +393,20 @@
 }
 
 <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">RequestedKeyInfo</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">SecretInfo</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">i</span>: <span class="ident">RequestedKeyInfo</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">i</span>: <span class="ident">RequestedKeyInfo</span>) -&gt; <span class="self">Self</span> {
         <span class="ident"><span class="self">Self</span>::KeyRequest</span>(<span class="ident">i</span>)
     }
 }
 
 <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">SecretName</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">SecretInfo</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">i</span>: <span class="ident">SecretName</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">i</span>: <span class="ident">SecretName</span>) -&gt; <span class="self">Self</span> {
         <span class="ident"><span class="self">Self</span>::SecretRequest</span>(<span class="ident">i</span>)
     }
 }
 
 <span class="kw">impl</span> <span class="ident">GossipRequest</span> {
     <span class="doccomment">/// Create an ougoing secret request for the given secret.</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">from_secret_name</span>(<span class="ident">own_user_id</span>: <span class="ident">UserId</span>, <span class="ident">secret_name</span>: <span class="ident">SecretName</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">from_secret_name</span>(<span class="ident">own_user_id</span>: <span class="ident">UserId</span>, <span class="ident">secret_name</span>: <span class="ident">SecretName</span>) -&gt; <span class="self">Self</span> {
         <span class="self">Self</span> {
             <span class="ident">request_recipient</span>: <span class="ident">own_user_id</span>,
             <span class="ident">request_id</span>: <span class="ident">Uuid::new_v4</span>(),
@@ -415,16 +415,16 @@
         }
     }
 
-    <span class="kw">fn</span> <span class="ident">request_type</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="ident">str</span> {
+    <span class="kw">fn</span> <span class="ident">request_type</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">str</span> {
         <span class="kw">match</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">info</span> {
-            <span class="ident">SecretInfo::KeyRequest</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;m.room_key_request&quot;</span>,
-            <span class="ident">SecretInfo::SecretRequest</span>(<span class="ident">s</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">s</span>.<span class="ident">as_ref</span>(),
+            <span class="ident">SecretInfo::KeyRequest</span>(<span class="kw">_</span>) =&gt; <span class="string">&quot;m.room_key_request&quot;</span>,
+            <span class="ident">SecretInfo::SecretRequest</span>(<span class="ident">s</span>) =&gt; <span class="ident">s</span>.<span class="ident">as_ref</span>(),
         }
     }
 
-    <span class="kw">fn</span> <span class="ident">to_request</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">own_device_id</span>: <span class="kw-2">&amp;</span><span class="ident">DeviceId</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">OutgoingRequest</span> {
+    <span class="kw">fn</span> <span class="ident">to_request</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">own_device_id</span>: <span class="kw-2">&amp;</span><span class="ident">DeviceId</span>) -&gt; <span class="ident">OutgoingRequest</span> {
         <span class="kw">let</span> <span class="ident">content</span> <span class="op">=</span> <span class="kw">match</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">info</span> {
-            <span class="ident">SecretInfo::KeyRequest</span>(<span class="ident">r</span>) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">SecretInfo::KeyRequest</span>(<span class="ident">r</span>) =&gt; {
                 <span class="ident">AnyToDeviceEventContent::RoomKeyRequest</span>(<span class="ident">ToDeviceRoomKeyRequestEventContent::new</span>(
                     <span class="ident">Action::Request</span>,
                     <span class="prelude-val">Some</span>(<span class="ident">r</span>.<span class="ident">clone</span>()),
@@ -432,7 +432,7 @@
                     <span class="self">self</span>.<span class="ident">request_id</span>.<span class="ident">to_string</span>(),
                 ))
             }
-            <span class="ident">SecretInfo::SecretRequest</span>(<span class="ident">s</span>) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">SecretInfo::SecretRequest</span>(<span class="ident">s</span>) =&gt; {
                 <span class="ident">AnyToDeviceEventContent::SecretRequest</span>(<span class="ident">SecretRequestEventContent::new</span>(
                     <span class="ident">RequestAction::Request</span>(<span class="ident">s</span>.<span class="ident">clone</span>()),
                     <span class="ident">own_device_id</span>.<span class="ident">to_owned</span>(),
@@ -451,9 +451,9 @@
         <span class="ident">OutgoingRequest</span> { <span class="ident">request_id</span>: <span class="ident">request</span>.<span class="ident">txn_id</span>, <span class="ident">request</span>: <span class="ident">Arc::new</span>(<span class="ident">request</span>.<span class="ident">into</span>()) }
     }
 
-    <span class="kw">fn</span> <span class="ident">to_cancellation</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">own_device_id</span>: <span class="kw-2">&amp;</span><span class="ident">DeviceId</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">OutgoingRequest</span> {
+    <span class="kw">fn</span> <span class="ident">to_cancellation</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">own_device_id</span>: <span class="kw-2">&amp;</span><span class="ident">DeviceId</span>) -&gt; <span class="ident">OutgoingRequest</span> {
         <span class="kw">let</span> <span class="ident">content</span> <span class="op">=</span> <span class="kw">match</span> <span class="self">self</span>.<span class="ident">info</span> {
-            <span class="ident">SecretInfo::KeyRequest</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">SecretInfo::KeyRequest</span>(<span class="kw">_</span>) =&gt; {
                 <span class="ident">AnyToDeviceEventContent::RoomKeyRequest</span>(<span class="ident">ToDeviceRoomKeyRequestEventContent::new</span>(
                     <span class="ident">Action::CancelRequest</span>,
                     <span class="prelude-val">None</span>,
@@ -461,7 +461,7 @@
                     <span class="self">self</span>.<span class="ident">request_id</span>.<span class="ident">to_string</span>(),
                 ))
             }
-            <span class="ident">SecretInfo::SecretRequest</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">SecretInfo::SecretRequest</span>(<span class="kw">_</span>) =&gt; {
                 <span class="ident">AnyToDeviceEventContent::SecretRequest</span>(<span class="ident">SecretRequestEventContent::new</span>(
                     <span class="ident">RequestAction::RequestCancellation</span>,
                     <span class="ident">own_device_id</span>.<span class="ident">to_owned</span>(),
@@ -481,21 +481,21 @@
 }
 
 <span class="kw">impl</span> <span class="ident">PartialEq</span> <span class="kw">for</span> <span class="ident">GossipRequest</span> {
-    <span class="kw">fn</span> <span class="ident">eq</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">other</span>: <span class="kw-2">&amp;</span><span class="self">Self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+    <span class="kw">fn</span> <span class="ident">eq</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">other</span>: <span class="kw-2">&amp;</span><span class="self">Self</span>) -&gt; <span class="ident">bool</span> {
         <span class="kw">let</span> <span class="ident">is_info_equal</span> <span class="op">=</span> <span class="kw">match</span> (<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">info</span>, <span class="kw-2">&amp;</span><span class="ident">other</span>.<span class="ident">info</span>) {
-            (<span class="ident">SecretInfo::KeyRequest</span>(<span class="ident">first</span>), <span class="ident">SecretInfo::KeyRequest</span>(<span class="ident">second</span>)) <span class="op">=</span><span class="op">&gt;</span> {
-                <span class="ident">first</span>.<span class="ident">algorithm</span> <span class="op">=</span><span class="op">=</span> <span class="ident">second</span>.<span class="ident">algorithm</span>
-                    <span class="op">&amp;&amp;</span> <span class="ident">first</span>.<span class="ident">room_id</span> <span class="op">=</span><span class="op">=</span> <span class="ident">second</span>.<span class="ident">room_id</span>
-                    <span class="op">&amp;&amp;</span> <span class="ident">first</span>.<span class="ident">session_id</span> <span class="op">=</span><span class="op">=</span> <span class="ident">second</span>.<span class="ident">session_id</span>
+            (<span class="ident">SecretInfo::KeyRequest</span>(<span class="ident">first</span>), <span class="ident">SecretInfo::KeyRequest</span>(<span class="ident">second</span>)) =&gt; {
+                <span class="ident">first</span>.<span class="ident">algorithm</span> <span class="op">==</span> <span class="ident">second</span>.<span class="ident">algorithm</span>
+                    <span class="op">&amp;&amp;</span> <span class="ident">first</span>.<span class="ident">room_id</span> <span class="op">==</span> <span class="ident">second</span>.<span class="ident">room_id</span>
+                    <span class="op">&amp;&amp;</span> <span class="ident">first</span>.<span class="ident">session_id</span> <span class="op">==</span> <span class="ident">second</span>.<span class="ident">session_id</span>
             }
-            (<span class="ident">SecretInfo::SecretRequest</span>(<span class="ident">first</span>), <span class="ident">SecretInfo::SecretRequest</span>(<span class="ident">second</span>)) <span class="op">=</span><span class="op">&gt;</span> {
-                <span class="ident">first</span> <span class="op">=</span><span class="op">=</span> <span class="ident">second</span>
+            (<span class="ident">SecretInfo::SecretRequest</span>(<span class="ident">first</span>), <span class="ident">SecretInfo::SecretRequest</span>(<span class="ident">second</span>)) =&gt; {
+                <span class="ident">first</span> <span class="op">==</span> <span class="ident">second</span>
             }
             (<span class="ident">SecretInfo::KeyRequest</span>(<span class="kw">_</span>), <span class="ident">SecretInfo::SecretRequest</span>(<span class="kw">_</span>))
-            <span class="op">|</span> (<span class="ident">SecretInfo::SecretRequest</span>(<span class="kw">_</span>), <span class="ident">SecretInfo::KeyRequest</span>(<span class="kw">_</span>)) <span class="op">=</span><span class="op">&gt;</span> <span class="bool-val">false</span>,
+            <span class="op">|</span> (<span class="ident">SecretInfo::SecretRequest</span>(<span class="kw">_</span>), <span class="ident">SecretInfo::KeyRequest</span>(<span class="kw">_</span>)) =&gt; <span class="bool-val">false</span>,
         };
 
-        <span class="self">self</span>.<span class="ident">request_id</span> <span class="op">=</span><span class="op">=</span> <span class="ident">other</span>.<span class="ident">request_id</span> <span class="op">&amp;&amp;</span> <span class="ident">is_info_equal</span>
+        <span class="self">self</span>.<span class="ident">request_id</span> <span class="op">==</span> <span class="ident">other</span>.<span class="ident">request_id</span> <span class="op">&amp;&amp;</span> <span class="ident">is_info_equal</span>
     }
 }
 
@@ -506,19 +506,19 @@
 }
 
 <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">SecretRequestEvent</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">RequestEvent</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">e</span>: <span class="ident">SecretRequestEvent</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">e</span>: <span class="ident">SecretRequestEvent</span>) -&gt; <span class="self">Self</span> {
         <span class="ident"><span class="self">Self</span>::Secret</span>(<span class="ident">e</span>)
     }
 }
 
 <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">ToDeviceRoomKeyRequestEvent</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">RequestEvent</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">e</span>: <span class="ident">ToDeviceRoomKeyRequestEvent</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">e</span>: <span class="ident">ToDeviceRoomKeyRequestEvent</span>) -&gt; <span class="self">Self</span> {
         <span class="ident"><span class="self">Self</span>::KeyShare</span>(<span class="ident">e</span>)
     }
 }
 
 <span class="kw">impl</span> <span class="ident">RequestEvent</span> {
-    <span class="kw">fn</span> <span class="ident">to_request_info</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">RequestInfo</span> {
+    <span class="kw">fn</span> <span class="ident">to_request_info</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">RequestInfo</span> {
         <span class="ident">RequestInfo::new</span>(
             <span class="self">self</span>.<span class="ident">sender</span>().<span class="ident">to_owned</span>(),
             <span class="self">self</span>.<span class="ident">requesting_device_id</span>().<span class="ident">into</span>(),
@@ -526,24 +526,24 @@
         )
     }
 
-    <span class="kw">fn</span> <span class="ident">sender</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="ident">UserId</span> {
+    <span class="kw">fn</span> <span class="ident">sender</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">UserId</span> {
         <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">RequestEvent::KeyShare</span>(<span class="ident">e</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="ident">e</span>.<span class="ident">sender</span>,
-            <span class="ident">RequestEvent::Secret</span>(<span class="ident">e</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="ident">e</span>.<span class="ident">sender</span>,
+            <span class="ident">RequestEvent::KeyShare</span>(<span class="ident">e</span>) =&gt; <span class="kw-2">&amp;</span><span class="ident">e</span>.<span class="ident">sender</span>,
+            <span class="ident">RequestEvent::Secret</span>(<span class="ident">e</span>) =&gt; <span class="kw-2">&amp;</span><span class="ident">e</span>.<span class="ident">sender</span>,
         }
     }
 
-    <span class="kw">fn</span> <span class="ident">requesting_device_id</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="ident">DeviceId</span> {
+    <span class="kw">fn</span> <span class="ident">requesting_device_id</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">DeviceId</span> {
         <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">RequestEvent::KeyShare</span>(<span class="ident">e</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="ident">e</span>.<span class="ident">content</span>.<span class="ident">requesting_device_id</span>,
-            <span class="ident">RequestEvent::Secret</span>(<span class="ident">e</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="ident">e</span>.<span class="ident">content</span>.<span class="ident">requesting_device_id</span>,
+            <span class="ident">RequestEvent::KeyShare</span>(<span class="ident">e</span>) =&gt; <span class="kw-2">&amp;</span><span class="ident">e</span>.<span class="ident">content</span>.<span class="ident">requesting_device_id</span>,
+            <span class="ident">RequestEvent::Secret</span>(<span class="ident">e</span>) =&gt; <span class="kw-2">&amp;</span><span class="ident">e</span>.<span class="ident">content</span>.<span class="ident">requesting_device_id</span>,
         }
     }
 
-    <span class="kw">fn</span> <span class="ident">request_id</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="ident">str</span> {
+    <span class="kw">fn</span> <span class="ident">request_id</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">str</span> {
         <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">RequestEvent::KeyShare</span>(<span class="ident">e</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="ident">e</span>.<span class="ident">content</span>.<span class="ident">request_id</span>,
-            <span class="ident">RequestEvent::Secret</span>(<span class="ident">e</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="ident">e</span>.<span class="ident">content</span>.<span class="ident">request_id</span>,
+            <span class="ident">RequestEvent::KeyShare</span>(<span class="ident">e</span>) =&gt; <span class="kw-2">&amp;</span><span class="ident">e</span>.<span class="ident">content</span>.<span class="ident">request_id</span>,
+            <span class="ident">RequestEvent::Secret</span>(<span class="ident">e</span>) =&gt; <span class="kw-2">&amp;</span><span class="ident">e</span>.<span class="ident">content</span>.<span class="ident">request_id</span>,
         }
     }
 }
@@ -556,7 +556,7 @@
 }
 
 <span class="kw">impl</span> <span class="ident">RequestInfo</span> {
-    <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">sender</span>: <span class="ident">UserId</span>, <span class="ident">requesting_device_id</span>: <span class="ident">DeviceIdBox</span>, <span class="ident">request_id</span>: <span class="ident">String</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">sender</span>: <span class="ident">UserId</span>, <span class="ident">requesting_device_id</span>: <span class="ident">DeviceIdBox</span>, <span class="ident">request_id</span>: <span class="ident">String</span>) -&gt; <span class="self">Self</span> {
         <span class="self">Self</span> { <span class="ident">sender</span>, <span class="ident">requesting_device_id</span>, <span class="ident">request_id</span> }
     }
 }
@@ -570,7 +570,7 @@
 }
 
 <span class="kw">impl</span> <span class="ident">WaitQueue</span> {
-    <span class="kw">fn</span> <span class="ident">new</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">new</span>() -&gt; <span class="self">Self</span> {
         <span class="self">Self</span> {
             <span class="ident">requests_waiting_for_session</span>: <span class="ident">Arc::new</span>(<span class="ident">DashMap::new</span>()),
             <span class="ident">requests_ids_waiting</span>: <span class="ident">Arc::new</span>(<span class="ident">DashMap::new</span>()),
@@ -578,7 +578,7 @@
     }
 
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
-    <span class="kw">fn</span> <span class="ident">is_empty</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+    <span class="kw">fn</span> <span class="ident">is_empty</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
         <span class="self">self</span>.<span class="ident">requests_ids_waiting</span>.<span class="ident">is_empty</span>() <span class="op">&amp;&amp;</span> <span class="self">self</span>.<span class="ident">requests_waiting_for_session</span>.<span class="ident">is_empty</span>()
     }
 
@@ -596,7 +596,7 @@
         <span class="self">self</span>.<span class="ident">requests_ids_waiting</span>.<span class="ident">entry</span>(<span class="ident">key</span>).<span class="ident">or_insert_with</span>(<span class="ident">DashSet::new</span>).<span class="ident">insert</span>(<span class="ident">request_id</span>);
     }
 
-    <span class="kw">fn</span> <span class="ident">remove</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">user_id</span>: <span class="kw-2">&amp;</span><span class="ident">UserId</span>, <span class="ident">device_id</span>: <span class="kw-2">&amp;</span><span class="ident">DeviceId</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Vec</span><span class="op">&lt;</span>(<span class="ident">RequestInfo</span>, <span class="ident">RequestEvent</span>)<span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">remove</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">user_id</span>: <span class="kw-2">&amp;</span><span class="ident">UserId</span>, <span class="ident">device_id</span>: <span class="kw-2">&amp;</span><span class="ident">DeviceId</span>) -&gt; <span class="ident">Vec</span><span class="op">&lt;</span>(<span class="ident">RequestInfo</span>, <span class="ident">RequestEvent</span>)<span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">requests_ids_waiting</span>
             .<span class="ident">remove</span>(<span class="kw-2">&amp;</span>(<span class="ident">user_id</span>.<span class="ident">to_owned</span>(), <span class="ident">device_id</span>.<span class="ident">into</span>()))
             .<span class="ident">map</span>(<span class="op">|</span>(<span class="kw">_</span>, <span class="ident">request_ids</span>)<span class="op">|</span> {

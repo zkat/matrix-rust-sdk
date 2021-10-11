@@ -1163,10 +1163,10 @@
 
 <span class="kw">impl</span> <span class="ident">SessionType</span> {
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">session</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Session</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">session</span>(<span class="self">self</span>) -&gt; <span class="ident">Session</span> {
         <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">SessionType::New</span>(<span class="ident">s</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">s</span>,
-            <span class="ident">SessionType::Existing</span>(<span class="ident">s</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">s</span>,
+            <span class="ident">SessionType::New</span>(<span class="ident">s</span>) =&gt; <span class="ident">s</span>,
+            <span class="ident">SessionType::Existing</span>(<span class="ident">s</span>) =&gt; <span class="ident">s</span>,
         }
     }
 }
@@ -1196,7 +1196,7 @@
 <span class="kw">impl</span> <span class="ident">Deref</span> <span class="kw">for</span> <span class="ident">Account</span> {
     <span class="kw">type</span> <span class="ident">Target</span> <span class="op">=</span> <span class="ident">ReadOnlyAccount</span>;
 
-    <span class="kw">fn</span> <span class="ident">deref</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="ident"><span class="self">Self</span>::Target</span> {
+    <span class="kw">fn</span> <span class="ident">deref</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident"><span class="self">Self</span>::Target</span> {
         <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">inner</span>
     }
 }
@@ -1205,7 +1205,7 @@
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">decrypt_to_device_event</span>(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         <span class="ident">event</span>: <span class="kw-2">&amp;</span><span class="ident">ToDeviceEncryptedEvent</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">OlmResult</span><span class="op">&lt;</span><span class="ident">OlmDecryptionInfo</span><span class="op">&gt;</span> {
+    ) -&gt; <span class="ident">OlmResult</span><span class="op">&lt;</span><span class="ident">OlmDecryptionInfo</span><span class="op">&gt;</span> {
         <span class="macro">debug!</span>(<span class="ident">sender</span> <span class="op">=</span> <span class="ident">event</span>.<span class="ident">sender</span>.<span class="ident">as_str</span>(), <span class="string">&quot;Decrypting a to-device event&quot;</span>);
 
         <span class="kw">let</span> <span class="ident">content</span> <span class="op">=</span> <span class="kw">if</span> <span class="kw">let</span> <span class="ident">EncryptedEventScheme::OlmV1Curve25519AesSha2</span>(<span class="ident">c</span>) <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">event</span>.<span class="ident">content</span>.<span class="ident">scheme</span>
@@ -1247,8 +1247,8 @@
             <span class="comment">// Decrypt the OlmMessage and get a Ruma event out of it.</span>
             <span class="kw">let</span> (<span class="ident">session</span>, <span class="ident">event</span>, <span class="ident">signing_key</span>) <span class="op">=</span>
                 <span class="kw">match</span> <span class="self">self</span>.<span class="ident">decrypt_olm_message</span>(<span class="kw-2">&amp;</span><span class="ident">event</span>.<span class="ident">sender</span>, <span class="kw-2">&amp;</span><span class="ident">content</span>.<span class="ident">sender_key</span>, <span class="ident">message</span>).<span class="kw">await</span> {
-                    <span class="prelude-val">Ok</span>(<span class="ident">d</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">d</span>,
-                    <span class="prelude-val">Err</span>(<span class="ident">OlmError::SessionWedged</span>(<span class="ident">user_id</span>, <span class="ident">sender_key</span>)) <span class="op">=</span><span class="op">&gt;</span> {
+                    <span class="prelude-val">Ok</span>(<span class="ident">d</span>) =&gt; <span class="ident">d</span>,
+                    <span class="prelude-val">Err</span>(<span class="ident">OlmError::SessionWedged</span>(<span class="ident">user_id</span>, <span class="ident">sender_key</span>)) =&gt; {
                         <span class="kw">if</span> <span class="self">self</span>.<span class="ident">store</span>.<span class="ident">is_message_known</span>(<span class="kw-2">&amp;</span><span class="ident">message_hash</span>).<span class="kw">await</span><span class="question-mark">?</span> {
                             <span class="macro">warn!</span>(
                                 <span class="ident">sender</span> <span class="op">=</span> <span class="ident">event</span>.<span class="ident">sender</span>.<span class="ident">as_str</span>(),
@@ -1259,7 +1259,7 @@
                             <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">OlmError::SessionWedged</span>(<span class="ident">user_id</span>, <span class="ident">sender_key</span>));
                         }
                     }
-                    <span class="prelude-val">Err</span>(<span class="ident">e</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">e</span>),
+                    <span class="prelude-val">Err</span>(<span class="ident">e</span>) =&gt; <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">e</span>),
                 };
 
             <span class="prelude-val">Ok</span>(<span class="ident">OlmDecryptionInfo</span> {
@@ -1303,7 +1303,7 @@
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">receive_keys_upload_response</span>(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         <span class="ident">response</span>: <span class="kw-2">&amp;</span><span class="ident">upload_keys::Response</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">OlmResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+    ) -&gt; <span class="ident">OlmResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="kw">if</span> <span class="op">!</span><span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">shared</span>() {
             <span class="macro">debug!</span>(<span class="string">&quot;Marking account as shared&quot;</span>);
         }
@@ -1326,7 +1326,7 @@
         <span class="ident">sender</span>: <span class="kw-2">&amp;</span><span class="ident">UserId</span>,
         <span class="ident">sender_key</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>,
         <span class="ident">message</span>: <span class="kw-2">&amp;</span><span class="ident">OlmMessage</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">OlmResult</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span>(<span class="ident">Session</span>, <span class="ident">String</span>)<span class="op">&gt;</span><span class="op">&gt;</span> {
+    ) -&gt; <span class="ident">OlmResult</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span>(<span class="ident">Session</span>, <span class="ident">String</span>)<span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">s</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">store</span>.<span class="ident">get_sessions</span>(<span class="ident">sender_key</span>).<span class="kw">await</span><span class="question-mark">?</span>;
 
         <span class="comment">// We don&#39;t have any existing sessions, return early.</span>
@@ -1354,11 +1354,11 @@
             <span class="kw">let</span> <span class="ident">ret</span> <span class="op">=</span> <span class="ident">session</span>.<span class="ident">decrypt</span>(<span class="ident">message</span>.<span class="ident">clone</span>()).<span class="kw">await</span>;
 
             <span class="kw">match</span> <span class="ident">ret</span> {
-                <span class="prelude-val">Ok</span>(<span class="ident">p</span>) <span class="op">=</span><span class="op">&gt;</span> {
+                <span class="prelude-val">Ok</span>(<span class="ident">p</span>) =&gt; {
                     <span class="ident">decrypted</span> <span class="op">=</span> <span class="prelude-val">Some</span>((<span class="ident">session</span>.<span class="ident">clone</span>(), <span class="ident">p</span>));
                     <span class="kw">break</span>;
                 }
-                <span class="prelude-val">Err</span>(<span class="ident">e</span>) <span class="op">=</span><span class="op">&gt;</span> {
+                <span class="prelude-val">Err</span>(<span class="ident">e</span>) =&gt; {
                     <span class="comment">// Decryption failed with a matching session, the session is</span>
                     <span class="comment">// likely wedged and needs to be rotated.</span>
                     <span class="kw">if</span> <span class="ident">matches</span> {
@@ -1386,7 +1386,7 @@
         <span class="ident">sender</span>: <span class="kw-2">&amp;</span><span class="ident">UserId</span>,
         <span class="ident">sender_key</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>,
         <span class="ident">message</span>: <span class="ident">OlmMessage</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">OlmResult</span><span class="op">&lt;</span>(<span class="ident">SessionType</span>, <span class="ident">Raw</span><span class="op">&lt;</span><span class="ident">AnyToDeviceEvent</span><span class="op">&gt;</span>, <span class="ident">String</span>)<span class="op">&gt;</span> {
+    ) -&gt; <span class="ident">OlmResult</span><span class="op">&lt;</span>(<span class="ident">SessionType</span>, <span class="ident">Raw</span><span class="op">&lt;</span><span class="ident">AnyToDeviceEvent</span><span class="op">&gt;</span>, <span class="ident">String</span>)<span class="op">&gt;</span> {
         <span class="comment">// First try to decrypt using an existing session.</span>
         <span class="kw">let</span> (<span class="ident">session</span>, <span class="ident">plaintext</span>) <span class="op">=</span> <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">d</span>) <span class="op">=</span>
             <span class="self">self</span>.<span class="ident">try_decrypt_olm_message</span>(<span class="ident">sender</span>, <span class="ident">sender_key</span>, <span class="kw-2">&amp;</span><span class="ident">message</span>).<span class="kw">await</span><span class="question-mark">?</span>
@@ -1400,7 +1400,7 @@
             <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">session</span> <span class="op">=</span> <span class="kw">match</span> <span class="kw-2">&amp;</span><span class="ident">message</span> {
                 <span class="comment">// A new session can only be created using a pre-key message,</span>
                 <span class="comment">// return with an error if it isn&#39;t one.</span>
-                <span class="ident">OlmMessage::Message</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> {
+                <span class="ident">OlmMessage::Message</span>(<span class="kw">_</span>) =&gt; {
                     <span class="macro">warn!</span>(
                         <span class="ident">sender</span> <span class="op">=</span> <span class="ident">sender</span>.<span class="ident">as_str</span>(),
                         <span class="ident">sender_key</span> <span class="op">=</span> <span class="ident">sender_key</span>,
@@ -1410,12 +1410,12 @@
                     <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">OlmError::SessionWedged</span>(<span class="ident">sender</span>.<span class="ident">to_owned</span>(), <span class="ident">sender_key</span>.<span class="ident">to_owned</span>()));
                 }
 
-                <span class="ident">OlmMessage::PreKey</span>(<span class="ident">m</span>) <span class="op">=</span><span class="op">&gt;</span> {
+                <span class="ident">OlmMessage::PreKey</span>(<span class="ident">m</span>) =&gt; {
                     <span class="comment">// Create the new session.</span>
                     <span class="kw">let</span> <span class="ident">session</span> <span class="op">=</span>
                         <span class="kw">match</span> <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">create_inbound_session</span>(<span class="ident">sender_key</span>, <span class="ident">m</span>.<span class="ident">clone</span>()).<span class="kw">await</span> {
-                            <span class="prelude-val">Ok</span>(<span class="ident">s</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">s</span>,
-                            <span class="prelude-val">Err</span>(<span class="ident">e</span>) <span class="op">=</span><span class="op">&gt;</span> {
+                            <span class="prelude-val">Ok</span>(<span class="ident">s</span>) =&gt; <span class="ident">s</span>,
+                            <span class="prelude-val">Err</span>(<span class="ident">e</span>) =&gt; {
                                 <span class="macro">warn!</span>(
                                     <span class="ident">sender</span> <span class="op">=</span> <span class="ident">sender</span>.<span class="ident">as_str</span>(),
                                     <span class="ident">sender_key</span> <span class="op">=</span> <span class="ident">sender_key</span>,
@@ -1459,13 +1459,13 @@
         );
 
         <span class="kw">let</span> (<span class="ident">event</span>, <span class="ident">signing_key</span>) <span class="op">=</span> <span class="kw">match</span> <span class="self">self</span>.<span class="ident">parse_decrypted_to_device_event</span>(<span class="ident">sender</span>, <span class="ident">plaintext</span>) {
-            <span class="prelude-val">Ok</span>(<span class="ident">r</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">r</span>,
-            <span class="prelude-val">Err</span>(<span class="ident">e</span>) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="prelude-val">Ok</span>(<span class="ident">r</span>) =&gt; <span class="ident">r</span>,
+            <span class="prelude-val">Err</span>(<span class="ident">e</span>) =&gt; {
                 <span class="comment">// We might created a new session but decryption might still</span>
                 <span class="comment">// have failed, store it for the error case here, this is fine</span>
                 <span class="comment">// since we don&#39;t expect this to happen often or at all.</span>
                 <span class="kw">match</span> <span class="ident">session</span> {
-                    <span class="ident">SessionType::New</span>(<span class="ident">s</span>) <span class="op">=</span><span class="op">&gt;</span> {
+                    <span class="ident">SessionType::New</span>(<span class="ident">s</span>) =&gt; {
                         <span class="kw">let</span> <span class="ident">changes</span> <span class="op">=</span> <span class="ident">Changes</span> {
                             <span class="ident">account</span>: <span class="prelude-val">Some</span>(<span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">clone</span>()),
                             <span class="ident">sessions</span>: <span class="macro">vec!</span>[<span class="ident">s</span>],
@@ -1473,7 +1473,7 @@
                         };
                         <span class="self">self</span>.<span class="ident">store</span>.<span class="ident">save_changes</span>(<span class="ident">changes</span>).<span class="kw">await</span><span class="question-mark">?</span>;
                     }
-                    <span class="ident">SessionType::Existing</span>(<span class="ident">s</span>) <span class="op">=</span><span class="op">&gt;</span> {
+                    <span class="ident">SessionType::Existing</span>(<span class="ident">s</span>) =&gt; {
                         <span class="self">self</span>.<span class="ident">store</span>.<span class="ident">save_sessions</span>(<span class="kw-2">&amp;</span>[<span class="ident">s</span>]).<span class="kw">await</span><span class="question-mark">?</span>;
                     }
                 }
@@ -1491,7 +1491,7 @@
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         <span class="ident">sender</span>: <span class="kw-2">&amp;</span><span class="ident">UserId</span>,
         <span class="ident">plaintext</span>: <span class="ident">String</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">OlmResult</span><span class="op">&lt;</span>(<span class="ident">Raw</span><span class="op">&lt;</span><span class="ident">AnyToDeviceEvent</span><span class="op">&gt;</span>, <span class="ident">String</span>)<span class="op">&gt;</span> {
+    ) -&gt; <span class="ident">OlmResult</span><span class="op">&lt;</span>(<span class="ident">Raw</span><span class="op">&lt;</span><span class="ident">AnyToDeviceEvent</span><span class="op">&gt;</span>, <span class="ident">String</span>)<span class="op">&gt;</span> {
         <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Deserialize</span>)]</span>
         <span class="kw">struct</span> <span class="ident">DecryptedEvent</span> {
             <span class="ident">sender</span>: <span class="ident">UserId</span>,
@@ -1539,13 +1539,13 @@
 
 <span class="kw">impl</span> <span class="ident">AccountPickle</span> {
     <span class="doccomment">/// Get the string representation of the pickle.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">as_str</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="ident">str</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">as_str</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">str</span> {
         <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="number">0</span>
     }
 }
 
 <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">AccountPickle</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">value</span>: <span class="ident">String</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">value</span>: <span class="ident">String</span>) -&gt; <span class="self">Self</span> {
         <span class="self">Self</span>(<span class="ident">value</span>)
     }
 }
@@ -1570,7 +1570,7 @@
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">tarpaulin_include</span>))]</span>
 <span class="kw">impl</span> <span class="ident">fmt::Debug</span> <span class="kw">for</span> <span class="ident">ReadOnlyAccount</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">fmt::Result</span> {
+    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
         <span class="ident">f</span>.<span class="ident">debug_struct</span>(<span class="string">&quot;Account&quot;</span>)
             .<span class="ident">field</span>(<span class="string">&quot;identity_keys&quot;</span>, <span class="self">self</span>.<span class="ident">identity_keys</span>())
             .<span class="ident">field</span>(<span class="string">&quot;shared&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">shared</span>())
@@ -1586,7 +1586,7 @@
 
     <span class="doccomment">/// Create a fresh new account, this will generate the identity key-pair.</span>
     <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy::ptr_arg</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">user_id</span>: <span class="kw-2">&amp;</span><span class="ident">UserId</span>, <span class="ident">device_id</span>: <span class="kw-2">&amp;</span><span class="ident">DeviceId</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">user_id</span>: <span class="kw-2">&amp;</span><span class="ident">UserId</span>, <span class="ident">device_id</span>: <span class="kw-2">&amp;</span><span class="ident">DeviceId</span>) -&gt; <span class="self">Self</span> {
         <span class="kw">let</span> <span class="ident">account</span> <span class="op">=</span> <span class="ident">OlmAccount::new</span>();
         <span class="kw">let</span> <span class="ident">identity_keys</span> <span class="op">=</span> <span class="ident">account</span>.<span class="ident">parsed_identity_keys</span>();
 
@@ -1601,17 +1601,17 @@
     }
 
     <span class="doccomment">/// Get the user id of the owner of the account.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">user_id</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="ident">UserId</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">user_id</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">UserId</span> {
         <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">user_id</span>
     }
 
     <span class="doccomment">/// Get the device id that owns this account.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">device_id</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="ident">DeviceId</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">device_id</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">DeviceId</span> {
         <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">device_id</span>
     }
 
     <span class="doccomment">/// Get the public parts of the identity keys for the account.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">identity_keys</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="ident">IdentityKeys</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">identity_keys</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">IdentityKeys</span> {
         <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">identity_keys</span>
     }
 
@@ -1625,12 +1625,12 @@
     }
 
     <span class="doccomment">/// Get the currently known uploaded key count.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">uploaded_key_count</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">u64</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">uploaded_key_count</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">u64</span> {
         <span class="self">self</span>.<span class="ident">uploaded_signed_key_count</span>.<span class="ident">load</span>(<span class="ident">Ordering::SeqCst</span>)
     }
 
     <span class="doccomment">/// Has the account been shared with the server.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">shared</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">shared</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
         <span class="self">self</span>.<span class="ident">shared</span>.<span class="ident">load</span>(<span class="ident">Ordering::SeqCst</span>)
     }
 
@@ -1645,7 +1645,7 @@
     <span class="doccomment">/// Get the one-time keys of the account.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// This can be empty, keys need to be generated first.</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">one_time_keys</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">OneTimeKeys</span> {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">one_time_keys</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">OneTimeKeys</span> {
         <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">lock</span>().<span class="kw">await</span>.<span class="ident">parsed_one_time_keys</span>()
     }
 
@@ -1655,14 +1655,14 @@
     }
 
     <span class="doccomment">/// Get the maximum number of one-time keys the account can hold.</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">max_one_time_keys</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">usize</span> {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">max_one_time_keys</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">usize</span> {
         <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">lock</span>().<span class="kw">await</span>.<span class="ident">max_number_of_one_time_keys</span>()
     }
 
     <span class="doccomment">/// Get a tuple of device and one-time keys that need to be uploaded.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// Returns an empty error if no keys need to be uploaded.</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">generate_one_time_keys</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">u64</span>, ()<span class="op">&gt;</span> {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">generate_one_time_keys</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">u64</span>, ()<span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">count</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">uploaded_key_count</span>();
         <span class="kw">let</span> <span class="ident">max_keys</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">max_one_time_keys</span>().<span class="kw">await</span>;
         <span class="kw">let</span> <span class="ident">max_on_server</span> <span class="op">=</span> (<span class="ident">max_keys</span> <span class="kw">as</span> <span class="ident">u64</span>) <span class="op">/</span> <span class="number">2</span>;
@@ -1679,7 +1679,7 @@
     }
 
     <span class="doccomment">/// Should account or one-time keys be uploaded to the server.</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">should_upload_keys</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">should_upload_keys</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
         <span class="kw">if</span> <span class="op">!</span><span class="self">self</span>.<span class="ident">shared</span>() {
             <span class="kw">return</span> <span class="bool-val">true</span>;
         }
@@ -1704,7 +1704,7 @@
     <span class="doccomment">/// Returns None if no keys need to be uploaded.</span>
     <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">keys_for_upload</span>(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span>(<span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">DeviceKeys</span><span class="op">&gt;</span>, <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">BTreeMap</span><span class="op">&lt;</span><span class="ident">DeviceKeyId</span>, <span class="ident">OneTimeKey</span><span class="op">&gt;</span><span class="op">&gt;</span>)<span class="op">&gt;</span> {
+    ) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span>(<span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">DeviceKeys</span><span class="op">&gt;</span>, <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">BTreeMap</span><span class="op">&lt;</span><span class="ident">DeviceKeyId</span>, <span class="ident">OneTimeKey</span><span class="op">&gt;</span><span class="op">&gt;</span>)<span class="op">&gt;</span> {
         <span class="kw">if</span> <span class="op">!</span><span class="self">self</span>.<span class="ident">should_upload_keys</span>().<span class="kw">await</span> {
             <span class="kw">return</span> <span class="prelude-val">None</span>;
         }
@@ -1724,7 +1724,7 @@
     <span class="doccomment">/// Sign the given string using the accounts signing key.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// Returns the signature as a base64 encoded string.</span>
-    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">sign</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">string</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">String</span> {
+    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">sign</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">string</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">String</span> {
         <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">lock</span>().<span class="kw">await</span>.<span class="ident">sign</span>(<span class="ident">string</span>)
     }
 
@@ -1735,7 +1735,7 @@
     <span class="doccomment">/// * `pickle_mode` - The mode that was used to pickle the account, either</span>
     <span class="doccomment">///   an</span>
     <span class="doccomment">/// unencrypted mode or an encrypted using passphrase.</span>
-    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">pickle</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">pickle_mode</span>: <span class="ident">PicklingMode</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">PickledAccount</span> {
+    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">pickle</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">pickle_mode</span>: <span class="ident">PicklingMode</span>) -&gt; <span class="ident">PickledAccount</span> {
         <span class="kw">let</span> <span class="ident">pickle</span> <span class="op">=</span> <span class="ident">AccountPickle</span>(<span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">lock</span>().<span class="kw">await</span>.<span class="ident">pickle</span>(<span class="ident">pickle_mode</span>));
 
         <span class="ident">PickledAccount</span> {
@@ -1759,7 +1759,7 @@
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">from_pickle</span>(
         <span class="ident">pickle</span>: <span class="ident">PickledAccount</span>,
         <span class="ident">pickle_mode</span>: <span class="ident">PicklingMode</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">OlmAccountError</span><span class="op">&gt;</span> {
+    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">OlmAccountError</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">account</span> <span class="op">=</span> <span class="ident">OlmAccount::unpickle</span>(<span class="ident">pickle</span>.<span class="ident">pickle</span>.<span class="number">0</span>, <span class="ident">pickle_mode</span>)<span class="question-mark">?</span>;
         <span class="kw">let</span> <span class="ident">identity_keys</span> <span class="op">=</span> <span class="ident">account</span>.<span class="ident">parsed_identity_keys</span>();
 
@@ -1773,7 +1773,7 @@
         })
     }
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">unsigned_device_keys</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">DeviceKeys</span> {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">unsigned_device_keys</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">DeviceKeys</span> {
         <span class="kw">let</span> <span class="ident">identity_keys</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">identity_keys</span>();
 
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">keys</span> <span class="op">=</span> <span class="ident">BTreeMap::new</span>();
@@ -1798,7 +1798,7 @@
 
     <span class="doccomment">/// Sign the device keys of the account and return them so they can be</span>
     <span class="doccomment">/// uploaded.</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">device_keys</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">DeviceKeys</span> {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">device_keys</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">DeviceKeys</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">device_keys</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">unsigned_device_keys</span>();
 
         <span class="comment">// Create a copy of the device keys containing only fields that will</span>
@@ -1820,14 +1820,14 @@
 
     <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">bootstrap_cross_signing</span>(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> (<span class="ident">PrivateCrossSigningIdentity</span>, <span class="ident">UploadSigningKeysRequest</span>, <span class="ident">SignatureUploadRequest</span>) {
+    ) -&gt; (<span class="ident">PrivateCrossSigningIdentity</span>, <span class="ident">UploadSigningKeysRequest</span>, <span class="ident">SignatureUploadRequest</span>) {
         <span class="ident">PrivateCrossSigningIdentity::new_with_account</span>(<span class="self">self</span>).<span class="kw">await</span>
     }
 
     <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">sign_cross_signing_key</span>(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         <span class="ident">cross_signing_key</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">CrossSigningKey</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">SignatureError</span><span class="op">&gt;</span> {
+    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">SignatureError</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">signature</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">sign_json</span>(<span class="ident">serde_json::to_value</span>(<span class="kw-2">&amp;</span><span class="ident">cross_signing_key</span>)<span class="question-mark">?</span>).<span class="kw">await</span>;
 
         <span class="ident">cross_signing_key</span>
@@ -1845,7 +1845,7 @@
     <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">sign_master_key</span>(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         <span class="ident">master_key</span>: <span class="ident">MasterPubkey</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">SignatureUploadRequest</span>, <span class="ident">SignatureError</span><span class="op">&gt;</span> {
+    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">SignatureUploadRequest</span>, <span class="ident">SignatureError</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">public_key</span> <span class="op">=</span>
             <span class="ident">master_key</span>.<span class="ident">get_first_key</span>().<span class="ident">ok_or</span>(<span class="ident">SignatureError::MissingSigningKey</span>)<span class="question-mark">?</span>.<span class="ident">to_string</span>();
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">cross_signing_key</span> <span class="op">=</span> <span class="ident">master_key</span>.<span class="ident">into</span>();
@@ -1871,7 +1871,7 @@
     <span class="doccomment">/// # Panic</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// Panics if the json value can&#39;t be serialized.</span>
-    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">sign_json</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">json</span>: <span class="ident">Value</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">String</span> {
+    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">sign_json</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">json</span>: <span class="ident">Value</span>) -&gt; <span class="ident">String</span> {
         <span class="kw">let</span> <span class="ident">canonical_json</span>: <span class="ident">CanonicalJsonValue</span> <span class="op">=</span>
             <span class="ident">json</span>.<span class="ident">try_into</span>().<span class="ident">expect</span>(<span class="string">&quot;Can&#39;t canonicalize the json value&quot;</span>);
         <span class="self">self</span>.<span class="ident">sign</span>(<span class="kw-2">&amp;</span><span class="ident">canonical_json</span>.<span class="ident">to_string</span>()).<span class="kw">await</span>
@@ -1879,7 +1879,7 @@
 
     <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">signed_one_time_keys_helper</span>(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">BTreeMap</span><span class="op">&lt;</span><span class="ident">DeviceKeyId</span>, <span class="ident">OneTimeKey</span><span class="op">&gt;</span>, ()<span class="op">&gt;</span> {
+    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">BTreeMap</span><span class="op">&lt;</span><span class="ident">DeviceKeyId</span>, <span class="ident">OneTimeKey</span><span class="op">&gt;</span>, ()<span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">one_time_keys</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">one_time_keys</span>().<span class="kw">await</span>;
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">one_time_key_map</span> <span class="op">=</span> <span class="ident">BTreeMap::new</span>();
 
@@ -1919,7 +1919,7 @@
     <span class="doccomment">/// If no one-time keys need to be uploaded returns an empty error.</span>
     <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">signed_one_time_keys</span>(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">BTreeMap</span><span class="op">&lt;</span><span class="ident">DeviceKeyId</span>, <span class="ident">OneTimeKey</span><span class="op">&gt;</span>, ()<span class="op">&gt;</span> {
+    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">BTreeMap</span><span class="op">&lt;</span><span class="ident">DeviceKeyId</span>, <span class="ident">OneTimeKey</span><span class="op">&gt;</span>, ()<span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="kw">_</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">generate_one_time_keys</span>().<span class="kw">await</span><span class="question-mark">?</span>;
         <span class="self">self</span>.<span class="ident">signed_one_time_keys_helper</span>().<span class="kw">await</span>
     }
@@ -1938,7 +1938,7 @@
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         <span class="ident">their_identity_key</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>,
         <span class="ident">their_one_time_key</span>: <span class="kw-2">&amp;</span><span class="ident">SignedKey</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Session</span>, <span class="ident">OlmSessionError</span><span class="op">&gt;</span> {
+    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Session</span>, <span class="ident">OlmSessionError</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">session</span> <span class="op">=</span> <span class="self">self</span>
             .<span class="ident">inner</span>
             .<span class="ident">lock</span>()
@@ -1975,7 +1975,7 @@
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         <span class="ident">device</span>: <span class="ident">ReadOnlyDevice</span>,
         <span class="ident">key_map</span>: <span class="kw-2">&amp;</span><span class="ident">BTreeMap</span><span class="op">&lt;</span><span class="ident">DeviceKeyId</span>, <span class="ident">OneTimeKey</span><span class="op">&gt;</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Session</span>, <span class="ident">SessionCreationError</span><span class="op">&gt;</span> {
+    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Session</span>, <span class="ident">SessionCreationError</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">one_time_key</span> <span class="op">=</span> <span class="ident">key_map</span>.<span class="ident">values</span>().<span class="ident">next</span>().<span class="ident">ok_or_else</span>(<span class="op">|</span><span class="op">|</span> {
             <span class="ident">SessionCreationError::OneTimeKeyMissing</span>(
                 <span class="ident">device</span>.<span class="ident">user_id</span>().<span class="ident">to_owned</span>(),
@@ -1984,14 +1984,14 @@
         })<span class="question-mark">?</span>;
 
         <span class="kw">let</span> <span class="ident">one_time_key</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">one_time_key</span> {
-            <span class="ident">OneTimeKey::SignedKey</span>(<span class="ident">k</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">k</span>,
-            <span class="ident">OneTimeKey::Key</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">OneTimeKey::SignedKey</span>(<span class="ident">k</span>) =&gt; <span class="ident">k</span>,
+            <span class="ident">OneTimeKey::Key</span>(<span class="kw">_</span>) =&gt; {
                 <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">SessionCreationError::OneTimeKeyNotSigned</span>(
                     <span class="ident">device</span>.<span class="ident">user_id</span>().<span class="ident">to_owned</span>(),
                     <span class="ident">device</span>.<span class="ident">device_id</span>().<span class="ident">into</span>(),
                 ));
             }
-            <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="kw">_</span> =&gt; {
                 <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">SessionCreationError::OneTimeKeyUnknown</span>(
                     <span class="ident">device</span>.<span class="ident">user_id</span>().<span class="ident">to_owned</span>(),
                     <span class="ident">device</span>.<span class="ident">device_id</span>().<span class="ident">into</span>(),
@@ -2037,7 +2037,7 @@
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         <span class="ident">their_identity_key</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>,
         <span class="ident">message</span>: <span class="ident">PreKeyMessage</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Session</span>, <span class="ident">OlmSessionError</span><span class="op">&gt;</span> {
+    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Session</span>, <span class="ident">OlmSessionError</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">session</span> <span class="op">=</span>
             <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">lock</span>().<span class="kw">await</span>.<span class="ident">create_inbound_session_from</span>(<span class="ident">their_identity_key</span>, <span class="ident">message</span>)<span class="question-mark">?</span>;
 
@@ -2078,7 +2078,7 @@
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         <span class="ident">room_id</span>: <span class="kw-2">&amp;</span><span class="ident">RoomId</span>,
         <span class="ident">settings</span>: <span class="ident">EncryptionSettings</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(<span class="ident">OutboundGroupSession</span>, <span class="ident">InboundGroupSession</span>), ()<span class="op">&gt;</span> {
+    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(<span class="ident">OutboundGroupSession</span>, <span class="ident">InboundGroupSession</span>), ()<span class="op">&gt;</span> {
         <span class="kw">if</span> <span class="ident">settings</span>.<span class="ident">algorithm</span> <span class="op">!</span><span class="op">=</span> <span class="ident">EventEncryptionAlgorithm::MegolmV1AesSha2</span> {
             <span class="kw">return</span> <span class="prelude-val">Err</span>(());
         }
@@ -2112,12 +2112,12 @@
     <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">create_group_session_pair_with_defaults</span>(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         <span class="ident">room_id</span>: <span class="kw-2">&amp;</span><span class="ident">RoomId</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(<span class="ident">OutboundGroupSession</span>, <span class="ident">InboundGroupSession</span>), ()<span class="op">&gt;</span> {
+    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(<span class="ident">OutboundGroupSession</span>, <span class="ident">InboundGroupSession</span>), ()<span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">create_group_session_pair</span>(<span class="ident">room_id</span>, <span class="ident">EncryptionSettings::default</span>()).<span class="kw">await</span>
     }
 
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">create_session_for</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">other</span>: <span class="kw-2">&amp;</span><span class="ident">ReadOnlyAccount</span>) <span class="op">-</span><span class="op">&gt;</span> (<span class="ident">Session</span>, <span class="ident">Session</span>) {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">create_session_for</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">other</span>: <span class="kw-2">&amp;</span><span class="ident">ReadOnlyAccount</span>) -&gt; (<span class="ident">Session</span>, <span class="ident">Session</span>) {
         <span class="kw">use</span> <span class="ident">ruma::events</span>::{<span class="ident">dummy::ToDeviceDummyEventContent</span>, <span class="ident">AnyToDeviceEventContent</span>};
 
         <span class="ident">other</span>.<span class="ident">generate_one_time_keys_helper</span>(<span class="number">1</span>).<span class="kw">await</span>;
@@ -2174,8 +2174,8 @@
 }
 
 <span class="kw">impl</span> <span class="ident">PartialEq</span> <span class="kw">for</span> <span class="ident">ReadOnlyAccount</span> {
-    <span class="kw">fn</span> <span class="ident">eq</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">other</span>: <span class="kw-2">&amp;</span><span class="self">Self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">identity_keys</span>() <span class="op">=</span><span class="op">=</span> <span class="ident">other</span>.<span class="ident">identity_keys</span>() <span class="op">&amp;&amp;</span> <span class="self">self</span>.<span class="ident">shared</span>() <span class="op">=</span><span class="op">=</span> <span class="ident">other</span>.<span class="ident">shared</span>()
+    <span class="kw">fn</span> <span class="ident">eq</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">other</span>: <span class="kw-2">&amp;</span><span class="self">Self</span>) -&gt; <span class="ident">bool</span> {
+        <span class="self">self</span>.<span class="ident">identity_keys</span>() <span class="op">==</span> <span class="ident">other</span>.<span class="ident">identity_keys</span>() <span class="op">&amp;&amp;</span> <span class="self">self</span>.<span class="ident">shared</span>() <span class="op">==</span> <span class="ident">other</span>.<span class="ident">shared</span>()
     }
 }
 </code></pre></div>

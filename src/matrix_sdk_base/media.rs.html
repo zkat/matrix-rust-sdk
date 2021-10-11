@@ -236,7 +236,7 @@
 <span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">UniqueKey</span> {
     <span class="doccomment">/// A string that uniquely identifies `Self` compared to other values of</span>
     <span class="doccomment">/// the same type.</span>
-    <span class="kw">fn</span> <span class="ident">unique_key</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">String</span>;
+    <span class="kw">fn</span> <span class="ident">unique_key</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">String</span>;
 }
 
 <span class="doccomment">/// The requested format of a media file.</span>
@@ -250,10 +250,10 @@
 }
 
 <span class="kw">impl</span> <span class="ident">UniqueKey</span> <span class="kw">for</span> <span class="ident">MediaFormat</span> {
-    <span class="kw">fn</span> <span class="ident">unique_key</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">String</span> {
+    <span class="kw">fn</span> <span class="ident">unique_key</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">String</span> {
         <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident"><span class="self">Self</span>::File</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;file&quot;</span>.<span class="ident">into</span>(),
-            <span class="ident"><span class="self">Self</span>::Thumbnail</span>(<span class="ident">size</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">size</span>.<span class="ident">unique_key</span>(),
+            <span class="ident"><span class="self">Self</span>::File</span> =&gt; <span class="string">&quot;file&quot;</span>.<span class="ident">into</span>(),
+            <span class="ident"><span class="self">Self</span>::Thumbnail</span>(<span class="ident">size</span>) =&gt; <span class="ident">size</span>.<span class="ident">unique_key</span>(),
         }
     }
 }
@@ -274,7 +274,7 @@
 }
 
 <span class="kw">impl</span> <span class="ident">UniqueKey</span> <span class="kw">for</span> <span class="ident">MediaThumbnailSize</span> {
-    <span class="kw">fn</span> <span class="ident">unique_key</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">String</span> {
+    <span class="kw">fn</span> <span class="ident">unique_key</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">String</span> {
         <span class="macro">format!</span>(<span class="string">&quot;{}{}{}x{}&quot;</span>, <span class="self">self</span>.<span class="ident">method</span>, <span class="ident">UNIQUE_SEPARATOR</span>, <span class="self">self</span>.<span class="ident">width</span>, <span class="self">self</span>.<span class="ident">height</span>)
     }
 }
@@ -290,10 +290,10 @@
 }
 
 <span class="kw">impl</span> <span class="ident">UniqueKey</span> <span class="kw">for</span> <span class="ident">MediaType</span> {
-    <span class="kw">fn</span> <span class="ident">unique_key</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">String</span> {
+    <span class="kw">fn</span> <span class="ident">unique_key</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">String</span> {
         <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident"><span class="self">Self</span>::Uri</span>(<span class="ident">uri</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">uri</span>.<span class="ident">to_string</span>(),
-            <span class="ident"><span class="self">Self</span>::Encrypted</span>(<span class="ident">file</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">file</span>.<span class="ident">url</span>.<span class="ident">to_string</span>(),
+            <span class="ident"><span class="self">Self</span>::Uri</span>(<span class="ident">uri</span>) =&gt; <span class="ident">uri</span>.<span class="ident">to_string</span>(),
+            <span class="ident"><span class="self">Self</span>::Encrypted</span>(<span class="ident">file</span>) =&gt; <span class="ident">file</span>.<span class="ident">url</span>.<span class="ident">to_string</span>(),
         }
     }
 }
@@ -309,7 +309,7 @@
 }
 
 <span class="kw">impl</span> <span class="ident">UniqueKey</span> <span class="kw">for</span> <span class="ident">MediaRequest</span> {
-    <span class="kw">fn</span> <span class="ident">unique_key</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">String</span> {
+    <span class="kw">fn</span> <span class="ident">unique_key</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">String</span> {
         <span class="macro">format!</span>(<span class="string">&quot;{}{}{}&quot;</span>, <span class="self">self</span>.<span class="ident">media_type</span>.<span class="ident">unique_key</span>(), <span class="ident">UNIQUE_SEPARATOR</span>, <span class="self">self</span>.<span class="ident">format</span>.<span class="ident">unique_key</span>())
     }
 }
@@ -319,46 +319,46 @@
     <span class="doccomment">/// Get the type of the file for `Self`.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// Returns `None` if `Self` has no file.</span>
-    <span class="kw">fn</span> <span class="ident">file</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">MediaType</span><span class="op">&gt;</span>;
+    <span class="kw">fn</span> <span class="ident">file</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">MediaType</span><span class="op">&gt;</span>;
 
     <span class="doccomment">/// Get the type of the thumbnail for `Self`.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// Returns `None` if `Self` has no thumbnail.</span>
-    <span class="kw">fn</span> <span class="ident">thumbnail</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">MediaType</span><span class="op">&gt;</span>;
+    <span class="kw">fn</span> <span class="ident">thumbnail</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">MediaType</span><span class="op">&gt;</span>;
 }
 
 <span class="kw">impl</span> <span class="ident">MediaEventContent</span> <span class="kw">for</span> <span class="ident">StickerEventContent</span> {
-    <span class="kw">fn</span> <span class="ident">file</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">MediaType</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">file</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">MediaType</span><span class="op">&gt;</span> {
         <span class="prelude-val">Some</span>(<span class="ident">MediaType::Uri</span>(<span class="self">self</span>.<span class="ident">url</span>.<span class="ident">clone</span>()))
     }
 
-    <span class="kw">fn</span> <span class="ident">thumbnail</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">MediaType</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">thumbnail</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">MediaType</span><span class="op">&gt;</span> {
         <span class="prelude-val">None</span>
     }
 }
 
 <span class="kw">impl</span> <span class="ident">MediaEventContent</span> <span class="kw">for</span> <span class="ident">AudioMessageEventContent</span> {
-    <span class="kw">fn</span> <span class="ident">file</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">MediaType</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">file</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">MediaType</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">url</span>
             .<span class="ident">as_ref</span>()
             .<span class="ident">map</span>(<span class="op">|</span><span class="ident">uri</span><span class="op">|</span> <span class="ident">MediaType::Uri</span>(<span class="ident">uri</span>.<span class="ident">clone</span>()))
             .<span class="ident">or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="self">self</span>.<span class="ident">file</span>.<span class="ident">as_ref</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">e</span><span class="op">|</span> <span class="ident">MediaType::Encrypted</span>(<span class="ident">e</span>.<span class="ident">clone</span>())))
     }
 
-    <span class="kw">fn</span> <span class="ident">thumbnail</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">MediaType</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">thumbnail</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">MediaType</span><span class="op">&gt;</span> {
         <span class="prelude-val">None</span>
     }
 }
 
 <span class="kw">impl</span> <span class="ident">MediaEventContent</span> <span class="kw">for</span> <span class="ident">FileMessageEventContent</span> {
-    <span class="kw">fn</span> <span class="ident">file</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">MediaType</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">file</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">MediaType</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">url</span>
             .<span class="ident">as_ref</span>()
             .<span class="ident">map</span>(<span class="op">|</span><span class="ident">uri</span><span class="op">|</span> <span class="ident">MediaType::Uri</span>(<span class="ident">uri</span>.<span class="ident">clone</span>()))
             .<span class="ident">or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="self">self</span>.<span class="ident">file</span>.<span class="ident">as_ref</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">e</span><span class="op">|</span> <span class="ident">MediaType::Encrypted</span>(<span class="ident">e</span>.<span class="ident">clone</span>())))
     }
 
-    <span class="kw">fn</span> <span class="ident">thumbnail</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">MediaType</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">thumbnail</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">MediaType</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">info</span>.<span class="ident">as_ref</span>().<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">info</span><span class="op">|</span> {
             <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">uri</span>) <span class="op">=</span> <span class="ident">info</span>.<span class="ident">thumbnail_url</span>.<span class="ident">as_ref</span>() {
                 <span class="prelude-val">Some</span>(<span class="ident">MediaType::Uri</span>(<span class="ident">uri</span>.<span class="ident">clone</span>()))
@@ -370,14 +370,14 @@
 }
 
 <span class="kw">impl</span> <span class="ident">MediaEventContent</span> <span class="kw">for</span> <span class="ident">ImageMessageEventContent</span> {
-    <span class="kw">fn</span> <span class="ident">file</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">MediaType</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">file</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">MediaType</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">url</span>
             .<span class="ident">as_ref</span>()
             .<span class="ident">map</span>(<span class="op">|</span><span class="ident">uri</span><span class="op">|</span> <span class="ident">MediaType::Uri</span>(<span class="ident">uri</span>.<span class="ident">clone</span>()))
             .<span class="ident">or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="self">self</span>.<span class="ident">file</span>.<span class="ident">as_ref</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">e</span><span class="op">|</span> <span class="ident">MediaType::Encrypted</span>(<span class="ident">e</span>.<span class="ident">clone</span>())))
     }
 
-    <span class="kw">fn</span> <span class="ident">thumbnail</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">MediaType</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">thumbnail</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">MediaType</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">info</span>
             .<span class="ident">as_ref</span>()
             .<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">info</span><span class="op">|</span> {
@@ -392,14 +392,14 @@
 }
 
 <span class="kw">impl</span> <span class="ident">MediaEventContent</span> <span class="kw">for</span> <span class="ident">VideoMessageEventContent</span> {
-    <span class="kw">fn</span> <span class="ident">file</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">MediaType</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">file</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">MediaType</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">url</span>
             .<span class="ident">as_ref</span>()
             .<span class="ident">map</span>(<span class="op">|</span><span class="ident">uri</span><span class="op">|</span> <span class="ident">MediaType::Uri</span>(<span class="ident">uri</span>.<span class="ident">clone</span>()))
             .<span class="ident">or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="self">self</span>.<span class="ident">file</span>.<span class="ident">as_ref</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">e</span><span class="op">|</span> <span class="ident">MediaType::Encrypted</span>(<span class="ident">e</span>.<span class="ident">clone</span>())))
     }
 
-    <span class="kw">fn</span> <span class="ident">thumbnail</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">MediaType</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">thumbnail</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">MediaType</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">info</span>
             .<span class="ident">as_ref</span>()
             .<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">info</span><span class="op">|</span> {
@@ -414,11 +414,11 @@
 }
 
 <span class="kw">impl</span> <span class="ident">MediaEventContent</span> <span class="kw">for</span> <span class="ident">LocationMessageEventContent</span> {
-    <span class="kw">fn</span> <span class="ident">file</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">MediaType</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">file</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">MediaType</span><span class="op">&gt;</span> {
         <span class="prelude-val">None</span>
     }
 
-    <span class="kw">fn</span> <span class="ident">thumbnail</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">MediaType</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">thumbnail</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">MediaType</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">info</span>.<span class="ident">as_ref</span>().<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">info</span><span class="op">|</span> {
             <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">uri</span>) <span class="op">=</span> <span class="ident">info</span>.<span class="ident">thumbnail_url</span>.<span class="ident">as_ref</span>() {
                 <span class="prelude-val">Some</span>(<span class="ident">MediaType::Uri</span>(<span class="ident">uri</span>.<span class="ident">clone</span>()))

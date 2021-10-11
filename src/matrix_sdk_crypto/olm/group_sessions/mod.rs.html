@@ -259,7 +259,7 @@
     <span class="doccomment">/// This will fail if the exported room key has multiple sender claimed keys</span>
     <span class="doccomment">/// or if the algorithm of the claimed sender key isn&#39;t</span>
     <span class="doccomment">/// `DeviceKeyAlgorithm::Ed25519`.</span>
-    <span class="kw">fn</span> <span class="ident">try_into</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">ToDeviceForwardedRoomKeyEventContent</span>, <span class="ident"><span class="self">Self</span>::Error</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">try_into</span>(<span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">ToDeviceForwardedRoomKeyEventContent</span>, <span class="ident"><span class="self">Self</span>::Error</span><span class="op">&gt;</span> {
         <span class="kw">if</span> <span class="self">self</span>.<span class="ident">sender_claimed_keys</span>.<span class="ident">len</span>() <span class="op">!</span><span class="op">=</span> <span class="number">1</span> {
             <span class="prelude-val">Err</span>(())
         } <span class="kw">else</span> {
@@ -285,7 +285,7 @@
 
 <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">ToDeviceForwardedRoomKeyEventContent</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">ExportedRoomKey</span> {
     <span class="doccomment">/// Convert the content of a forwarded room key into a exported room key.</span>
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">forwarded_key</span>: <span class="ident">ToDeviceForwardedRoomKeyEventContent</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">forwarded_key</span>: <span class="ident">ToDeviceForwardedRoomKeyEventContent</span>) -&gt; <span class="self">Self</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">sender_claimed_keys</span>: <span class="ident">BTreeMap</span><span class="op">&lt;</span><span class="ident">DeviceKeyAlgorithm</span>, <span class="ident">String</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">BTreeMap::new</span>();
         <span class="ident">sender_claimed_keys</span>
             .<span class="ident">insert</span>(<span class="ident">DeviceKeyAlgorithm::Ed25519</span>, <span class="ident">forwarded_key</span>.<span class="ident">sender_claimed_ed25519_key</span>);
@@ -319,7 +319,7 @@
 
     <span class="attribute">#[<span class="ident">tokio::test</span>]</span>
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">target_os</span> <span class="op">=</span> <span class="string">&quot;linux&quot;</span>)]</span>
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">expiration</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">MegolmError</span><span class="op">&gt;</span> {
+    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">expiration</span>() -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">MegolmError</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">settings</span> <span class="op">=</span> <span class="ident">EncryptionSettings</span> { <span class="ident">rotation_period_msgs</span>: <span class="number">1</span>, ..<span class="ident">Default::default</span>() };
 
         <span class="kw">let</span> <span class="ident">account</span> <span class="op">=</span> <span class="ident">ReadOnlyAccount::new</span>(<span class="kw-2">&amp;</span><span class="macro">user_id!</span>(<span class="string">&quot;@alice:example.org&quot;</span>), <span class="string">&quot;DEVICEID&quot;</span>.<span class="ident">into</span>());

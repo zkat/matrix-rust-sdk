@@ -679,7 +679,7 @@
 <span class="doccomment">///</span>
 <span class="doccomment">/// * `content` - The `m.key.verification.start` event content that started the</span>
 <span class="doccomment">/// interactive verification process.</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">calculate_commitment</span>(<span class="ident">public_key</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">content</span>: <span class="kw-2">&amp;</span><span class="ident">StartContent</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">String</span> {
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">calculate_commitment</span>(<span class="ident">public_key</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">content</span>: <span class="kw-2">&amp;</span><span class="ident">StartContent</span>) -&gt; <span class="ident">String</span> {
     <span class="kw">let</span> <span class="ident">content</span> <span class="op">=</span> <span class="ident">content</span>.<span class="ident">canonical_json</span>();
     <span class="kw">let</span> <span class="ident">content_string</span> <span class="op">=</span> <span class="ident">content</span>.<span class="ident">to_string</span>();
 
@@ -696,73 +696,73 @@
 <span class="doccomment">/// bigger than 63.</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// [spec]: https://matrix.org/docs/spec/client_server/latest#sas-method-emoji</span>
-<span class="kw">fn</span> <span class="ident">emoji_from_index</span>(<span class="ident">index</span>: <span class="ident">u8</span>) <span class="op">-</span><span class="op">&gt;</span> (<span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>, <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>) {
+<span class="kw">fn</span> <span class="ident">emoji_from_index</span>(<span class="ident">index</span>: <span class="ident">u8</span>) -&gt; (<span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>, <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>) {
     <span class="kw">match</span> <span class="ident">index</span> {
-        <span class="number">0</span> <span class="op">=</span><span class="op">&gt;</span> (<span class="string">&quot;🐶&quot;</span>, <span class="string">&quot;Dog&quot;</span>),
-        <span class="number">1</span> <span class="op">=</span><span class="op">&gt;</span> (<span class="string">&quot;🐱&quot;</span>, <span class="string">&quot;Cat&quot;</span>),
-        <span class="number">2</span> <span class="op">=</span><span class="op">&gt;</span> (<span class="string">&quot;🦁&quot;</span>, <span class="string">&quot;Lion&quot;</span>),
-        <span class="number">3</span> <span class="op">=</span><span class="op">&gt;</span> (<span class="string">&quot;🐎&quot;</span>, <span class="string">&quot;Horse&quot;</span>),
-        <span class="number">4</span> <span class="op">=</span><span class="op">&gt;</span> (<span class="string">&quot;🦄&quot;</span>, <span class="string">&quot;Unicorn&quot;</span>),
-        <span class="number">5</span> <span class="op">=</span><span class="op">&gt;</span> (<span class="string">&quot;🐷&quot;</span>, <span class="string">&quot;Pig&quot;</span>),
-        <span class="number">6</span> <span class="op">=</span><span class="op">&gt;</span> (<span class="string">&quot;🐘&quot;</span>, <span class="string">&quot;Elephant&quot;</span>),
-        <span class="number">7</span> <span class="op">=</span><span class="op">&gt;</span> (<span class="string">&quot;🐰&quot;</span>, <span class="string">&quot;Rabbit&quot;</span>),
-        <span class="number">8</span> <span class="op">=</span><span class="op">&gt;</span> (<span class="string">&quot;🐼&quot;</span>, <span class="string">&quot;Panda&quot;</span>),
-        <span class="number">9</span> <span class="op">=</span><span class="op">&gt;</span> (<span class="string">&quot;🐓&quot;</span>, <span class="string">&quot;Rooster&quot;</span>),
-        <span class="number">10</span> <span class="op">=</span><span class="op">&gt;</span> (<span class="string">&quot;🐧&quot;</span>, <span class="string">&quot;Penguin&quot;</span>),
-        <span class="number">11</span> <span class="op">=</span><span class="op">&gt;</span> (<span class="string">&quot;🐢&quot;</span>, <span class="string">&quot;Turtle&quot;</span>),
-        <span class="number">12</span> <span class="op">=</span><span class="op">&gt;</span> (<span class="string">&quot;🐟&quot;</span>, <span class="string">&quot;Fish&quot;</span>),
-        <span class="number">13</span> <span class="op">=</span><span class="op">&gt;</span> (<span class="string">&quot;🐙&quot;</span>, <span class="string">&quot;Octopus&quot;</span>),
-        <span class="number">14</span> <span class="op">=</span><span class="op">&gt;</span> (<span class="string">&quot;🦋&quot;</span>, <span class="string">&quot;Butterfly&quot;</span>),
-        <span class="number">15</span> <span class="op">=</span><span class="op">&gt;</span> (<span class="string">&quot;🌷&quot;</span>, <span class="string">&quot;Flower&quot;</span>),
-        <span class="number">16</span> <span class="op">=</span><span class="op">&gt;</span> (<span class="string">&quot;🌳&quot;</span>, <span class="string">&quot;Tree&quot;</span>),
-        <span class="number">17</span> <span class="op">=</span><span class="op">&gt;</span> (<span class="string">&quot;🌵&quot;</span>, <span class="string">&quot;Cactus&quot;</span>),
-        <span class="number">18</span> <span class="op">=</span><span class="op">&gt;</span> (<span class="string">&quot;🍄&quot;</span>, <span class="string">&quot;Mushroom&quot;</span>),
-        <span class="number">19</span> <span class="op">=</span><span class="op">&gt;</span> (<span class="string">&quot;🌏&quot;</span>, <span class="string">&quot;Globe&quot;</span>),
-        <span class="number">20</span> <span class="op">=</span><span class="op">&gt;</span> (<span class="string">&quot;🌙&quot;</span>, <span class="string">&quot;Moon&quot;</span>),
-        <span class="number">21</span> <span class="op">=</span><span class="op">&gt;</span> (<span class="string">&quot;☁️&quot;</span>, <span class="string">&quot;Cloud&quot;</span>),
-        <span class="number">22</span> <span class="op">=</span><span class="op">&gt;</span> (<span class="string">&quot;🔥&quot;</span>, <span class="string">&quot;Fire&quot;</span>),
-        <span class="number">23</span> <span class="op">=</span><span class="op">&gt;</span> (<span class="string">&quot;🍌&quot;</span>, <span class="string">&quot;Banana&quot;</span>),
-        <span class="number">24</span> <span class="op">=</span><span class="op">&gt;</span> (<span class="string">&quot;🍎&quot;</span>, <span class="string">&quot;Apple&quot;</span>),
-        <span class="number">25</span> <span class="op">=</span><span class="op">&gt;</span> (<span class="string">&quot;🍓&quot;</span>, <span class="string">&quot;Strawberry&quot;</span>),
-        <span class="number">26</span> <span class="op">=</span><span class="op">&gt;</span> (<span class="string">&quot;🌽&quot;</span>, <span class="string">&quot;Corn&quot;</span>),
-        <span class="number">27</span> <span class="op">=</span><span class="op">&gt;</span> (<span class="string">&quot;🍕&quot;</span>, <span class="string">&quot;Pizza&quot;</span>),
-        <span class="number">28</span> <span class="op">=</span><span class="op">&gt;</span> (<span class="string">&quot;🎂&quot;</span>, <span class="string">&quot;Cake&quot;</span>),
-        <span class="number">29</span> <span class="op">=</span><span class="op">&gt;</span> (<span class="string">&quot;❤️&quot;</span>, <span class="string">&quot;Heart&quot;</span>),
-        <span class="number">30</span> <span class="op">=</span><span class="op">&gt;</span> (<span class="string">&quot;😀&quot;</span>, <span class="string">&quot;Smiley&quot;</span>),
-        <span class="number">31</span> <span class="op">=</span><span class="op">&gt;</span> (<span class="string">&quot;🤖&quot;</span>, <span class="string">&quot;Robot&quot;</span>),
-        <span class="number">32</span> <span class="op">=</span><span class="op">&gt;</span> (<span class="string">&quot;🎩&quot;</span>, <span class="string">&quot;Hat&quot;</span>),
-        <span class="number">33</span> <span class="op">=</span><span class="op">&gt;</span> (<span class="string">&quot;👓&quot;</span>, <span class="string">&quot;Glasses&quot;</span>),
-        <span class="number">34</span> <span class="op">=</span><span class="op">&gt;</span> (<span class="string">&quot;🔧&quot;</span>, <span class="string">&quot;Spanner&quot;</span>),
-        <span class="number">35</span> <span class="op">=</span><span class="op">&gt;</span> (<span class="string">&quot;🎅&quot;</span>, <span class="string">&quot;Santa&quot;</span>),
-        <span class="number">36</span> <span class="op">=</span><span class="op">&gt;</span> (<span class="string">&quot;👍&quot;</span>, <span class="string">&quot;Thumbs up&quot;</span>),
-        <span class="number">37</span> <span class="op">=</span><span class="op">&gt;</span> (<span class="string">&quot;☂️&quot;</span>, <span class="string">&quot;Umbrella&quot;</span>),
-        <span class="number">38</span> <span class="op">=</span><span class="op">&gt;</span> (<span class="string">&quot;⌛&quot;</span>, <span class="string">&quot;Hourglass&quot;</span>),
-        <span class="number">39</span> <span class="op">=</span><span class="op">&gt;</span> (<span class="string">&quot;⏰&quot;</span>, <span class="string">&quot;Clock&quot;</span>),
-        <span class="number">40</span> <span class="op">=</span><span class="op">&gt;</span> (<span class="string">&quot;🎁&quot;</span>, <span class="string">&quot;Gift&quot;</span>),
-        <span class="number">41</span> <span class="op">=</span><span class="op">&gt;</span> (<span class="string">&quot;💡&quot;</span>, <span class="string">&quot;Light Bulb&quot;</span>),
-        <span class="number">42</span> <span class="op">=</span><span class="op">&gt;</span> (<span class="string">&quot;📕&quot;</span>, <span class="string">&quot;Book&quot;</span>),
-        <span class="number">43</span> <span class="op">=</span><span class="op">&gt;</span> (<span class="string">&quot;✏️&quot;</span>, <span class="string">&quot;Pencil&quot;</span>),
-        <span class="number">44</span> <span class="op">=</span><span class="op">&gt;</span> (<span class="string">&quot;📎&quot;</span>, <span class="string">&quot;Paperclip&quot;</span>),
-        <span class="number">45</span> <span class="op">=</span><span class="op">&gt;</span> (<span class="string">&quot;✂️&quot;</span>, <span class="string">&quot;Scissors&quot;</span>),
-        <span class="number">46</span> <span class="op">=</span><span class="op">&gt;</span> (<span class="string">&quot;🔒&quot;</span>, <span class="string">&quot;Lock&quot;</span>),
-        <span class="number">47</span> <span class="op">=</span><span class="op">&gt;</span> (<span class="string">&quot;🔑&quot;</span>, <span class="string">&quot;Key&quot;</span>),
-        <span class="number">48</span> <span class="op">=</span><span class="op">&gt;</span> (<span class="string">&quot;🔨&quot;</span>, <span class="string">&quot;Hammer&quot;</span>),
-        <span class="number">49</span> <span class="op">=</span><span class="op">&gt;</span> (<span class="string">&quot;☎️&quot;</span>, <span class="string">&quot;Telephone&quot;</span>),
-        <span class="number">50</span> <span class="op">=</span><span class="op">&gt;</span> (<span class="string">&quot;🏁&quot;</span>, <span class="string">&quot;Flag&quot;</span>),
-        <span class="number">51</span> <span class="op">=</span><span class="op">&gt;</span> (<span class="string">&quot;🚂&quot;</span>, <span class="string">&quot;Train&quot;</span>),
-        <span class="number">52</span> <span class="op">=</span><span class="op">&gt;</span> (<span class="string">&quot;🚲&quot;</span>, <span class="string">&quot;Bicycle&quot;</span>),
-        <span class="number">53</span> <span class="op">=</span><span class="op">&gt;</span> (<span class="string">&quot;✈️&quot;</span>, <span class="string">&quot;Airplane&quot;</span>),
-        <span class="number">54</span> <span class="op">=</span><span class="op">&gt;</span> (<span class="string">&quot;🚀&quot;</span>, <span class="string">&quot;Rocket&quot;</span>),
-        <span class="number">55</span> <span class="op">=</span><span class="op">&gt;</span> (<span class="string">&quot;🏆&quot;</span>, <span class="string">&quot;Trophy&quot;</span>),
-        <span class="number">56</span> <span class="op">=</span><span class="op">&gt;</span> (<span class="string">&quot;⚽&quot;</span>, <span class="string">&quot;Ball&quot;</span>),
-        <span class="number">57</span> <span class="op">=</span><span class="op">&gt;</span> (<span class="string">&quot;🎸&quot;</span>, <span class="string">&quot;Guitar&quot;</span>),
-        <span class="number">58</span> <span class="op">=</span><span class="op">&gt;</span> (<span class="string">&quot;🎺&quot;</span>, <span class="string">&quot;Trumpet&quot;</span>),
-        <span class="number">59</span> <span class="op">=</span><span class="op">&gt;</span> (<span class="string">&quot;🔔&quot;</span>, <span class="string">&quot;Bell&quot;</span>),
-        <span class="number">60</span> <span class="op">=</span><span class="op">&gt;</span> (<span class="string">&quot;⚓&quot;</span>, <span class="string">&quot;Anchor&quot;</span>),
-        <span class="number">61</span> <span class="op">=</span><span class="op">&gt;</span> (<span class="string">&quot;🎧&quot;</span>, <span class="string">&quot;Headphones&quot;</span>),
-        <span class="number">62</span> <span class="op">=</span><span class="op">&gt;</span> (<span class="string">&quot;📁&quot;</span>, <span class="string">&quot;Folder&quot;</span>),
-        <span class="number">63</span> <span class="op">=</span><span class="op">&gt;</span> (<span class="string">&quot;📌&quot;</span>, <span class="string">&quot;Pin&quot;</span>),
-        <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">panic!</span>(<span class="string">&quot;Trying to fetch an emoji outside the allowed range&quot;</span>),
+        <span class="number">0</span> =&gt; (<span class="string">&quot;🐶&quot;</span>, <span class="string">&quot;Dog&quot;</span>),
+        <span class="number">1</span> =&gt; (<span class="string">&quot;🐱&quot;</span>, <span class="string">&quot;Cat&quot;</span>),
+        <span class="number">2</span> =&gt; (<span class="string">&quot;🦁&quot;</span>, <span class="string">&quot;Lion&quot;</span>),
+        <span class="number">3</span> =&gt; (<span class="string">&quot;🐎&quot;</span>, <span class="string">&quot;Horse&quot;</span>),
+        <span class="number">4</span> =&gt; (<span class="string">&quot;🦄&quot;</span>, <span class="string">&quot;Unicorn&quot;</span>),
+        <span class="number">5</span> =&gt; (<span class="string">&quot;🐷&quot;</span>, <span class="string">&quot;Pig&quot;</span>),
+        <span class="number">6</span> =&gt; (<span class="string">&quot;🐘&quot;</span>, <span class="string">&quot;Elephant&quot;</span>),
+        <span class="number">7</span> =&gt; (<span class="string">&quot;🐰&quot;</span>, <span class="string">&quot;Rabbit&quot;</span>),
+        <span class="number">8</span> =&gt; (<span class="string">&quot;🐼&quot;</span>, <span class="string">&quot;Panda&quot;</span>),
+        <span class="number">9</span> =&gt; (<span class="string">&quot;🐓&quot;</span>, <span class="string">&quot;Rooster&quot;</span>),
+        <span class="number">10</span> =&gt; (<span class="string">&quot;🐧&quot;</span>, <span class="string">&quot;Penguin&quot;</span>),
+        <span class="number">11</span> =&gt; (<span class="string">&quot;🐢&quot;</span>, <span class="string">&quot;Turtle&quot;</span>),
+        <span class="number">12</span> =&gt; (<span class="string">&quot;🐟&quot;</span>, <span class="string">&quot;Fish&quot;</span>),
+        <span class="number">13</span> =&gt; (<span class="string">&quot;🐙&quot;</span>, <span class="string">&quot;Octopus&quot;</span>),
+        <span class="number">14</span> =&gt; (<span class="string">&quot;🦋&quot;</span>, <span class="string">&quot;Butterfly&quot;</span>),
+        <span class="number">15</span> =&gt; (<span class="string">&quot;🌷&quot;</span>, <span class="string">&quot;Flower&quot;</span>),
+        <span class="number">16</span> =&gt; (<span class="string">&quot;🌳&quot;</span>, <span class="string">&quot;Tree&quot;</span>),
+        <span class="number">17</span> =&gt; (<span class="string">&quot;🌵&quot;</span>, <span class="string">&quot;Cactus&quot;</span>),
+        <span class="number">18</span> =&gt; (<span class="string">&quot;🍄&quot;</span>, <span class="string">&quot;Mushroom&quot;</span>),
+        <span class="number">19</span> =&gt; (<span class="string">&quot;🌏&quot;</span>, <span class="string">&quot;Globe&quot;</span>),
+        <span class="number">20</span> =&gt; (<span class="string">&quot;🌙&quot;</span>, <span class="string">&quot;Moon&quot;</span>),
+        <span class="number">21</span> =&gt; (<span class="string">&quot;☁️&quot;</span>, <span class="string">&quot;Cloud&quot;</span>),
+        <span class="number">22</span> =&gt; (<span class="string">&quot;🔥&quot;</span>, <span class="string">&quot;Fire&quot;</span>),
+        <span class="number">23</span> =&gt; (<span class="string">&quot;🍌&quot;</span>, <span class="string">&quot;Banana&quot;</span>),
+        <span class="number">24</span> =&gt; (<span class="string">&quot;🍎&quot;</span>, <span class="string">&quot;Apple&quot;</span>),
+        <span class="number">25</span> =&gt; (<span class="string">&quot;🍓&quot;</span>, <span class="string">&quot;Strawberry&quot;</span>),
+        <span class="number">26</span> =&gt; (<span class="string">&quot;🌽&quot;</span>, <span class="string">&quot;Corn&quot;</span>),
+        <span class="number">27</span> =&gt; (<span class="string">&quot;🍕&quot;</span>, <span class="string">&quot;Pizza&quot;</span>),
+        <span class="number">28</span> =&gt; (<span class="string">&quot;🎂&quot;</span>, <span class="string">&quot;Cake&quot;</span>),
+        <span class="number">29</span> =&gt; (<span class="string">&quot;❤️&quot;</span>, <span class="string">&quot;Heart&quot;</span>),
+        <span class="number">30</span> =&gt; (<span class="string">&quot;😀&quot;</span>, <span class="string">&quot;Smiley&quot;</span>),
+        <span class="number">31</span> =&gt; (<span class="string">&quot;🤖&quot;</span>, <span class="string">&quot;Robot&quot;</span>),
+        <span class="number">32</span> =&gt; (<span class="string">&quot;🎩&quot;</span>, <span class="string">&quot;Hat&quot;</span>),
+        <span class="number">33</span> =&gt; (<span class="string">&quot;👓&quot;</span>, <span class="string">&quot;Glasses&quot;</span>),
+        <span class="number">34</span> =&gt; (<span class="string">&quot;🔧&quot;</span>, <span class="string">&quot;Spanner&quot;</span>),
+        <span class="number">35</span> =&gt; (<span class="string">&quot;🎅&quot;</span>, <span class="string">&quot;Santa&quot;</span>),
+        <span class="number">36</span> =&gt; (<span class="string">&quot;👍&quot;</span>, <span class="string">&quot;Thumbs up&quot;</span>),
+        <span class="number">37</span> =&gt; (<span class="string">&quot;☂️&quot;</span>, <span class="string">&quot;Umbrella&quot;</span>),
+        <span class="number">38</span> =&gt; (<span class="string">&quot;⌛&quot;</span>, <span class="string">&quot;Hourglass&quot;</span>),
+        <span class="number">39</span> =&gt; (<span class="string">&quot;⏰&quot;</span>, <span class="string">&quot;Clock&quot;</span>),
+        <span class="number">40</span> =&gt; (<span class="string">&quot;🎁&quot;</span>, <span class="string">&quot;Gift&quot;</span>),
+        <span class="number">41</span> =&gt; (<span class="string">&quot;💡&quot;</span>, <span class="string">&quot;Light Bulb&quot;</span>),
+        <span class="number">42</span> =&gt; (<span class="string">&quot;📕&quot;</span>, <span class="string">&quot;Book&quot;</span>),
+        <span class="number">43</span> =&gt; (<span class="string">&quot;✏️&quot;</span>, <span class="string">&quot;Pencil&quot;</span>),
+        <span class="number">44</span> =&gt; (<span class="string">&quot;📎&quot;</span>, <span class="string">&quot;Paperclip&quot;</span>),
+        <span class="number">45</span> =&gt; (<span class="string">&quot;✂️&quot;</span>, <span class="string">&quot;Scissors&quot;</span>),
+        <span class="number">46</span> =&gt; (<span class="string">&quot;🔒&quot;</span>, <span class="string">&quot;Lock&quot;</span>),
+        <span class="number">47</span> =&gt; (<span class="string">&quot;🔑&quot;</span>, <span class="string">&quot;Key&quot;</span>),
+        <span class="number">48</span> =&gt; (<span class="string">&quot;🔨&quot;</span>, <span class="string">&quot;Hammer&quot;</span>),
+        <span class="number">49</span> =&gt; (<span class="string">&quot;☎️&quot;</span>, <span class="string">&quot;Telephone&quot;</span>),
+        <span class="number">50</span> =&gt; (<span class="string">&quot;🏁&quot;</span>, <span class="string">&quot;Flag&quot;</span>),
+        <span class="number">51</span> =&gt; (<span class="string">&quot;🚂&quot;</span>, <span class="string">&quot;Train&quot;</span>),
+        <span class="number">52</span> =&gt; (<span class="string">&quot;🚲&quot;</span>, <span class="string">&quot;Bicycle&quot;</span>),
+        <span class="number">53</span> =&gt; (<span class="string">&quot;✈️&quot;</span>, <span class="string">&quot;Airplane&quot;</span>),
+        <span class="number">54</span> =&gt; (<span class="string">&quot;🚀&quot;</span>, <span class="string">&quot;Rocket&quot;</span>),
+        <span class="number">55</span> =&gt; (<span class="string">&quot;🏆&quot;</span>, <span class="string">&quot;Trophy&quot;</span>),
+        <span class="number">56</span> =&gt; (<span class="string">&quot;⚽&quot;</span>, <span class="string">&quot;Ball&quot;</span>),
+        <span class="number">57</span> =&gt; (<span class="string">&quot;🎸&quot;</span>, <span class="string">&quot;Guitar&quot;</span>),
+        <span class="number">58</span> =&gt; (<span class="string">&quot;🎺&quot;</span>, <span class="string">&quot;Trumpet&quot;</span>),
+        <span class="number">59</span> =&gt; (<span class="string">&quot;🔔&quot;</span>, <span class="string">&quot;Bell&quot;</span>),
+        <span class="number">60</span> =&gt; (<span class="string">&quot;⚓&quot;</span>, <span class="string">&quot;Anchor&quot;</span>),
+        <span class="number">61</span> =&gt; (<span class="string">&quot;🎧&quot;</span>, <span class="string">&quot;Headphones&quot;</span>),
+        <span class="number">62</span> =&gt; (<span class="string">&quot;📁&quot;</span>, <span class="string">&quot;Folder&quot;</span>),
+        <span class="number">63</span> =&gt; (<span class="string">&quot;📌&quot;</span>, <span class="string">&quot;Pin&quot;</span>),
+        <span class="kw">_</span> =&gt; <span class="macro">panic!</span>(<span class="string">&quot;Trying to fetch an emoji outside the allowed range&quot;</span>),
     }
 }
 
@@ -774,7 +774,7 @@
 <span class="doccomment">/// * `ids` - The ids that are used for this SAS authentication flow.</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// * `flow_id` - The unique id that identifies this SAS verification process.</span>
-<span class="kw">fn</span> <span class="ident">extra_mac_info_receive</span>(<span class="ident">ids</span>: <span class="kw-2">&amp;</span><span class="ident">SasIds</span>, <span class="ident">flow_id</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">String</span> {
+<span class="kw">fn</span> <span class="ident">extra_mac_info_receive</span>(<span class="ident">ids</span>: <span class="kw-2">&amp;</span><span class="ident">SasIds</span>, <span class="ident">flow_id</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">String</span> {
     <span class="macro">format!</span>(
         <span class="string">&quot;MATRIX_KEY_VERIFICATION_MAC{first_user}{first_device}\
         {second_user}{second_device}{transaction_id}&quot;</span>,
@@ -807,7 +807,7 @@
     <span class="ident">flow_id</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>,
     <span class="ident">sender</span>: <span class="kw-2">&amp;</span><span class="ident">UserId</span>,
     <span class="ident">content</span>: <span class="kw-2">&amp;</span><span class="ident">MacContent</span>,
-) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(<span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">ReadOnlyDevice</span><span class="op">&gt;</span>, <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">ReadOnlyUserIdentities</span><span class="op">&gt;</span>), <span class="ident">CancelCode</span><span class="op">&gt;</span> {
+) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(<span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">ReadOnlyDevice</span><span class="op">&gt;</span>, <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">ReadOnlyUserIdentities</span><span class="op">&gt;</span>), <span class="ident">CancelCode</span><span class="op">&gt;</span> {
     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">verified_devices</span> <span class="op">=</span> <span class="ident">Vec::new</span>();
     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">verified_identities</span> <span class="op">=</span> <span class="ident">Vec::new</span>();
 
@@ -839,13 +839,13 @@
         );
 
         <span class="kw">let</span> <span class="ident">key_id</span>: <span class="ident">DeviceKeyId</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">key_id</span>.<span class="ident">as_str</span>().<span class="ident">try_into</span>() {
-            <span class="prelude-val">Ok</span>(<span class="ident">id</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">id</span>,
-            <span class="prelude-val">Err</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="kw">continue</span>,
+            <span class="prelude-val">Ok</span>(<span class="ident">id</span>) =&gt; <span class="ident">id</span>,
+            <span class="prelude-val">Err</span>(<span class="kw">_</span>) =&gt; <span class="kw">continue</span>,
         };
 
         <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">key</span>) <span class="op">=</span> <span class="ident">ids</span>.<span class="ident">other_device</span>.<span class="ident">keys</span>().<span class="ident">get</span>(<span class="kw-2">&amp;</span><span class="ident">key_id</span>) {
             <span class="kw">if</span> <span class="ident">key_mac</span>
-                <span class="op">=</span><span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">sas</span>
+                <span class="op">==</span> <span class="kw-2">&amp;</span><span class="ident">sas</span>
                     .<span class="ident">calculate_mac</span>(<span class="ident">key</span>, <span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">&quot;{}{}&quot;</span>, <span class="ident">info</span>, <span class="ident">key_id</span>))
                     .<span class="ident">expect</span>(<span class="string">&quot;Can&#39;t calculate SAS MAC&quot;</span>)
             {
@@ -860,7 +860,7 @@
                 <span class="comment">// TODO we should check that the master key signs the device,</span>
                 <span class="comment">// this way we know the master key also trusts the device</span>
                 <span class="kw">if</span> <span class="ident">key_mac</span>
-                    <span class="op">=</span><span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">sas</span>
+                    <span class="op">==</span> <span class="kw-2">&amp;</span><span class="ident">sas</span>
                         .<span class="ident">calculate_mac</span>(<span class="ident">key</span>, <span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">&quot;{}{}&quot;</span>, <span class="ident">info</span>, <span class="ident">key_id</span>))
                         .<span class="ident">expect</span>(<span class="string">&quot;Can&#39;t calculate SAS MAC&quot;</span>)
                 {
@@ -892,7 +892,7 @@
 <span class="doccomment">/// * `ids` - The ids that are used for this SAS authentication flow.</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// * `flow_id` - The unique id that identifies this SAS verification process.</span>
-<span class="kw">fn</span> <span class="ident">extra_mac_info_send</span>(<span class="ident">ids</span>: <span class="kw-2">&amp;</span><span class="ident">SasIds</span>, <span class="ident">flow_id</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">String</span> {
+<span class="kw">fn</span> <span class="ident">extra_mac_info_send</span>(<span class="ident">ids</span>: <span class="kw-2">&amp;</span><span class="ident">SasIds</span>, <span class="ident">flow_id</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">String</span> {
     <span class="macro">format!</span>(
         <span class="string">&quot;MATRIX_KEY_VERIFICATION_MAC{first_user}{first_device}\
         {second_user}{second_device}{transaction_id}&quot;</span>,
@@ -917,7 +917,7 @@
 <span class="doccomment">/// # Panics</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// This will panic if the public key of the other side wasn&#39;t set.</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_mac_content</span>(<span class="ident">sas</span>: <span class="kw-2">&amp;</span><span class="ident">OlmSas</span>, <span class="ident">ids</span>: <span class="kw-2">&amp;</span><span class="ident">SasIds</span>, <span class="ident">flow_id</span>: <span class="kw-2">&amp;</span><span class="ident">FlowId</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">OutgoingContent</span> {
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_mac_content</span>(<span class="ident">sas</span>: <span class="kw-2">&amp;</span><span class="ident">OlmSas</span>, <span class="ident">ids</span>: <span class="kw-2">&amp;</span><span class="ident">SasIds</span>, <span class="ident">flow_id</span>: <span class="kw-2">&amp;</span><span class="ident">FlowId</span>) -&gt; <span class="ident">OutgoingContent</span> {
     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">mac</span>: <span class="ident">BTreeMap</span><span class="op">&lt;</span><span class="ident">String</span>, <span class="ident">String</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">BTreeMap::new</span>();
 
     <span class="kw">let</span> <span class="ident">key_id</span> <span class="op">=</span> <span class="ident">DeviceKeyId::from_parts</span>(<span class="ident">DeviceKeyAlgorithm::Ed25519</span>, <span class="ident">ids</span>.<span class="ident">account</span>.<span class="ident">device_id</span>());
@@ -952,11 +952,11 @@
         .<span class="ident">expect</span>(<span class="string">&quot;Can&#39;t calculate SAS MAC&quot;</span>);
 
     <span class="kw">match</span> <span class="ident">flow_id</span> {
-        <span class="ident">FlowId::ToDevice</span>(<span class="ident">s</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">AnyToDeviceEventContent::KeyVerificationMac</span>(
+        <span class="ident">FlowId::ToDevice</span>(<span class="ident">s</span>) =&gt; <span class="ident">AnyToDeviceEventContent::KeyVerificationMac</span>(
             <span class="ident">ToDeviceMacEventContent::new</span>(<span class="ident">s</span>.<span class="ident">to_string</span>(), <span class="ident">mac</span>, <span class="ident">keys</span>),
         )
         .<span class="ident">into</span>(),
-        <span class="ident">FlowId::InRoom</span>(<span class="ident">r</span>, <span class="ident">e</span>) <span class="op">=</span><span class="op">&gt;</span> (
+        <span class="ident">FlowId::InRoom</span>(<span class="ident">r</span>, <span class="ident">e</span>) =&gt; (
             <span class="ident">r</span>.<span class="ident">clone</span>(),
             <span class="ident">AnyMessageEventContent::KeyVerificationMac</span>(<span class="ident">MacEventContent::new</span>(
                 <span class="ident">mac</span>,
@@ -984,7 +984,7 @@
     <span class="ident">their_pubkey</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>,
     <span class="ident">flow_id</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>,
     <span class="ident">we_started</span>: <span class="ident">bool</span>,
-) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">String</span> {
+) -&gt; <span class="ident">String</span> {
     <span class="kw">let</span> <span class="ident">our_info</span> <span class="op">=</span> <span class="macro">format!</span>(<span class="string">&quot;{}|{}|{}&quot;</span>, <span class="ident">ids</span>.<span class="ident">account</span>.<span class="ident">user_id</span>(), <span class="ident">ids</span>.<span class="ident">account</span>.<span class="ident">device_id</span>(), <span class="ident">own_pubkey</span>);
     <span class="kw">let</span> <span class="ident">their_info</span> <span class="op">=</span>
         <span class="macro">format!</span>(<span class="string">&quot;{}|{}|{}&quot;</span>, <span class="ident">ids</span>.<span class="ident">other_device</span>.<span class="ident">user_id</span>(), <span class="ident">ids</span>.<span class="ident">other_device</span>.<span class="ident">device_id</span>(), <span class="ident">their_pubkey</span>);
@@ -1029,7 +1029,7 @@
     <span class="ident">their_pubkey</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>,
     <span class="ident">flow_id</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>,
     <span class="ident">we_started</span>: <span class="ident">bool</span>,
-) <span class="op">-</span><span class="op">&gt;</span> [(<span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>, <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>); <span class="number">7</span>] {
+) -&gt; [(<span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>, <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>); <span class="number">7</span>] {
     <span class="kw">let</span> <span class="ident">bytes</span> <span class="op">=</span> <span class="ident">sas</span>
         .<span class="ident">generate_bytes</span>(
             <span class="kw-2">&amp;</span><span class="ident">extra_info_sas</span>(<span class="ident">ids</span>, <span class="kw-2">&amp;</span><span class="ident">sas</span>.<span class="ident">public_key</span>(), <span class="ident">their_pubkey</span>, <span class="ident">flow_id</span>, <span class="ident">we_started</span>),
@@ -1066,7 +1066,7 @@
     <span class="ident">their_pubkey</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>,
     <span class="ident">flow_id</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>,
     <span class="ident">we_started</span>: <span class="ident">bool</span>,
-) <span class="op">-</span><span class="op">&gt;</span> [<span class="ident">u8</span>; <span class="number">7</span>] {
+) -&gt; [<span class="ident">u8</span>; <span class="number">7</span>] {
     <span class="kw">let</span> <span class="ident">bytes</span> <span class="op">=</span> <span class="ident">sas</span>
         .<span class="ident">generate_bytes</span>(
             <span class="kw-2">&amp;</span><span class="ident">extra_info_sas</span>(<span class="ident">ids</span>, <span class="kw-2">&amp;</span><span class="ident">sas</span>.<span class="ident">public_key</span>(), <span class="ident">their_pubkey</span>, <span class="ident">flow_id</span>, <span class="ident">we_started</span>),
@@ -1077,7 +1077,7 @@
     <span class="ident">bytes_to_emoji_index</span>(<span class="ident">bytes</span>)
 }
 
-<span class="kw">fn</span> <span class="ident">bytes_to_emoji_index</span>(<span class="ident">bytes</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> [<span class="ident">u8</span>; <span class="number">7</span>] {
+<span class="kw">fn</span> <span class="ident">bytes_to_emoji_index</span>(<span class="ident">bytes</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>) -&gt; [<span class="ident">u8</span>; <span class="number">7</span>] {
     <span class="kw">let</span> <span class="ident">bytes</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u64</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">bytes</span>.<span class="ident">iter</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">b</span><span class="op">|</span> <span class="kw-2">*</span><span class="ident">b</span> <span class="kw">as</span> <span class="ident">u64</span>).<span class="ident">collect</span>();
     <span class="comment">// Join the 6 bytes into one 64 bit unsigned int. This u64 will contain 48</span>
     <span class="comment">// bits from our 6 bytes.</span>
@@ -1101,7 +1101,7 @@
     ]
 }
 
-<span class="kw">fn</span> <span class="ident">bytes_to_emoji</span>(<span class="ident">bytes</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> [(<span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>, <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>); <span class="number">7</span>] {
+<span class="kw">fn</span> <span class="ident">bytes_to_emoji</span>(<span class="ident">bytes</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>) -&gt; [(<span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>, <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>); <span class="number">7</span>] {
     <span class="kw">let</span> <span class="ident">numbers</span> <span class="op">=</span> <span class="ident">bytes_to_emoji_index</span>(<span class="ident">bytes</span>);
 
     <span class="comment">// Convert the 6 bit number into a emoji/description tuple.</span>
@@ -1141,7 +1141,7 @@
     <span class="ident">their_pubkey</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>,
     <span class="ident">flow_id</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>,
     <span class="ident">we_started</span>: <span class="ident">bool</span>,
-) <span class="op">-</span><span class="op">&gt;</span> (<span class="ident">u16</span>, <span class="ident">u16</span>, <span class="ident">u16</span>) {
+) -&gt; (<span class="ident">u16</span>, <span class="ident">u16</span>, <span class="ident">u16</span>) {
     <span class="kw">let</span> <span class="ident">bytes</span> <span class="op">=</span> <span class="ident">sas</span>
         .<span class="ident">generate_bytes</span>(
             <span class="kw-2">&amp;</span><span class="ident">extra_info_sas</span>(<span class="ident">ids</span>, <span class="kw-2">&amp;</span><span class="ident">sas</span>.<span class="ident">public_key</span>(), <span class="ident">their_pubkey</span>, <span class="ident">flow_id</span>, <span class="ident">we_started</span>),
@@ -1152,7 +1152,7 @@
     <span class="ident">bytes_to_decimal</span>(<span class="ident">bytes</span>)
 }
 
-<span class="kw">fn</span> <span class="ident">bytes_to_decimal</span>(<span class="ident">bytes</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> (<span class="ident">u16</span>, <span class="ident">u16</span>, <span class="ident">u16</span>) {
+<span class="kw">fn</span> <span class="ident">bytes_to_decimal</span>(<span class="ident">bytes</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>) -&gt; (<span class="ident">u16</span>, <span class="ident">u16</span>, <span class="ident">u16</span>) {
     <span class="kw">let</span> <span class="ident">bytes</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u16</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">bytes</span>.<span class="ident">into_iter</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">b</span><span class="op">|</span> <span class="ident">b</span> <span class="kw">as</span> <span class="ident">u16</span>).<span class="ident">collect</span>();
 
     <span class="comment">// This bitwise operation is taken from the [spec]</span>
