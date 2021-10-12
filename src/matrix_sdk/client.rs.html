@@ -3547,10 +3547,6 @@
 <span id="3547">3547</span>
 <span id="3548">3548</span>
 <span id="3549">3549</span>
-<span id="3550">3550</span>
-<span id="3551">3551</span>
-<span id="3552">3552</span>
-<span id="3553">3553</span>
 </pre><pre class="rust"><code><span class="comment">// Copyright 2020 Damir Jelić</span>
 <span class="comment">// Copyright 2020 The Matrix.org Foundation C.I.C.</span>
 <span class="comment">//</span>
@@ -5564,7 +5560,7 @@
     <span class="doccomment">/// # let homeserver = Url::parse(&quot;http://localhost:8080&quot;)?;</span>
     <span class="doccomment">/// # let username = &quot;&quot;;</span>
     <span class="doccomment">/// # let password = &quot;&quot;;</span>
-    <span class="doccomment">/// use futures::stream::TryStreamExt;</span>
+    <span class="doccomment">/// use futures::StreamExt;</span>
     <span class="doccomment">/// use matrix_sdk::{</span>
     <span class="doccomment">///     Client, config::SyncSettings,</span>
     <span class="doccomment">///     ruma::events::{SyncMessageEvent, room::message::MessageEventContent},</span>
@@ -5575,7 +5571,7 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// let mut sync_stream = Box::pin(client.sync_stream(SyncSettings::default()).await);</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// for response in sync_stream.try_next().await? {</span>
+    <span class="doccomment">/// while let Some(Ok(response)) = sync_stream.next().await {</span>
     <span class="doccomment">///     for room in response.rooms.join.values() {</span>
     <span class="doccomment">///         for e in &amp;room.timeline.events {</span>
     <span class="doccomment">///             if let Ok(event) = e.event.deserialize() {</span>
@@ -5598,13 +5594,9 @@
             <span class="ident">sync_settings</span>.<span class="ident">token</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">sync_token</span>().<span class="kw">await</span>;
         }
 
-        <span class="comment">// TODO we should only abort the sync loop if the error is a storage error or</span>
-        <span class="comment">// the access token got invalid.</span>
-        <span class="macro">async_stream::try_stream!</span> {
+        <span class="macro">async_stream::stream!</span> {
             <span class="kw">loop</span> {
-                <span class="kw">let</span> <span class="ident">response</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">sync_loop_helper</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">sync_settings</span>).<span class="kw">await</span><span class="question-mark">?</span>;
-
-                <span class="kw">yield</span> <span class="ident">response</span>;
+                <span class="kw">yield</span> <span class="self">self</span>.<span class="ident">sync_loop_helper</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">sync_settings</span>).<span class="kw">await</span>;
 
                 <span class="ident">Client::delay_sync</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">last_sync_time</span>).<span class="kw">await</span>
             }
