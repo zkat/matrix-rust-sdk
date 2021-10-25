@@ -184,6 +184,9 @@
 <span id="184">184</span>
 <span id="185">185</span>
 <span id="186">186</span>
+<span id="187">187</span>
+<span id="188">188</span>
+<span id="189">189</span>
 </pre><pre class="rust"><code><span class="comment">// Copyright 2021 The Matrix.org Foundation C.I.C.</span>
 <span class="comment">//</span>
 <span class="comment">// Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);</span>
@@ -205,7 +208,7 @@
 };
 
 <span class="kw">use</span> <span class="ident">http</span>::{<span class="ident">header::InvalidHeaderValue</span>, <span class="ident">HeaderValue</span>};
-<span class="kw">use</span> <span class="ident">matrix_sdk_base</span>::{<span class="ident">crypto::store::CryptoStore</span>, <span class="ident">BaseClientConfig</span>};
+<span class="kw">use</span> <span class="ident">matrix_sdk_base::BaseClientConfig</span>;
 
 <span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">config::RequestConfig</span>, <span class="ident">HttpSend</span>, <span class="prelude-ty">Result</span>};
 
@@ -365,7 +368,10 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// The crypto store should be opened before being set.</span>
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;encryption&quot;</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">crypto_store</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">store</span>: <span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">CryptoStore</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">crypto_store</span>(
+        <span class="kw-2">mut</span> <span class="self">self</span>,
+        <span class="ident">store</span>: <span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">matrix_sdk_base::crypto::store::CryptoStore</span><span class="op">&gt;</span>,
+    ) -&gt; <span class="self">Self</span> {
         <span class="self">self</span>.<span class="ident">base_config</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">base_config</span>.<span class="ident">crypto_store</span>(<span class="ident">store</span>);
         <span class="self">self</span>
     }
