@@ -564,6 +564,10 @@
 <span id="564">564</span>
 <span id="565">565</span>
 <span id="566">566</span>
+<span id="567">567</span>
+<span id="568">568</span>
+<span id="569">569</span>
+<span id="570">570</span>
 </pre><pre class="rust"><code><span class="comment">// Copyright 2021 The Matrix.org Foundation C.I.C.</span>
 <span class="comment">//</span>
 <span class="comment">// Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);</span>
@@ -645,6 +649,10 @@
     <span class="doccomment">/// The store failed to encrypt or decrypt some data.</span>
     <span class="attribute">#[<span class="ident">error</span>(<span class="string">&quot;Error encrypting or decrypting data from the store: {0}&quot;</span>)]</span>
     <span class="ident">Encryption</span>(<span class="ident">String</span>),
+    <span class="doccomment">/// An error happened while running a tokio task.</span>
+    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;sled_state_store&quot;</span>)]</span>
+    <span class="attribute">#[<span class="ident">error</span>(<span class="ident">transparent</span>)]</span>
+    <span class="ident">Task</span>(<span class="attribute">#[<span class="ident">from</span>]</span> <span class="ident">tokio::task::JoinError</span>),
 }
 
 <span class="doccomment">/// A `StateStore` specific result type.</span>
