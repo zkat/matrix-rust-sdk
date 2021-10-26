@@ -208,6 +208,35 @@
 <span id="208">208</span>
 <span id="209">209</span>
 <span id="210">210</span>
+<span id="211">211</span>
+<span id="212">212</span>
+<span id="213">213</span>
+<span id="214">214</span>
+<span id="215">215</span>
+<span id="216">216</span>
+<span id="217">217</span>
+<span id="218">218</span>
+<span id="219">219</span>
+<span id="220">220</span>
+<span id="221">221</span>
+<span id="222">222</span>
+<span id="223">223</span>
+<span id="224">224</span>
+<span id="225">225</span>
+<span id="226">226</span>
+<span id="227">227</span>
+<span id="228">228</span>
+<span id="229">229</span>
+<span id="230">230</span>
+<span id="231">231</span>
+<span id="232">232</span>
+<span id="233">233</span>
+<span id="234">234</span>
+<span id="235">235</span>
+<span id="236">236</span>
+<span id="237">237</span>
+<span id="238">238</span>
+<span id="239">239</span>
 </pre><pre class="rust"><code><span class="comment">// Copyright 2021 Famedly GmbH</span>
 <span class="comment">//</span>
 <span class="comment">// Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);</span>
@@ -225,7 +254,18 @@
 <span class="kw">use</span> <span class="ident">std</span>::{<span class="ident">net::ToSocketAddrs</span>, <span class="ident">result::Result</span> <span class="kw">as</span> <span class="ident">StdResult</span>};
 
 <span class="kw">use</span> <span class="ident">futures::TryFutureExt</span>;
-<span class="kw">use</span> <span class="ident">matrix_sdk</span>::{<span class="ident">bytes::Bytes</span>, <span class="ident">ruma</span>};
+<span class="kw">use</span> <span class="ident">matrix_sdk</span>::{
+    <span class="ident">bytes::Bytes</span>,
+    <span class="ident">ruma</span>::{
+        <span class="self">self</span>,
+        <span class="ident">api</span>::{
+            <span class="ident">appservice::query</span>::{
+                <span class="ident">query_room_alias::v1</span> <span class="kw">as</span> <span class="ident">query_room</span>, <span class="ident">query_user_id::v1</span> <span class="kw">as</span> <span class="ident">query_user</span>,
+            },
+            <span class="ident">IncomingRequest</span>,
+        },
+    },
+};
 <span class="kw">use</span> <span class="ident">serde::Serialize</span>;
 <span class="kw">use</span> <span class="ident">warp</span>::{<span class="ident">filters::BoxedFilter</span>, <span class="ident">path::FullPath</span>, <span class="ident">Filter</span>, <span class="ident">Rejection</span>, <span class="ident">Reply</span>};
 
@@ -366,17 +406,35 @@
 
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">user</span>(
         <span class="ident">_user_id</span>: <span class="ident">String</span>,
-        <span class="ident">_appservice</span>: <span class="ident">AppService</span>,
-        <span class="ident">_request</span>: <span class="ident">http::Request</span><span class="op">&lt;</span><span class="ident">Bytes</span><span class="op">&gt;</span>,
+        <span class="ident">appservice</span>: <span class="ident">AppService</span>,
+        <span class="ident">request</span>: <span class="ident">http::Request</span><span class="op">&lt;</span><span class="ident">Bytes</span><span class="op">&gt;</span>,
     ) -&gt; <span class="ident">StdResult</span><span class="op">&lt;</span><span class="kw">impl</span> <span class="ident">warp::Reply</span>, <span class="ident">Rejection</span><span class="op">&gt;</span> {
+        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">user_exists</span>) <span class="op">=</span> <span class="ident">appservice</span>.<span class="ident">event_handler</span>.<span class="ident">users</span>.<span class="ident">lock</span>().<span class="kw">await</span>.<span class="ident">as_mut</span>() {
+            <span class="kw">let</span> <span class="ident">request</span> <span class="op">=</span>
+                <span class="ident">query_user::IncomingRequest::try_from_http_request</span>(<span class="ident">request</span>).<span class="ident">map_err</span>(<span class="ident">Error::from</span>)<span class="question-mark">?</span>;
+            <span class="kw">return</span> <span class="kw">if</span> <span class="ident">user_exists</span>(<span class="ident">appservice</span>.<span class="ident">clone</span>(), <span class="ident">request</span>).<span class="kw">await</span> {
+                <span class="prelude-val">Ok</span>(<span class="ident">warp::reply::json</span>(<span class="kw-2">&amp;</span><span class="ident">String::from</span>(<span class="string">&quot;{}&quot;</span>)))
+            } <span class="kw">else</span> {
+                <span class="prelude-val">Err</span>(<span class="ident">warp::reject::not_found</span>())
+            };
+        }
         <span class="prelude-val">Ok</span>(<span class="ident">warp::reply::json</span>(<span class="kw-2">&amp;</span><span class="ident">String::from</span>(<span class="string">&quot;{}&quot;</span>)))
     }
 
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">room</span>(
         <span class="ident">_room_id</span>: <span class="ident">String</span>,
-        <span class="ident">_appservice</span>: <span class="ident">AppService</span>,
-        <span class="ident">_request</span>: <span class="ident">http::Request</span><span class="op">&lt;</span><span class="ident">Bytes</span><span class="op">&gt;</span>,
+        <span class="ident">appservice</span>: <span class="ident">AppService</span>,
+        <span class="ident">request</span>: <span class="ident">http::Request</span><span class="op">&lt;</span><span class="ident">Bytes</span><span class="op">&gt;</span>,
     ) -&gt; <span class="ident">StdResult</span><span class="op">&lt;</span><span class="kw">impl</span> <span class="ident">warp::Reply</span>, <span class="ident">Rejection</span><span class="op">&gt;</span> {
+        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">room_exists</span>) <span class="op">=</span> <span class="ident">appservice</span>.<span class="ident">event_handler</span>.<span class="ident">rooms</span>.<span class="ident">lock</span>().<span class="kw">await</span>.<span class="ident">as_mut</span>() {
+            <span class="kw">let</span> <span class="ident">request</span> <span class="op">=</span>
+                <span class="ident">query_room::IncomingRequest::try_from_http_request</span>(<span class="ident">request</span>).<span class="ident">map_err</span>(<span class="ident">Error::from</span>)<span class="question-mark">?</span>;
+            <span class="kw">return</span> <span class="kw">if</span> <span class="ident">room_exists</span>(<span class="ident">appservice</span>.<span class="ident">clone</span>(), <span class="ident">request</span>).<span class="kw">await</span> {
+                <span class="prelude-val">Ok</span>(<span class="ident">warp::reply::json</span>(<span class="kw-2">&amp;</span><span class="ident">String::from</span>(<span class="string">&quot;{}&quot;</span>)))
+            } <span class="kw">else</span> {
+                <span class="prelude-val">Err</span>(<span class="ident">warp::reject::not_found</span>())
+            };
+        }
         <span class="prelude-val">Ok</span>(<span class="ident">warp::reply::json</span>(<span class="kw-2">&amp;</span><span class="ident">String::from</span>(<span class="string">&quot;{}&quot;</span>)))
     }
 

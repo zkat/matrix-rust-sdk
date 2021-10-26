@@ -545,6 +545,36 @@
 <span id="545">545</span>
 <span id="546">546</span>
 <span id="547">547</span>
+<span id="548">548</span>
+<span id="549">549</span>
+<span id="550">550</span>
+<span id="551">551</span>
+<span id="552">552</span>
+<span id="553">553</span>
+<span id="554">554</span>
+<span id="555">555</span>
+<span id="556">556</span>
+<span id="557">557</span>
+<span id="558">558</span>
+<span id="559">559</span>
+<span id="560">560</span>
+<span id="561">561</span>
+<span id="562">562</span>
+<span id="563">563</span>
+<span id="564">564</span>
+<span id="565">565</span>
+<span id="566">566</span>
+<span id="567">567</span>
+<span id="568">568</span>
+<span id="569">569</span>
+<span id="570">570</span>
+<span id="571">571</span>
+<span id="572">572</span>
+<span id="573">573</span>
+<span id="574">574</span>
+<span id="575">575</span>
+<span id="576">576</span>
+<span id="577">577</span>
 </pre><pre class="rust"><code><span class="comment">// Copyright 2021 Famedly GmbH</span>
 <span class="comment">//</span>
 <span class="comment">// Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);</span>
@@ -633,6 +663,7 @@
 
 <span class="kw">use</span> <span class="ident">dashmap::DashMap</span>;
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">error::Error</span>;
+<span class="kw">use</span> <span class="ident">event_handler::AppserviceFn</span>;
 <span class="kw">use</span> <span class="ident">http::Uri</span>;
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">matrix_sdk</span>;
 <span class="attribute">#[<span class="ident">doc</span>(<span class="ident">no_inline</span>)]</span>
@@ -647,7 +678,10 @@
 <span class="kw">use</span> <span class="ident">regex::Regex</span>;
 <span class="kw">use</span> <span class="ident">ruma</span>::{
     <span class="ident">api</span>::{
-        <span class="ident">appservice::Registration</span>,
+        <span class="ident">appservice</span>::{
+            <span class="ident">query</span>::{<span class="ident">query_room_alias::v1</span> <span class="kw">as</span> <span class="ident">query_room</span>, <span class="ident">query_user_id::v1</span> <span class="kw">as</span> <span class="ident">query_user</span>},
+            <span class="ident">Registration</span>,
+        },
         <span class="ident">client</span>::{
             <span class="ident">error::ErrorKind</span>,
             <span class="ident">r0</span>::{<span class="ident">account::register</span>, <span class="ident">uiaa::UiaaResponse</span>},
@@ -660,6 +694,7 @@
 <span class="kw">use</span> <span class="ident">tracing</span>::{<span class="ident">info</span>, <span class="ident">warn</span>};
 
 <span class="kw">mod</span> <span class="ident">error</span>;
+<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">event_handler</span>;
 <span class="kw">mod</span> <span class="ident">webserver</span>;
 
 <span class="kw">pub</span> <span class="kw">type</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">E</span> <span class="op">=</span> <span class="ident">Error</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">std::result::Result</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">E</span><span class="op">&gt;</span>;
@@ -750,6 +785,7 @@
     <span class="ident">server_name</span>: <span class="ident">ServerNameBox</span>,
     <span class="ident">registration</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">AppServiceRegistration</span><span class="op">&gt;</span>,
     <span class="ident">clients</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">DashMap</span><span class="op">&lt;</span><span class="ident">Localpart</span>, <span class="ident">Client</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+    <span class="ident">event_handler</span>: <span class="ident">event_handler::EventHandler</span>,
 }
 
 <span class="kw">impl</span> <span class="ident">AppService</span> {
@@ -797,8 +833,10 @@
         <span class="kw">let</span> <span class="ident">registration</span> <span class="op">=</span> <span class="ident">Arc::new</span>(<span class="ident">registration</span>);
         <span class="kw">let</span> <span class="ident">clients</span> <span class="op">=</span> <span class="ident">Arc::new</span>(<span class="ident">DashMap::new</span>());
         <span class="kw">let</span> <span class="ident">sender_localpart</span> <span class="op">=</span> <span class="ident">registration</span>.<span class="ident">sender_localpart</span>.<span class="ident">clone</span>();
+        <span class="kw">let</span> <span class="ident">event_handler</span> <span class="op">=</span> <span class="ident">event_handler::EventHandler::default</span>();
 
-        <span class="kw">let</span> <span class="ident">appservice</span> <span class="op">=</span> <span class="ident">AppService</span> { <span class="ident">homeserver_url</span>, <span class="ident">server_name</span>, <span class="ident">registration</span>, <span class="ident">clients</span> };
+        <span class="kw">let</span> <span class="ident">appservice</span> <span class="op">=</span>
+            <span class="ident">AppService</span> { <span class="ident">homeserver_url</span>, <span class="ident">server_name</span>, <span class="ident">registration</span>, <span class="ident">clients</span>, <span class="ident">event_handler</span> };
 
         <span class="comment">// we create and cache the [`MainUser`] by default</span>
         <span class="ident">appservice</span>.<span class="ident">create_and_cache_client</span>(<span class="kw-2">&amp;</span><span class="ident">sender_localpart</span>, <span class="ident">client_config</span>).<span class="kw">await</span><span class="question-mark">?</span>;
@@ -931,6 +969,28 @@
         <span class="ident">client</span>.<span class="ident">register_event_handler</span>(<span class="ident">handler</span>).<span class="kw">await</span>;
 
         <span class="prelude-val">Ok</span>(())
+    }
+
+    <span class="doccomment">/// Register a responder for queries about the existence of a user with a</span>
+    <span class="doccomment">/// given mxid.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// See [GET /_matrix/app/v1/users/{userId}](https://matrix.org/docs/spec/application_service/r0.1.2#get-matrix-app-v1-users-userid).</span>
+    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">register_user_query</span>(
+        <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>,
+        <span class="ident">handler</span>: <span class="ident">AppserviceFn</span><span class="op">&lt;</span><span class="ident">query_user::IncomingRequest</span>, <span class="ident">bool</span><span class="op">&gt;</span>,
+    ) {
+        <span class="kw-2">*</span><span class="self">self</span>.<span class="ident">event_handler</span>.<span class="ident">users</span>.<span class="ident">lock</span>().<span class="kw">await</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">handler</span>);
+    }
+
+    <span class="doccomment">/// Register a responder for queries about the existence of a room with the</span>
+    <span class="doccomment">/// given alias.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// See [GET /_matrix/app/v1/rooms/{roomAlias}](https://matrix.org/docs/spec/application_service/r0.1.2#get-matrix-app-v1-rooms-roomalias).</span>
+    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">register_room_query</span>(
+        <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>,
+        <span class="ident">handler</span>: <span class="ident">AppserviceFn</span><span class="op">&lt;</span><span class="ident">query_room::IncomingRequest</span>, <span class="ident">bool</span><span class="op">&gt;</span>,
+    ) {
+        <span class="kw-2">*</span><span class="self">self</span>.<span class="ident">event_handler</span>.<span class="ident">rooms</span>.<span class="ident">lock</span>().<span class="kw">await</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">handler</span>);
     }
 
     <span class="doccomment">/// Register a virtual user by sending a [`register::Request`] to the</span>
