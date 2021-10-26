@@ -575,6 +575,19 @@
 <span id="575">575</span>
 <span id="576">576</span>
 <span id="577">577</span>
+<span id="578">578</span>
+<span id="579">579</span>
+<span id="580">580</span>
+<span id="581">581</span>
+<span id="582">582</span>
+<span id="583">583</span>
+<span id="584">584</span>
+<span id="585">585</span>
+<span id="586">586</span>
+<span id="587">587</span>
+<span id="588">588</span>
+<span id="589">589</span>
+<span id="590">590</span>
 </pre><pre class="rust"><code><span class="comment">// Copyright 2021 Famedly GmbH</span>
 <span class="comment">//</span>
 <span class="comment">// Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);</span>
@@ -682,16 +695,12 @@
             <span class="ident">query</span>::{<span class="ident">query_room_alias::v1</span> <span class="kw">as</span> <span class="ident">query_room</span>, <span class="ident">query_user_id::v1</span> <span class="kw">as</span> <span class="ident">query_user</span>},
             <span class="ident">Registration</span>,
         },
-        <span class="ident">client</span>::{
-            <span class="ident">error::ErrorKind</span>,
-            <span class="ident">r0</span>::{<span class="ident">account::register</span>, <span class="ident">uiaa::UiaaResponse</span>},
-        },
-        <span class="ident">error</span>::{<span class="ident">FromHttpResponseError</span>, <span class="ident">ServerError</span>},
+        <span class="ident">client::r0::account::register</span>,
     },
     <span class="ident">assign</span>, <span class="ident">identifiers</span>, <span class="ident">DeviceId</span>, <span class="ident">ServerNameBox</span>, <span class="ident">UserId</span>,
 };
 <span class="kw">use</span> <span class="ident">serde::de::DeserializeOwned</span>;
-<span class="kw">use</span> <span class="ident">tracing</span>::{<span class="ident">info</span>, <span class="ident">warn</span>};
+<span class="kw">use</span> <span class="ident">tracing::info</span>;
 
 <span class="kw">mod</span> <span class="ident">error</span>;
 <span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">event_handler</span>;
@@ -700,6 +709,8 @@
 <span class="kw">pub</span> <span class="kw">type</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">E</span> <span class="op">=</span> <span class="ident">Error</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">std::result::Result</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">E</span><span class="op">&gt;</span>;
 <span class="kw">pub</span> <span class="kw">type</span> <span class="ident">Host</span> <span class="op">=</span> <span class="ident">String</span>;
 <span class="kw">pub</span> <span class="kw">type</span> <span class="ident">Port</span> <span class="op">=</span> <span class="ident">u16</span>;
+
+<span class="kw">const</span> <span class="ident">USER_KEY</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>] <span class="op">=</span> <span class="string">b&quot;appservice.users.&quot;</span>;
 
 <span class="doccomment">/// AppService Registration</span>
 <span class="doccomment">///</span>
@@ -1000,32 +1011,47 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// * `localpart` - The localpart of the user to register. Must be covered</span>
     <span class="doccomment">///   by the namespaces in the [`Registration`] in order to succeed.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// # Returns</span>
+    <span class="doccomment">/// This function may return a UIAA response, which should be checked for</span>
+    <span class="doccomment">/// with [`Error::uiaa_response()`].</span>
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">register_virtual_user</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">localpart</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">str</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">is_user_registered</span>(<span class="ident">localpart</span>.<span class="ident">as_ref</span>()).<span class="kw">await</span><span class="question-mark">?</span> {
+            <span class="kw">return</span> <span class="prelude-val">Ok</span>(());
+        }
         <span class="kw">let</span> <span class="ident">request</span> <span class="op">=</span> <span class="macro">assign!</span>(<span class="ident">register::Request::new</span>(), {
             <span class="ident">username</span>: <span class="prelude-val">Some</span>(<span class="ident">localpart</span>.<span class="ident">as_ref</span>()),
             <span class="ident">login_type</span>: <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="ident">register::LoginType::ApplicationService</span>),
         });
 
         <span class="kw">let</span> <span class="ident">client</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">get_cached_client</span>(<span class="prelude-val">None</span>)<span class="question-mark">?</span>;
-        <span class="kw">match</span> <span class="ident">client</span>.<span class="ident">register</span>(<span class="ident">request</span>).<span class="kw">await</span> {
-            <span class="prelude-val">Ok</span>(<span class="kw">_</span>) =&gt; (),
-            <span class="prelude-val">Err</span>(<span class="ident">error</span>) =&gt; <span class="kw">match</span> <span class="ident">error</span> {
-                <span class="ident">matrix_sdk::HttpError::UiaaError</span>(<span class="ident">FromHttpResponseError::Http</span>(
-                    <span class="ident">ServerError::Known</span>(<span class="ident">UiaaResponse::MatrixError</span>(<span class="kw-2">ref</span> <span class="ident">matrix_error</span>)),
-                )) =&gt; {
-                    <span class="kw">match</span> <span class="ident">matrix_error</span>.<span class="ident">kind</span> {
-                        <span class="ident">ErrorKind::UserInUse</span> =&gt; {
-                            <span class="comment">// TODO: persist the fact that we registered that user</span>
-                            <span class="macro">warn!</span>(<span class="string">&quot;{}&quot;</span>, <span class="ident">matrix_error</span>.<span class="ident">message</span>);
-                        }
-                        <span class="kw">_</span> =&gt; <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">error</span>.<span class="ident">into</span>()),
-                    }
-                }
-                <span class="kw">_</span> =&gt; <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">error</span>.<span class="ident">into</span>()),
-            },
-        }
+        <span class="ident">client</span>.<span class="ident">register</span>(<span class="ident">request</span>).<span class="kw">await</span><span class="question-mark">?</span>;
+        <span class="self">self</span>.<span class="ident">set_user_registered</span>(<span class="ident">localpart</span>.<span class="ident">as_ref</span>()).<span class="kw">await</span><span class="question-mark">?</span>;
 
         <span class="prelude-val">Ok</span>(())
+    }
+
+    <span class="doccomment">/// Add the given localpart to the database of registered localparts.</span>
+    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">set_user_registered</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">localpart</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">str</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+        <span class="kw">let</span> <span class="ident">client</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">get_cached_client</span>(<span class="prelude-val">None</span>)<span class="question-mark">?</span>;
+        <span class="ident">client</span>
+            .<span class="ident">store</span>()
+            .<span class="ident">set_custom_value</span>(
+                <span class="kw-2">&amp;</span>[<span class="ident">USER_KEY</span>, <span class="ident">localpart</span>.<span class="ident">as_ref</span>().<span class="ident">as_bytes</span>()].<span class="ident">concat</span>(),
+                <span class="macro">vec!</span>[<span class="ident">u8::from</span>(<span class="bool-val">true</span>)],
+            )
+            .<span class="kw">await</span><span class="question-mark">?</span>;
+        <span class="prelude-val">Ok</span>(())
+    }
+
+    <span class="doccomment">/// Get whether a localpart is listed in the database as registered.</span>
+    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">is_user_registered</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">localpart</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">str</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">bool</span><span class="op">&gt;</span> {
+        <span class="kw">let</span> <span class="ident">client</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">get_cached_client</span>(<span class="prelude-val">None</span>)<span class="question-mark">?</span>;
+        <span class="kw">let</span> <span class="ident">key</span> <span class="op">=</span> [<span class="ident">USER_KEY</span>, <span class="ident">localpart</span>.<span class="ident">as_ref</span>().<span class="ident">as_bytes</span>()].<span class="ident">concat</span>();
+        <span class="kw">let</span> <span class="ident">store</span> <span class="op">=</span> <span class="ident">client</span>.<span class="ident">store</span>().<span class="ident">get_custom_value</span>(<span class="kw-2">&amp;</span><span class="ident">key</span>).<span class="kw">await</span><span class="question-mark">?</span>;
+        <span class="kw">let</span> <span class="ident">registered</span> <span class="op">=</span>
+            <span class="ident">store</span>.<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">vec</span><span class="op">|</span> <span class="ident">vec</span>.<span class="ident">get</span>(<span class="number">0</span>).<span class="ident">copied</span>()).<span class="ident">map_or</span>(<span class="bool-val">false</span>, <span class="op">|</span><span class="ident">b</span><span class="op">|</span> <span class="ident">b</span> <span class="op">==</span> <span class="ident">u8::from</span>(<span class="bool-val">true</span>));
+        <span class="prelude-val">Ok</span>(<span class="ident">registered</span>)
     }
 
     <span class="doccomment">/// Get the AppService [registration]</span>
