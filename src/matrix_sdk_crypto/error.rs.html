@@ -287,10 +287,10 @@
     <span class="attribute">#[<span class="ident">error</span>(<span class="ident">transparent</span>)]</span>
     <span class="ident">JsonError</span>(<span class="attribute">#[<span class="ident">from</span>]</span> <span class="ident">SerdeError</span>),
 
-    <span class="doccomment">/// Decryption failed because the session needed to decrypt the event is</span>
-    <span class="doccomment">/// missing.</span>
-    <span class="attribute">#[<span class="ident">error</span>(<span class="string">&quot;decryption failed because the session to decrypt the message is missing&quot;</span>)]</span>
-    <span class="ident">MissingSession</span>,
+    <span class="doccomment">/// Decryption failed because we&#39;re missing the room key that was to encrypt</span>
+    <span class="doccomment">/// the event.</span>
+    <span class="attribute">#[<span class="ident">error</span>(<span class="string">&quot;decryption failed because the room key is missing&quot;</span>)]</span>
+    <span class="ident">MissingRoomKey</span>,
 
     <span class="doccomment">/// The underlying group session operation returned an error.</span>
     <span class="attribute">#[<span class="ident">error</span>(<span class="string">&quot;can&#39;t finish Olm group session operation {0}&quot;</span>)]</span>
@@ -307,8 +307,8 @@
 
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Error</span>, <span class="ident">Debug</span>)]</span>
 <span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">EventError</span> {
-    <span class="attribute">#[<span class="ident">error</span>(<span class="string">&quot;the Olm message has a unsupported type&quot;</span>)]</span>
-    <span class="ident">UnsupportedOlmType</span>,
+    <span class="attribute">#[<span class="ident">error</span>(<span class="string">&quot;the Olm message has a unsupported type, got {0}, expected 0 or 1&quot;</span>)]</span>
+    <span class="ident">UnsupportedOlmType</span>(<span class="ident">u64</span>),
 
     <span class="attribute">#[<span class="ident">error</span>(<span class="string">&quot;the Encrypted message has been encrypted with a unsupported algorithm.&quot;</span>)]</span>
     <span class="ident">UnsupportedAlgorithm</span>,

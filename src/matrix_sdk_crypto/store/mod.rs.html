@@ -664,6 +664,31 @@
 <span id="664">664</span>
 <span id="665">665</span>
 <span id="666">666</span>
+<span id="667">667</span>
+<span id="668">668</span>
+<span id="669">669</span>
+<span id="670">670</span>
+<span id="671">671</span>
+<span id="672">672</span>
+<span id="673">673</span>
+<span id="674">674</span>
+<span id="675">675</span>
+<span id="676">676</span>
+<span id="677">677</span>
+<span id="678">678</span>
+<span id="679">679</span>
+<span id="680">680</span>
+<span id="681">681</span>
+<span id="682">682</span>
+<span id="683">683</span>
+<span id="684">684</span>
+<span id="685">685</span>
+<span id="686">686</span>
+<span id="687">687</span>
+<span id="688">688</span>
+<span id="689">689</span>
+<span id="690">690</span>
+<span id="691">691</span>
 </pre><pre class="rust"><code><span class="comment">// Copyright 2020 The Matrix.org Foundation C.I.C.</span>
 <span class="comment">//</span>
 <span class="comment">// Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);</span>
@@ -775,9 +800,24 @@
     <span class="kw">pub</span> <span class="ident">message_hashes</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">OlmMessageHash</span><span class="op">&gt;</span>,
     <span class="kw">pub</span> <span class="ident">inbound_group_sessions</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">InboundGroupSession</span><span class="op">&gt;</span>,
     <span class="kw">pub</span> <span class="ident">outbound_group_sessions</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">OutboundGroupSession</span><span class="op">&gt;</span>,
-    <span class="kw">pub</span> <span class="ident">identities</span>: <span class="ident">IdentityChanges</span>,
     <span class="kw">pub</span> <span class="ident">key_requests</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">GossipRequest</span><span class="op">&gt;</span>,
+    <span class="kw">pub</span> <span class="ident">identities</span>: <span class="ident">IdentityChanges</span>,
     <span class="kw">pub</span> <span class="ident">devices</span>: <span class="ident">DeviceChanges</span>,
+}
+
+<span class="kw">impl</span> <span class="ident">Changes</span> {
+    <span class="doccomment">/// Are there any changes stored or is this an empty `Changes` struct</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_empty</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
+        <span class="self">self</span>.<span class="ident">account</span>.<span class="ident">is_none</span>()
+            <span class="op">&amp;&amp;</span> <span class="self">self</span>.<span class="ident">private_identity</span>.<span class="ident">is_none</span>()
+            <span class="op">&amp;&amp;</span> <span class="self">self</span>.<span class="ident">sessions</span>.<span class="ident">is_empty</span>()
+            <span class="op">&amp;&amp;</span> <span class="self">self</span>.<span class="ident">message_hashes</span>.<span class="ident">is_empty</span>()
+            <span class="op">&amp;&amp;</span> <span class="self">self</span>.<span class="ident">inbound_group_sessions</span>.<span class="ident">is_empty</span>()
+            <span class="op">&amp;&amp;</span> <span class="self">self</span>.<span class="ident">outbound_group_sessions</span>.<span class="ident">is_empty</span>()
+            <span class="op">&amp;&amp;</span> <span class="self">self</span>.<span class="ident">key_requests</span>.<span class="ident">is_empty</span>()
+            <span class="op">&amp;&amp;</span> <span class="self">self</span>.<span class="ident">identities</span>.<span class="ident">is_empty</span>()
+            <span class="op">&amp;&amp;</span> <span class="self">self</span>.<span class="ident">devices</span>.<span class="ident">is_empty</span>()
+    }
 }
 
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>, <span class="ident">Default</span>)]</span>
@@ -785,6 +825,12 @@
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">IdentityChanges</span> {
     <span class="kw">pub</span> <span class="ident">new</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">ReadOnlyUserIdentities</span><span class="op">&gt;</span>,
     <span class="kw">pub</span> <span class="ident">changed</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">ReadOnlyUserIdentities</span><span class="op">&gt;</span>,
+}
+
+<span class="kw">impl</span> <span class="ident">IdentityChanges</span> {
+    <span class="kw">fn</span> <span class="ident">is_empty</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
+        <span class="self">self</span>.<span class="ident">new</span>.<span class="ident">is_empty</span>() <span class="op">&amp;&amp;</span> <span class="self">self</span>.<span class="ident">changed</span>.<span class="ident">is_empty</span>()
+    }
 }
 
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>, <span class="ident">Default</span>)]</span>
@@ -801,6 +847,10 @@
         <span class="self">self</span>.<span class="ident">new</span>.<span class="ident">extend</span>(<span class="ident">other</span>.<span class="ident">new</span>);
         <span class="self">self</span>.<span class="ident">changed</span>.<span class="ident">extend</span>(<span class="ident">other</span>.<span class="ident">changed</span>);
         <span class="self">self</span>.<span class="ident">deleted</span>.<span class="ident">extend</span>(<span class="ident">other</span>.<span class="ident">deleted</span>);
+    }
+
+    <span class="kw">fn</span> <span class="ident">is_empty</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
+        <span class="self">self</span>.<span class="ident">new</span>.<span class="ident">is_empty</span>() <span class="op">&amp;&amp;</span> <span class="self">self</span>.<span class="ident">changed</span>.<span class="ident">is_empty</span>() <span class="op">&amp;&amp;</span> <span class="self">self</span>.<span class="ident">deleted</span>.<span class="ident">is_empty</span>()
     }
 }
 
