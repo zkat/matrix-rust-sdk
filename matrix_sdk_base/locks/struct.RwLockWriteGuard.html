@@ -19,7 +19,7 @@ the same name on the contents of the locked data.</p>
 <span class="kw">let</span> <span class="ident">lock</span> <span class="op">=</span> <span class="ident">RwLock::new</span>(<span class="ident">Foo</span>(<span class="number">1</span>));
 
 {
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">mapped</span> <span class="op">=</span> <span class="ident">RwLockWriteGuard::map</span>(<span class="ident">lock</span>.<span class="ident">write</span>().<span class="kw">await</span>, <span class="op">|</span><span class="ident">f</span><span class="op">|</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">f</span>.<span class="number">0</span>);
+    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">mapped</span> <span class="op">=</span> <span class="ident">RwLockWriteGuard::map</span>(<span class="ident">lock</span>.<span class="ident">write</span>().<span class="kw">await</span>, <span class="op">|</span><span class="ident">f</span><span class="op">|</span> <span class="kw-2">&amp;mut</span> <span class="ident">f</span>.<span class="number">0</span>);
     <span class="kw-2">*</span><span class="ident">mapped</span> <span class="op">=</span> <span class="number">2</span>;
 }
 
@@ -44,7 +44,7 @@ the <a href="https://crates.io/crates/parking_lot"><code>parking_lot</code> crat
 
 {
     <span class="kw">let</span> <span class="ident">guard</span> <span class="op">=</span> <span class="ident">lock</span>.<span class="ident">write</span>().<span class="kw">await</span>;
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">guard</span> <span class="op">=</span> <span class="ident">RwLockWriteGuard::try_map</span>(<span class="ident">guard</span>, <span class="op">|</span><span class="ident">f</span><span class="op">|</span> <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">f</span>.<span class="number">0</span>)).<span class="ident">expect</span>(<span class="string">&quot;should not fail&quot;</span>);
+    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">guard</span> <span class="op">=</span> <span class="ident">RwLockWriteGuard::try_map</span>(<span class="ident">guard</span>, <span class="op">|</span><span class="ident">f</span><span class="op">|</span> <span class="prelude-val">Some</span>(<span class="kw-2">&amp;mut</span> <span class="ident">f</span>.<span class="number">0</span>)).<span class="ident">expect</span>(<span class="string">&quot;should not fail&quot;</span>);
     <span class="kw-2">*</span><span class="ident">guard</span> <span class="op">=</span> <span class="number">2</span>;
 }
 

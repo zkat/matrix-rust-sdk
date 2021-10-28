@@ -2174,7 +2174,7 @@
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">tarpaulin_include</span>))]</span>
 <span class="kw">impl</span> <span class="ident">std::fmt::Debug</span> <span class="kw">for</span> <span class="ident">OlmMachine</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">std::fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">std::fmt::Result</span> {
+    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">std::fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">std::fmt::Result</span> {
         <span class="ident">f</span>.<span class="ident">debug_struct</span>(<span class="string">&quot;OlmMachine&quot;</span>)
             .<span class="ident">field</span>(<span class="string">&quot;user_id&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">user_id</span>)
             .<span class="ident">field</span>(<span class="string">&quot;device_id&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">device_id</span>)
@@ -2395,8 +2395,8 @@
             <span class="ident">requests</span>.<span class="ident">push</span>(<span class="ident">request</span>);
         }
 
-        <span class="ident">requests</span>.<span class="ident">append</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>.<span class="ident">verification_machine</span>.<span class="ident">outgoing_messages</span>());
-        <span class="ident">requests</span>.<span class="ident">append</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>.<span class="ident">key_request_machine</span>.<span class="ident">outgoing_to_device_requests</span>().<span class="kw">await</span><span class="question-mark">?</span>);
+        <span class="ident">requests</span>.<span class="ident">append</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">verification_machine</span>.<span class="ident">outgoing_messages</span>());
+        <span class="ident">requests</span>.<span class="ident">append</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">key_request_machine</span>.<span class="ident">outgoing_to_device_requests</span>().<span class="kw">await</span><span class="question-mark">?</span>);
 
         <span class="prelude-val">Ok</span>(<span class="ident">requests</span>)
     }
@@ -2652,11 +2652,11 @@
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         <span class="ident">sender_key</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>,
         <span class="ident">signing_key</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>,
-        <span class="ident">event</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">ToDeviceRoomKeyEvent</span>,
+        <span class="ident">event</span>: <span class="kw-2">&amp;mut</span> <span class="ident">ToDeviceRoomKeyEvent</span>,
     ) -&gt; <span class="ident">OlmResult</span><span class="op">&lt;</span>(<span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">AnyToDeviceEvent</span><span class="op">&gt;</span>, <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">InboundGroupSession</span><span class="op">&gt;</span>)<span class="op">&gt;</span> {
         <span class="kw">match</span> <span class="ident">event</span>.<span class="ident">content</span>.<span class="ident">algorithm</span> {
             <span class="ident">EventEncryptionAlgorithm::MegolmV1AesSha2</span> =&gt; {
-                <span class="kw">let</span> <span class="ident">session_key</span> <span class="op">=</span> <span class="ident">GroupSessionKey</span>(<span class="ident">mem::take</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">event</span>.<span class="ident">content</span>.<span class="ident">session_key</span>));
+                <span class="kw">let</span> <span class="ident">session_key</span> <span class="op">=</span> <span class="ident">GroupSessionKey</span>(<span class="ident">mem::take</span>(<span class="kw-2">&amp;mut</span> <span class="ident">event</span>.<span class="ident">content</span>.<span class="ident">session_key</span>));
 
                 <span class="kw">match</span> <span class="ident">InboundGroupSession::new</span>(
                     <span class="ident">sender_key</span>,
@@ -2846,14 +2846,14 @@
 
         <span class="kw">match</span> <span class="ident">event</span> {
             <span class="ident">AnyToDeviceEvent::RoomKey</span>(<span class="kw-2">mut</span> <span class="ident">e</span>) =&gt; {
-                <span class="prelude-val">Ok</span>(<span class="self">self</span>.<span class="ident">add_room_key</span>(<span class="kw-2">&amp;</span><span class="ident">decrypted</span>.<span class="ident">sender_key</span>, <span class="kw-2">&amp;</span><span class="ident">decrypted</span>.<span class="ident">signing_key</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">e</span>).<span class="kw">await</span><span class="question-mark">?</span>)
+                <span class="prelude-val">Ok</span>(<span class="self">self</span>.<span class="ident">add_room_key</span>(<span class="kw-2">&amp;</span><span class="ident">decrypted</span>.<span class="ident">sender_key</span>, <span class="kw-2">&amp;</span><span class="ident">decrypted</span>.<span class="ident">signing_key</span>, <span class="kw-2">&amp;mut</span> <span class="ident">e</span>).<span class="kw">await</span><span class="question-mark">?</span>)
             }
             <span class="ident">AnyToDeviceEvent::ForwardedRoomKey</span>(<span class="kw-2">mut</span> <span class="ident">e</span>) =&gt; <span class="prelude-val">Ok</span>(<span class="self">self</span>
                 .<span class="ident">key_request_machine</span>
-                .<span class="ident">receive_forwarded_room_key</span>(<span class="kw-2">&amp;</span><span class="ident">decrypted</span>.<span class="ident">sender_key</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">e</span>)
+                .<span class="ident">receive_forwarded_room_key</span>(<span class="kw-2">&amp;</span><span class="ident">decrypted</span>.<span class="ident">sender_key</span>, <span class="kw-2">&amp;mut</span> <span class="ident">e</span>)
                 .<span class="kw">await</span><span class="question-mark">?</span>),
             <span class="ident">AnyToDeviceEvent::SecretSend</span>(<span class="kw-2">mut</span> <span class="ident">e</span>) =&gt; <span class="prelude-val">Ok</span>((
-                <span class="self">self</span>.<span class="ident">key_request_machine</span>.<span class="ident">receive_secret</span>(<span class="kw-2">&amp;</span><span class="ident">decrypted</span>.<span class="ident">sender_key</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">e</span>).<span class="kw">await</span><span class="question-mark">?</span>,
+                <span class="self">self</span>.<span class="ident">key_request_machine</span>.<span class="ident">receive_secret</span>(<span class="kw-2">&amp;</span><span class="ident">decrypted</span>.<span class="ident">sender_key</span>, <span class="kw-2">&amp;mut</span> <span class="ident">e</span>).<span class="kw">await</span><span class="question-mark">?</span>,
                 <span class="prelude-val">None</span>,
             )),
             <span class="kw">_</span> =&gt; {
@@ -3717,7 +3717,7 @@
             <span class="kw-2">&amp;</span><span class="ident">machine</span>.<span class="ident">user_id</span>,
             <span class="kw-2">&amp;</span><span class="ident">DeviceKeyId::from_parts</span>(<span class="ident">DeviceKeyAlgorithm::Ed25519</span>, <span class="ident">machine</span>.<span class="ident">device_id</span>()),
             <span class="ident">ed25519_key</span>,
-            <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="macro">json!</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">device_keys</span>),
+            <span class="kw-2">&amp;mut</span> <span class="macro">json!</span>(<span class="kw-2">&amp;mut</span> <span class="ident">device_keys</span>),
         );
         <span class="macro">assert!</span>(<span class="ident">ret</span>.<span class="ident">is_ok</span>());
     }
@@ -3750,7 +3750,7 @@
             <span class="kw-2">&amp;</span><span class="ident">machine</span>.<span class="ident">user_id</span>,
             <span class="kw-2">&amp;</span><span class="ident">DeviceKeyId::from_parts</span>(<span class="ident">DeviceKeyAlgorithm::Ed25519</span>, <span class="ident">machine</span>.<span class="ident">device_id</span>()),
             <span class="string">&quot;fake_key&quot;</span>,
-            <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="macro">json!</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">device_keys</span>),
+            <span class="kw-2">&amp;mut</span> <span class="macro">json!</span>(<span class="kw-2">&amp;mut</span> <span class="ident">device_keys</span>),
         );
         <span class="macro">assert!</span>(<span class="ident">ret</span>.<span class="ident">is_err</span>());
     }
@@ -3771,7 +3771,7 @@
             <span class="kw-2">&amp;</span><span class="ident">machine</span>.<span class="ident">user_id</span>,
             <span class="kw-2">&amp;</span><span class="ident">DeviceKeyId::from_parts</span>(<span class="ident">DeviceKeyAlgorithm::Ed25519</span>, <span class="ident">machine</span>.<span class="ident">device_id</span>()),
             <span class="ident">ed25519_key</span>,
-            <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="macro">json!</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">one_time_key</span>),
+            <span class="kw-2">&amp;mut</span> <span class="macro">json!</span>(<span class="kw-2">&amp;mut</span> <span class="ident">one_time_key</span>),
         );
         <span class="macro">assert!</span>(<span class="ident">ret</span>.<span class="ident">is_ok</span>());
     }
@@ -3792,7 +3792,7 @@
             <span class="kw-2">&amp;</span><span class="ident">machine</span>.<span class="ident">user_id</span>,
             <span class="kw-2">&amp;</span><span class="ident">DeviceKeyId::from_parts</span>(<span class="ident">DeviceKeyAlgorithm::Ed25519</span>, <span class="ident">machine</span>.<span class="ident">device_id</span>()),
             <span class="ident">ed25519_key</span>,
-            <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="macro">json!</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">request</span>.<span class="ident">one_time_keys</span>.<span class="ident">as_mut</span>().<span class="ident">unwrap</span>().<span class="ident">values_mut</span>().<span class="ident">next</span>()),
+            <span class="kw-2">&amp;mut</span> <span class="macro">json!</span>(<span class="kw-2">&amp;mut</span> <span class="ident">request</span>.<span class="ident">one_time_keys</span>.<span class="ident">as_mut</span>().<span class="ident">unwrap</span>().<span class="ident">values_mut</span>().<span class="ident">next</span>()),
         );
         <span class="macro">assert!</span>(<span class="ident">ret</span>.<span class="ident">is_ok</span>());
 
@@ -3801,7 +3801,7 @@
             <span class="kw-2">&amp;</span><span class="ident">machine</span>.<span class="ident">user_id</span>,
             <span class="kw-2">&amp;</span><span class="ident">DeviceKeyId::from_parts</span>(<span class="ident">DeviceKeyAlgorithm::Ed25519</span>, <span class="ident">machine</span>.<span class="ident">device_id</span>()),
             <span class="ident">ed25519_key</span>,
-            <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="macro">json!</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">request</span>.<span class="ident">device_keys</span>.<span class="ident">unwrap</span>()),
+            <span class="kw-2">&amp;mut</span> <span class="macro">json!</span>(<span class="kw-2">&amp;mut</span> <span class="ident">request</span>.<span class="ident">device_keys</span>.<span class="ident">unwrap</span>()),
         );
         <span class="macro">assert!</span>(<span class="ident">ret</span>.<span class="ident">is_ok</span>());
 
@@ -3842,7 +3842,7 @@
         <span class="kw">let</span> <span class="ident">alice_device</span> <span class="op">=</span> <span class="ident">alice_device_id</span>();
 
         <span class="kw">let</span> (<span class="kw">_</span>, <span class="ident">missing_sessions</span>) <span class="op">=</span>
-            <span class="ident">machine</span>.<span class="ident">get_missing_sessions</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> [<span class="ident">alice</span>.<span class="ident">clone</span>()].<span class="ident">iter</span>()).<span class="kw">await</span>.<span class="ident">unwrap</span>().<span class="ident">unwrap</span>();
+            <span class="ident">machine</span>.<span class="ident">get_missing_sessions</span>(<span class="kw-2">&amp;mut</span> [<span class="ident">alice</span>.<span class="ident">clone</span>()].<span class="ident">iter</span>()).<span class="kw">await</span>.<span class="ident">unwrap</span>().<span class="ident">unwrap</span>();
 
         <span class="macro">assert!</span>(<span class="ident">missing_sessions</span>.<span class="ident">one_time_keys</span>.<span class="ident">contains_key</span>(<span class="kw-2">&amp;</span><span class="ident">alice</span>));
         <span class="kw">let</span> <span class="ident">user_sessions</span> <span class="op">=</span> <span class="ident">missing_sessions</span>.<span class="ident">one_time_keys</span>.<span class="ident">get</span>(<span class="kw-2">&amp;</span><span class="ident">alice</span>).<span class="ident">unwrap</span>();

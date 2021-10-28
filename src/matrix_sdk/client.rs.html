@@ -3688,7 +3688,7 @@
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">tarpaulin_include</span>))]</span>
 <span class="kw">impl</span> <span class="ident">Debug</span> <span class="kw">for</span> <span class="ident">Client</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">fmt</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">StdResult</span><span class="op">&lt;</span>(), <span class="ident">fmt::Error</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">fmt</span>: <span class="kw-2">&amp;mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">StdResult</span><span class="op">&lt;</span>(), <span class="ident">fmt::Error</span><span class="op">&gt;</span> {
         <span class="macro">write!</span>(<span class="ident">fmt</span>, <span class="string">&quot;Client&quot;</span>)
     }
 }
@@ -3828,7 +3828,7 @@
     <span class="doccomment">/// # Arguments</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// * `homeserver_url` - The new URL to use.</span>
-    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">set_homeserver</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">homeserver_url</span>: <span class="ident">Url</span>) {
+    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">set_homeserver</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">homeserver_url</span>: <span class="ident">Url</span>) {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">homeserver</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">homeserver</span>.<span class="ident">write</span>().<span class="kw">await</span>;
         <span class="kw-2">*</span><span class="ident">homeserver</span> <span class="op">=</span> <span class="ident">homeserver_url</span>;
     }
@@ -4049,7 +4049,7 @@
     <span class="doccomment">/// client.upload_avatar(&amp;mime::IMAGE_JPEG, &amp;mut image).await.expect(&quot;Can&#39;t set avatar&quot;);</span>
     <span class="doccomment">/// # })</span>
     <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">upload_avatar</span><span class="op">&lt;</span><span class="ident">R</span>: <span class="ident">Read</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">content_type</span>: <span class="kw-2">&amp;</span><span class="ident">Mime</span>, <span class="ident">reader</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">R</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">upload_avatar</span><span class="op">&lt;</span><span class="ident">R</span>: <span class="ident">Read</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">content_type</span>: <span class="kw-2">&amp;</span><span class="ident">Mime</span>, <span class="ident">reader</span>: <span class="kw-2">&amp;mut</span> <span class="ident">R</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">upload_response</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">upload</span>(<span class="ident">content_type</span>, <span class="ident">reader</span>).<span class="kw">await</span><span class="question-mark">?</span>;
         <span class="self">self</span>.<span class="ident">set_avatar_url</span>(<span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="ident">upload_response</span>.<span class="ident">content_uri</span>)).<span class="kw">await</span><span class="question-mark">?</span>;
         <span class="prelude-val">Ok</span>(())
@@ -4992,10 +4992,10 @@
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">upload</span>(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         <span class="ident">content_type</span>: <span class="kw-2">&amp;</span><span class="ident">Mime</span>,
-        <span class="ident">reader</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="kw">impl</span> <span class="ident">Read</span>,
+        <span class="ident">reader</span>: <span class="kw-2">&amp;mut</span> <span class="kw">impl</span> <span class="ident">Read</span>,
     ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">create_content::Response</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">data</span> <span class="op">=</span> <span class="ident">Vec::new</span>();
-        <span class="ident">reader</span>.<span class="ident">read_to_end</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">data</span>)<span class="question-mark">?</span>;
+        <span class="ident">reader</span>.<span class="ident">read_to_end</span>(<span class="kw-2">&amp;mut</span> <span class="ident">data</span>)<span class="question-mark">?</span>;
 
         <span class="kw">let</span> <span class="ident">timeout</span> <span class="op">=</span> <span class="ident">std::cmp::max</span>(
             <span class="ident">Duration::from_secs</span>(<span class="ident">data</span>.<span class="ident">len</span>() <span class="kw">as</span> <span class="ident">u64</span> <span class="op">/</span> <span class="ident">DEFAULT_UPLOAD_SPEED</span>),
@@ -5245,7 +5245,7 @@
 
     <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">sync_loop_helper</span>(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
-        <span class="ident">sync_settings</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident"><span class="kw">crate</span>::config::SyncSettings</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>,
+        <span class="ident">sync_settings</span>: <span class="kw-2">&amp;mut</span> <span class="ident"><span class="kw">crate</span>::config::SyncSettings</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>,
     ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">SyncResponse</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">response</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">sync_once</span>(<span class="ident">sync_settings</span>.<span class="ident">clone</span>()).<span class="kw">await</span>;
 
@@ -5262,7 +5262,7 @@
         }
     }
 
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">delay_sync</span>(<span class="ident">last_sync_time</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Instant</span><span class="op">&gt;</span>) {
+    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">delay_sync</span>(<span class="ident">last_sync_time</span>: <span class="kw-2">&amp;mut</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Instant</span><span class="op">&gt;</span>) {
         <span class="kw">let</span> <span class="ident">now</span> <span class="op">=</span> <span class="ident">Instant::now</span>();
 
         <span class="comment">// If the last sync happened less than a second ago, sleep for a</span>
@@ -5527,7 +5527,7 @@
         <span class="kw">loop</span> {
             <span class="comment">// TODO we should abort the sync loop if the error is a storage error or</span>
             <span class="comment">// the access token got invalid.</span>
-            <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Ok</span>(<span class="ident">r</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">sync_loop_helper</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">sync_settings</span>).<span class="kw">await</span> {
+            <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Ok</span>(<span class="ident">r</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">sync_loop_helper</span>(<span class="kw-2">&amp;mut</span> <span class="ident">sync_settings</span>).<span class="kw">await</span> {
                 <span class="kw">if</span> <span class="ident">callback</span>(<span class="ident">r</span>).<span class="kw">await</span> <span class="op">==</span> <span class="ident">LoopCtrl::Break</span> {
                     <span class="kw">return</span>;
                 }
@@ -5535,7 +5535,7 @@
                 <span class="kw">continue</span>;
             }
 
-            <span class="ident">Client::delay_sync</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">last_sync_time</span>).<span class="kw">await</span>
+            <span class="ident">Client::delay_sync</span>(<span class="kw-2">&amp;mut</span> <span class="ident">last_sync_time</span>).<span class="kw">await</span>
         }
     }
 
@@ -5596,9 +5596,9 @@
 
         <span class="macro">async_stream::stream!</span> {
             <span class="kw">loop</span> {
-                <span class="kw">yield</span> <span class="self">self</span>.<span class="ident">sync_loop_helper</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">sync_settings</span>).<span class="kw">await</span>;
+                <span class="kw">yield</span> <span class="self">self</span>.<span class="ident">sync_loop_helper</span>(<span class="kw-2">&amp;mut</span> <span class="ident">sync_settings</span>).<span class="kw">await</span>;
 
-                <span class="ident">Client::delay_sync</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">last_sync_time</span>).<span class="kw">await</span>
+                <span class="ident">Client::delay_sync</span>(<span class="kw-2">&amp;mut</span> <span class="ident">last_sync_time</span>).<span class="kw">await</span>
             }
         }
     }
@@ -5642,12 +5642,12 @@
                     <span class="kw">let</span> <span class="ident">content</span> <span class="op">=</span> {
                         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">cursor</span> <span class="op">=</span> <span class="ident">std::io::Cursor::new</span>(<span class="ident">content</span>);
                         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">reader</span> <span class="op">=</span> <span class="ident">matrix_sdk_base::crypto::AttachmentDecryptor::new</span>(
-                            <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">cursor</span>,
+                            <span class="kw-2">&amp;mut</span> <span class="ident">cursor</span>,
                             <span class="ident">file</span>.<span class="ident">as_ref</span>().<span class="ident">clone</span>().<span class="ident">into</span>(),
                         )<span class="question-mark">?</span>;
 
                         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">decrypted</span> <span class="op">=</span> <span class="ident">Vec::new</span>();
-                        <span class="ident">reader</span>.<span class="ident">read_to_end</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">decrypted</span>)<span class="question-mark">?</span>;
+                        <span class="ident">reader</span>.<span class="ident">read_to_end</span>(<span class="kw-2">&amp;mut</span> <span class="ident">decrypted</span>)<span class="question-mark">?</span>;
 
                         <span class="ident">decrypted</span>
                     };
@@ -6634,7 +6634,7 @@
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">media</span> <span class="op">=</span> <span class="ident">Cursor::new</span>(<span class="string">&quot;Hello world&quot;</span>);
 
         <span class="kw">let</span> <span class="ident">response</span> <span class="op">=</span>
-            <span class="ident">room</span>.<span class="ident">send_attachment</span>(<span class="string">&quot;image&quot;</span>, <span class="kw-2">&amp;</span><span class="ident">mime::IMAGE_JPEG</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">media</span>, <span class="prelude-val">None</span>).<span class="kw">await</span>.<span class="ident">unwrap</span>();
+            <span class="ident">room</span>.<span class="ident">send_attachment</span>(<span class="string">&quot;image&quot;</span>, <span class="kw-2">&amp;</span><span class="ident">mime::IMAGE_JPEG</span>, <span class="kw-2">&amp;mut</span> <span class="ident">media</span>, <span class="prelude-val">None</span>).<span class="kw">await</span>.<span class="ident">unwrap</span>();
 
         <span class="macro">assert_eq!</span>(<span class="macro">event_id!</span>(<span class="string">&quot;$h29iv0s8:example.com&quot;</span>), <span class="ident">response</span>.<span class="ident">event_id</span>)
     }

@@ -283,7 +283,7 @@
 <span class="kw">impl</span> <span class="ident">Default</span> <span class="kw">for</span> <span class="ident">PickleKey</span> {
     <span class="kw">fn</span> <span class="ident">default</span>() -&gt; <span class="self">Self</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">key</span> <span class="op">=</span> <span class="macro">vec!</span>[<span class="number">0u8</span>; <span class="ident">KEY_SIZE</span>];
-        <span class="ident">getrandom</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">key</span>).<span class="ident">expect</span>(<span class="string">&quot;Can&#39;t generate new pickle key&quot;</span>);
+        <span class="ident">getrandom</span>(<span class="kw-2">&amp;mut</span> <span class="ident">key</span>).<span class="ident">expect</span>(<span class="string">&quot;Can&#39;t generate new pickle key&quot;</span>);
 
         <span class="self">Self</span> { <span class="ident">aes256_key</span>: <span class="ident">key</span> }
     }
@@ -308,7 +308,7 @@
 
     <span class="kw">fn</span> <span class="ident">expand_key</span>(<span class="ident">passphrase</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">salt</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>], <span class="ident">rounds</span>: <span class="ident">u32</span>) -&gt; <span class="ident">Zeroizing</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">key</span> <span class="op">=</span> <span class="ident">Zeroizing::from</span>(<span class="macro">vec!</span>[<span class="number">0u8</span>; <span class="ident">KEY_SIZE</span>]);
-        <span class="ident">pbkdf2</span>::<span class="op">&lt;</span><span class="ident">Hmac</span><span class="op">&lt;</span><span class="ident">Sha256</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="ident">passphrase</span>.<span class="ident">as_bytes</span>(), <span class="ident">salt</span>, <span class="ident">rounds</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="kw-2">*</span><span class="ident">key</span>);
+        <span class="ident">pbkdf2</span>::<span class="op">&lt;</span><span class="ident">Hmac</span><span class="op">&lt;</span><span class="ident">Sha256</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="ident">passphrase</span>.<span class="ident">as_bytes</span>(), <span class="ident">salt</span>, <span class="ident">rounds</span>, <span class="kw-2">&amp;mut</span> <span class="kw-2">*</span><span class="ident">key</span>);
         <span class="ident">key</span>
     }
 
@@ -330,14 +330,14 @@
     <span class="doccomment">/// pickle key.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">encrypt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">passphrase</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">EncryptedPickleKey</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">salt</span> <span class="op">=</span> <span class="macro">vec!</span>[<span class="number">0u8</span>; <span class="ident">KDF_SALT_SIZE</span>];
-        <span class="ident">getrandom</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">salt</span>).<span class="ident">expect</span>(<span class="string">&quot;Can&#39;t generate new random pickle key&quot;</span>);
+        <span class="ident">getrandom</span>(<span class="kw-2">&amp;mut</span> <span class="ident">salt</span>).<span class="ident">expect</span>(<span class="string">&quot;Can&#39;t generate new random pickle key&quot;</span>);
 
         <span class="kw">let</span> <span class="ident">key</span> <span class="op">=</span> <span class="ident">PickleKey::expand_key</span>(<span class="ident">passphrase</span>, <span class="kw-2">&amp;</span><span class="ident">salt</span>, <span class="ident">KDF_ROUNDS</span>);
         <span class="kw">let</span> <span class="ident">key</span> <span class="op">=</span> <span class="ident">GenericArray::from_slice</span>(<span class="ident">key</span>.<span class="ident">as_ref</span>());
         <span class="kw">let</span> <span class="ident">cipher</span> <span class="op">=</span> <span class="ident">Aes256Gcm::new</span>(<span class="ident">key</span>);
 
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">nonce</span> <span class="op">=</span> <span class="macro">vec!</span>[<span class="number">0u8</span>; <span class="ident">NONCE_SIZE</span>];
-        <span class="ident">getrandom</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">nonce</span>).<span class="ident">expect</span>(<span class="string">&quot;Can&#39;t generate new random nonce for the pickle key&quot;</span>);
+        <span class="ident">getrandom</span>(<span class="kw-2">&amp;mut</span> <span class="ident">nonce</span>).<span class="ident">expect</span>(<span class="string">&quot;Can&#39;t generate new random nonce for the pickle key&quot;</span>);
 
         <span class="kw">let</span> <span class="ident">ciphertext</span> <span class="op">=</span> <span class="ident">cipher</span>
             .<span class="ident">encrypt</span>(<span class="ident">GenericArray::from_slice</span>(<span class="ident">nonce</span>.<span class="ident">as_ref</span>()), <span class="self">self</span>.<span class="ident">aes256_key</span>.<span class="ident">as_slice</span>())

@@ -689,6 +689,17 @@
 <span id="689">689</span>
 <span id="690">690</span>
 <span id="691">691</span>
+<span id="692">692</span>
+<span id="693">693</span>
+<span id="694">694</span>
+<span id="695">695</span>
+<span id="696">696</span>
+<span id="697">697</span>
+<span id="698">698</span>
+<span id="699">699</span>
+<span id="700">700</span>
+<span id="701">701</span>
+<span id="702">702</span>
 </pre><pre class="rust"><code><span class="comment">// Copyright 2020 The Matrix.org Foundation C.I.C.</span>
 <span class="comment">//</span>
 <span class="comment">// Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);</span>
@@ -843,7 +854,7 @@
 
 <span class="kw">impl</span> <span class="ident">DeviceChanges</span> {
     <span class="doccomment">/// Merge the given `DeviceChanges` into this instance of `DeviceChanges`.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">extend</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">other</span>: <span class="ident">DeviceChanges</span>) {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">extend</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">other</span>: <span class="ident">DeviceChanges</span>) {
         <span class="self">self</span>.<span class="ident">new</span>.<span class="ident">extend</span>(<span class="ident">other</span>.<span class="ident">new</span>);
         <span class="self">self</span>.<span class="ident">changed</span>.<span class="ident">extend</span>(<span class="ident">other</span>.<span class="ident">changed</span>);
         <span class="self">self</span>.<span class="ident">deleted</span>.<span class="ident">extend</span>(<span class="ident">other</span>.<span class="ident">deleted</span>);
@@ -868,7 +879,7 @@
 }
 
 <span class="kw">impl</span> <span class="ident">Debug</span> <span class="kw">for</span> <span class="ident">CrossSigningKeyExport</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">std::fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">std::fmt::Result</span> {
+    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">std::fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">std::fmt::Result</span> {
         <span class="ident">f</span>.<span class="ident">debug_struct</span>(<span class="string">&quot;CrossSigningKeyExport&quot;</span>)
             .<span class="ident">field</span>(<span class="string">&quot;master_key&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">master_key</span>.<span class="ident">is_some</span>())
             .<span class="ident">field</span>(<span class="string">&quot;self_signing_key&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">self_signing_key</span>.<span class="ident">is_some</span>())
@@ -958,7 +969,7 @@
             .<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">d</span><span class="op">|</span> <span class="ident">d</span>.<span class="ident">display_name</span>().<span class="ident">to_owned</span>()))
     }
 
-    <span class="doccomment">/// Get the read-only version of all the devices that the given user has.</span>
+    <span class="doccomment">/// Get the read-only version of a specific device.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// *Note*: This doesn&#39;t return our own device.</span>
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">get_readonly_device</span>(
@@ -971,6 +982,17 @@
         } <span class="kw">else</span> {
             <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">get_device</span>(<span class="ident">user_id</span>, <span class="ident">device_id</span>).<span class="kw">await</span>
         }
+    }
+
+    <span class="doccomment">/// Get the read-only version of a specific device.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// *Note*: This doesn&#39;t return our own device.</span>
+    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">get_readonly_device_unfiltered</span>(
+        <span class="kw-2">&amp;</span><span class="self">self</span>,
+        <span class="ident">user_id</span>: <span class="kw-2">&amp;</span><span class="ident">UserId</span>,
+        <span class="ident">device_id</span>: <span class="kw-2">&amp;</span><span class="ident">DeviceId</span>,
+    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ReadOnlyDevice</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+        <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">get_device</span>(<span class="ident">user_id</span>, <span class="ident">device_id</span>).<span class="kw">await</span>
     }
 
     <span class="doccomment">/// Get the read-only version of all the devices that the given user has.</span>

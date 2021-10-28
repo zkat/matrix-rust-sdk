@@ -1401,7 +1401,7 @@
 
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">decrypted</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span>(<span class="ident">Session</span>, <span class="ident">String</span>)<span class="op">&gt;</span> <span class="op">=</span> <span class="prelude-val">None</span>;
 
-        <span class="kw">for</span> <span class="ident">session</span> <span class="kw">in</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="kw-2">*</span><span class="ident">sessions</span>.<span class="ident">lock</span>().<span class="kw">await</span> {
+        <span class="kw">for</span> <span class="ident">session</span> <span class="kw">in</span> <span class="kw-2">&amp;mut</span> <span class="kw-2">*</span><span class="ident">sessions</span>.<span class="ident">lock</span>().<span class="kw">await</span> {
             <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">matches</span> <span class="op">=</span> <span class="bool-val">false</span>;
 
             <span class="comment">// If this is a pre-key message check if it was encrypted for our</span>
@@ -1644,7 +1644,7 @@
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">tarpaulin_include</span>))]</span>
 <span class="kw">impl</span> <span class="ident">fmt::Debug</span> <span class="kw">for</span> <span class="ident">ReadOnlyAccount</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
+    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
         <span class="ident">f</span>.<span class="ident">debug_struct</span>(<span class="string">&quot;Account&quot;</span>)
             .<span class="ident">field</span>(<span class="string">&quot;identity_keys&quot;</span>, <span class="self">self</span>.<span class="ident">identity_keys</span>())
             .<span class="ident">field</span>(<span class="string">&quot;shared&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">shared</span>())
@@ -1900,7 +1900,7 @@
 
     <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">sign_cross_signing_key</span>(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
-        <span class="ident">cross_signing_key</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">CrossSigningKey</span>,
+        <span class="ident">cross_signing_key</span>: <span class="kw-2">&amp;mut</span> <span class="ident">CrossSigningKey</span>,
     ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">SignatureError</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">signature</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">sign_json</span>(<span class="ident">serde_json::to_value</span>(<span class="kw-2">&amp;</span><span class="ident">cross_signing_key</span>)<span class="question-mark">?</span>).<span class="kw">await</span>;
 
@@ -1923,7 +1923,7 @@
         <span class="kw">let</span> <span class="ident">public_key</span> <span class="op">=</span>
             <span class="ident">master_key</span>.<span class="ident">get_first_key</span>().<span class="ident">ok_or</span>(<span class="ident">SignatureError::MissingSigningKey</span>)<span class="question-mark">?</span>.<span class="ident">to_string</span>();
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">cross_signing_key</span> <span class="op">=</span> <span class="ident">master_key</span>.<span class="ident">into</span>();
-        <span class="self">self</span>.<span class="ident">sign_cross_signing_key</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">cross_signing_key</span>).<span class="kw">await</span><span class="question-mark">?</span>;
+        <span class="self">self</span>.<span class="ident">sign_cross_signing_key</span>(<span class="kw-2">&amp;mut</span> <span class="ident">cross_signing_key</span>).<span class="kw">await</span><span class="question-mark">?</span>;
 
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">signed_keys</span> <span class="op">=</span> <span class="ident">BTreeMap::new</span>();
         <span class="ident">signed_keys</span>

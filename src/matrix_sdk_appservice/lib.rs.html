@@ -970,7 +970,7 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// [`join` room `timeline` events]: https://spec.matrix.org/unstable/client-server-api/#get_matrixclientr0sync</span>
     <span class="doccomment">/// [MSC2409]: https://github.com/matrix-org/matrix-doc/pull/2409</span>
-    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">register_event_handler</span><span class="op">&lt;</span><span class="ident">Ev</span>, <span class="ident">Ctx</span>, <span class="ident">H</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">handler</span>: <span class="ident">H</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span>
+    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">register_event_handler</span><span class="op">&lt;</span><span class="ident">Ev</span>, <span class="ident">Ctx</span>, <span class="ident">H</span><span class="op">&gt;</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">handler</span>: <span class="ident">H</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span>
     <span class="kw">where</span>
         <span class="ident">Ev</span>: <span class="ident">SyncEvent</span> <span class="op">+</span> <span class="ident">DeserializeOwned</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
         <span class="ident">H</span>: <span class="ident">EventHandler</span><span class="op">&lt;</span><span class="ident">Ev</span>, <span class="ident">Ctx</span><span class="op">&gt;</span>,
@@ -987,7 +987,7 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// See [GET /_matrix/app/v1/users/{userId}](https://matrix.org/docs/spec/application_service/r0.1.2#get-matrix-app-v1-users-userid).</span>
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">register_user_query</span>(
-        <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>,
+        <span class="kw-2">&amp;mut</span> <span class="self">self</span>,
         <span class="ident">handler</span>: <span class="ident">AppserviceFn</span><span class="op">&lt;</span><span class="ident">query_user::IncomingRequest</span>, <span class="ident">bool</span><span class="op">&gt;</span>,
     ) {
         <span class="kw-2">*</span><span class="self">self</span>.<span class="ident">event_handler</span>.<span class="ident">users</span>.<span class="ident">lock</span>().<span class="kw">await</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">handler</span>);
@@ -998,7 +998,7 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// See [GET /_matrix/app/v1/rooms/{roomAlias}](https://matrix.org/docs/spec/application_service/r0.1.2#get-matrix-app-v1-rooms-roomalias).</span>
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">register_room_query</span>(
-        <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>,
+        <span class="kw-2">&amp;mut</span> <span class="self">self</span>,
         <span class="ident">handler</span>: <span class="ident">AppserviceFn</span><span class="op">&lt;</span><span class="ident">query_room::IncomingRequest</span>, <span class="ident">bool</span><span class="op">&gt;</span>,
     ) {
         <span class="kw-2">*</span><span class="self">self</span>.<span class="ident">event_handler</span>.<span class="ident">rooms</span>.<span class="ident">lock</span>().<span class="kw">await</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">handler</span>);

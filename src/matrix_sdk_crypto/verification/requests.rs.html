@@ -2197,7 +2197,7 @@
         }
     }
 
-    <span class="kw">fn</span> <span class="ident">accept</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">methods</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">VerificationMethod</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">OutgoingContent</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">accept</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">methods</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">VerificationMethod</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">OutgoingContent</span><span class="op">&gt;</span> {
         <span class="kw">if</span> <span class="kw">let</span> <span class="ident">InnerRequest::Requested</span>(<span class="ident">s</span>) <span class="op">=</span> <span class="self">self</span> {
             <span class="kw">let</span> (<span class="ident">state</span>, <span class="ident">content</span>) <span class="op">=</span> <span class="ident">s</span>.<span class="ident">clone</span>().<span class="ident">accept</span>(<span class="ident">methods</span>);
             <span class="kw-2">*</span><span class="self">self</span> <span class="op">=</span> <span class="ident">InnerRequest::Ready</span>(<span class="ident">state</span>);
@@ -2208,7 +2208,7 @@
         }
     }
 
-    <span class="kw">fn</span> <span class="ident">receive_done</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">content</span>: <span class="kw-2">&amp;</span><span class="ident">DoneContent</span>) {
+    <span class="kw">fn</span> <span class="ident">receive_done</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">content</span>: <span class="kw-2">&amp;</span><span class="ident">DoneContent</span>) {
         <span class="kw-2">*</span><span class="self">self</span> <span class="op">=</span> <span class="ident">InnerRequest::Done</span>(<span class="kw">match</span> <span class="self">self</span> {
             <span class="ident">InnerRequest::Ready</span>(<span class="ident">s</span>) =&gt; <span class="ident">s</span>.<span class="ident">clone</span>().<span class="ident">into_done</span>(<span class="ident">content</span>),
             <span class="ident">InnerRequest::Passive</span>(<span class="ident">s</span>) =&gt; <span class="ident">s</span>.<span class="ident">clone</span>().<span class="ident">into_done</span>(<span class="ident">content</span>),
@@ -2219,7 +2219,7 @@
         })
     }
 
-    <span class="kw">fn</span> <span class="ident">cancel</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">cancelled_by_us</span>: <span class="ident">bool</span>, <span class="ident">cancel_code</span>: <span class="kw-2">&amp;</span><span class="ident">CancelCode</span>) {
+    <span class="kw">fn</span> <span class="ident">cancel</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">cancelled_by_us</span>: <span class="ident">bool</span>, <span class="ident">cancel_code</span>: <span class="kw-2">&amp;</span><span class="ident">CancelCode</span>) {
         <span class="kw">let</span> <span class="ident">print_info</span> <span class="op">=</span> <span class="op">|</span><span class="op">|</span> {
             <span class="macro">trace!</span>(
                 <span class="ident">cancelled_by_us</span> <span class="op">=</span> <span class="ident">cancelled_by_us</span>,

@@ -494,7 +494,7 @@
 }
 
 <span class="kw">impl</span> <span class="ident">std::fmt::Debug</span> <span class="kw">for</span> <span class="ident">Signing</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">std::fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">std::fmt::Result</span> {
+    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">std::fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">std::fmt::Result</span> {
         <span class="ident">f</span>.<span class="ident">debug_struct</span>(<span class="string">&quot;Signing&quot;</span>).<span class="ident">field</span>(<span class="string">&quot;public_key&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">public_key</span>.<span class="ident">as_str</span>()).<span class="ident">finish</span>()
     }
 }
@@ -583,7 +583,7 @@
         <span class="prelude-val">Ok</span>(<span class="self">Self</span> { <span class="ident">inner</span>, <span class="ident">public_key</span>: <span class="ident">pickle</span>.<span class="ident">public_key</span>.<span class="ident">into</span>() })
     }
 
-    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">sign_subkey</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">subkey</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">CrossSigningKey</span>) {
+    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">sign_subkey</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">subkey</span>: <span class="kw-2">&amp;mut</span> <span class="ident">CrossSigningKey</span>) {
         <span class="kw">let</span> <span class="ident">subkey_without_signatures</span> <span class="op">=</span> <span class="macro">json!</span>({
             <span class="string">&quot;user_id&quot;</span>: <span class="ident">subkey</span>.<span class="ident">user_id</span>.<span class="ident">clone</span>(),
             <span class="string">&quot;keys&quot;</span>: <span class="ident">subkey</span>.<span class="ident">keys</span>.<span class="ident">clone</span>(),
@@ -695,7 +695,7 @@
         <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">sign_json</span>(<span class="ident">value</span>).<span class="kw">await</span>
     }
 
-    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">sign_device</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">device_keys</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">DeviceKeys</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">SignatureError</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">sign_device</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">device_keys</span>: <span class="kw-2">&amp;mut</span> <span class="ident">DeviceKeys</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">SignatureError</span><span class="op">&gt;</span> {
         <span class="comment">// Create a copy of the device keys containing only fields that will</span>
         <span class="comment">// get signed.</span>
         <span class="kw">let</span> <span class="ident">json_device</span> <span class="op">=</span> <span class="macro">json!</span>({
@@ -755,7 +755,7 @@
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Signature</span>(<span class="ident">String</span>);
 
 <span class="kw">impl</span> <span class="ident">std::fmt::Display</span> <span class="kw">for</span> <span class="ident">Signature</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">std::fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">std::fmt::Result</span> {
+    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">std::fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">std::fmt::Result</span> {
         <span class="self">self</span>.<span class="number">0</span>.<span class="ident">fmt</span>(<span class="ident">f</span>)
     }
 }
@@ -802,7 +802,7 @@
         <span class="kw">let</span> <span class="ident">cipher</span> <span class="op">=</span> <span class="ident">Aes256Gcm::new</span>(<span class="ident">key</span>);
 
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">nonce</span> <span class="op">=</span> <span class="macro">vec!</span>[<span class="number">0u8</span>; <span class="ident">NONCE_SIZE</span>];
-        <span class="ident">getrandom</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">nonce</span>).<span class="ident">expect</span>(<span class="string">&quot;Can&#39;t generate nonce to pickle the signing object&quot;</span>);
+        <span class="ident">getrandom</span>(<span class="kw-2">&amp;mut</span> <span class="ident">nonce</span>).<span class="ident">expect</span>(<span class="string">&quot;Can&#39;t generate nonce to pickle the signing object&quot;</span>);
         <span class="kw">let</span> <span class="ident">nonce</span> <span class="op">=</span> <span class="ident">GenericArray::from_slice</span>(<span class="ident">nonce</span>.<span class="ident">as_slice</span>());
 
         <span class="kw">let</span> <span class="ident">ciphertext</span> <span class="op">=</span>
