@@ -985,6 +985,16 @@
 <span id="985">985</span>
 <span id="986">986</span>
 <span id="987">987</span>
+<span id="988">988</span>
+<span id="989">989</span>
+<span id="990">990</span>
+<span id="991">991</span>
+<span id="992">992</span>
+<span id="993">993</span>
+<span id="994">994</span>
+<span id="995">995</span>
+<span id="996">996</span>
+<span id="997">997</span>
 </pre><pre class="rust"><code><span class="comment">// Copyright 2021 The Matrix.org Foundation C.I.C.</span>
 <span class="comment">//</span>
 <span class="comment">// Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);</span>
@@ -1048,7 +1058,12 @@
     <span class="ident">Store</span>(<span class="attribute">#[<span class="ident">from</span>]</span> <span class="ident">CryptoStoreError</span>),
     <span class="doccomment">/// A key mismatch happened during the validation of the QR code scan.</span>
     <span class="attribute">#[<span class="ident">error</span>(<span class="string">&quot;The keys that are being verified didn&#39;t match (expected {expected}, found {found})&quot;</span>)]</span>
-    <span class="ident">KeyMismatch</span> { <span class="ident">expected</span>: <span class="ident">String</span>, <span class="ident">found</span>: <span class="ident">String</span> },
+    <span class="ident">KeyMismatch</span> {
+        <span class="doccomment">/// The expected ed25519 key.</span>
+        <span class="ident">expected</span>: <span class="ident">String</span>,
+        <span class="doccomment">/// The ed25519 key that we got.</span>
+        <span class="ident">found</span>: <span class="ident">String</span>,
+    },
     <span class="doccomment">/// One of the users that is participating in this verification doesn&#39;t have</span>
     <span class="doccomment">/// a valid cross signing identity.</span>
     <span class="attribute">#[<span class="ident">error</span>(<span class="string">&quot;The user {0} is missing a valid cross signing identity&quot;</span>)]</span>
@@ -1060,7 +1075,12 @@
     <span class="doccomment">/// The ID uniquely identifying this verification flow didn&#39;t match to the</span>
     <span class="doccomment">/// one that has been scanned.</span>
     <span class="attribute">#[<span class="ident">error</span>(<span class="string">&quot;The unique verification flow id did not match (expected {expected}, found {found})&quot;</span>)]</span>
-    <span class="ident">FlowIdMismatch</span> { <span class="ident">expected</span>: <span class="ident">String</span>, <span class="ident">found</span>: <span class="ident">String</span> },
+    <span class="ident">FlowIdMismatch</span> {
+        <span class="doccomment">/// The expected verification flow id.</span>
+        <span class="ident">expected</span>: <span class="ident">String</span>,
+        <span class="doccomment">/// The verification flow id that we instead got.</span>
+        <span class="ident">found</span>: <span class="ident">String</span>,
+    },
 }
 
 <span class="doccomment">/// An object controlling QR code style key verification flows.</span>

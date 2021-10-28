@@ -1805,18 +1805,16 @@
         <span class="macro">matches!</span>(<span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">lock</span>().<span class="ident">unwrap</span>(), <span class="ident">InnerRequest::Cancelled</span>(<span class="kw">_</span>))
     }
 
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;qrcode&quot;</span>)]</span>
-    <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;docs&quot;</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">qrcode</span>)))]</span>
     <span class="doccomment">/// Generate a QR code that can be used by another client to start a QR code</span>
     <span class="doccomment">/// based verification.</span>
+    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;qrcode&quot;</span>)]</span>
+    <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;docs&quot;</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">qrcode</span>)))]</span>
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">generate_qr_code</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">QrVerification</span><span class="op">&gt;</span>, <span class="ident">CryptoStoreError</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">inner</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">lock</span>().<span class="ident">unwrap</span>().<span class="ident">clone</span>();
 
         <span class="ident">inner</span>.<span class="ident">generate_qr_code</span>(<span class="self">self</span>.<span class="ident">we_started</span>, <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">clone</span>().<span class="ident">into</span>()).<span class="kw">await</span>
     }
-    <span class="doccomment">///</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;qrcode&quot;</span>)]</span>
-    <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;docs&quot;</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">qrcode</span>)))]</span>
+
     <span class="doccomment">/// Start a QR code verification by providing a scanned QR code for this</span>
     <span class="doccomment">/// verification flow.</span>
     <span class="doccomment">///</span>
@@ -1824,6 +1822,8 @@
     <span class="doccomment">/// verification request isn&#39;t in the ready state or we don&#39;t support QR</span>
     <span class="doccomment">/// code verification, otherwise a newly created `QrVerification` object</span>
     <span class="doccomment">/// which will be used for the remainder of the verification flow.</span>
+    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;qrcode&quot;</span>)]</span>
+    <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;docs&quot;</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">qrcode</span>)))]</span>
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">scan_qr_code</span>(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         <span class="ident">data</span>: <span class="ident">QrVerificationData</span>,
