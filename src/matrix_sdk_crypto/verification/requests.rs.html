@@ -1493,9 +1493,6 @@
 <span id="1493">1493</span>
 <span id="1494">1494</span>
 <span id="1495">1495</span>
-<span id="1496">1496</span>
-<span id="1497">1497</span>
-<span id="1498">1498</span>
 </pre><pre class="rust"><code><span class="comment">// Copyright 2020 The Matrix.org Foundation C.I.C.</span>
 <span class="comment">//</span>
 <span class="comment">// Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);</span>
@@ -1828,12 +1825,8 @@
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         <span class="ident">data</span>: <span class="ident">QrVerificationData</span>,
     ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">QrVerification</span><span class="op">&gt;</span>, <span class="ident">ScanError</span><span class="op">&gt;</span> {
-        <span class="comment">// Lint is buggy: https://github.com/rust-lang/rust/issues/89562</span>
-        <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">unknown_lints</span>, <span class="ident">must_not_suspend</span>)]</span>
-        <span class="kw">let</span> <span class="ident">state</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">lock</span>().<span class="ident">unwrap</span>();
-
-        <span class="kw">if</span> <span class="kw">let</span> <span class="ident">InnerRequest::Ready</span>(<span class="ident">r</span>) <span class="op">=</span> <span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="ident">state</span> {
-            <span class="kw">let</span> <span class="ident">fut</span> <span class="op">=</span> <span class="ident">QrVerification::from_scan</span>(
+        <span class="kw">let</span> <span class="ident">fut</span> <span class="op">=</span> <span class="kw">if</span> <span class="kw">let</span> <span class="ident">InnerRequest::Ready</span>(<span class="ident">r</span>) <span class="op">=</span> <span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">lock</span>().<span class="ident">unwrap</span>() {
+            <span class="prelude-val">Some</span>(<span class="ident">QrVerification::from_scan</span>(
                 <span class="ident">r</span>.<span class="ident">store</span>.<span class="ident">clone</span>(),
                 <span class="ident">r</span>.<span class="ident">private_cross_signing_identity</span>.<span class="ident">clone</span>(),
                 <span class="ident">r</span>.<span class="ident">other_user_id</span>.<span class="ident">clone</span>(),
@@ -1842,12 +1835,13 @@
                 <span class="ident">data</span>,
                 <span class="self">self</span>.<span class="ident">we_started</span>,
                 <span class="prelude-val">Some</span>(<span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">clone</span>().<span class="ident">into</span>()),
-            );
+            ))
+        } <span class="kw">else</span> {
+            <span class="prelude-val">None</span>
+        };
 
-            <span class="comment">// Prevent mutex lock being held across `.await` point.</span>
-            <span class="ident">drop</span>(<span class="ident">state</span>);
-
-            <span class="kw">let</span> <span class="ident">qr_verification</span> <span class="op">=</span> <span class="ident">fut</span>.<span class="kw">await</span><span class="question-mark">?</span>;
+        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">future</span>) <span class="op">=</span> <span class="ident">fut</span> {
+            <span class="kw">let</span> <span class="ident">qr_verification</span> <span class="op">=</span> <span class="ident">future</span>.<span class="kw">await</span><span class="question-mark">?</span>;
             <span class="self">self</span>.<span class="ident">verification_cache</span>.<span class="ident">insert_qr</span>(<span class="ident">qr_verification</span>.<span class="ident">clone</span>());
 
             <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(<span class="ident">qr_verification</span>))
