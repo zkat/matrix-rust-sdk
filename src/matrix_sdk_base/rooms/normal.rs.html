@@ -602,12 +602,12 @@
     <span class="ident">events</span>::{
         <span class="ident">receipt::Receipt</span>,
         <span class="ident">room</span>::{
-            <span class="ident">create</span>::{<span class="ident">CreateEventContent</span>, <span class="ident">RoomType</span> <span class="kw">as</span> <span class="ident">CreateRoomType</span>},
-            <span class="ident">encryption::EncryptionEventContent</span>,
+            <span class="ident">create</span>::{<span class="ident">RoomCreateEventContent</span>, <span class="ident">RoomType</span> <span class="kw">as</span> <span class="ident">CreateRoomType</span>},
+            <span class="ident">encryption::RoomEncryptionEventContent</span>,
             <span class="ident">guest_access::GuestAccess</span>,
             <span class="ident">history_visibility::HistoryVisibility</span>,
             <span class="ident">join_rules::JoinRule</span>,
-            <span class="ident">tombstone::TombstoneEventContent</span>,
+            <span class="ident">tombstone::RoomTombstoneEventContent</span>,
         },
         <span class="ident">tag::Tags</span>,
         <span class="ident">AnyRoomAccountDataEvent</span>, <span class="ident">AnyStateEventContent</span>, <span class="ident">AnySyncStateEvent</span>, <span class="ident">EventType</span>,
@@ -753,7 +753,7 @@
     <span class="doccomment">/// This usually isn&#39;t optional but some servers might not send an</span>
     <span class="doccomment">/// `m.room.create` event as the first event for a given room, thus this can</span>
     <span class="doccomment">/// be optional.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">create_content</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">CreateEventContent</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">create_content</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">RoomCreateEventContent</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">read</span>().<span class="ident">unwrap</span>().<span class="ident">base_info</span>.<span class="ident">create</span>.<span class="ident">clone</span>()
     }
 
@@ -779,7 +779,7 @@
 
     <span class="doccomment">/// Get the `m.room.encryption` content that enabled end to end encryption</span>
     <span class="doccomment">/// in the room.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">encryption_settings</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">EncryptionEventContent</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">encryption_settings</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">RoomEncryptionEventContent</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">read</span>().<span class="ident">unwrap</span>().<span class="ident">base_info</span>.<span class="ident">encryption</span>.<span class="ident">clone</span>()
     }
 
@@ -822,7 +822,7 @@
     }
 
     <span class="doccomment">/// Get the `m.room.tombstone` content of this room if there is one.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">tombstone</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">TombstoneEventContent</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">tombstone</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">RoomTombstoneEventContent</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">read</span>().<span class="ident">unwrap</span>().<span class="ident">base_info</span>.<span class="ident">tombstone</span>.<span class="ident">clone</span>()
     }
 

@@ -172,11 +172,6 @@
 <span id="172">172</span>
 <span id="173">173</span>
 <span id="174">174</span>
-<span id="175">175</span>
-<span id="176">176</span>
-<span id="177">177</span>
-<span id="178">178</span>
-<span id="179">179</span>
 </pre><pre class="rust"><code><span class="comment">// Copyright 2020 The Matrix.org Foundation C.I.C.</span>
 <span class="comment">//</span>
 <span class="comment">// Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);</span>
@@ -309,10 +304,7 @@
         <span class="ident">time</span>::{<span class="ident">Duration</span>, <span class="ident">Instant</span>},
     };
 
-    <span class="kw">use</span> <span class="ident">ruma</span>::{
-        <span class="ident">events</span>::{<span class="ident">room::message::MessageEventContent</span>, <span class="ident">AnyMessageEventContent</span>},
-        <span class="ident">room_id</span>, <span class="ident">user_id</span>,
-    };
+    <span class="kw">use</span> <span class="ident">ruma</span>::{<span class="ident">events::room::message::RoomMessageEventContent</span>, <span class="ident">room_id</span>, <span class="ident">user_id</span>};
 
     <span class="kw">use</span> <span class="ident"><span class="kw">super</span>::EncryptionSettings</span>;
     <span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">MegolmError</span>, <span class="ident">ReadOnlyAccount</span>};
@@ -331,9 +323,7 @@
         <span class="macro">assert!</span>(<span class="op">!</span><span class="ident">session</span>.<span class="ident">expired</span>());
         <span class="kw">let</span> <span class="kw">_</span> <span class="op">=</span> <span class="ident">session</span>
             .<span class="ident">encrypt</span>(
-                <span class="ident">serde_json::to_value</span>(<span class="ident">AnyMessageEventContent::RoomMessage</span>(
-                    <span class="ident">MessageEventContent::text_plain</span>(<span class="string">&quot;Test message&quot;</span>),
-                ))<span class="question-mark">?</span>,
+                <span class="ident">serde_json::to_value</span>(<span class="ident">RoomMessageEventContent::text_plain</span>(<span class="string">&quot;Test message&quot;</span>))<span class="question-mark">?</span>,
                 <span class="string">&quot;m.room.message&quot;</span>,
             )
             .<span class="kw">await</span>;

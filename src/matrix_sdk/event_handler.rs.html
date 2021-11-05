@@ -569,6 +569,13 @@
 <span id="569">569</span>
 <span id="570">570</span>
 <span id="571">571</span>
+<span id="572">572</span>
+<span id="573">573</span>
+<span id="574">574</span>
+<span id="575">575</span>
+<span id="576">576</span>
+<span id="577">577</span>
+<span id="578">578</span>
 </pre><pre class="rust"><code><span class="comment">// Copyright 2021 Jonas Platte</span>
 <span class="comment">//</span>
 <span class="comment">// Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);</span>
@@ -976,10 +983,10 @@
         <span class="kw">const</span> <span class="ident">ID</span>: (<span class="ident">EventKind</span>, <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>) <span class="op">=</span> (<span class="ident">EventKind::Message</span> { <span class="ident">redacted</span>: <span class="bool-val">false</span> }, <span class="ident">C::TYPE</span>);
     }
 
-    <span class="kw">impl</span> <span class="ident">SyncEvent</span> <span class="kw">for</span> <span class="ident">events::room::redaction::SyncRedactionEvent</span> {
+    <span class="kw">impl</span> <span class="ident">SyncEvent</span> <span class="kw">for</span> <span class="ident">events::room::redaction::SyncRoomRedactionEvent</span> {
         <span class="kw">const</span> <span class="ident">ID</span>: (<span class="ident">EventKind</span>, <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>) <span class="op">=</span> (
             <span class="ident">EventKind::Message</span> { <span class="ident">redacted</span>: <span class="bool-val">false</span> },
-            <span class="ident">events::room::redaction::RedactionEventContent::TYPE</span>,
+            <span class="ident">events::room::redaction::RoomRedactionEventContent::TYPE</span>,
         );
     }
 
@@ -1022,6 +1029,13 @@
         <span class="kw">const</span> <span class="ident">ID</span>: (<span class="ident">EventKind</span>, <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>) <span class="op">=</span> (<span class="ident">EventKind::Message</span> { <span class="ident">redacted</span>: <span class="bool-val">true</span> }, <span class="ident">C::TYPE</span>);
     }
 
+    <span class="kw">impl</span> <span class="ident">SyncEvent</span> <span class="kw">for</span> <span class="ident">events::room::redaction::RedactedSyncRoomRedactionEvent</span> {
+        <span class="kw">const</span> <span class="ident">ID</span>: (<span class="ident">EventKind</span>, <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>) <span class="op">=</span> (
+            <span class="ident">EventKind::Message</span> { <span class="ident">redacted</span>: <span class="bool-val">true</span> },
+            <span class="ident">events::room::redaction::RoomRedactionEventContent::TYPE</span>,
+        );
+    }
+
     <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">C</span><span class="op">&gt;</span> <span class="ident">SyncEvent</span> <span class="kw">for</span> <span class="ident">events::RedactedSyncStateEvent</span><span class="op">&lt;</span><span class="ident">C</span><span class="op">&gt;</span>
     <span class="kw">where</span>
         <span class="ident">C</span>: <span class="ident">StaticEventContent</span> <span class="op">+</span> <span class="ident">events::RedactedStateEventContent</span>,
@@ -1036,7 +1050,7 @@
 
     <span class="kw">use</span> <span class="ident">matrix_sdk_test</span>::{<span class="ident">EventBuilder</span>, <span class="ident">EventsJson</span>};
     <span class="kw">use</span> <span class="ident">ruma</span>::{
-        <span class="ident">events::room::member</span>::{<span class="ident">StrippedMemberEvent</span>, <span class="ident">SyncMemberEvent</span>},
+        <span class="ident">events::room::member</span>::{<span class="ident">StrippedRoomMemberEvent</span>, <span class="ident">SyncRoomMemberEvent</span>},
         <span class="ident">room_id</span>,
     };
     <span class="kw">use</span> <span class="ident">serde_json::json</span>;
@@ -1057,7 +1071,7 @@
         <span class="ident">client</span>
             .<span class="ident">register_event_handler</span>({
                 <span class="kw">let</span> <span class="ident">member_count</span> <span class="op">=</span> <span class="ident">member_count</span>.<span class="ident">clone</span>();
-                <span class="kw">move</span> <span class="op">|</span><span class="ident">_ev</span>: <span class="ident">SyncMemberEvent</span>, <span class="ident">_room</span>: <span class="ident">room::Room</span><span class="op">|</span> {
+                <span class="kw">move</span> <span class="op">|</span><span class="ident">_ev</span>: <span class="ident">SyncRoomMemberEvent</span>, <span class="ident">_room</span>: <span class="ident">room::Room</span><span class="op">|</span> {
                     <span class="ident">member_count</span>.<span class="ident">fetch_add</span>(<span class="number">1</span>, <span class="ident">SeqCst</span>);
                     <span class="ident">future::ready</span>(())
                 }
@@ -1065,7 +1079,7 @@
             .<span class="kw">await</span>
             .<span class="ident">register_event_handler</span>({
                 <span class="kw">let</span> <span class="ident">typing_count</span> <span class="op">=</span> <span class="ident">typing_count</span>.<span class="ident">clone</span>();
-                <span class="kw">move</span> <span class="op">|</span><span class="ident">_ev</span>: <span class="ident">SyncMemberEvent</span><span class="op">|</span> {
+                <span class="kw">move</span> <span class="op">|</span><span class="ident">_ev</span>: <span class="ident">SyncRoomMemberEvent</span><span class="op">|</span> {
                     <span class="ident">typing_count</span>.<span class="ident">fetch_add</span>(<span class="number">1</span>, <span class="ident">SeqCst</span>);
                     <span class="ident">future::ready</span>(())
                 }
@@ -1073,7 +1087,7 @@
             .<span class="kw">await</span>
             .<span class="ident">register_event_handler</span>({
                 <span class="kw">let</span> <span class="ident">power_levels_count</span> <span class="op">=</span> <span class="ident">power_levels_count</span>.<span class="ident">clone</span>();
-                <span class="kw">move</span> <span class="op">|</span><span class="ident">_ev</span>: <span class="ident">SyncMemberEvent</span>, <span class="ident">_client</span>: <span class="ident">Client</span>, <span class="ident">_room</span>: <span class="ident">room::Room</span><span class="op">|</span> {
+                <span class="kw">move</span> <span class="op">|</span><span class="ident">_ev</span>: <span class="ident">SyncRoomMemberEvent</span>, <span class="ident">_client</span>: <span class="ident">Client</span>, <span class="ident">_room</span>: <span class="ident">room::Room</span><span class="op">|</span> {
                     <span class="ident">power_levels_count</span>.<span class="ident">fetch_add</span>(<span class="number">1</span>, <span class="ident">SeqCst</span>);
                     <span class="ident">future::ready</span>(())
                 }
@@ -1081,7 +1095,7 @@
             .<span class="kw">await</span>
             .<span class="ident">register_event_handler</span>({
                 <span class="kw">let</span> <span class="ident">invited_member_count</span> <span class="op">=</span> <span class="ident">invited_member_count</span>.<span class="ident">clone</span>();
-                <span class="kw">move</span> <span class="op">|</span><span class="ident">_ev</span>: <span class="ident">StrippedMemberEvent</span><span class="op">|</span> {
+                <span class="kw">move</span> <span class="op">|</span><span class="ident">_ev</span>: <span class="ident">StrippedRoomMemberEvent</span><span class="op">|</span> {
                     <span class="ident">invited_member_count</span>.<span class="ident">fetch_add</span>(<span class="number">1</span>, <span class="ident">SeqCst</span>);
                     <span class="ident">future::ready</span>(())
                 }
