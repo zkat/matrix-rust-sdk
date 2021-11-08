@@ -397,6 +397,98 @@
 <span id="397">397</span>
 <span id="398">398</span>
 <span id="399">399</span>
+<span id="400">400</span>
+<span id="401">401</span>
+<span id="402">402</span>
+<span id="403">403</span>
+<span id="404">404</span>
+<span id="405">405</span>
+<span id="406">406</span>
+<span id="407">407</span>
+<span id="408">408</span>
+<span id="409">409</span>
+<span id="410">410</span>
+<span id="411">411</span>
+<span id="412">412</span>
+<span id="413">413</span>
+<span id="414">414</span>
+<span id="415">415</span>
+<span id="416">416</span>
+<span id="417">417</span>
+<span id="418">418</span>
+<span id="419">419</span>
+<span id="420">420</span>
+<span id="421">421</span>
+<span id="422">422</span>
+<span id="423">423</span>
+<span id="424">424</span>
+<span id="425">425</span>
+<span id="426">426</span>
+<span id="427">427</span>
+<span id="428">428</span>
+<span id="429">429</span>
+<span id="430">430</span>
+<span id="431">431</span>
+<span id="432">432</span>
+<span id="433">433</span>
+<span id="434">434</span>
+<span id="435">435</span>
+<span id="436">436</span>
+<span id="437">437</span>
+<span id="438">438</span>
+<span id="439">439</span>
+<span id="440">440</span>
+<span id="441">441</span>
+<span id="442">442</span>
+<span id="443">443</span>
+<span id="444">444</span>
+<span id="445">445</span>
+<span id="446">446</span>
+<span id="447">447</span>
+<span id="448">448</span>
+<span id="449">449</span>
+<span id="450">450</span>
+<span id="451">451</span>
+<span id="452">452</span>
+<span id="453">453</span>
+<span id="454">454</span>
+<span id="455">455</span>
+<span id="456">456</span>
+<span id="457">457</span>
+<span id="458">458</span>
+<span id="459">459</span>
+<span id="460">460</span>
+<span id="461">461</span>
+<span id="462">462</span>
+<span id="463">463</span>
+<span id="464">464</span>
+<span id="465">465</span>
+<span id="466">466</span>
+<span id="467">467</span>
+<span id="468">468</span>
+<span id="469">469</span>
+<span id="470">470</span>
+<span id="471">471</span>
+<span id="472">472</span>
+<span id="473">473</span>
+<span id="474">474</span>
+<span id="475">475</span>
+<span id="476">476</span>
+<span id="477">477</span>
+<span id="478">478</span>
+<span id="479">479</span>
+<span id="480">480</span>
+<span id="481">481</span>
+<span id="482">482</span>
+<span id="483">483</span>
+<span id="484">484</span>
+<span id="485">485</span>
+<span id="486">486</span>
+<span id="487">487</span>
+<span id="488">488</span>
+<span id="489">489</span>
+<span id="490">490</span>
+<span id="491">491</span>
 </pre><pre class="rust"><code><span class="comment">// Copyright 2021 The Matrix.org Foundation C.I.C.</span>
 <span class="comment">//</span>
 <span class="comment">// Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);</span>
@@ -432,7 +524,34 @@
 
 <span class="doccomment">/// A struct representing a E2EE capable identity of a user.</span>
 <span class="doccomment">///</span>
-<span class="doccomment">/// The identity is backed by public [cross signing] keys that users upload.</span>
+<span class="doccomment">/// The identity is backed by public [cross signing] keys that users upload. If</span>
+<span class="doccomment">/// our own user doesn&#39;t yet have such an identity, a new one can be created and</span>
+<span class="doccomment">/// uploaded to the server using [`Client::bootstrap_cross_signing()`]. The user</span>
+<span class="doccomment">/// identity can be also reset using the same method.</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// The user identity consists of three separate `Ed25519` keypairs:</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// ```text</span>
+<span class="doccomment">///           ┌──────────────────────────────────────────────────────┐</span>
+<span class="doccomment">///           │                    User Identity                     │</span>
+<span class="doccomment">///           ├────────────────┬──────────────────┬──────────────────┤</span>
+<span class="doccomment">///           │   Master Key   │ Self-signing Key │ User-signing key │</span>
+<span class="doccomment">///           └────────────────┴──────────────────┴──────────────────┘</span>
+<span class="doccomment">/// ```</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// The identity consists of a Master key and two sub-keys, the Self-signing key</span>
+<span class="doccomment">/// and the User-signing key.</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// Each key has a separate role:</span>
+<span class="doccomment">/// * Master key, signs only the sub-keys, can be used as a fingerprint of the</span>
+<span class="doccomment">/// identity.</span>
+<span class="doccomment">/// * Self-signing key, signs devices belonging to the user that owns this</span>
+<span class="doccomment">/// identity.</span>
+<span class="doccomment">/// * User-signing key, signs Master keys belonging to other users.</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// The User-signing key and its signatures of other user&#39;s Master keys are</span>
+<span class="doccomment">/// hidden from us by the homeserver. This is done to preserve privacy and not</span>
+<span class="doccomment">/// let us know whom the user verified.</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// [cross signing]: https://spec.matrix.org/unstable/client-server-api/#cross-signing</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>)]</span>
@@ -457,7 +576,26 @@
         <span class="self">Self</span> { <span class="ident">inner</span>: <span class="ident">identity</span>.<span class="ident">into</span>() }
     }
 
-    <span class="doccomment">/// The ID of the user this E2EE identity belongs to.</span>
+    <span class="doccomment">/// The ID of the user this identity belongs to.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// # Examples</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// ```no_run</span>
+    <span class="doccomment">/// # use std::convert::TryFrom;</span>
+    <span class="doccomment">/// # use matrix_sdk::{Client, ruma::UserId};</span>
+    <span class="doccomment">/// # use url::Url;</span>
+    <span class="doccomment">/// # let alice = UserId::try_from(&quot;@alice:example.org&quot;).unwrap();</span>
+    <span class="doccomment">/// # let homeserver = Url::parse(&quot;http://example.com&quot;).unwrap();</span>
+    <span class="doccomment">/// # let client = Client::new(homeserver).unwrap();</span>
+    <span class="doccomment">/// # futures::executor::block_on(async {</span>
+    <span class="doccomment">/// let user = client.get_user_identity(&amp;alice).await?;</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// if let Some(user) = user {</span>
+    <span class="doccomment">///     println!(&quot;This user identity belongs to {}&quot;, user.user_id().as_str());</span>
+    <span class="doccomment">/// }</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// # anyhow::Result::&lt;()&gt;::Ok(()) });</span>
+    <span class="doccomment">/// ```</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">user_id</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">UserId</span> {
         <span class="kw">match</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">inner</span> {
             <span class="ident">UserIdentities::Own</span>(<span class="ident">i</span>) =&gt; <span class="ident">i</span>.<span class="ident">inner</span>.<span class="ident">user_id</span>(),
@@ -465,23 +603,32 @@
         }
     }
 
-    <span class="doccomment">/// Request an interacitve verification with this `UserIdentity`.</span>
+    <span class="doccomment">/// Request an interactive verification with this `UserIdentity`.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// Returns a [`VerificationRequest`] object that can be used to control the</span>
     <span class="doccomment">/// verification flow.</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// This will send out a `m.key.verification.request` event to all the E2EE</span>
-    <span class="doccomment">/// capable devices we have if we&#39;re requesting verification with our own</span>
-    <span class="doccomment">/// user identity or will send out the event to a DM we share with the user.</span>
+    <span class="doccomment">/// This will send out a `m.key.verification.request` event. Who such an</span>
+    <span class="doccomment">/// event will be sent to depends on if we&#39;re veryfing our own identity or</span>
+    <span class="doccomment">/// someone else&#39;s:</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// If we don&#39;t share a DM with this user one will be created before the</span>
-    <span class="doccomment">/// event gets sent out.</span>
+    <span class="doccomment">/// * Our own identity - All our E2EE capable devices will receive the event</span>
+    <span class="doccomment">/// over to-device messaging.</span>
+    <span class="doccomment">/// * Someone else&#39;s identity - The event will be sent to a DM room we share</span>
+    <span class="doccomment">/// with the user, if we don&#39;t share a DM with the user, one will be</span>
+    <span class="doccomment">/// created.</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// The default methods that are supported are `m.sas.v1` and</span>
-    <span class="doccomment">/// `m.qr_code.show.v1`, if this isn&#39;t desirable the</span>
-    <span class="doccomment">/// [`request_verification_with_methods()`] method can be used to override</span>
-    <span class="doccomment">/// this. `m.qr_code.show.v1` is only available if the `qrcode` feature is</span>
-    <span class="doccomment">/// enabled, which it is by default.</span>
+    <span class="doccomment">/// The default methods that are supported are:</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// * `m.sas.v1` - Short auth string, or emoji based verification</span>
+    <span class="doccomment">/// * `m.qr_code.show.v1` - QR code based verification</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// [`request_verification_with_methods()`] method can be</span>
+    <span class="doccomment">/// used to override this. The `m.qr_code.show.v1` method is only available</span>
+    <span class="doccomment">/// if the `qrcode` feature is enabled, which it is by default.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// Check out the [`verification`] module for more info on how to handle</span>
+    <span class="doccomment">/// interactive verifications.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// # Examples</span>
     <span class="doccomment">///</span>
@@ -504,6 +651,7 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// [`request_verification_with_methods()`]:</span>
     <span class="doccomment">/// #method.request_verification_with_methods</span>
+    <span class="doccomment">/// [`verification`]: crate::encryption::verification</span>
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">request_verification</span>(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
     ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">VerificationRequest</span>, <span class="ident">RequestVerificationError</span><span class="op">&gt;</span> {
@@ -513,13 +661,17 @@
         }
     }
 
-    <span class="doccomment">/// Request an interacitve verification with this `UserIdentity`.</span>
+    <span class="doccomment">/// Request an interactive verification with this `UserIdentity` using the</span>
+    <span class="doccomment">/// selected methods.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// Returns a [`VerificationRequest`] object that can be used to control the</span>
     <span class="doccomment">/// verification flow.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// This methods behaves the same way as [`request_verification()`],</span>
     <span class="doccomment">/// but the advertised verification methods can be manually selected.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// Check out the [`verification`] module for more info on how to handle</span>
+    <span class="doccomment">/// interactive verifications.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// # Arguments</span>
     <span class="doccomment">///</span>
@@ -560,6 +712,7 @@
     <span class="doccomment">/// ```</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// [`request_verification()`]: #method.request_verification</span>
+    <span class="doccomment">/// [`verification`]: crate::encryption::verification</span>
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">request_verification_with_methods</span>(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         <span class="ident">methods</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">VerificationMethod</span><span class="op">&gt;</span>,
@@ -574,14 +727,39 @@
 
     <span class="doccomment">/// Manually verify this [`UserIdentity`].</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// This method will attempt to sign the user identity using our private</span>
-    <span class="doccomment">/// cross signing key. Verifying can fail if we don&#39;t have the private</span>
-    <span class="doccomment">/// part of our user-signing key.</span>
+    <span class="doccomment">/// This method will do different things depending on if the user identity</span>
+    <span class="doccomment">/// belongs to us, or if the user identity belongs to someone else. Users</span>
+    <span class="doccomment">/// that chose to manually verify a user identity should make sure that the</span>
+    <span class="doccomment">/// Master key does match to to the `Ed25519` they expect.</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// The state of our private cross signing keys can be inspected using the</span>
+    <span class="doccomment">/// The Master key can be inspected using the [`UserIdentity::master_key()`]</span>
+    <span class="doccomment">/// method.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// ### Manually verifying other users</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// This method will attempt to sign the user identity using our private</span>
+    <span class="doccomment">/// parts of the cross signing keys. The method will attempt to sign the</span>
+    <span class="doccomment">/// Master key of the user using our own User-signing key. This will of</span>
+    <span class="doccomment">/// course fail if the private part of the User-signing key isn&#39;t available.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// The availability of the User-signing key can be checked using the</span>
     <span class="doccomment">/// [`Client::cross_signing_status()`] method.</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// [`Client::cross_signing_status()`]: crate::Client::cross_signing_status</span>
+    <span class="doccomment">/// ### Manually verifying our own user</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// On the other hand, if the user identity belongs to us, it will be</span>
+    <span class="doccomment">/// marked as verified using a local flag, our own device will also sign the</span>
+    <span class="doccomment">/// Master key. Manually verifying our own user identity can&#39;t fail.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// ### Problems of manual verification</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// Manual verification may be more convenient to use, i.e. both users need</span>
+    <span class="doccomment">/// to be online and available to interactively verify each other. Despite</span>
+    <span class="doccomment">/// the convenience, interactive verifications should be generally</span>
+    <span class="doccomment">/// preferred. Manually verifying a user won&#39;t notify the other user, the</span>
+    <span class="doccomment">/// one being verified, that they should also verify us. This means that</span>
+    <span class="doccomment">/// user `A` will consider user `B` to be verified, but not the other way</span>
+    <span class="doccomment">/// around.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// # Examples</span>
     <span class="doccomment">///</span>
@@ -616,9 +794,12 @@
 
     <span class="doccomment">/// Is the user identity considered to be verified.</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// A user identity is considered to be verified if it has been signed by</span>
-    <span class="doccomment">/// our user-signing key, if the identity belongs to another user, or if we</span>
-    <span class="doccomment">/// locally marked it as verified, if the user identity belongs to us.</span>
+    <span class="doccomment">/// A user identity is considered to be verified if:</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// * It has been signed by our User-signing key, if the identity belongs</span>
+    <span class="doccomment">/// to another user</span>
+    <span class="doccomment">/// * If it has been locally marked as verified, if the user identity</span>
+    <span class="doccomment">/// belongs to us.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// If the identity belongs to another user, our own user identity needs to</span>
     <span class="doccomment">/// be verified as well for the identity to be considered to be verified.</span>
@@ -658,7 +839,10 @@
         }
     }
 
-    <span class="doccomment">/// Get the public part of the master key of this user identity.</span>
+    <span class="doccomment">/// Get the public part of the Master key of this user identity.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// The public part of the Master key is usually used to uniquely identify</span>
+    <span class="doccomment">/// the identity.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// # Examples</span>
     <span class="doccomment">///</span>

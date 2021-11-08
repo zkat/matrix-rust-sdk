@@ -49,31 +49,17 @@ some event handlers and then syncing.</p>
 <p>More examples can be found in the <a href="https://github.com/matrix-org/matrix-rust-sdk/tree/main/crates/matrix-sdk/examples">examples</a> directory.</p>
 <h2 id="crate-feature-flags" class="section-header"><a href="#crate-feature-flags">Crate Feature Flags</a></h2>
 <p>The following crate feature flags are available:</p>
-<ul>
-<li><code>encryption</code>: Enables end-to-end encryption support in the library.</li>
-<li><code>qrcode</code>: Enables QR code verification support in the library. This will also
-enable <code>encryption</code>. Enabled by default.</li>
-<li><code>sled_cryptostore</code>: Enables a Sled-based store for the encryption keys. If
-this is disabled and <code>encryption</code> support is enabled, the keys will by
-default be stored only in memory and thus lost after the client is
-destroyed.</li>
-<li><code>markdown</code>: Support for sending Markdown-formatted messages.</li>
-<li><code>socks</code>: Enables SOCKS support in
-<a href="https://docs.rs/reqwest/0.11.4/reqwest/"><code>reqwest</code></a>, the default HTTP
-client.</li>
-<li><code>sso_login</code>: Enables SSO login with a local HTTP server.</li>
-<li><code>require_auth_for_profile_requests</code>: Controls whether to send the access
-token in the authentication header when calling endpoints that retrieve
-profile data. This matches the Synapse option with the same name. Enabled by
-default.</li>
-<li><code>appservice</code>: Enables low-level appservice functionality. For a
-high-level API, see the <code>matrix-sdk-appservice</code> crate.</li>
-<li><code>anyhow</code>: More verbose error logging for event handlers that return
-<code>anyhow::Result&lt;()&gt;</code>.</li>
-<li><code>eyre</code>: More verbose error logging for event handlers that return
-<code>eyre::Result&lt;()&gt;</code>.</li>
-</ul>
-<h2 id="enabling-logging" class="section-header"><a href="#enabling-logging">Enabling logging</a></h2>
+<div><table><thead><tr><th>Feature</th><th align="center">Default</th><th>Description</th></tr></thead><tbody>
+<tr><td><code>anyhow</code></td><td align="center">No</td><td>Better logging for event handlers that return <code>anyhow::Result</code></td></tr>
+<tr><td><code>encryption</code></td><td align="center">Yes</td><td>End-to-end encryption support</td></tr>
+<tr><td><code>eyre</code></td><td align="center">No</td><td>Better logging for event handlers that return <code>eyre::Result</code></td></tr>
+<tr><td><code>markdown</code></td><td align="center">No</td><td>Support to send Markdown-formatted messages</td></tr>
+<tr><td><code>qrcode</code></td><td align="center">Yes</td><td>QR code verification support</td></tr>
+<tr><td><code>sled_cryptostore</code></td><td align="center">Yes</td><td>Persistent storage for E2EE related data</td></tr>
+<tr><td><code>socks</code></td><td align="center">No</td><td>Enables SOCKS support in the default HTTP client, <a href="https://docs.rs/reqwest/0.11.5/reqwest/index.html"><code>reqwest</code></a></td></tr>
+<tr><td><code>sso_login</code></td><td align="center">No</td><td>Enables SSO login with a local HTTP server</td></tr>
+</tbody></table>
+</div><h2 id="enabling-logging" class="section-header"><a href="#enabling-logging">Enabling logging</a></h2>
 <p>Users of the matrix-sdk crate can enable log output by depending on the
 <code>tracing-subscriber</code> crate and including the following line in their
 application (e.g. at the start of <code>main</code>):</p>
@@ -88,7 +74,7 @@ more information on this, check out the <a href="https://tracing.rs/tracing_subs
 </div></details><h2 id="reexports" class="section-header"><a href="#reexports">Re-exports</a></h2>
 <div class="item-table"><div class="item-row"><div class="item-left import-item"><code>pub use <a class="mod" href="https://docs.rs/bytes/1.1.0/bytes/index.html" title="mod bytes">bytes</a>;</code></div><div class="item-right docblock-short"></div></div><div class="item-row"><div class="item-left import-item"><code>pub use <a class="mod" href="https://docs.rs/reqwest/0.11.6/reqwest/index.html" title="mod reqwest">reqwest</a>;</code></div><div class="item-right docblock-short"></div></div><div class="item-row"><div class="item-left import-item"><code>pub use ruma;</code></div><div class="item-right docblock-short"></div></div></div><h2 id="modules" class="section-header"><a href="#modules">Modules</a></h2>
 <div class="item-table"><div class="item-row"><div class="item-left module-item"><a class="mod" href="config/index.html" title="matrix_sdk::config mod">config</a></div><div class="item-right docblock-short"><p>Configuration to change the behaviour of the <a href="#crate.Client"><code>Client</code></a>.</p>
-</div></div><div class="item-row"><div class="item-left module-item"><a class="mod" href="deserialized_responses/index.html" title="matrix_sdk::deserialized_responses mod">deserialized_responses</a></div><div class="item-right docblock-short"></div></div><div class="item-row"><div class="item-left module-item"><a class="mod" href="encryption/index.html" title="matrix_sdk::encryption mod">encryption</a><span class="stab portability" title="This is supported on `encryption` only"><code>encryption</code></span></div><div class="item-right docblock-short"><p>End to end encryption related types</p>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="mod" href="deserialized_responses/index.html" title="matrix_sdk::deserialized_responses mod">deserialized_responses</a></div><div class="item-right docblock-short"></div></div><div class="item-row"><div class="item-left module-item"><a class="mod" href="encryption/index.html" title="matrix_sdk::encryption mod">encryption</a><span class="stab portability" title="This is supported on `encryption` only"><code>encryption</code></span></div><div class="item-right docblock-short"><p>End-to-end encryption related types</p>
 </div></div><div class="item-row"><div class="item-left module-item"><a class="mod" href="event_handler/index.html" title="matrix_sdk::event_handler mod">event_handler</a></div><div class="item-right docblock-short"><p>Types and traits related for event handlers. For usage, see
 <a href="struct.Client.html#method.register_event_handler" title="Client::register_event_handler"><code>Client::register_event_handler</code></a>.</p>
 </div></div><div class="item-row"><div class="item-left module-item"><a class="mod" href="executor/index.html" title="matrix_sdk::executor mod">executor</a></div><div class="item-right docblock-short"><p>Abstraction over an executor so we can spawn tasks under WASM the same way
@@ -122,7 +108,7 @@ implemented, while other targets will.</p>
 http libraries.</p>
 </div></div></div><h2 id="types" class="section-header"><a href="#types">Type Definitions</a></h2>
 <div class="item-table"><div class="item-row"><div class="item-left module-item"><a class="type" href="type.HttpResult.html" title="matrix_sdk::HttpResult type">HttpResult</a></div><div class="item-right docblock-short"><p>Result type of a pure HTTP request.</p>
-</div></div><div class="item-row"><div class="item-left module-item"><a class="type" href="type.Result.html" title="matrix_sdk::Result type">Result</a></div><div class="item-right docblock-short"><p>Result type of the rust-sdk.</p>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="type" href="type.Result.html" title="matrix_sdk::Result type">Result</a></div><div class="item-right docblock-short"><p>Result type of the matrix-sdk.</p>
 </div></div></div><h2 id="attributes" class="section-header"><a href="#attributes">Attribute Macros</a></h2>
 <div class="item-table"><div class="item-row"><div class="item-left module-item"><a class="attr" href="attr.async_trait.html" title="matrix_sdk::async_trait attr">async_trait</a></div><div class="item-right docblock-short"></div></div></div></section><section id="search" class="content hidden"></section><div id="rustdoc-vars" data-root-path="../" data-current-crate="matrix_sdk" data-search-index-js="../search-index.js" data-search-js="../search.js"></div>
     <script src="../main.js"></script>

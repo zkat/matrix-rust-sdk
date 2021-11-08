@@ -857,6 +857,57 @@
 <span id="857">857</span>
 <span id="858">858</span>
 <span id="859">859</span>
+<span id="860">860</span>
+<span id="861">861</span>
+<span id="862">862</span>
+<span id="863">863</span>
+<span id="864">864</span>
+<span id="865">865</span>
+<span id="866">866</span>
+<span id="867">867</span>
+<span id="868">868</span>
+<span id="869">869</span>
+<span id="870">870</span>
+<span id="871">871</span>
+<span id="872">872</span>
+<span id="873">873</span>
+<span id="874">874</span>
+<span id="875">875</span>
+<span id="876">876</span>
+<span id="877">877</span>
+<span id="878">878</span>
+<span id="879">879</span>
+<span id="880">880</span>
+<span id="881">881</span>
+<span id="882">882</span>
+<span id="883">883</span>
+<span id="884">884</span>
+<span id="885">885</span>
+<span id="886">886</span>
+<span id="887">887</span>
+<span id="888">888</span>
+<span id="889">889</span>
+<span id="890">890</span>
+<span id="891">891</span>
+<span id="892">892</span>
+<span id="893">893</span>
+<span id="894">894</span>
+<span id="895">895</span>
+<span id="896">896</span>
+<span id="897">897</span>
+<span id="898">898</span>
+<span id="899">899</span>
+<span id="900">900</span>
+<span id="901">901</span>
+<span id="902">902</span>
+<span id="903">903</span>
+<span id="904">904</span>
+<span id="905">905</span>
+<span id="906">906</span>
+<span id="907">907</span>
+<span id="908">908</span>
+<span id="909">909</span>
+<span id="910">910</span>
 </pre><pre class="rust"><code><span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;encryption&quot;</span>)]</span>
 <span class="kw">use</span> <span class="ident">std::sync::Arc</span>;
 <span class="kw">use</span> <span class="ident">std</span>::{<span class="ident">io::Read</span>, <span class="ident">ops::Deref</span>};
@@ -1112,6 +1163,57 @@
         });
 
         <span class="self">self</span>.<span class="ident">client</span>.<span class="ident">send</span>(<span class="ident">request</span>, <span class="prelude-val">None</span>).<span class="kw">await</span><span class="question-mark">?</span>;
+        <span class="prelude-val">Ok</span>(())
+    }
+
+    <span class="doccomment">/// Enable End-to-end encryption in this room.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// This method will bea noop if encryption is already enabled, otherwise</span>
+    <span class="doccomment">/// sends a `m.room.encryption` state event to the room. This might fail if</span>
+    <span class="doccomment">/// you don&#39;t have the appropriate power level to enable end-to-end</span>
+    <span class="doccomment">/// encryption.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// A sync needs to be received to update the local room state. This method</span>
+    <span class="doccomment">/// will wait for a sync to be received though this might time out if no</span>
+    <span class="doccomment">/// sync loop is running or if the server is slow.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// # Examples</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// ```no_run</span>
+    <span class="doccomment">/// # use matrix_sdk::{</span>
+    <span class="doccomment">/// #     Client, config::SyncSettings,</span>
+    <span class="doccomment">/// #     ruma::room_id,</span>
+    <span class="doccomment">/// # };</span>
+    <span class="doccomment">/// # use futures::executor::block_on;</span>
+    <span class="doccomment">/// # use url::Url;</span>
+    <span class="doccomment">/// # block_on(async {</span>
+    <span class="doccomment">/// # let homeserver = Url::parse(&quot;http://localhost:8080&quot;)?;</span>
+    <span class="doccomment">/// # let client = Client::new(homeserver)?;</span>
+    <span class="doccomment">/// # let room_id = room_id!(&quot;!test:localhost&quot;);</span>
+    <span class="doccomment">/// let room_id = room_id!(&quot;!SVkFJHzfwvuaIEawgC:localhost&quot;);</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// if let Some(room) = client.get_joined_room(&amp;room_id) {</span>
+    <span class="doccomment">///     room.enable_encryption().await?</span>
+    <span class="doccomment">/// }</span>
+    <span class="doccomment">/// # matrix_sdk::Result::Ok(()) });</span>
+    <span class="doccomment">/// ```</span>
+    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">enable_encryption</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+        <span class="kw">use</span> <span class="ident">ruma</span>::{
+            <span class="ident">events::room::encryption::RoomEncryptionEventContent</span>, <span class="ident">EventEncryptionAlgorithm</span>,
+        };
+        <span class="kw">const</span> <span class="ident">SYNC_WAIT_TIME</span>: <span class="ident">Duration</span> <span class="op">=</span> <span class="ident">Duration::from_secs</span>(<span class="number">3</span>);
+
+        <span class="kw">if</span> <span class="op">!</span><span class="self">self</span>.<span class="ident">is_encrypted</span>() {
+            <span class="kw">let</span> <span class="ident">content</span> <span class="op">=</span>
+                <span class="ident">RoomEncryptionEventContent::new</span>(<span class="ident">EventEncryptionAlgorithm::MegolmV1AesSha2</span>);
+            <span class="self">self</span>.<span class="ident">send_state_event</span>(<span class="ident">content</span>, <span class="string">&quot;&quot;</span>).<span class="kw">await</span><span class="question-mark">?</span>;
+
+            <span class="comment">// TODO do we want to return an error here if we time out? This</span>
+            <span class="comment">// could be quite useful if someone wants to enable encryption and</span>
+            <span class="comment">// send a message right after it&#39;s enabled.</span>
+            <span class="self">self</span>.<span class="ident">client</span>.<span class="ident">sync_beat</span>.<span class="ident">listen</span>().<span class="ident">wait_timeout</span>(<span class="ident">SYNC_WAIT_TIME</span>);
+        }
+
         <span class="prelude-val">Ok</span>(())
     }
 
