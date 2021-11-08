@@ -166,6 +166,46 @@
 <span id="166">166</span>
 <span id="167">167</span>
 <span id="168">168</span>
+<span id="169">169</span>
+<span id="170">170</span>
+<span id="171">171</span>
+<span id="172">172</span>
+<span id="173">173</span>
+<span id="174">174</span>
+<span id="175">175</span>
+<span id="176">176</span>
+<span id="177">177</span>
+<span id="178">178</span>
+<span id="179">179</span>
+<span id="180">180</span>
+<span id="181">181</span>
+<span id="182">182</span>
+<span id="183">183</span>
+<span id="184">184</span>
+<span id="185">185</span>
+<span id="186">186</span>
+<span id="187">187</span>
+<span id="188">188</span>
+<span id="189">189</span>
+<span id="190">190</span>
+<span id="191">191</span>
+<span id="192">192</span>
+<span id="193">193</span>
+<span id="194">194</span>
+<span id="195">195</span>
+<span id="196">196</span>
+<span id="197">197</span>
+<span id="198">198</span>
+<span id="199">199</span>
+<span id="200">200</span>
+<span id="201">201</span>
+<span id="202">202</span>
+<span id="203">203</span>
+<span id="204">204</span>
+<span id="205">205</span>
+<span id="206">206</span>
+<span id="207">207</span>
+<span id="208">208</span>
 </pre><pre class="rust"><code><span class="comment">// Copyright 2020 The Matrix.org Foundation C.I.C.</span>
 <span class="comment">//</span>
 <span class="comment">// Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);</span>
@@ -267,7 +307,47 @@
     }
 
     <span class="doccomment">/// Get the emoji version of the short auth string.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">emoji</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span>[(<span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>, <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>); <span class="number">7</span>]<span class="op">&gt;</span> {
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// # Examples</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// ```no_run</span>
+    <span class="doccomment">/// # use matrix_sdk::Client;</span>
+    <span class="doccomment">/// # use futures::executor::block_on;</span>
+    <span class="doccomment">/// # use url::Url;</span>
+    <span class="doccomment">/// # use ruma::user_id;</span>
+    <span class="doccomment">/// use matrix_sdk::{</span>
+    <span class="doccomment">///     encryption::verification::{SasVerification, AcceptSettings},</span>
+    <span class="doccomment">///     ruma::events::key::verification::ShortAuthenticationString,</span>
+    <span class="doccomment">/// };</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// # let flow_id = &quot;someID&quot;;</span>
+    <span class="doccomment">/// # let user_id = user_id!(&quot;@alice:example&quot;);</span>
+    <span class="doccomment">/// # block_on(async {</span>
+    <span class="doccomment">/// # let homeserver = Url::parse(&quot;http://example.com&quot;)?;</span>
+    <span class="doccomment">/// # let client = Client::new(homeserver)?;</span>
+    <span class="doccomment">/// let sas_verification = client</span>
+    <span class="doccomment">///     .get_verification(&amp;user_id, flow_id)</span>
+    <span class="doccomment">///     .await</span>
+    <span class="doccomment">///     .and_then(|v| v.sas());</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// if let Some(emojis) = sas_verification.and_then(|s| s.emoji()) {</span>
+    <span class="doccomment">///     let emoji_string = emojis</span>
+    <span class="doccomment">///         .iter()</span>
+    <span class="doccomment">///         .map(|e| format!(&quot;{:^12}&quot;, e.symbol))</span>
+    <span class="doccomment">///         .collect::&lt;Vec&lt;_&gt;&gt;()</span>
+    <span class="doccomment">///         .join(&quot;&quot;);</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">///     let description = emojis</span>
+    <span class="doccomment">///         .iter()</span>
+    <span class="doccomment">///         .map(|e| format!(&quot;{:^12}&quot;, e.description))</span>
+    <span class="doccomment">///         .collect::&lt;Vec&lt;_&gt;&gt;()</span>
+    <span class="doccomment">///         .join(&quot;&quot;);</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">///     println!(&quot;Do the emojis match?\n{}\n{}&quot;, emoji_string, description);</span>
+    <span class="doccomment">/// }</span>
+    <span class="doccomment">/// # anyhow::Result::&lt;()&gt;::Ok(()) });</span>
+    <span class="doccomment">/// ```</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">emoji</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span>[<span class="ident"><span class="kw">super</span>::Emoji</span>; <span class="number">7</span>]<span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">emoji</span>()
     }
 
