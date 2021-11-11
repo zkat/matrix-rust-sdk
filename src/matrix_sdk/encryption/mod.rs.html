@@ -1232,7 +1232,7 @@
     <span class="ident">result::Result</span> <span class="kw">as</span> <span class="ident">StdResult</span>,
 };
 
-<span class="kw">use</span> <span class="ident">futures::StreamExt</span>;
+<span class="kw">use</span> <span class="ident">futures_util::stream</span>::{<span class="self">self</span>, <span class="ident">StreamExt</span>};
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">matrix_sdk_base::crypto</span>::{<span class="ident">MediaEncryptionInfo</span>, <span class="ident">LocalTrust</span>};
 <span class="kw">use</span> <span class="ident">matrix_sdk_base</span>::{
     <span class="ident">crypto</span>::{
@@ -1937,7 +1937,7 @@
             <span class="macro">warn!</span>(<span class="string">&quot;Error while claiming one-time keys {:?}&quot;</span>, <span class="ident">e</span>);
         }
 
-        <span class="kw">let</span> <span class="ident">outgoing_requests</span> <span class="op">=</span> <span class="ident">futures::stream::iter</span>(<span class="self">self</span>.<span class="ident">base_client</span>.<span class="ident">outgoing_requests</span>().<span class="kw">await</span><span class="question-mark">?</span>)
+        <span class="kw">let</span> <span class="ident">outgoing_requests</span> <span class="op">=</span> <span class="ident">stream::iter</span>(<span class="self">self</span>.<span class="ident">base_client</span>.<span class="ident">outgoing_requests</span>().<span class="kw">await</span><span class="question-mark">?</span>)
             .<span class="ident">map</span>(<span class="op">|</span><span class="ident">r</span><span class="op">|</span> <span class="self">self</span>.<span class="ident">send_outgoing_request</span>(<span class="ident">r</span>));
 
         <span class="kw">let</span> <span class="ident">requests</span> <span class="op">=</span> <span class="ident">outgoing_requests</span>.<span class="ident">buffer_unordered</span>(<span class="ident">MAX_CONCURRENT_REQUESTS</span>);

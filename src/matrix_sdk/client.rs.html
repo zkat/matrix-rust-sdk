@@ -3599,7 +3599,6 @@
 <span id="3599">3599</span>
 <span id="3600">3600</span>
 <span id="3601">3601</span>
-<span id="3602">3602</span>
 </pre><pre class="rust"><code><span class="comment">// Copyright 2020 Damir Jelić</span>
 <span class="comment">// Copyright 2020 The Matrix.org Foundation C.I.C.</span>
 <span class="comment">//</span>
@@ -3626,7 +3625,7 @@
 };
 
 <span class="kw">use</span> <span class="ident">dashmap::DashMap</span>;
-<span class="kw">use</span> <span class="ident">futures::FutureExt</span>;
+<span class="kw">use</span> <span class="ident">futures_core::stream::Stream</span>;
 <span class="kw">use</span> <span class="ident">futures_timer::Delay</span> <span class="kw">as</span> <span class="ident">sleep</span>;
 <span class="kw">use</span> <span class="ident">matrix_sdk_base</span>::{
     <span class="ident">deserialized_responses</span>::{<span class="ident">JoinedRoom</span>, <span class="ident">LeftRoom</span>, <span class="ident">SyncResponse</span>},
@@ -4210,7 +4209,7 @@
             <span class="kw">let</span> <span class="ident">maybe_fut</span> <span class="op">=</span> <span class="ident">serde_json::from_str</span>(<span class="ident">data</span>.<span class="ident">raw</span>.<span class="ident">get</span>())
                 .<span class="ident">map</span>(<span class="op">|</span><span class="ident">ev</span><span class="op">|</span> <span class="ident">handler</span>.<span class="ident">clone</span>().<span class="ident">handle_event</span>(<span class="ident">ev</span>, <span class="ident">data</span>));
 
-            <span class="kw">async</span> <span class="kw">move</span> {
+            <span class="ident">Box::pin</span>(<span class="kw">async</span> <span class="kw">move</span> {
                 <span class="kw">match</span> <span class="ident">maybe_fut</span> {
                     <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(<span class="ident">fut</span>)) =&gt; {
                         <span class="ident">fut</span>.<span class="kw">await</span>.<span class="ident">print_error</span>(<span class="ident">event_type</span>);
@@ -4226,8 +4225,7 @@
                         );
                     }
                 }
-            }
-            .<span class="ident">boxed</span>()
+            })
         }));
 
         <span class="self">self</span>
@@ -4244,7 +4242,7 @@
         <span class="ident">Fut</span>: <span class="ident">Future</span><span class="op">&lt;</span><span class="ident">Output</span> <span class="op">=</span> ()<span class="op">&gt;</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
     {
         <span class="self">self</span>.<span class="ident">notification_handlers</span>.<span class="ident">write</span>().<span class="kw">await</span>.<span class="ident">push</span>(<span class="ident">Box::new</span>(
-            <span class="kw">move</span> <span class="op">|</span><span class="ident">notification</span>, <span class="ident">room</span>, <span class="ident">client</span><span class="op">|</span> (<span class="ident">handler</span>)(<span class="ident">notification</span>, <span class="ident">room</span>, <span class="ident">client</span>).<span class="ident">boxed</span>(),
+            <span class="kw">move</span> <span class="op">|</span><span class="ident">notification</span>, <span class="ident">room</span>, <span class="ident">client</span><span class="op">|</span> <span class="ident">Box::pin</span>((<span class="ident">handler</span>)(<span class="ident">notification</span>, <span class="ident">room</span>, <span class="ident">client</span>)),
         ));
 
         <span class="self">self</span>
@@ -5651,7 +5649,7 @@
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">sync_stream</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(
         <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="self">self</span>,
         <span class="kw-2">mut</span> <span class="ident">sync_settings</span>: <span class="ident"><span class="kw">crate</span>::config::SyncSettings</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>,
-    ) -&gt; <span class="kw">impl</span> <span class="ident">futures::stream::Stream</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">SyncResponse</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="op">+</span> <span class="lifetime">&#39;a</span> {
+    ) -&gt; <span class="kw">impl</span> <span class="ident">Stream</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">SyncResponse</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="op">+</span> <span class="lifetime">&#39;a</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">last_sync_time</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Instant</span><span class="op">&gt;</span> <span class="op">=</span> <span class="prelude-val">None</span>;
 
         <span class="kw">if</span> <span class="ident">sync_settings</span>.<span class="ident">token</span>.<span class="ident">is_none</span>() {
