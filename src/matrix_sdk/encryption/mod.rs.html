@@ -975,7 +975,6 @@
 <span id="975">975</span>
 <span id="976">976</span>
 <span id="977">977</span>
-<span id="978">978</span>
 </pre><pre class="rust"><code><span class="comment">// Copyright 2021 The Matrix.org Foundation C.I.C.</span>
 <span class="comment">// Copyright 2021 Damir Jelić</span>
 <span class="comment">//</span>
@@ -1233,7 +1232,7 @@
 };
 
 <span class="kw">use</span> <span class="ident">futures_util::stream</span>::{<span class="self">self</span>, <span class="ident">StreamExt</span>};
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">matrix_sdk_base::crypto</span>::{<span class="ident">MediaEncryptionInfo</span>, <span class="ident">LocalTrust</span>};
+<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">matrix_sdk_base::crypto</span>::{<span class="ident">MediaEncryptionInfo</span>, <span class="ident">LocalTrust</span>, <span class="ident">RoomKeyImportResult</span>};
 <span class="kw">use</span> <span class="ident">matrix_sdk_base</span>::{
     <span class="ident">crypto</span>::{
         <span class="ident">store::CryptoStoreError</span>, <span class="ident">CrossSigningStatus</span>, <span class="ident">OutgoingRequest</span>, <span class="ident">RoomMessageRequest</span>,
@@ -1346,19 +1345,18 @@
     <span class="doccomment">/// # use matrix_sdk::{Client, ruma::UserId};</span>
     <span class="doccomment">/// # use url::Url;</span>
     <span class="doccomment">/// # use futures::executor::block_on;</span>
-    <span class="doccomment">/// # let alice = UserId::try_from(&quot;@alice:example.org&quot;).unwrap();</span>
-    <span class="doccomment">/// # let homeserver = Url::parse(&quot;http://example.com&quot;).unwrap();</span>
-    <span class="doccomment">/// # let client = Client::new(homeserver).unwrap();</span>
     <span class="doccomment">/// # block_on(async {</span>
-    <span class="doccomment">/// let device = client.get_device(&amp;alice, &quot;DEVICEID&quot;.into())</span>
-    <span class="doccomment">///     .await</span>
-    <span class="doccomment">///     .unwrap()</span>
-    <span class="doccomment">///     .unwrap();</span>
+    <span class="doccomment">/// # let alice = UserId::try_from(&quot;@alice:example.org&quot;)?;</span>
+    <span class="doccomment">/// # let homeserver = Url::parse(&quot;http://example.com&quot;)?;</span>
+    <span class="doccomment">/// # let client = Client::new(homeserver)?;</span>
+    <span class="doccomment">/// if let Some(device) = client.get_device(&amp;alice, &quot;DEVICEID&quot;.into()).await? {</span>
+    <span class="doccomment">///     println!(&quot;{:?}&quot;, device.verified());</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// println!(&quot;{:?}&quot;, device.verified());</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// let verification = device.request_verification().await.unwrap();</span>
-    <span class="doccomment">/// # });</span>
+    <span class="doccomment">///     if !device.verified() {</span>
+    <span class="doccomment">///         let verification = device.request_verification().await?;</span>
+    <span class="doccomment">///     }</span>
+    <span class="doccomment">/// }</span>
+    <span class="doccomment">/// # anyhow::Result::&lt;()&gt;::Ok(()) });</span>
     <span class="doccomment">/// ```</span>
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;encryption&quot;</span>)]</span>
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">get_device</span>(
@@ -1387,16 +1385,16 @@
     <span class="doccomment">/// # use matrix_sdk::{Client, ruma::UserId};</span>
     <span class="doccomment">/// # use url::Url;</span>
     <span class="doccomment">/// # use futures::executor::block_on;</span>
-    <span class="doccomment">/// # let alice = UserId::try_from(&quot;@alice:example.org&quot;).unwrap();</span>
-    <span class="doccomment">/// # let homeserver = Url::parse(&quot;http://example.com&quot;).unwrap();</span>
-    <span class="doccomment">/// # let client = Client::new(homeserver).unwrap();</span>
     <span class="doccomment">/// # block_on(async {</span>
-    <span class="doccomment">/// let devices = client.get_user_devices(&amp;alice).await.unwrap();</span>
+    <span class="doccomment">/// # let alice = UserId::try_from(&quot;@alice:example.org&quot;)?;</span>
+    <span class="doccomment">/// # let homeserver = Url::parse(&quot;http://example.com&quot;)?;</span>
+    <span class="doccomment">/// # let client = Client::new(homeserver)?;</span>
+    <span class="doccomment">/// let devices = client.get_user_devices(&amp;alice).await?;</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// for device in devices.devices() {</span>
     <span class="doccomment">///     println!(&quot;{:?}&quot;, device);</span>
     <span class="doccomment">/// }</span>
-    <span class="doccomment">/// # });</span>
+    <span class="doccomment">/// # anyhow::Result::&lt;()&gt;::Ok(()) });</span>
     <span class="doccomment">/// ```</span>
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;encryption&quot;</span>)]</span>
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">get_user_devices</span>(
@@ -1426,10 +1424,10 @@
     <span class="doccomment">/// # use matrix_sdk::{Client, ruma::UserId};</span>
     <span class="doccomment">/// # use url::Url;</span>
     <span class="doccomment">/// # use futures::executor::block_on;</span>
-    <span class="doccomment">/// # let alice = UserId::try_from(&quot;@alice:example.org&quot;).unwrap();</span>
-    <span class="doccomment">/// # let homeserver = Url::parse(&quot;http://example.com&quot;).unwrap();</span>
-    <span class="doccomment">/// # let client = Client::new(homeserver).unwrap();</span>
     <span class="doccomment">/// # block_on(async {</span>
+    <span class="doccomment">/// # let alice = UserId::try_from(&quot;@alice:example.org&quot;)?;</span>
+    <span class="doccomment">/// # let homeserver = Url::parse(&quot;http://example.com&quot;)?;</span>
+    <span class="doccomment">/// # let client = Client::new(homeserver)?;</span>
     <span class="doccomment">/// let user = client.get_user_identity(&amp;alice).await?;</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// if let Some(user) = user {</span>
@@ -1482,10 +1480,10 @@
     <span class="doccomment">/// # use url::Url;</span>
     <span class="doccomment">/// # use futures::executor::block_on;</span>
     <span class="doccomment">/// # use serde_json::json;</span>
-    <span class="doccomment">/// # let user_id = UserId::try_from(&quot;@alice:example.org&quot;).unwrap();</span>
-    <span class="doccomment">/// # let homeserver = Url::parse(&quot;http://example.com&quot;).unwrap();</span>
-    <span class="doccomment">/// # let client = Client::new(homeserver).unwrap();</span>
     <span class="doccomment">/// # block_on(async {</span>
+    <span class="doccomment">/// # let user_id = UserId::try_from(&quot;@alice:example.org&quot;)?;</span>
+    <span class="doccomment">/// # let homeserver = Url::parse(&quot;http://example.com&quot;)?;</span>
+    <span class="doccomment">/// # let client = Client::new(homeserver)?;</span>
     <span class="doccomment">/// if let Err(e) = client.bootstrap_cross_signing(None).await {</span>
     <span class="doccomment">///     if let Some(response) = e.uiaa_response() {</span>
     <span class="doccomment">///         let auth_data = uiaa::AuthData::Password(assign!(</span>
@@ -1501,7 +1499,7 @@
     <span class="doccomment">///         panic!(&quot;Error durign cross signing bootstrap {:#?}&quot;, e);</span>
     <span class="doccomment">///     }</span>
     <span class="doccomment">/// }</span>
-    <span class="doccomment">/// # })</span>
+    <span class="doccomment">/// # anyhow::Result::&lt;()&gt;::Ok(()) });</span>
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;encryption&quot;</span>)]</span>
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">bootstrap_cross_signing</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">auth_data</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">AuthData</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">olm</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">base_client</span>.<span class="ident">olm_machine</span>().<span class="kw">await</span>.<span class="ident">ok_or</span>(<span class="ident">Error::AuthenticationRequired</span>)<span class="question-mark">?</span>;
@@ -1555,14 +1553,13 @@
     <span class="doccomment">/// # use futures::executor::block_on;</span>
     <span class="doccomment">/// # use url::Url;</span>
     <span class="doccomment">/// # block_on(async {</span>
-    <span class="doccomment">/// # let homeserver = Url::parse(&quot;http://localhost:8080&quot;).unwrap();</span>
-    <span class="doccomment">/// # let mut client = Client::new(homeserver).unwrap();</span>
+    <span class="doccomment">/// # let homeserver = Url::parse(&quot;http://localhost:8080&quot;)?;</span>
+    <span class="doccomment">/// # let mut client = Client::new(homeserver)?;</span>
     <span class="doccomment">/// let path = PathBuf::from(&quot;/home/example/e2e-keys.txt&quot;);</span>
     <span class="doccomment">/// // Export all room keys.</span>
     <span class="doccomment">/// client</span>
     <span class="doccomment">///     .export_keys(path, &quot;secret-passphrase&quot;, |_| true)</span>
-    <span class="doccomment">///     .await</span>
-    <span class="doccomment">///     .expect(&quot;Can&#39;t export keys.&quot;);</span>
+    <span class="doccomment">///     .await?;</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// // Export only the room keys for a certain room.</span>
     <span class="doccomment">/// let path = PathBuf::from(&quot;/home/example/e2e-room-keys.txt&quot;);</span>
@@ -1570,9 +1567,8 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// client</span>
     <span class="doccomment">///     .export_keys(path, &quot;secret-passphrase&quot;, |s| s.room_id() == &amp;room_id)</span>
-    <span class="doccomment">///     .await</span>
-    <span class="doccomment">///     .expect(&quot;Can&#39;t export keys.&quot;);</span>
-    <span class="doccomment">/// # });</span>
+    <span class="doccomment">///     .await?;</span>
+    <span class="doccomment">/// # anyhow::Result::&lt;()&gt;::Ok(()) });</span>
     <span class="doccomment">/// ```</span>
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;encryption&quot;</span>, <span class="ident">not</span>(<span class="ident">target_arch</span> <span class="op">=</span> <span class="string">&quot;wasm32&quot;</span>)))]</span>
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">export_keys</span>(
@@ -1624,21 +1620,23 @@
     <span class="doccomment">/// # use futures::executor::block_on;</span>
     <span class="doccomment">/// # use url::Url;</span>
     <span class="doccomment">/// # block_on(async {</span>
-    <span class="doccomment">/// # let homeserver = Url::parse(&quot;http://localhost:8080&quot;).unwrap();</span>
-    <span class="doccomment">/// # let mut client = Client::new(homeserver).unwrap();</span>
+    <span class="doccomment">/// # let homeserver = Url::parse(&quot;http://localhost:8080&quot;)?;</span>
+    <span class="doccomment">/// # let mut client = Client::new(homeserver)?;</span>
     <span class="doccomment">/// let path = PathBuf::from(&quot;/home/example/e2e-keys.txt&quot;);</span>
-    <span class="doccomment">/// client</span>
-    <span class="doccomment">///     .import_keys(path, &quot;secret-passphrase&quot;)</span>
-    <span class="doccomment">///     .await</span>
-    <span class="doccomment">///     .expect(&quot;Can&#39;t import keys&quot;);</span>
-    <span class="doccomment">/// # });</span>
+    <span class="doccomment">/// let result = client.import_keys(path, &quot;secret-passphrase&quot;).await?;</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// println!(</span>
+    <span class="doccomment">///     &quot;Imported {} room keys out of {}&quot;,</span>
+    <span class="doccomment">///     result.imported_count, result.total_count</span>
+    <span class="doccomment">/// );</span>
+    <span class="doccomment">/// # anyhow::Result::&lt;()&gt;::Ok(()) });</span>
     <span class="doccomment">/// ```</span>
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;encryption&quot;</span>, <span class="ident">not</span>(<span class="ident">target_arch</span> <span class="op">=</span> <span class="string">&quot;wasm32&quot;</span>)))]</span>
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">import_keys</span>(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         <span class="ident">path</span>: <span class="ident">PathBuf</span>,
         <span class="ident">passphrase</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>,
-    ) -&gt; <span class="ident">StdResult</span><span class="op">&lt;</span>(<span class="ident">usize</span>, <span class="ident">usize</span>), <span class="ident">RoomKeyImportError</span><span class="op">&gt;</span> {
+    ) -&gt; <span class="ident">StdResult</span><span class="op">&lt;</span><span class="ident">RoomKeyImportResult</span>, <span class="ident">RoomKeyImportError</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">olm</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">base_client</span>.<span class="ident">olm_machine</span>().<span class="kw">await</span>.<span class="ident">ok_or</span>(<span class="ident">RoomKeyImportError::StoreClosed</span>)<span class="question-mark">?</span>;
         <span class="kw">let</span> <span class="ident">passphrase</span> <span class="op">=</span> <span class="ident">zeroize::Zeroizing::new</span>(<span class="ident">passphrase</span>.<span class="ident">to_owned</span>());
 

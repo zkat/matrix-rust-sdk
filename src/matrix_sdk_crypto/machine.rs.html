@@ -2160,7 +2160,7 @@
         <span class="ident">SecretImportError</span>, <span class="ident">Store</span>,
     },
     <span class="ident">verification</span>::{<span class="ident">Verification</span>, <span class="ident">VerificationMachine</span>, <span class="ident">VerificationRequest</span>},
-    <span class="ident">CrossSigningKeyExport</span>, <span class="ident">ToDeviceRequest</span>,
+    <span class="ident">CrossSigningKeyExport</span>, <span class="ident">RoomKeyImportResult</span>, <span class="ident">ToDeviceRequest</span>,
 };
 
 <span class="doccomment">/// State machine implementation of the Olm/Megolm encryption protocol used for</span>
@@ -3388,7 +3388,7 @@
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         <span class="ident">exported_keys</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">ExportedRoomKey</span><span class="op">&gt;</span>,
         <span class="ident">progress_listener</span>: <span class="kw">impl</span> <span class="ident">Fn</span>(<span class="ident">usize</span>, <span class="ident">usize</span>),
-    ) -&gt; <span class="ident">StoreResult</span><span class="op">&lt;</span>(<span class="ident">usize</span>, <span class="ident">usize</span>)<span class="op">&gt;</span> {
+    ) -&gt; <span class="ident">StoreResult</span><span class="op">&lt;</span><span class="ident">RoomKeyImportResult</span><span class="op">&gt;</span> {
         <span class="kw">type</span> <span class="ident">SessionIdToIndexMap</span> <span class="op">=</span> <span class="ident">BTreeMap</span><span class="op">&lt;</span><span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">str</span><span class="op">&gt;</span>, <span class="ident">u32</span><span class="op">&gt;</span>;
 
         <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
@@ -3429,7 +3429,7 @@
             ),
         };
 
-        <span class="kw">let</span> <span class="ident">total_sessions</span> <span class="op">=</span> <span class="ident">exported_keys</span>.<span class="ident">len</span>();
+        <span class="kw">let</span> <span class="ident">total_count</span> <span class="op">=</span> <span class="ident">exported_keys</span>.<span class="ident">len</span>();
 
         <span class="kw">for</span> (<span class="ident">i</span>, <span class="ident">key</span>) <span class="kw">in</span> <span class="ident">exported_keys</span>.<span class="ident">into_iter</span>().<span class="ident">enumerate</span>() {
             <span class="kw">let</span> <span class="ident">session</span> <span class="op">=</span> <span class="ident">InboundGroupSession::from_export</span>(<span class="ident">key</span>)<span class="question-mark">?</span>;
@@ -3441,18 +3441,18 @@
                 <span class="ident">sessions</span>.<span class="ident">push</span>(<span class="ident">session</span>)
             }
 
-            <span class="ident">progress_listener</span>(<span class="ident">i</span>, <span class="ident">total_sessions</span>)
+            <span class="ident">progress_listener</span>(<span class="ident">i</span>, <span class="ident">total_count</span>)
         }
 
-        <span class="kw">let</span> <span class="ident">num_sessions</span> <span class="op">=</span> <span class="ident">sessions</span>.<span class="ident">len</span>();
+        <span class="kw">let</span> <span class="ident">imported_count</span> <span class="op">=</span> <span class="ident">sessions</span>.<span class="ident">len</span>();
 
         <span class="kw">let</span> <span class="ident">changes</span> <span class="op">=</span> <span class="ident">Changes</span> { <span class="ident">inbound_group_sessions</span>: <span class="ident">sessions</span>, ..<span class="ident">Default::default</span>() };
 
         <span class="self">self</span>.<span class="ident">store</span>.<span class="ident">save_changes</span>(<span class="ident">changes</span>).<span class="kw">await</span><span class="question-mark">?</span>;
 
-        <span class="macro">info!</span>(<span class="string">&quot;Successfully imported {} inbound group sessions&quot;</span>, <span class="ident">num_sessions</span>);
+        <span class="macro">info!</span>(<span class="ident">total_count</span>, <span class="ident">imported_count</span>, <span class="string">&quot;Successfully imported room keys&quot;</span>);
 
-        <span class="prelude-val">Ok</span>((<span class="ident">num_sessions</span>, <span class="ident">total_sessions</span>))
+        <span class="prelude-val">Ok</span>(<span class="ident">RoomKeyImportResult::new</span>(<span class="ident">imported_count</span>, <span class="ident">total_count</span>))
     }
 
     <span class="doccomment">/// Export the keys that match the given predicate.</span>
