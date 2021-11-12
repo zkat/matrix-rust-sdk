@@ -3599,6 +3599,58 @@
 <span id="3599">3599</span>
 <span id="3600">3600</span>
 <span id="3601">3601</span>
+<span id="3602">3602</span>
+<span id="3603">3603</span>
+<span id="3604">3604</span>
+<span id="3605">3605</span>
+<span id="3606">3606</span>
+<span id="3607">3607</span>
+<span id="3608">3608</span>
+<span id="3609">3609</span>
+<span id="3610">3610</span>
+<span id="3611">3611</span>
+<span id="3612">3612</span>
+<span id="3613">3613</span>
+<span id="3614">3614</span>
+<span id="3615">3615</span>
+<span id="3616">3616</span>
+<span id="3617">3617</span>
+<span id="3618">3618</span>
+<span id="3619">3619</span>
+<span id="3620">3620</span>
+<span id="3621">3621</span>
+<span id="3622">3622</span>
+<span id="3623">3623</span>
+<span id="3624">3624</span>
+<span id="3625">3625</span>
+<span id="3626">3626</span>
+<span id="3627">3627</span>
+<span id="3628">3628</span>
+<span id="3629">3629</span>
+<span id="3630">3630</span>
+<span id="3631">3631</span>
+<span id="3632">3632</span>
+<span id="3633">3633</span>
+<span id="3634">3634</span>
+<span id="3635">3635</span>
+<span id="3636">3636</span>
+<span id="3637">3637</span>
+<span id="3638">3638</span>
+<span id="3639">3639</span>
+<span id="3640">3640</span>
+<span id="3641">3641</span>
+<span id="3642">3642</span>
+<span id="3643">3643</span>
+<span id="3644">3644</span>
+<span id="3645">3645</span>
+<span id="3646">3646</span>
+<span id="3647">3647</span>
+<span id="3648">3648</span>
+<span id="3649">3649</span>
+<span id="3650">3650</span>
+<span id="3651">3651</span>
+<span id="3652">3652</span>
+<span id="3653">3653</span>
 </pre><pre class="rust"><code><span class="comment">// Copyright 2020 Damir Jelić</span>
 <span class="comment">// Copyright 2020 The Matrix.org Foundation C.I.C.</span>
 <span class="comment">//</span>
@@ -3621,9 +3673,10 @@
     <span class="ident">io::Read</span>,
     <span class="ident">pin::Pin</span>,
     <span class="ident">result::Result</span> <span class="kw">as</span> <span class="ident">StdResult</span>,
-    <span class="ident">sync::Arc</span>,
+    <span class="ident">sync</span>::{<span class="ident">Arc</span>, <span class="ident">RwLock</span> <span class="kw">as</span> <span class="ident">StdRwLock</span>},
 };
 
+<span class="kw">use</span> <span class="ident">anymap2::any::CloneAnySendSync</span>;
 <span class="kw">use</span> <span class="ident">dashmap::DashMap</span>;
 <span class="kw">use</span> <span class="ident">futures_core::stream::Stream</span>;
 <span class="kw">use</span> <span class="ident">futures_timer::Delay</span> <span class="kw">as</span> <span class="ident">sleep</span>;
@@ -3688,6 +3741,8 @@
 <span class="kw">type</span> <span class="ident">NotificationHandlerFn</span> <span class="op">=</span>
     <span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">Fn</span>(<span class="ident">Notification</span>, <span class="ident">room::Room</span>, <span class="ident">Client</span>) -&gt; <span class="ident">NotificationHandlerFut</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span><span class="op">&gt;</span>;
 
+<span class="kw">type</span> <span class="ident">AnyMap</span> <span class="op">=</span> <span class="ident">anymap2::Map</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">CloneAnySendSync</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span><span class="op">&gt;</span>;
+
 <span class="doccomment">/// Enum controlling if a loop running callbacks should continue or abort.</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// This is mainly used in the [`sync_with_callback`] method, the return value</span>
@@ -3724,6 +3779,8 @@
     <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">typing_notice_times</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">DashMap</span><span class="op">&lt;</span><span class="ident">RoomId</span>, <span class="ident">Instant</span><span class="op">&gt;</span><span class="op">&gt;</span>,
     <span class="doccomment">/// Event handlers. See `register_event_handler`.</span>
     <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">event_handlers</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">RwLock</span><span class="op">&lt;</span><span class="ident">EventHandlerMap</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// Custom event handler context. See `register_event_handler_context`.</span>
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">event_handler_data</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">StdRwLock</span><span class="op">&lt;</span><span class="ident">AnyMap</span><span class="op">&gt;</span><span class="op">&gt;</span>,
     <span class="doccomment">/// Notification handlers. See `register_notification_handler`.</span>
     <span class="ident">notification_handlers</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">RwLock</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">NotificationHandlerFn</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span>,
     <span class="doccomment">/// Whether the client should operate in application service style mode.</span>
@@ -3793,6 +3850,7 @@
             <span class="ident">members_request_locks</span>: <span class="ident">Default::default</span>(),
             <span class="ident">typing_notice_times</span>: <span class="ident">Default::default</span>(),
             <span class="ident">event_handlers</span>: <span class="ident">Default::default</span>(),
+            <span class="ident">event_handler_data</span>: <span class="ident">Default::default</span>(),
             <span class="ident">notification_handlers</span>: <span class="ident">Default::default</span>(),
             <span class="ident">appservice_mode</span>: <span class="ident">config</span>.<span class="ident">appservice_mode</span>,
             <span class="ident">use_discovery_response</span>: <span class="ident">config</span>.<span class="ident">use_discovery_response</span>,
@@ -4130,6 +4188,7 @@
     <span class="doccomment">/// # Examples</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// ```</span>
+    <span class="doccomment">/// # use futures::executor::block_on;</span>
     <span class="doccomment">/// # use url::Url;</span>
     <span class="doccomment">/// # let homeserver = Url::parse(&quot;http://localhost:8080&quot;).unwrap();</span>
     <span class="doccomment">/// # let client = Client::new(homeserver).unwrap();</span>
@@ -4148,7 +4207,7 @@
     <span class="doccomment">/// };</span>
     <span class="doccomment">/// use serde::{Deserialize, Serialize};</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// # let _ = async {</span>
+    <span class="doccomment">/// # block_on(async {</span>
     <span class="doccomment">/// client</span>
     <span class="doccomment">///     .register_event_handler(</span>
     <span class="doccomment">///         |ev: SyncRoomMessageEvent, room: Room, client: Client| async move {</span>
@@ -4196,7 +4255,7 @@
     <span class="doccomment">///         }</span>
     <span class="doccomment">///     }</span>
     <span class="doccomment">/// }).await;</span>
-    <span class="doccomment">/// # };</span>
+    <span class="doccomment">/// # });</span>
     <span class="doccomment">/// ```</span>
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">register_event_handler</span><span class="op">&lt;</span><span class="ident">Ev</span>, <span class="ident">Ctx</span>, <span class="ident">H</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">handler</span>: <span class="ident">H</span>) -&gt; <span class="kw-2">&amp;</span><span class="self">Self</span>
     <span class="kw">where</span>
@@ -4228,6 +4287,51 @@
             })
         }));
 
+        <span class="self">self</span>
+    }
+
+    <span class="doccomment">/// Add an arbitrary value for use as event handler context.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// The value can be obtained in an event handler by adding an argument of</span>
+    <span class="doccomment">/// the type [`Ctx&lt;T&gt;`][crate::event_handler::Ctx].</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// If a value of the same type has been added before, it will be</span>
+    <span class="doccomment">/// overwritten.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// # Example</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// ```</span>
+    <span class="doccomment">/// # use futures::executor::block_on;</span>
+    <span class="doccomment">/// use matrix_sdk::{</span>
+    <span class="doccomment">///     event_handler::Ctx,</span>
+    <span class="doccomment">///     room::Room,</span>
+    <span class="doccomment">///     ruma::events::room::message::SyncRoomMessageEvent,</span>
+    <span class="doccomment">/// };</span>
+    <span class="doccomment">/// # #[derive(Clone)]</span>
+    <span class="doccomment">/// # struct SomeType;</span>
+    <span class="doccomment">/// # fn obtain_gui_handle() -&gt; SomeType { SomeType }</span>
+    <span class="doccomment">/// # let homeserver = url::Url::parse(&quot;http://localhost:8080&quot;).unwrap();</span>
+    <span class="doccomment">/// # let client = matrix_sdk::Client::new(homeserver).unwrap();</span>
+    <span class="doccomment">/// # block_on(async {</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// // Handle used to send messages to the UI part of the app</span>
+    <span class="doccomment">/// let my_gui_handle: SomeType = obtain_gui_handle();</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// client</span>
+    <span class="doccomment">///     .register_event_handler_context(my_gui_handle.clone())</span>
+    <span class="doccomment">///     .register_event_handler(</span>
+    <span class="doccomment">///         |ev: SyncRoomMessageEvent, room: Room, gui_handle: Ctx&lt;SomeType&gt;| async move {</span>
+    <span class="doccomment">///             // gui_handle.send(DisplayMessage { message: ev });</span>
+    <span class="doccomment">///         },</span>
+    <span class="doccomment">///     )</span>
+    <span class="doccomment">///     .await;</span>
+    <span class="doccomment">/// # });</span>
+    <span class="doccomment">/// ```</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">register_event_handler_context</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">ctx</span>: <span class="ident">T</span>) -&gt; <span class="kw-2">&amp;</span><span class="self">Self</span>
+    <span class="kw">where</span>
+        <span class="ident">T</span>: <span class="ident">Clone</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
+    {
+        <span class="self">self</span>.<span class="ident">event_handler_data</span>.<span class="ident">write</span>().<span class="ident">unwrap</span>().<span class="ident">insert</span>(<span class="ident">ctx</span>);
         <span class="self">self</span>
     }
 

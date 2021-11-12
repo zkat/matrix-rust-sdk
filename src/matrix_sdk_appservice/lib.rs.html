@@ -588,6 +588,18 @@
 <span id="588">588</span>
 <span id="589">589</span>
 <span id="590">590</span>
+<span id="591">591</span>
+<span id="592">592</span>
+<span id="593">593</span>
+<span id="594">594</span>
+<span id="595">595</span>
+<span id="596">596</span>
+<span id="597">597</span>
+<span id="598">598</span>
+<span id="599">599</span>
+<span id="600">600</span>
+<span id="601">601</span>
+<span id="602">602</span>
 </pre><pre class="rust"><code><span class="comment">// Copyright 2021 Famedly GmbH</span>
 <span class="comment">//</span>
 <span class="comment">// Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);</span>
@@ -970,7 +982,7 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// [`join` room `timeline` events]: https://spec.matrix.org/unstable/client-server-api/#get_matrixclientr0sync</span>
     <span class="doccomment">/// [MSC2409]: https://github.com/matrix-org/matrix-doc/pull/2409</span>
-    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">register_event_handler</span><span class="op">&lt;</span><span class="ident">Ev</span>, <span class="ident">Ctx</span>, <span class="ident">H</span><span class="op">&gt;</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">handler</span>: <span class="ident">H</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span>
+    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">register_event_handler</span><span class="op">&lt;</span><span class="ident">Ev</span>, <span class="ident">Ctx</span>, <span class="ident">H</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">handler</span>: <span class="ident">H</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="self">Self</span><span class="op">&gt;</span>
     <span class="kw">where</span>
         <span class="ident">Ev</span>: <span class="ident">SyncEvent</span> <span class="op">+</span> <span class="ident">DeserializeOwned</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
         <span class="ident">H</span>: <span class="ident">EventHandler</span><span class="op">&lt;</span><span class="ident">Ev</span>, <span class="ident">Ctx</span><span class="op">&gt;</span>,
@@ -979,7 +991,19 @@
         <span class="kw">let</span> <span class="ident">client</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">get_cached_client</span>(<span class="prelude-val">None</span>)<span class="question-mark">?</span>;
         <span class="ident">client</span>.<span class="ident">register_event_handler</span>(<span class="ident">handler</span>).<span class="kw">await</span>;
 
-        <span class="prelude-val">Ok</span>(())
+        <span class="prelude-val">Ok</span>(<span class="self">self</span>)
+    }
+
+    <span class="doccomment">/// Convenience wrapper around [`Client::register_event_handler_context`]</span>
+    <span class="doccomment">/// attaches the event handler context to the [`MainUser`]&#39;s [`Client`].</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">register_event_handler_context</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">ctx</span>: <span class="ident">T</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="self">Self</span><span class="op">&gt;</span>
+    <span class="kw">where</span>
+        <span class="ident">T</span>: <span class="ident">Clone</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
+    {
+        <span class="kw">let</span> <span class="ident">client</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">get_cached_client</span>(<span class="prelude-val">None</span>)<span class="question-mark">?</span>;
+        <span class="ident">client</span>.<span class="ident">register_event_handler_context</span>(<span class="ident">ctx</span>);
+
+        <span class="prelude-val">Ok</span>(<span class="self">self</span>)
     }
 
     <span class="doccomment">/// Register a responder for queries about the existence of a user with a</span>
