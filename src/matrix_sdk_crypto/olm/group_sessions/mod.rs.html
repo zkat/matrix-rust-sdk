@@ -172,6 +172,40 @@
 <span id="172">172</span>
 <span id="173">173</span>
 <span id="174">174</span>
+<span id="175">175</span>
+<span id="176">176</span>
+<span id="177">177</span>
+<span id="178">178</span>
+<span id="179">179</span>
+<span id="180">180</span>
+<span id="181">181</span>
+<span id="182">182</span>
+<span id="183">183</span>
+<span id="184">184</span>
+<span id="185">185</span>
+<span id="186">186</span>
+<span id="187">187</span>
+<span id="188">188</span>
+<span id="189">189</span>
+<span id="190">190</span>
+<span id="191">191</span>
+<span id="192">192</span>
+<span id="193">193</span>
+<span id="194">194</span>
+<span id="195">195</span>
+<span id="196">196</span>
+<span id="197">197</span>
+<span id="198">198</span>
+<span id="199">199</span>
+<span id="200">200</span>
+<span id="201">201</span>
+<span id="202">202</span>
+<span id="203">203</span>
+<span id="204">204</span>
+<span id="205">205</span>
+<span id="206">206</span>
+<span id="207">207</span>
+<span id="208">208</span>
 </pre><pre class="rust"><code><span class="comment">// Copyright 2020 The Matrix.org Foundation C.I.C.</span>
 <span class="comment">//</span>
 <span class="comment">// Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);</span>
@@ -217,7 +251,7 @@
 <span class="attribute">#[<span class="ident">zeroize</span>(<span class="ident">drop</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">ExportedGroupSessionKey</span>(<span class="kw">pub</span> <span class="ident">String</span>);
 
-<span class="doccomment">/// An exported version of a `InboundGroupSession`</span>
+<span class="doccomment">/// An exported version of an `InboundGroupSession`</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// This can be used to share the `InboundGroupSession` in an exported file.</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>, <span class="ident">PartialEq</span>)]</span>
@@ -233,6 +267,28 @@
 
     <span class="doccomment">/// The ID of the session that the key is for.</span>
     <span class="kw">pub</span> <span class="ident">session_id</span>: <span class="ident">String</span>,
+
+    <span class="doccomment">/// The key for the session.</span>
+    <span class="kw">pub</span> <span class="ident">session_key</span>: <span class="ident">ExportedGroupSessionKey</span>,
+
+    <span class="doccomment">/// The Ed25519 key of the device which initiated the session originally.</span>
+    <span class="kw">pub</span> <span class="ident">sender_claimed_keys</span>: <span class="ident">BTreeMap</span><span class="op">&lt;</span><span class="ident">DeviceKeyAlgorithm</span>, <span class="ident">String</span><span class="op">&gt;</span>,
+
+    <span class="doccomment">/// Chain of Curve25519 keys through which this session was forwarded, via</span>
+    <span class="doccomment">/// m.forwarded_room_key events.</span>
+    <span class="kw">pub</span> <span class="ident">forwarding_curve25519_key_chain</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
+}
+
+<span class="doccomment">/// A backed up version of an `InboundGroupSession`</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// This can be used to backup the `InboundGroupSession` to the server.</span>
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>, <span class="ident">PartialEq</span>)]</span>
+<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">BackedUpRoomKey</span> {
+    <span class="doccomment">/// The encryption algorithm that the session uses.</span>
+    <span class="kw">pub</span> <span class="ident">algorithm</span>: <span class="ident">EventEncryptionAlgorithm</span>,
+
+    <span class="doccomment">/// The Curve25519 key of the device which initiated the session originally.</span>
+    <span class="kw">pub</span> <span class="ident">sender_key</span>: <span class="ident">String</span>,
 
     <span class="doccomment">/// The key for the session.</span>
     <span class="kw">pub</span> <span class="ident">session_key</span>: <span class="ident">ExportedGroupSessionKey</span>,
@@ -274,6 +330,18 @@
                 <span class="ident">forwarding_curve25519_key_chain</span>: <span class="self">self</span>.<span class="ident">forwarding_curve25519_key_chain</span>,
             }
             .<span class="ident">into</span>())
+        }
+    }
+}
+
+<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">ExportedRoomKey</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">BackedUpRoomKey</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">k</span>: <span class="ident">ExportedRoomKey</span>) -&gt; <span class="self">Self</span> {
+        <span class="self">Self</span> {
+            <span class="ident">algorithm</span>: <span class="ident">k</span>.<span class="ident">algorithm</span>,
+            <span class="ident">sender_key</span>: <span class="ident">k</span>.<span class="ident">sender_key</span>,
+            <span class="ident">session_key</span>: <span class="ident">k</span>.<span class="ident">session_key</span>,
+            <span class="ident">sender_claimed_keys</span>: <span class="ident">k</span>.<span class="ident">sender_claimed_keys</span>,
+            <span class="ident">forwarding_curve25519_key_chain</span>: <span class="ident">k</span>.<span class="ident">forwarding_curve25519_key_chain</span>,
         }
     }
 }

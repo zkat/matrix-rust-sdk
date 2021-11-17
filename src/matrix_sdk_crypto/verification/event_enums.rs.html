@@ -784,6 +784,7 @@
 <span id="784">784</span>
 <span id="785">785</span>
 <span id="786">786</span>
+<span id="787">787</span>
 </pre><pre class="rust"><code><span class="comment">// Copyright 2020 The Matrix.org Foundation C.I.C.</span>
 <span class="comment">//</span>
 <span class="comment">// Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);</span>
@@ -1561,11 +1562,12 @@
 
     <span class="kw">fn</span> <span class="ident">try_from</span>(<span class="ident">value</span>: <span class="ident">OutgoingRequest</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident"><span class="self">Self</span>::Error</span><span class="op">&gt;</span> {
         <span class="kw">match</span> <span class="ident">value</span>.<span class="ident">request</span>() {
-            <span class="ident"><span class="kw">crate</span>::OutgoingRequests::KeysUpload</span>(<span class="kw">_</span>) =&gt; <span class="prelude-val">Err</span>(<span class="string">&quot;Invalid request type&quot;</span>.<span class="ident">to_owned</span>()),
-            <span class="ident"><span class="kw">crate</span>::OutgoingRequests::KeysQuery</span>(<span class="kw">_</span>) =&gt; <span class="prelude-val">Err</span>(<span class="string">&quot;Invalid request type&quot;</span>.<span class="ident">to_owned</span>()),
+            <span class="ident"><span class="kw">crate</span>::OutgoingRequests::KeysUpload</span>(<span class="kw">_</span>)
+            <span class="op">|</span> <span class="ident"><span class="kw">crate</span>::OutgoingRequests::KeysQuery</span>(<span class="kw">_</span>)
+            <span class="op">|</span> <span class="ident"><span class="kw">crate</span>::OutgoingRequests::KeysBackup</span>(<span class="kw">_</span>)
+            <span class="op">|</span> <span class="ident"><span class="kw">crate</span>::OutgoingRequests::SignatureUpload</span>(<span class="kw">_</span>)
+            <span class="op">|</span> <span class="ident"><span class="kw">crate</span>::OutgoingRequests::KeysClaim</span>(<span class="kw">_</span>) =&gt; <span class="prelude-val">Err</span>(<span class="string">&quot;Invalid request type&quot;</span>.<span class="ident">to_owned</span>()),
             <span class="ident"><span class="kw">crate</span>::OutgoingRequests::ToDeviceRequest</span>(<span class="ident">r</span>) =&gt; <span class="ident"><span class="self">Self</span>::try_from</span>(<span class="ident">r</span>.<span class="ident">clone</span>()),
-            <span class="ident"><span class="kw">crate</span>::OutgoingRequests::SignatureUpload</span>(<span class="kw">_</span>) =&gt; <span class="prelude-val">Err</span>(<span class="string">&quot;Invalid request type&quot;</span>.<span class="ident">to_owned</span>()),
-            <span class="ident"><span class="kw">crate</span>::OutgoingRequests::KeysClaim</span>(<span class="kw">_</span>) =&gt; <span class="prelude-val">Err</span>(<span class="string">&quot;Invalid request type&quot;</span>.<span class="ident">to_owned</span>()),
             <span class="ident"><span class="kw">crate</span>::OutgoingRequests::RoomMessage</span>(<span class="ident">r</span>) =&gt; <span class="prelude-val">Ok</span>(<span class="ident"><span class="self">Self</span>::from</span>(<span class="ident">r</span>.<span class="ident">clone</span>())),
         }
     }

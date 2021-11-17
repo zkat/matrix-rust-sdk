@@ -1198,6 +1198,19 @@
 <span id="1198">1198</span>
 <span id="1199">1199</span>
 <span id="1200">1200</span>
+<span id="1201">1201</span>
+<span id="1202">1202</span>
+<span id="1203">1203</span>
+<span id="1204">1204</span>
+<span id="1205">1205</span>
+<span id="1206">1206</span>
+<span id="1207">1207</span>
+<span id="1208">1208</span>
+<span id="1209">1209</span>
+<span id="1210">1210</span>
+<span id="1211">1211</span>
+<span id="1212">1212</span>
+<span id="1213">1213</span>
 </pre><pre class="rust"><code><span class="comment">// Copyright 2020 The Matrix.org Foundation C.I.C.</span>
 <span class="comment">//</span>
 <span class="comment">// Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);</span>
@@ -1884,6 +1897,19 @@
     <span class="doccomment">/// Returns the signature as a base64 encoded string.</span>
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">sign</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">string</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">String</span> {
         <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">lock</span>().<span class="kw">await</span>.<span class="ident">sign</span>(<span class="ident">string</span>)
+    }
+
+    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;backups_v1&quot;</span>)]</span>
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">is_signed</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">json</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Value</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">SignatureError</span><span class="op">&gt;</span> {
+        <span class="kw">let</span> <span class="ident">signing_key</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">identity_keys</span>.<span class="ident">ed25519</span>();
+        <span class="kw">let</span> <span class="ident">utility</span> <span class="op">=</span> <span class="ident"><span class="kw">crate</span>::olm::Utility::new</span>();
+
+        <span class="ident">utility</span>.<span class="ident">verify_json</span>(
+            <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">user_id</span>,
+            <span class="kw-2">&amp;</span><span class="ident">DeviceKeyId::from_parts</span>(<span class="ident">DeviceKeyAlgorithm::Ed25519</span>, <span class="self">self</span>.<span class="ident">device_id</span>()),
+            <span class="ident">signing_key</span>,
+            <span class="ident">json</span>,
+        )
     }
 
     <span class="doccomment">/// Store the account as a base64 encoded string.</span>

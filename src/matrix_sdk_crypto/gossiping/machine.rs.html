@@ -1697,6 +1697,10 @@
 <span id="1697">1697</span>
 <span id="1698">1698</span>
 <span id="1699">1699</span>
+<span id="1700">1700</span>
+<span id="1701">1701</span>
+<span id="1702">1702</span>
+<span id="1703">1703</span>
 </pre><pre class="rust"><code><span class="comment">// Copyright 2020 The Matrix.org Foundation C.I.C.</span>
 <span class="comment">//</span>
 <span class="comment">// Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);</span>
@@ -2469,6 +2473,8 @@
             <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="prelude-val">None</span>);
         };
 
+        <span class="kw">let</span> <span class="ident">secret</span> <span class="op">=</span> <span class="ident">std::mem::take</span>(<span class="kw-2">&amp;mut</span> <span class="ident">event</span>.<span class="ident">content</span>.<span class="ident">secret</span>);
+
         <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">request</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">store</span>.<span class="ident">get_outgoing_secret_requests</span>(<span class="ident">request_id</span>).<span class="kw">await</span><span class="question-mark">?</span> {
             <span class="kw">match</span> <span class="kw-2">&amp;</span><span class="ident">request</span>.<span class="ident">info</span> {
                 <span class="ident">SecretInfo::KeyRequest</span>(<span class="kw">_</span>) =&gt; {
@@ -2490,30 +2496,32 @@
                         <span class="self">self</span>.<span class="ident">store</span>.<span class="ident">get_device_from_curve_key</span>(<span class="kw-2">&amp;</span><span class="ident">event</span>.<span class="ident">sender</span>, <span class="ident">sender_key</span>).<span class="kw">await</span><span class="question-mark">?</span>
                     {
                         <span class="kw">if</span> <span class="ident">device</span>.<span class="ident">verified</span>() {
-                            <span class="kw">match</span> <span class="self">self</span>
-                                .<span class="ident">store</span>
-                                .<span class="ident">import_secret</span>(
-                                    <span class="ident">secret_name</span>,
-                                    <span class="ident">std::mem::take</span>(<span class="kw-2">&amp;mut</span> <span class="ident">event</span>.<span class="ident">content</span>.<span class="ident">secret</span>),
-                                )
-                                .<span class="kw">await</span>
-                            {
-                                <span class="prelude-val">Ok</span>(<span class="kw">_</span>) =&gt; <span class="self">self</span>.<span class="ident">mark_as_done</span>(<span class="ident">request</span>).<span class="kw">await</span><span class="question-mark">?</span>,
-                                <span class="prelude-val">Err</span>(<span class="ident">e</span>) =&gt; {
-                                    <span class="comment">// If this is a store error propagate it up</span>
-                                    <span class="comment">// the call stack.</span>
-                                    <span class="kw">if</span> <span class="kw">let</span> <span class="ident">SecretImportError::Store</span>(<span class="ident">e</span>) <span class="op">=</span> <span class="ident">e</span> {
-                                        <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">e</span>);
-                                    } <span class="kw">else</span> {
-                                        <span class="comment">// Otherwise warn that there was</span>
-                                        <span class="comment">// something wrong with the secret.</span>
-                                        <span class="macro">warn!</span>(
-                                            <span class="ident">secret_name</span> <span class="op">=</span> <span class="ident">secret_name</span>.<span class="ident">as_ref</span>(),
-                                            <span class="ident">error</span> <span class="op">=</span><span class="question-mark">?</span> <span class="ident">e</span>,
-                                            <span class="string">&quot;Error while importing a secret&quot;</span>
-                                        )
+                            <span class="kw">if</span> <span class="ident">secret_name</span> <span class="op">!</span><span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">SecretName::RecoveryKey</span> {
+                                <span class="kw">match</span> <span class="self">self</span>.<span class="ident">store</span>.<span class="ident">import_secret</span>(<span class="ident">secret_name</span>, <span class="ident">secret</span>).<span class="kw">await</span> {
+                                    <span class="prelude-val">Ok</span>(<span class="kw">_</span>) =&gt; <span class="self">self</span>.<span class="ident">mark_as_done</span>(<span class="ident">request</span>).<span class="kw">await</span><span class="question-mark">?</span>,
+                                    <span class="prelude-val">Err</span>(<span class="ident">e</span>) =&gt; {
+                                        <span class="comment">// If this is a store error propagate it up</span>
+                                        <span class="comment">// the call stack.</span>
+                                        <span class="kw">if</span> <span class="kw">let</span> <span class="ident">SecretImportError::Store</span>(<span class="ident">e</span>) <span class="op">=</span> <span class="ident">e</span> {
+                                            <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">e</span>);
+                                        } <span class="kw">else</span> {
+                                            <span class="comment">// Otherwise warn that there was</span>
+                                            <span class="comment">// something wrong with the secret.</span>
+                                            <span class="macro">warn!</span>(
+                                                <span class="ident">secret_name</span> <span class="op">=</span> <span class="ident">secret_name</span>.<span class="ident">as_ref</span>(),
+                                                <span class="ident">error</span> <span class="op">=</span><span class="question-mark">?</span> <span class="ident">e</span>,
+                                                <span class="string">&quot;Error while importing a secret&quot;</span>
+                                            )
+                                        }
                                     }
                                 }
+                            } <span class="kw">else</span> {
+                                <span class="comment">// Skip importing the recovery key here since</span>
+                                <span class="comment">// we&#39;ll want to check if the public key matches</span>
+                                <span class="comment">// to the latest version on the server. We</span>
+                                <span class="comment">// instead leave the key in the event and let</span>
+                                <span class="comment">// the user import it later.</span>
+                                <span class="ident">event</span>.<span class="ident">content</span>.<span class="ident">secret</span> <span class="op">=</span> <span class="ident">secret</span>;
                             }
                         } <span class="kw">else</span> {
                             <span class="macro">warn!</span>(

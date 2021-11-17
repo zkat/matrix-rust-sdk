@@ -735,6 +735,13 @@
 <span id="735">735</span>
 <span id="736">736</span>
 <span id="737">737</span>
+<span id="738">738</span>
+<span id="739">739</span>
+<span id="740">740</span>
+<span id="741">741</span>
+<span id="742">742</span>
+<span id="743">743</span>
+<span id="744">744</span>
 </pre><pre class="rust"><code><span class="comment">// Copyright 2020 The Matrix.org Foundation C.I.C.</span>
 <span class="comment">//</span>
 <span class="comment">// Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);</span>
@@ -1272,7 +1279,7 @@
         };
 
         <span class="kw">if</span> <span class="ident">should_request_secrets</span> {
-            <span class="kw">let</span> <span class="ident">secret_requests</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">request_missing_secrets</span>().<span class="kw">await</span>;
+            <span class="kw">let</span> <span class="ident">secret_requests</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">request_missing_secrets</span>().<span class="kw">await</span><span class="question-mark">?</span>;
             <span class="ident">changes</span>.<span class="ident">key_requests</span> <span class="op">=</span> <span class="ident">secret_requests</span>;
         }
 
@@ -1284,9 +1291,16 @@
             .<span class="ident">unwrap_or</span>(<span class="ident">VerificationResult::Ok</span>))
     }
 
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">request_missing_secrets</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">GossipRequest</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">secrets</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">private_identity</span>.<span class="ident">get_missing_secrets</span>().<span class="kw">await</span>;
-        <span class="ident">GossipMachine::request_missing_secrets</span>(<span class="self">self</span>.<span class="ident">user_id</span>(), <span class="ident">secrets</span>)
+    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">request_missing_secrets</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">GossipRequest</span><span class="op">&gt;</span>, <span class="ident">CryptoStoreError</span><span class="op">&gt;</span> {
+        <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">unused_mut</span>)]</span>
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">secrets</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">private_identity</span>.<span class="ident">get_missing_secrets</span>().<span class="kw">await</span>;
+
+        <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;backups_v1&quot;</span>)]</span>
+        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">store</span>.<span class="ident">inner</span>.<span class="ident">load_backup_keys</span>().<span class="kw">await</span><span class="question-mark">?</span>.<span class="ident">recovery_key</span>.<span class="ident">is_none</span>() {
+            <span class="ident">secrets</span>.<span class="ident">push</span>(<span class="ident">ruma::events::secret::request::SecretName::RecoveryKey</span>);
+        }
+
+        <span class="prelude-val">Ok</span>(<span class="ident">GossipMachine::request_missing_secrets</span>(<span class="self">self</span>.<span class="ident">user_id</span>(), <span class="ident">secrets</span>))
     }
 
     <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">mark_identity_as_verified</span>(

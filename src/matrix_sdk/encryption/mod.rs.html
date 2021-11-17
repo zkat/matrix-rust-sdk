@@ -1015,6 +1015,23 @@
 <span id="1015">1015</span>
 <span id="1016">1016</span>
 <span id="1017">1017</span>
+<span id="1018">1018</span>
+<span id="1019">1019</span>
+<span id="1020">1020</span>
+<span id="1021">1021</span>
+<span id="1022">1022</span>
+<span id="1023">1023</span>
+<span id="1024">1024</span>
+<span id="1025">1025</span>
+<span id="1026">1026</span>
+<span id="1027">1027</span>
+<span id="1028">1028</span>
+<span id="1029">1029</span>
+<span id="1030">1030</span>
+<span id="1031">1031</span>
+<span id="1032">1032</span>
+<span id="1033">1033</span>
+<span id="1034">1034</span>
 </pre><pre class="rust"><code><span class="comment">// Copyright 2021 The Matrix.org Foundation C.I.C.</span>
 <span class="comment">// Copyright 2021 Damir Jelić</span>
 <span class="comment">//</span>
@@ -1283,6 +1300,7 @@
 <span class="kw">use</span> <span class="ident">matrix_sdk_common</span>::{<span class="ident">instant::Duration</span>, <span class="ident">uuid::Uuid</span>};
 <span class="kw">use</span> <span class="ident">ruma</span>::{
     <span class="ident">api::client::r0</span>::{
+        <span class="ident">backup::add_backup_keys::Response</span> <span class="kw">as</span> <span class="ident">KeysBackupResponse</span>,
         <span class="ident">keys</span>::{<span class="ident">get_keys</span>, <span class="ident">upload_keys</span>, <span class="ident">upload_signing_keys::Request</span> <span class="kw">as</span> <span class="ident">UploadSigningKeysRequest</span>},
         <span class="ident">message::send_message_event</span>,
         <span class="ident">to_device::send_event_to_device</span>::{
@@ -2001,9 +2019,25 @@
                 <span class="kw">let</span> <span class="ident">response</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">send</span>(<span class="ident">request</span>.<span class="ident">clone</span>(), <span class="prelude-val">None</span>).<span class="kw">await</span><span class="question-mark">?</span>;
                 <span class="self">self</span>.<span class="ident">base_client</span>.<span class="ident">mark_request_as_sent</span>(<span class="ident">r</span>.<span class="ident">request_id</span>(), <span class="kw-2">&amp;</span><span class="ident">response</span>).<span class="kw">await</span><span class="question-mark">?</span>;
             }
+            <span class="ident">OutgoingRequests::KeysBackup</span>(<span class="ident">request</span>) =&gt; {
+                <span class="kw">let</span> <span class="ident">response</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">send_backup_request</span>(<span class="ident">request</span>).<span class="kw">await</span><span class="question-mark">?</span>;
+                <span class="self">self</span>.<span class="ident">base_client</span>.<span class="ident">mark_request_as_sent</span>(<span class="ident">r</span>.<span class="ident">request_id</span>(), <span class="kw-2">&amp;</span><span class="ident">response</span>).<span class="kw">await</span><span class="question-mark">?</span>;
+            }
         }
 
         <span class="prelude-val">Ok</span>(())
+    }
+
+    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">send_backup_request</span>(
+        <span class="kw-2">&amp;</span><span class="self">self</span>,
+        <span class="ident">request</span>: <span class="kw-2">&amp;</span><span class="ident">matrix_sdk_base::crypto::KeysBackupRequest</span>,
+    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">KeysBackupResponse</span><span class="op">&gt;</span> {
+        <span class="kw">let</span> <span class="ident">request</span> <span class="op">=</span> <span class="ident">ruma::api::client::r0::backup::add_backup_keys::Request::new</span>(
+            <span class="kw-2">&amp;</span><span class="ident">request</span>.<span class="ident">version</span>,
+            <span class="ident">request</span>.<span class="ident">rooms</span>.<span class="ident">to_owned</span>(),
+        );
+
+        <span class="prelude-val">Ok</span>(<span class="self">self</span>.<span class="ident">send</span>(<span class="ident">request</span>, <span class="prelude-val">None</span>).<span class="kw">await</span><span class="question-mark">?</span>)
     }
 
     <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">send_outgoing_requests</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
