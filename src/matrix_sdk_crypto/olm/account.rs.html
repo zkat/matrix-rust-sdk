@@ -1211,6 +1211,7 @@
 <span id="1211">1211</span>
 <span id="1212">1212</span>
 <span id="1213">1213</span>
+<span id="1214">1214</span>
 </pre><pre class="rust"><code><span class="comment">// Copyright 2020 The Matrix.org Foundation C.I.C.</span>
 <span class="comment">//</span>
 <span class="comment">// Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);</span>
@@ -2032,7 +2033,8 @@
     ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">SignatureUploadRequest</span>, <span class="ident">SignatureError</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">public_key</span> <span class="op">=</span>
             <span class="ident">master_key</span>.<span class="ident">get_first_key</span>().<span class="ident">ok_or</span>(<span class="ident">SignatureError::MissingSigningKey</span>)<span class="question-mark">?</span>.<span class="ident">to_string</span>();
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">cross_signing_key</span> <span class="op">=</span> <span class="ident">master_key</span>.<span class="ident">into</span>();
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">cross_signing_key</span>: <span class="ident">CrossSigningKey</span> <span class="op">=</span> <span class="ident">master_key</span>.<span class="ident">into</span>();
+        <span class="ident">cross_signing_key</span>.<span class="ident">signatures</span>.<span class="ident">clear</span>();
         <span class="self">self</span>.<span class="ident">sign_cross_signing_key</span>(<span class="kw-2">&amp;mut</span> <span class="ident">cross_signing_key</span>).<span class="kw">await</span><span class="question-mark">?</span>;
 
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">signed_keys</span> <span class="op">=</span> <span class="ident">BTreeMap::new</span>();
