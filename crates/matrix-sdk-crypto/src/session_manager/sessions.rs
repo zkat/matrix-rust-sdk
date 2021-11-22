@@ -262,7 +262,7 @@ impl SessionManager {
 
         for (user_id, user_devices) in &response.one_time_keys {
             for (device_id, key_map) in user_devices {
-                let device = match self.store.get_readonly_device(user_id, device_id).await {
+                let device = match self.store.get_readonly_device(user_id, &device_id).await {
                     Ok(Some(d)) => d,
                     Ok(None) => {
                         warn!(
@@ -285,7 +285,7 @@ impl SessionManager {
                     }
                 };
 
-                let session = match self.account.create_outbound_session(device, key_map).await {
+                let session = match self.account.create_outbound_session(device, &key_map).await {
                     Ok(s) => s,
                     Err(e) => {
                         warn!(
@@ -298,17 +298,17 @@ impl SessionManager {
                     }
                 };
 
-                changes.sessions.push(session);
-                new_sessions.entry(user_id).or_default().insert(device_id);
+                self.key_request_machine.retry_keyshare(user_id, &device_id);
 
-                self.key_request_machine.retry_keyshare(user_id, device_id);
-
-                if let Err(e) = self.check_if_unwedged(user_id, device_id).await {
+                if let Err(e) = self.check_if_unwedged(user_id, &device_id).await {
                     error!(
                         "Error while treating an unwedged device {} {} {:?}",
                         user_id, device_id, e
                     );
                 }
+
+                changes.sessions.push(session);
+                new_sessions.entry(user_id).or_default().insert(&device_id);
             }
         }
 
