@@ -3651,89 +3651,6 @@
 <span id="3651">3651</span>
 <span id="3652">3652</span>
 <span id="3653">3653</span>
-<span id="3654">3654</span>
-<span id="3655">3655</span>
-<span id="3656">3656</span>
-<span id="3657">3657</span>
-<span id="3658">3658</span>
-<span id="3659">3659</span>
-<span id="3660">3660</span>
-<span id="3661">3661</span>
-<span id="3662">3662</span>
-<span id="3663">3663</span>
-<span id="3664">3664</span>
-<span id="3665">3665</span>
-<span id="3666">3666</span>
-<span id="3667">3667</span>
-<span id="3668">3668</span>
-<span id="3669">3669</span>
-<span id="3670">3670</span>
-<span id="3671">3671</span>
-<span id="3672">3672</span>
-<span id="3673">3673</span>
-<span id="3674">3674</span>
-<span id="3675">3675</span>
-<span id="3676">3676</span>
-<span id="3677">3677</span>
-<span id="3678">3678</span>
-<span id="3679">3679</span>
-<span id="3680">3680</span>
-<span id="3681">3681</span>
-<span id="3682">3682</span>
-<span id="3683">3683</span>
-<span id="3684">3684</span>
-<span id="3685">3685</span>
-<span id="3686">3686</span>
-<span id="3687">3687</span>
-<span id="3688">3688</span>
-<span id="3689">3689</span>
-<span id="3690">3690</span>
-<span id="3691">3691</span>
-<span id="3692">3692</span>
-<span id="3693">3693</span>
-<span id="3694">3694</span>
-<span id="3695">3695</span>
-<span id="3696">3696</span>
-<span id="3697">3697</span>
-<span id="3698">3698</span>
-<span id="3699">3699</span>
-<span id="3700">3700</span>
-<span id="3701">3701</span>
-<span id="3702">3702</span>
-<span id="3703">3703</span>
-<span id="3704">3704</span>
-<span id="3705">3705</span>
-<span id="3706">3706</span>
-<span id="3707">3707</span>
-<span id="3708">3708</span>
-<span id="3709">3709</span>
-<span id="3710">3710</span>
-<span id="3711">3711</span>
-<span id="3712">3712</span>
-<span id="3713">3713</span>
-<span id="3714">3714</span>
-<span id="3715">3715</span>
-<span id="3716">3716</span>
-<span id="3717">3717</span>
-<span id="3718">3718</span>
-<span id="3719">3719</span>
-<span id="3720">3720</span>
-<span id="3721">3721</span>
-<span id="3722">3722</span>
-<span id="3723">3723</span>
-<span id="3724">3724</span>
-<span id="3725">3725</span>
-<span id="3726">3726</span>
-<span id="3727">3727</span>
-<span id="3728">3728</span>
-<span id="3729">3729</span>
-<span id="3730">3730</span>
-<span id="3731">3731</span>
-<span id="3732">3732</span>
-<span id="3733">3733</span>
-<span id="3734">3734</span>
-<span id="3735">3735</span>
-<span id="3736">3736</span>
 </pre><pre class="rust"><code><span class="comment">// Copyright 2020 Damir Jelić</span>
 <span class="comment">// Copyright 2020 The Matrix.org Foundation C.I.C.</span>
 <span class="comment">//</span>
@@ -3762,15 +3679,14 @@
 <span class="kw">use</span> <span class="ident">anymap2::any::CloneAnySendSync</span>;
 <span class="kw">use</span> <span class="ident">dashmap::DashMap</span>;
 <span class="kw">use</span> <span class="ident">futures_core::stream::Stream</span>;
-<span class="kw">use</span> <span class="ident">futures_timer::Delay</span> <span class="kw">as</span> <span class="ident">sleep</span>;
 <span class="kw">use</span> <span class="ident">matrix_sdk_base</span>::{
-    <span class="ident">deserialized_responses</span>::{<span class="ident">JoinedRoom</span>, <span class="ident">LeftRoom</span>, <span class="ident">SyncResponse</span>},
+    <span class="ident">deserialized_responses::SyncResponse</span>,
     <span class="ident">media</span>::{<span class="ident">MediaEventContent</span>, <span class="ident">MediaFormat</span>, <span class="ident">MediaRequest</span>, <span class="ident">MediaThumbnailSize</span>, <span class="ident">MediaType</span>},
     <span class="ident">BaseClient</span>, <span class="ident">Session</span>, <span class="ident">Store</span>,
 };
 <span class="kw">use</span> <span class="ident">matrix_sdk_common</span>::{
     <span class="ident">instant</span>::{<span class="ident">Duration</span>, <span class="ident">Instant</span>},
-    <span class="ident">locks</span>::{<span class="ident">Mutex</span>, <span class="ident">RwLock</span>},
+    <span class="ident">locks</span>::{<span class="ident">Mutex</span>, <span class="ident">RwLock</span>, <span class="ident">RwLockReadGuard</span>},
 };
 <span class="kw">use</span> <span class="ident">mime</span>::{<span class="self">self</span>, <span class="ident">Mime</span>};
 <span class="kw">use</span> <span class="ident">ruma</span>::{
@@ -3845,27 +3761,31 @@
 <span class="doccomment">/// All of the state is held in an `Arc` so the `Client` can be cloned freely.</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Client</span> {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">inner</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">ClientInner</span><span class="op">&gt;</span>,
+}
+
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct</span> <span class="ident">ClientInner</span> {
     <span class="doccomment">/// The URL of the homeserver to connect to.</span>
     <span class="ident">homeserver</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">RwLock</span><span class="op">&lt;</span><span class="ident">Url</span><span class="op">&gt;</span><span class="op">&gt;</span>,
     <span class="doccomment">/// The underlying HTTP client.</span>
     <span class="ident">http_client</span>: <span class="ident">HttpClient</span>,
     <span class="doccomment">/// User session data.</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">base_client</span>: <span class="ident">BaseClient</span>,
+    <span class="ident">base_client</span>: <span class="ident">BaseClient</span>,
     <span class="doccomment">/// Locks making sure we only have one group session sharing request in</span>
     <span class="doccomment">/// flight per room.</span>
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;encryption&quot;</span>)]</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">group_session_locks</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">DashMap</span><span class="op">&lt;</span><span class="ident">RoomId</span>, <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">Mutex</span><span class="op">&lt;</span>()<span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">group_session_locks</span>: <span class="ident">DashMap</span><span class="op">&lt;</span><span class="ident">RoomId</span>, <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">Mutex</span><span class="op">&lt;</span>()<span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span>,
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;encryption&quot;</span>)]</span>
     <span class="doccomment">/// Lock making sure we&#39;re only doing one key claim request at a time.</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">key_claim_lock</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">Mutex</span><span class="op">&lt;</span>()<span class="op">&gt;</span><span class="op">&gt;</span>,
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">members_request_locks</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">DashMap</span><span class="op">&lt;</span><span class="ident">RoomId</span>, <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">Mutex</span><span class="op">&lt;</span>()<span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">typing_notice_times</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">DashMap</span><span class="op">&lt;</span><span class="ident">RoomId</span>, <span class="ident">Instant</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">key_claim_lock</span>: <span class="ident">Mutex</span><span class="op">&lt;</span>()<span class="op">&gt;</span>,
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">members_request_locks</span>: <span class="ident">DashMap</span><span class="op">&lt;</span><span class="ident">RoomId</span>, <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">Mutex</span><span class="op">&lt;</span>()<span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">typing_notice_times</span>: <span class="ident">DashMap</span><span class="op">&lt;</span><span class="ident">RoomId</span>, <span class="ident">Instant</span><span class="op">&gt;</span>,
     <span class="doccomment">/// Event handlers. See `register_event_handler`.</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">event_handlers</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">RwLock</span><span class="op">&lt;</span><span class="ident">EventHandlerMap</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+    <span class="ident">event_handlers</span>: <span class="ident">RwLock</span><span class="op">&lt;</span><span class="ident">EventHandlerMap</span><span class="op">&gt;</span>,
     <span class="doccomment">/// Custom event handler context. See `register_event_handler_context`.</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">event_handler_data</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">StdRwLock</span><span class="op">&lt;</span><span class="ident">AnyMap</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+    <span class="ident">event_handler_data</span>: <span class="ident">StdRwLock</span><span class="op">&lt;</span><span class="ident">AnyMap</span><span class="op">&gt;</span>,
     <span class="doccomment">/// Notification handlers. See `register_notification_handler`.</span>
-    <span class="ident">notification_handlers</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">RwLock</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">NotificationHandlerFn</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+    <span class="ident">notification_handlers</span>: <span class="ident">RwLock</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">NotificationHandlerFn</span><span class="op">&gt;</span><span class="op">&gt;</span>,
     <span class="doccomment">/// Whether the client should operate in application service style mode.</span>
     <span class="doccomment">/// This is low-level functionality. For an high-level API check the</span>
     <span class="doccomment">/// `matrix_sdk_appservice` crate.</span>
@@ -3878,7 +3798,7 @@
     <span class="doccomment">/// synchronization, e.g. if we send out a request to create a room, we can</span>
     <span class="doccomment">/// wait for the sync to get the data to fetch a room object from the state</span>
     <span class="doccomment">/// store.</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">sync_beat</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">event_listener::Event</span><span class="op">&gt;</span>,
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">sync_beat</span>: <span class="ident">event_listener::Event</span>,
 }
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">tarpaulin_include</span>))]</span>
@@ -3922,7 +3842,7 @@
         <span class="kw">let</span> <span class="ident">http_client</span> <span class="op">=</span>
             <span class="ident">HttpClient::new</span>(<span class="ident">client</span>, <span class="ident">homeserver</span>.<span class="ident">clone</span>(), <span class="ident">session</span>, <span class="ident">config</span>.<span class="ident">request_config</span>);
 
-        <span class="prelude-val">Ok</span>(<span class="self">Self</span> {
+        <span class="kw">let</span> <span class="ident">inner</span> <span class="op">=</span> <span class="ident">Arc::new</span>(<span class="ident">ClientInner</span> {
             <span class="ident">homeserver</span>,
             <span class="ident">http_client</span>,
             <span class="ident">base_client</span>,
@@ -3937,8 +3857,10 @@
             <span class="ident">notification_handlers</span>: <span class="ident">Default::default</span>(),
             <span class="ident">appservice_mode</span>: <span class="ident">config</span>.<span class="ident">appservice_mode</span>,
             <span class="ident">use_discovery_response</span>: <span class="ident">config</span>.<span class="ident">use_discovery_response</span>,
-            <span class="ident">sync_beat</span>: <span class="ident">event_listener::Event::new</span>().<span class="ident">into</span>(),
-        })
+            <span class="ident">sync_beat</span>: <span class="ident">event_listener::Event::new</span>(),
+        });
+
+        <span class="prelude-val">Ok</span>(<span class="self">Self</span> { <span class="ident">inner</span> })
     }
 
     <span class="doccomment">/// Create a new [`Client`] using homeserver auto discovery.</span>
@@ -3962,12 +3884,12 @@
     <span class="doccomment">/// // First let&#39;s try to construct an user id, presumably from user input.</span>
     <span class="doccomment">/// let alice = UserId::try_from(&quot;@alice:example.org&quot;)?;</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// // Now let&#39;s try to discover the homeserver and create client object.</span>
+    <span class="doccomment">/// // Now let&#39;s try to discover the homeserver and create a client object.</span>
     <span class="doccomment">/// let client = Client::new_from_user_id(&amp;alice).await?;</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// // Finally let&#39;s try to login.</span>
     <span class="doccomment">/// client.login(alice, &quot;password&quot;, None, None).await?;</span>
-    <span class="doccomment">/// # matrix_sdk::Result::Ok(()) });</span>
+    <span class="doccomment">/// # Result::&lt;_, matrix_sdk::Error&gt;::Ok(()) });</span>
     <span class="doccomment">/// ```</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// [spec]: https://spec.matrix.org/unstable/client-server-api/#well-known-uri</span>
@@ -4004,6 +3926,24 @@
         <span class="prelude-val">Ok</span>(<span class="ident">client</span>)
     }
 
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">base_client</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">BaseClient</span> {
+        <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">base_client</span>
+    }
+
+    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;encryption&quot;</span>)]</span>
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">olm_machine</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">matrix_sdk_base::crypto::OlmMachine</span><span class="op">&gt;</span> {
+        <span class="self">self</span>.<span class="ident">base_client</span>().<span class="ident">olm_machine</span>().<span class="kw">await</span>
+    }
+
+    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;encryption&quot;</span>)]</span>
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">mark_request_as_sent</span>(
+        <span class="kw-2">&amp;</span><span class="self">self</span>,
+        <span class="ident">request_id</span>: <span class="kw-2">&amp;</span><span class="ident">matrix_sdk_base::uuid::Uuid</span>,
+        <span class="ident">response</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">matrix_sdk_base::crypto::IncomingResponse</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">matrix_sdk_base::Error</span><span class="op">&gt;</span> {
+        <span class="self">self</span>.<span class="ident">base_client</span>().<span class="ident">mark_request_as_sent</span>(<span class="ident">request_id</span>, <span class="ident">response</span>).<span class="kw">await</span>
+    }
+
     <span class="kw">fn</span> <span class="ident">homeserver_from_user_id</span>(<span class="ident">user_id</span>: <span class="kw-2">&amp;</span><span class="ident">UserId</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Url</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">homeserver</span> <span class="op">=</span> <span class="macro">format!</span>(<span class="string">&quot;https://{}&quot;</span>, <span class="ident">user_id</span>.<span class="ident">server_name</span>());
         <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">unused_mut</span>)]</span>
@@ -4026,7 +3966,7 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// * `homeserver_url` - The new URL to use.</span>
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">set_homeserver</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">homeserver_url</span>: <span class="ident">Url</span>) {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">homeserver</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">homeserver</span>.<span class="ident">write</span>().<span class="kw">await</span>;
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">homeserver</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">homeserver</span>.<span class="ident">write</span>().<span class="kw">await</span>;
         <span class="kw-2">*</span><span class="ident">homeserver</span> <span class="op">=</span> <span class="ident">homeserver_url</span>;
     }
 
@@ -4060,23 +4000,23 @@
 
     <span class="doccomment">/// Is the client logged in.</span>
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">logged_in</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">base_client</span>.<span class="ident">logged_in</span>().<span class="kw">await</span>
+        <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">base_client</span>.<span class="ident">logged_in</span>().<span class="kw">await</span>
     }
 
     <span class="doccomment">/// The Homeserver of the client.</span>
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">homeserver</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Url</span> {
-        <span class="self">self</span>.<span class="ident">homeserver</span>.<span class="ident">read</span>().<span class="kw">await</span>.<span class="ident">clone</span>()
+        <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">homeserver</span>.<span class="ident">read</span>().<span class="kw">await</span>.<span class="ident">clone</span>()
     }
 
     <span class="doccomment">/// Get the user id of the current owner of the client.</span>
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">user_id</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">UserId</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">session</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">base_client</span>.<span class="ident">session</span>().<span class="ident">read</span>().<span class="kw">await</span>;
+        <span class="kw">let</span> <span class="ident">session</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">base_client</span>.<span class="ident">session</span>().<span class="ident">read</span>().<span class="kw">await</span>;
         <span class="ident">session</span>.<span class="ident">as_ref</span>().<span class="ident">cloned</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">s</span><span class="op">|</span> <span class="ident">s</span>.<span class="ident">user_id</span>)
     }
 
     <span class="doccomment">/// Get the device id that identifies the current session.</span>
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">device_id</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">DeviceIdBox</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">session</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">base_client</span>.<span class="ident">session</span>().<span class="ident">read</span>().<span class="kw">await</span>;
+        <span class="kw">let</span> <span class="ident">session</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">base_client</span>.<span class="ident">session</span>().<span class="ident">read</span>().<span class="kw">await</span>;
         <span class="ident">session</span>.<span class="ident">as_ref</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">s</span><span class="op">|</span> <span class="ident">s</span>.<span class="ident">device_id</span>.<span class="ident">clone</span>())
     }
 
@@ -4087,7 +4027,7 @@
     <span class="doccomment">/// Can be used with [`Client::restore_login`] to restore a previously</span>
     <span class="doccomment">/// logged in session.</span>
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">session</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Session</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">base_client</span>.<span class="ident">session</span>().<span class="ident">read</span>().<span class="kw">await</span>.<span class="ident">clone</span>()
+        <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">base_client</span>.<span class="ident">session</span>().<span class="ident">read</span>().<span class="kw">await</span>.<span class="ident">clone</span>()
     }
 
     <span class="doccomment">/// Fetches the display name of the owner of the client.</span>
@@ -4205,7 +4145,7 @@
 
     <span class="doccomment">/// Get a reference to the store.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">store</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">Store</span> {
-        <span class="self">self</span>.<span class="ident">base_client</span>.<span class="ident">store</span>()
+        <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">base_client</span>.<span class="ident">store</span>()
     }
 
     <span class="doccomment">/// Sets the mxc avatar url of the client&#39;s owner. The avatar gets unset if</span>
@@ -4347,30 +4287,39 @@
         <span class="op">&lt;</span><span class="ident">H::Future</span> <span class="kw">as</span> <span class="ident">Future</span><span class="op">&gt;</span><span class="ident">::Output</span>: <span class="ident">EventHandlerResult</span>,
     {
         <span class="kw">let</span> <span class="ident">event_type</span> <span class="op">=</span> <span class="ident">H::ID</span>.<span class="number">1</span>;
-        <span class="self">self</span>.<span class="ident">event_handlers</span>.<span class="ident">write</span>().<span class="kw">await</span>.<span class="ident">entry</span>(<span class="ident">H::ID</span>).<span class="ident">or_default</span>().<span class="ident">push</span>(<span class="ident">Box::new</span>(<span class="kw">move</span> <span class="op">|</span><span class="ident">data</span><span class="op">|</span> {
-            <span class="kw">let</span> <span class="ident">maybe_fut</span> <span class="op">=</span> <span class="ident">serde_json::from_str</span>(<span class="ident">data</span>.<span class="ident">raw</span>.<span class="ident">get</span>())
-                .<span class="ident">map</span>(<span class="op">|</span><span class="ident">ev</span><span class="op">|</span> <span class="ident">handler</span>.<span class="ident">clone</span>().<span class="ident">handle_event</span>(<span class="ident">ev</span>, <span class="ident">data</span>));
+        <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">event_handlers</span>.<span class="ident">write</span>().<span class="kw">await</span>.<span class="ident">entry</span>(<span class="ident">H::ID</span>).<span class="ident">or_default</span>().<span class="ident">push</span>(<span class="ident">Box::new</span>(
+            <span class="kw">move</span> <span class="op">|</span><span class="ident">data</span><span class="op">|</span> {
+                <span class="kw">let</span> <span class="ident">maybe_fut</span> <span class="op">=</span> <span class="ident">serde_json::from_str</span>(<span class="ident">data</span>.<span class="ident">raw</span>.<span class="ident">get</span>())
+                    .<span class="ident">map</span>(<span class="op">|</span><span class="ident">ev</span><span class="op">|</span> <span class="ident">handler</span>.<span class="ident">clone</span>().<span class="ident">handle_event</span>(<span class="ident">ev</span>, <span class="ident">data</span>));
 
-            <span class="ident">Box::pin</span>(<span class="kw">async</span> <span class="kw">move</span> {
-                <span class="kw">match</span> <span class="ident">maybe_fut</span> {
-                    <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(<span class="ident">fut</span>)) =&gt; {
-                        <span class="ident">fut</span>.<span class="kw">await</span>.<span class="ident">print_error</span>(<span class="ident">event_type</span>);
-                    }
-                    <span class="prelude-val">Ok</span>(<span class="prelude-val">None</span>) =&gt; {
-                        <span class="macro">error!</span>(<span class="string">&quot;Event handler for {} has an invalid context argument&quot;</span>, <span class="ident">event_type</span>);
-                    }
-                    <span class="prelude-val">Err</span>(<span class="ident">e</span>) =&gt; {
-                        <span class="macro">warn!</span>(
-                            <span class="string">&quot;Failed to deserialize `{}` event, skipping event handler.\n\
+                <span class="ident">Box::pin</span>(<span class="kw">async</span> <span class="kw">move</span> {
+                    <span class="kw">match</span> <span class="ident">maybe_fut</span> {
+                        <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(<span class="ident">fut</span>)) =&gt; {
+                            <span class="ident">fut</span>.<span class="kw">await</span>.<span class="ident">print_error</span>(<span class="ident">event_type</span>);
+                        }
+                        <span class="prelude-val">Ok</span>(<span class="prelude-val">None</span>) =&gt; {
+                            <span class="macro">error!</span>(
+                                <span class="string">&quot;Event handler for {} has an invalid context argument&quot;</span>,
+                                <span class="ident">event_type</span>
+                            );
+                        }
+                        <span class="prelude-val">Err</span>(<span class="ident">e</span>) =&gt; {
+                            <span class="macro">warn!</span>(
+                                <span class="string">&quot;Failed to deserialize `{}` event, skipping event handler.\n\
                                  Deserialization error: {}&quot;</span>,
-                            <span class="ident">event_type</span>, <span class="ident">e</span>,
-                        );
+                                <span class="ident">event_type</span>, <span class="ident">e</span>,
+                            );
+                        }
                     }
-                }
-            })
-        }));
+                })
+            },
+        ));
 
         <span class="self">self</span>
+    }
+
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">event_handlers</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">RwLockReadGuard</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">EventHandlerMap</span><span class="op">&gt;</span> {
+        <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">event_handlers</span>.<span class="ident">read</span>().<span class="kw">await</span>
     }
 
     <span class="doccomment">/// Add an arbitrary value for use as event handler context.</span>
@@ -4414,8 +4363,16 @@
     <span class="kw">where</span>
         <span class="ident">T</span>: <span class="ident">Clone</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
     {
-        <span class="self">self</span>.<span class="ident">event_handler_data</span>.<span class="ident">write</span>().<span class="ident">unwrap</span>().<span class="ident">insert</span>(<span class="ident">ctx</span>);
+        <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">event_handler_data</span>.<span class="ident">write</span>().<span class="ident">unwrap</span>().<span class="ident">insert</span>(<span class="ident">ctx</span>);
         <span class="self">self</span>
+    }
+
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">event_handler_context</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>
+    <span class="kw">where</span>
+        <span class="ident">T</span>: <span class="ident">Clone</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
+    {
+        <span class="kw">let</span> <span class="ident">map</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">event_handler_data</span>.<span class="ident">read</span>().<span class="ident">unwrap</span>();
+        <span class="ident">map</span>.<span class="ident">get</span>::<span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>().<span class="ident">cloned</span>()
     }
 
     <span class="doccomment">/// Register a handler for a notification.</span>
@@ -4428,11 +4385,17 @@
         <span class="ident">H</span>: <span class="ident">Fn</span>(<span class="ident">Notification</span>, <span class="ident">room::Room</span>, <span class="ident">Client</span>) -&gt; <span class="ident">Fut</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
         <span class="ident">Fut</span>: <span class="ident">Future</span><span class="op">&lt;</span><span class="ident">Output</span> <span class="op">=</span> ()<span class="op">&gt;</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
     {
-        <span class="self">self</span>.<span class="ident">notification_handlers</span>.<span class="ident">write</span>().<span class="kw">await</span>.<span class="ident">push</span>(<span class="ident">Box::new</span>(
+        <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">notification_handlers</span>.<span class="ident">write</span>().<span class="kw">await</span>.<span class="ident">push</span>(<span class="ident">Box::new</span>(
             <span class="kw">move</span> <span class="op">|</span><span class="ident">notification</span>, <span class="ident">room</span>, <span class="ident">client</span><span class="op">|</span> <span class="ident">Box::pin</span>((<span class="ident">handler</span>)(<span class="ident">notification</span>, <span class="ident">room</span>, <span class="ident">client</span>)),
         ));
 
         <span class="self">self</span>
+    }
+
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">notification_handlers</span>(
+        <span class="kw-2">&amp;</span><span class="self">self</span>,
+    ) -&gt; <span class="ident">RwLockReadGuard</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">NotificationHandlerFn</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+        <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">notification_handlers</span>.<span class="ident">read</span>().<span class="kw">await</span>
     }
 
     <span class="doccomment">/// Get all the rooms the client knows about.</span>
@@ -4585,7 +4548,7 @@
     <span class="doccomment">///     &quot;Logged in as {}, got device_id {} and access_token {}&quot;,</span>
     <span class="doccomment">///     user, response.device_id, response.access_token</span>
     <span class="doccomment">/// );</span>
-    <span class="doccomment">/// # matrix_sdk::Result::Ok(()) });</span>
+    <span class="doccomment">/// # Result::&lt;_, matrix_sdk::Error&gt;::Ok(()) });</span>
     <span class="doccomment">/// ```</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// [`restore_login`]: #method.restore_login</span>
@@ -4902,7 +4865,7 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// * `response` - A successful login response.</span>
     <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">receive_login_response</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">response</span>: <span class="kw-2">&amp;</span><span class="ident">login::Response</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">use_discovery_response</span> {
+        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">use_discovery_response</span> {
             <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">well_known</span>) <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">response</span>.<span class="ident">well_known</span> {
                 <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Ok</span>(<span class="ident">homeserver</span>) <span class="op">=</span> <span class="ident">Url::parse</span>(<span class="kw-2">&amp;</span><span class="ident">well_known</span>.<span class="ident">homeserver</span>.<span class="ident">base_url</span>) {
                     <span class="self">self</span>.<span class="ident">set_homeserver</span>(<span class="ident">homeserver</span>).<span class="kw">await</span>;
@@ -4910,7 +4873,7 @@
             }
         }
 
-        <span class="self">self</span>.<span class="ident">base_client</span>.<span class="ident">receive_login_response</span>(<span class="ident">response</span>).<span class="kw">await</span><span class="question-mark">?</span>;
+        <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">base_client</span>.<span class="ident">receive_login_response</span>(<span class="ident">response</span>).<span class="kw">await</span><span class="question-mark">?</span>;
 
         <span class="prelude-val">Ok</span>(())
     }
@@ -4973,7 +4936,7 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// [`login`]: #method.login</span>
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">restore_login</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">session</span>: <span class="ident">Session</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-        <span class="prelude-val">Ok</span>(<span class="self">self</span>.<span class="ident">base_client</span>.<span class="ident">restore_login</span>(<span class="ident">session</span>).<span class="kw">await</span><span class="question-mark">?</span>)
+        <span class="prelude-val">Ok</span>(<span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">base_client</span>.<span class="ident">restore_login</span>(<span class="ident">session</span>).<span class="kw">await</span><span class="question-mark">?</span>)
     }
 
     <span class="doccomment">/// Register a user to the server.</span>
@@ -5020,8 +4983,8 @@
         <span class="kw">let</span> <span class="ident">homeserver</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">homeserver</span>().<span class="kw">await</span>;
         <span class="macro">info!</span>(<span class="string">&quot;Registering to {}&quot;</span>, <span class="ident">homeserver</span>);
 
-        <span class="kw">let</span> <span class="ident">config</span> <span class="op">=</span> <span class="kw">if</span> <span class="self">self</span>.<span class="ident">appservice_mode</span> {
-            <span class="prelude-val">Some</span>(<span class="self">self</span>.<span class="ident">http_client</span>.<span class="ident">request_config</span>.<span class="ident">force_auth</span>())
+        <span class="kw">let</span> <span class="ident">config</span> <span class="op">=</span> <span class="kw">if</span> <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">appservice_mode</span> {
+            <span class="prelude-val">Some</span>(<span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">http_client</span>.<span class="ident">request_config</span>.<span class="ident">force_auth</span>())
         } <span class="kw">else</span> {
             <span class="prelude-val">None</span>
         };
@@ -5086,14 +5049,14 @@
         <span class="ident">filter_name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>,
         <span class="ident">definition</span>: <span class="ident">FilterDefinition</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>,
     ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span> {
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">filter</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">base_client</span>.<span class="ident">get_filter</span>(<span class="ident">filter_name</span>).<span class="kw">await</span><span class="question-mark">?</span> {
+        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">filter</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">base_client</span>.<span class="ident">get_filter</span>(<span class="ident">filter_name</span>).<span class="kw">await</span><span class="question-mark">?</span> {
             <span class="prelude-val">Ok</span>(<span class="ident">filter</span>)
         } <span class="kw">else</span> {
             <span class="kw">let</span> <span class="ident">user_id</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">user_id</span>().<span class="kw">await</span>.<span class="ident">ok_or</span>(<span class="ident">Error::AuthenticationRequired</span>)<span class="question-mark">?</span>;
             <span class="kw">let</span> <span class="ident">request</span> <span class="op">=</span> <span class="ident">FilterUploadRequest::new</span>(<span class="kw-2">&amp;</span><span class="ident">user_id</span>, <span class="ident">definition</span>);
             <span class="kw">let</span> <span class="ident">response</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">send</span>(<span class="ident">request</span>, <span class="prelude-val">None</span>).<span class="kw">await</span><span class="question-mark">?</span>;
 
-            <span class="self">self</span>.<span class="ident">base_client</span>.<span class="ident">receive_filter_upload</span>(<span class="ident">filter_name</span>, <span class="kw-2">&amp;</span><span class="ident">response</span>).<span class="kw">await</span><span class="question-mark">?</span>;
+            <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">base_client</span>.<span class="ident">receive_filter_upload</span>(<span class="ident">filter_name</span>, <span class="kw-2">&amp;</span><span class="ident">response</span>).<span class="kw">await</span><span class="question-mark">?</span>;
 
             <span class="prelude-val">Ok</span>(<span class="ident">response</span>.<span class="ident">filter_id</span>)
         }
@@ -5247,7 +5210,7 @@
     <span class="doccomment">/// for room in response.chunk {</span>
     <span class="doccomment">///     println!(&quot;Found room {:?}&quot;, room);</span>
     <span class="doccomment">/// }</span>
-    <span class="doccomment">/// # matrix_sdk::Result::Ok(()) });</span>
+    <span class="doccomment">/// # Result::&lt;_, matrix_sdk::Error&gt;::Ok(()) });</span>
     <span class="doccomment">/// ```</span>
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">public_rooms_filtered</span>(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
@@ -5305,8 +5268,8 @@
             <span class="ident">content_type</span>: <span class="prelude-val">Some</span>(<span class="ident">content_type</span>.<span class="ident">essence_str</span>()),
         });
 
-        <span class="kw">let</span> <span class="ident">request_config</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">http_client</span>.<span class="ident">request_config</span>.<span class="ident">timeout</span>(<span class="ident">timeout</span>);
-        <span class="prelude-val">Ok</span>(<span class="self">self</span>.<span class="ident">http_client</span>.<span class="ident">upload</span>(<span class="ident">request</span>, <span class="prelude-val">Some</span>(<span class="ident">request_config</span>)).<span class="kw">await</span><span class="question-mark">?</span>)
+        <span class="kw">let</span> <span class="ident">request_config</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">http_client</span>.<span class="ident">request_config</span>.<span class="ident">timeout</span>(<span class="ident">timeout</span>);
+        <span class="prelude-val">Ok</span>(<span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">http_client</span>.<span class="ident">upload</span>(<span class="ident">request</span>, <span class="prelude-val">Some</span>(<span class="ident">request_config</span>)).<span class="kw">await</span><span class="question-mark">?</span>)
     }
 
     <span class="doccomment">/// Send an arbitrary request to the server, without updating client state.</span>
@@ -5347,7 +5310,7 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// // Check the corresponding Response struct to find out what types are</span>
     <span class="doccomment">/// // returned</span>
-    <span class="doccomment">/// # matrix_sdk::Result::Ok(()) });</span>
+    <span class="doccomment">/// # Result::&lt;_, matrix_sdk::Error&gt;::Ok(()) });</span>
     <span class="doccomment">/// ```</span>
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">send</span><span class="op">&lt;</span><span class="ident">Request</span><span class="op">&gt;</span>(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
@@ -5358,7 +5321,7 @@
         <span class="ident">Request</span>: <span class="ident">OutgoingRequest</span> <span class="op">+</span> <span class="ident">Debug</span>,
         <span class="ident">HttpError</span>: <span class="ident">From</span><span class="op">&lt;</span><span class="ident">FromHttpResponseError</span><span class="op">&lt;</span><span class="ident">Request::EndpointError</span><span class="op">&gt;</span><span class="op">&gt;</span>,
     {
-        <span class="prelude-val">Ok</span>(<span class="self">self</span>.<span class="ident">http_client</span>.<span class="ident">send</span>(<span class="ident">request</span>, <span class="ident">config</span>).<span class="kw">await</span><span class="question-mark">?</span>)
+        <span class="prelude-val">Ok</span>(<span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">http_client</span>.<span class="ident">send</span>(<span class="ident">request</span>, <span class="ident">config</span>).<span class="kw">await</span><span class="question-mark">?</span>)
     }
 
     <span class="doccomment">/// Get information of all our own devices.</span>
@@ -5382,7 +5345,7 @@
     <span class="doccomment">///         device.display_name.as_deref().unwrap_or(&quot;&quot;)</span>
     <span class="doccomment">///     );</span>
     <span class="doccomment">/// }</span>
-    <span class="doccomment">/// # matrix_sdk::Result::Ok(()) });</span>
+    <span class="doccomment">/// # Result::&lt;_, matrix_sdk::Error&gt;::Ok(()) });</span>
     <span class="doccomment">/// ```</span>
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">devices</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">HttpResult</span><span class="op">&lt;</span><span class="ident">get_devices::Response</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">request</span> <span class="op">=</span> <span class="ident">get_devices::Request::new</span>();
@@ -5435,7 +5398,7 @@
     <span class="doccomment">///             .await?;</span>
     <span class="doccomment">///     }</span>
     <span class="doccomment">/// }</span>
-    <span class="doccomment">/// # matrix_sdk::Result::Ok(()) });</span>
+    <span class="doccomment">/// # Result::&lt;_, matrix_sdk::Error&gt;::Ok(()) });</span>
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">delete_devices</span>(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         <span class="ident">devices</span>: <span class="kw-2">&amp;</span>[<span class="ident">DeviceIdBox</span>],
@@ -5445,135 +5408,6 @@
         <span class="ident">request</span>.<span class="ident">auth</span> <span class="op">=</span> <span class="ident">auth_data</span>;
 
         <span class="self">self</span>.<span class="ident">send</span>(<span class="ident">request</span>, <span class="prelude-val">None</span>).<span class="kw">await</span>
-    }
-
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">process_sync</span>(
-        <span class="kw-2">&amp;</span><span class="self">self</span>,
-        <span class="ident">response</span>: <span class="ident">sync_events::Response</span>,
-    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">SyncResponse</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">response</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">base_client</span>.<span class="ident">receive_sync_response</span>(<span class="ident">response</span>).<span class="kw">await</span><span class="question-mark">?</span>;
-        <span class="kw">let</span> <span class="ident">SyncResponse</span> {
-            <span class="ident">next_batch</span>: <span class="kw">_</span>,
-            <span class="ident">rooms</span>,
-            <span class="ident">presence</span>,
-            <span class="ident">account_data</span>,
-            <span class="ident">to_device</span>: <span class="kw">_</span>,
-            <span class="ident">device_lists</span>: <span class="kw">_</span>,
-            <span class="ident">device_one_time_keys_count</span>: <span class="kw">_</span>,
-            <span class="ident">ambiguity_changes</span>: <span class="kw">_</span>,
-            <span class="ident">notifications</span>,
-        } <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">response</span>;
-
-        <span class="self">self</span>.<span class="ident">handle_sync_events</span>(<span class="ident">EventKind::GlobalAccountData</span>, <span class="kw-2">&amp;</span><span class="prelude-val">None</span>, <span class="kw-2">&amp;</span><span class="ident">account_data</span>.<span class="ident">events</span>).<span class="kw">await</span><span class="question-mark">?</span>;
-        <span class="self">self</span>.<span class="ident">handle_sync_events</span>(<span class="ident">EventKind::Presence</span>, <span class="kw-2">&amp;</span><span class="prelude-val">None</span>, <span class="kw-2">&amp;</span><span class="ident">presence</span>.<span class="ident">events</span>).<span class="kw">await</span><span class="question-mark">?</span>;
-
-        <span class="kw">for</span> (<span class="ident">room_id</span>, <span class="ident">room_info</span>) <span class="kw">in</span> <span class="kw-2">&amp;</span><span class="ident">rooms</span>.<span class="ident">join</span> {
-            <span class="kw">let</span> <span class="ident">room</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">get_room</span>(<span class="ident">room_id</span>);
-            <span class="kw">if</span> <span class="ident">room</span>.<span class="ident">is_none</span>() {
-                <span class="macro">error!</span>(<span class="string">&quot;Can&#39;t call event handler, room {} not found&quot;</span>, <span class="ident">room_id</span>);
-                <span class="kw">continue</span>;
-            }
-
-            <span class="kw">let</span> <span class="ident">JoinedRoom</span> { <span class="ident">unread_notifications</span>: <span class="kw">_</span>, <span class="ident">timeline</span>, <span class="ident">state</span>, <span class="ident">account_data</span>, <span class="ident">ephemeral</span> } <span class="op">=</span>
-                <span class="ident">room_info</span>;
-
-            <span class="self">self</span>.<span class="ident">handle_sync_events</span>(<span class="ident">EventKind::EphemeralRoomData</span>, <span class="kw-2">&amp;</span><span class="ident">room</span>, <span class="kw-2">&amp;</span><span class="ident">ephemeral</span>.<span class="ident">events</span>).<span class="kw">await</span><span class="question-mark">?</span>;
-            <span class="self">self</span>.<span class="ident">handle_sync_events</span>(<span class="ident">EventKind::RoomAccountData</span>, <span class="kw-2">&amp;</span><span class="ident">room</span>, <span class="kw-2">&amp;</span><span class="ident">account_data</span>.<span class="ident">events</span>)
-                .<span class="kw">await</span><span class="question-mark">?</span>;
-            <span class="self">self</span>.<span class="ident">handle_sync_state_events</span>(<span class="kw-2">&amp;</span><span class="ident">room</span>, <span class="kw-2">&amp;</span><span class="ident">state</span>.<span class="ident">events</span>).<span class="kw">await</span><span class="question-mark">?</span>;
-            <span class="self">self</span>.<span class="ident">handle_sync_timeline_events</span>(<span class="kw-2">&amp;</span><span class="ident">room</span>, <span class="kw-2">&amp;</span><span class="ident">timeline</span>.<span class="ident">events</span>).<span class="kw">await</span><span class="question-mark">?</span>;
-        }
-
-        <span class="kw">for</span> (<span class="ident">room_id</span>, <span class="ident">room_info</span>) <span class="kw">in</span> <span class="kw-2">&amp;</span><span class="ident">rooms</span>.<span class="ident">leave</span> {
-            <span class="kw">let</span> <span class="ident">room</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">get_room</span>(<span class="ident">room_id</span>);
-            <span class="kw">if</span> <span class="ident">room</span>.<span class="ident">is_none</span>() {
-                <span class="macro">error!</span>(<span class="string">&quot;Can&#39;t call event handler, room {} not found&quot;</span>, <span class="ident">room_id</span>);
-                <span class="kw">continue</span>;
-            }
-
-            <span class="kw">let</span> <span class="ident">LeftRoom</span> { <span class="ident">timeline</span>, <span class="ident">state</span>, <span class="ident">account_data</span> } <span class="op">=</span> <span class="ident">room_info</span>;
-
-            <span class="self">self</span>.<span class="ident">handle_sync_events</span>(<span class="ident">EventKind::RoomAccountData</span>, <span class="kw-2">&amp;</span><span class="ident">room</span>, <span class="kw-2">&amp;</span><span class="ident">account_data</span>.<span class="ident">events</span>)
-                .<span class="kw">await</span><span class="question-mark">?</span>;
-            <span class="self">self</span>.<span class="ident">handle_sync_state_events</span>(<span class="kw-2">&amp;</span><span class="ident">room</span>, <span class="kw-2">&amp;</span><span class="ident">state</span>.<span class="ident">events</span>).<span class="kw">await</span><span class="question-mark">?</span>;
-            <span class="self">self</span>.<span class="ident">handle_sync_timeline_events</span>(<span class="kw-2">&amp;</span><span class="ident">room</span>, <span class="kw-2">&amp;</span><span class="ident">timeline</span>.<span class="ident">events</span>).<span class="kw">await</span><span class="question-mark">?</span>;
-        }
-
-        <span class="kw">for</span> (<span class="ident">room_id</span>, <span class="ident">room_info</span>) <span class="kw">in</span> <span class="kw-2">&amp;</span><span class="ident">rooms</span>.<span class="ident">invite</span> {
-            <span class="kw">let</span> <span class="ident">room</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">get_room</span>(<span class="ident">room_id</span>);
-            <span class="kw">if</span> <span class="ident">room</span>.<span class="ident">is_none</span>() {
-                <span class="macro">error!</span>(<span class="string">&quot;Can&#39;t call event handler, room {} not found&quot;</span>, <span class="ident">room_id</span>);
-                <span class="kw">continue</span>;
-            }
-
-            <span class="comment">// FIXME: Destructure room_info</span>
-            <span class="self">self</span>.<span class="ident">handle_sync_events</span>(
-                <span class="ident">EventKind::StrippedState</span>,
-                <span class="kw-2">&amp;</span><span class="ident">room</span>,
-                <span class="kw-2">&amp;</span><span class="ident">room_info</span>.<span class="ident">invite_state</span>.<span class="ident">events</span>,
-            )
-            .<span class="kw">await</span><span class="question-mark">?</span>;
-        }
-
-        <span class="comment">// Construct notification event handler futures</span>
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">futures</span> <span class="op">=</span> <span class="ident">Vec::new</span>();
-        <span class="kw">for</span> <span class="ident">handler</span> <span class="kw">in</span> <span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="self">self</span>.<span class="ident">notification_handlers</span>.<span class="ident">read</span>().<span class="kw">await</span> {
-            <span class="kw">for</span> (<span class="ident">room_id</span>, <span class="ident">room_notifications</span>) <span class="kw">in</span> <span class="ident">notifications</span> {
-                <span class="kw">let</span> <span class="ident">room</span> <span class="op">=</span> <span class="kw">match</span> <span class="self">self</span>.<span class="ident">get_room</span>(<span class="ident">room_id</span>) {
-                    <span class="prelude-val">Some</span>(<span class="ident">room</span>) =&gt; <span class="ident">room</span>,
-                    <span class="prelude-val">None</span> =&gt; {
-                        <span class="macro">warn!</span>(<span class="string">&quot;Can&#39;t call notification handler, room {} not found&quot;</span>, <span class="ident">room_id</span>);
-                        <span class="kw">continue</span>;
-                    }
-                };
-
-                <span class="ident">futures</span>.<span class="ident">extend</span>(<span class="ident">room_notifications</span>.<span class="ident">iter</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">notification</span><span class="op">|</span> {
-                    (<span class="ident">handler</span>)(<span class="ident">notification</span>.<span class="ident">clone</span>(), <span class="ident">room</span>.<span class="ident">clone</span>(), <span class="self">self</span>.<span class="ident">clone</span>())
-                }));
-            }
-        }
-
-        <span class="comment">// Run the notification handler futures with the</span>
-        <span class="comment">// `self.notification_handlers` lock no longer being held, in order.</span>
-        <span class="kw">for</span> <span class="ident">fut</span> <span class="kw">in</span> <span class="ident">futures</span> {
-            <span class="ident">fut</span>.<span class="kw">await</span>;
-        }
-
-        <span class="prelude-val">Ok</span>(<span class="ident">response</span>)
-    }
-
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">sync_loop_helper</span>(
-        <span class="kw-2">&amp;</span><span class="self">self</span>,
-        <span class="ident">sync_settings</span>: <span class="kw-2">&amp;mut</span> <span class="ident"><span class="kw">crate</span>::config::SyncSettings</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>,
-    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">SyncResponse</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">response</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">sync_once</span>(<span class="ident">sync_settings</span>.<span class="ident">clone</span>()).<span class="kw">await</span>;
-
-        <span class="kw">match</span> <span class="ident">response</span> {
-            <span class="prelude-val">Ok</span>(<span class="ident">r</span>) =&gt; {
-                <span class="ident">sync_settings</span>.<span class="ident">token</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">r</span>.<span class="ident">next_batch</span>.<span class="ident">clone</span>());
-                <span class="prelude-val">Ok</span>(<span class="ident">r</span>)
-            }
-            <span class="prelude-val">Err</span>(<span class="ident">e</span>) =&gt; {
-                <span class="macro">error!</span>(<span class="string">&quot;Received an invalid response: {}&quot;</span>, <span class="ident">e</span>);
-                <span class="ident">sleep::new</span>(<span class="ident">Duration::from_secs</span>(<span class="number">1</span>)).<span class="kw">await</span>;
-                <span class="prelude-val">Err</span>(<span class="ident">e</span>)
-            }
-        }
-    }
-
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">delay_sync</span>(<span class="ident">last_sync_time</span>: <span class="kw-2">&amp;mut</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Instant</span><span class="op">&gt;</span>) {
-        <span class="kw">let</span> <span class="ident">now</span> <span class="op">=</span> <span class="ident">Instant::now</span>();
-
-        <span class="comment">// If the last sync happened less than a second ago, sleep for a</span>
-        <span class="comment">// while to not hammer out requests if the server doesn&#39;t respect</span>
-        <span class="comment">// the sync timeout.</span>
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">t</span>) <span class="op">=</span> <span class="ident">last_sync_time</span> {
-            <span class="kw">if</span> <span class="ident">now</span> <span class="op">-</span> <span class="kw-2">*</span><span class="ident">t</span> <span class="op">&lt;</span><span class="op">=</span> <span class="ident">Duration::from_secs</span>(<span class="number">1</span>) {
-                <span class="ident">sleep::new</span>(<span class="ident">Duration::from_secs</span>(<span class="number">1</span>)).<span class="kw">await</span>;
-            }
-        }
-
-        <span class="kw-2">*</span><span class="ident">last_sync_time</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">now</span>);
     }
 
     <span class="doccomment">/// Synchronize the client&#39;s state with the latest state on the server.</span>
@@ -5653,7 +5487,7 @@
     <span class="doccomment">/// // Now keep on syncing forever. `sync()` will use the stored sync token</span>
     <span class="doccomment">/// // from our `sync_once()` call automatically.</span>
     <span class="doccomment">/// client.sync(SyncSettings::default()).await;</span>
-    <span class="doccomment">/// # matrix_sdk::Result::Ok(()) });</span>
+    <span class="doccomment">/// # Result::&lt;_, matrix_sdk::Error&gt;::Ok(()) });</span>
     <span class="doccomment">/// ```</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// [`sync`]: #method.sync</span>
@@ -5680,9 +5514,9 @@
             <span class="ident">timeout</span>: <span class="ident">sync_settings</span>.<span class="ident">timeout</span>,
         });
 
-        <span class="kw">let</span> <span class="ident">request_config</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">http_client</span>.<span class="ident">request_config</span>.<span class="ident">timeout</span>(
+        <span class="kw">let</span> <span class="ident">request_config</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">http_client</span>.<span class="ident">request_config</span>.<span class="ident">timeout</span>(
             <span class="ident">sync_settings</span>.<span class="ident">timeout</span>.<span class="ident">unwrap_or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">Duration::from_secs</span>(<span class="number">0</span>))
-                <span class="op">+</span> <span class="self">self</span>.<span class="ident">http_client</span>.<span class="ident">request_config</span>.<span class="ident">timeout</span>,
+                <span class="op">+</span> <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">http_client</span>.<span class="ident">request_config</span>.<span class="ident">timeout</span>,
         );
 
         <span class="kw">let</span> <span class="ident">response</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">send</span>(<span class="ident">request</span>, <span class="prelude-val">Some</span>(<span class="ident">request_config</span>)).<span class="kw">await</span><span class="question-mark">?</span>;
@@ -5693,7 +5527,7 @@
             <span class="macro">error!</span>(<span class="ident">error</span> <span class="op">=</span><span class="question-mark">?</span> <span class="ident">e</span>, <span class="string">&quot;Error while sending outgoing E2EE requests&quot;</span>);
         };
 
-        <span class="self">self</span>.<span class="ident">sync_beat</span>.<span class="ident">notify</span>(<span class="ident">usize::MAX</span>);
+        <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">sync_beat</span>.<span class="ident">notify</span>(<span class="ident">usize::MAX</span>);
 
         <span class="prelude-val">Ok</span>(<span class="ident">response</span>)
     }
@@ -5744,7 +5578,7 @@
     <span class="doccomment">/// // Now keep on syncing forever. `sync()` will use the latest sync token</span>
     <span class="doccomment">/// // automatically.</span>
     <span class="doccomment">/// client.sync(SyncSettings::default()).await;</span>
-    <span class="doccomment">/// # matrix_sdk::Result::Ok(()) });</span>
+    <span class="doccomment">/// # Result::&lt;_, matrix_sdk::Error&gt;::Ok(()) });</span>
     <span class="doccomment">/// ```</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// [argument docs]: #method.sync_once</span>
@@ -5873,7 +5707,7 @@
     <span class="doccomment">///     }</span>
     <span class="doccomment">/// }</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// # matrix_sdk::Result::Ok(()) });</span>
+    <span class="doccomment">/// # Result::&lt;_, matrix_sdk::Error&gt;::Ok(()) });</span>
     <span class="doccomment">/// ```</span>
     <span class="attribute">#[<span class="ident">instrument</span>]</span>
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">sync_stream</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(
@@ -5898,7 +5732,7 @@
     <span class="doccomment">/// Get the current, if any, sync token of the client.</span>
     <span class="doccomment">/// This will be None if the client didn&#39;t sync at least once.</span>
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">sync_token</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">base_client</span>.<span class="ident">sync_token</span>().<span class="kw">await</span>
+        <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">base_client</span>.<span class="ident">sync_token</span>().<span class="kw">await</span>
     }
 
     <span class="doccomment">/// Get a media file&#39;s content.</span>
@@ -5917,7 +5751,7 @@
         <span class="ident">use_cache</span>: <span class="ident">bool</span>,
     ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">content</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">use_cache</span> {
-            <span class="self">self</span>.<span class="ident">base_client</span>.<span class="ident">store</span>().<span class="ident">get_media_content</span>(<span class="ident">request</span>).<span class="kw">await</span><span class="question-mark">?</span>
+            <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">base_client</span>.<span class="ident">store</span>().<span class="ident">get_media_content</span>(<span class="ident">request</span>).<span class="kw">await</span><span class="question-mark">?</span>
         } <span class="kw">else</span> {
             <span class="prelude-val">None</span>
         };
@@ -5961,7 +5795,7 @@
             };
 
             <span class="kw">if</span> <span class="ident">use_cache</span> {
-                <span class="self">self</span>.<span class="ident">base_client</span>.<span class="ident">store</span>().<span class="ident">add_media_content</span>(<span class="ident">request</span>, <span class="ident">content</span>.<span class="ident">clone</span>()).<span class="kw">await</span><span class="question-mark">?</span>;
+                <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">base_client</span>.<span class="ident">store</span>().<span class="ident">add_media_content</span>(<span class="ident">request</span>, <span class="ident">content</span>.<span class="ident">clone</span>()).<span class="kw">await</span><span class="question-mark">?</span>;
             }
 
             <span class="prelude-val">Ok</span>(<span class="ident">content</span>)
@@ -5974,7 +5808,7 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// * `request` - The `MediaRequest` of the content.</span>
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">remove_media_content</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">request</span>: <span class="kw-2">&amp;</span><span class="ident">MediaRequest</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-        <span class="prelude-val">Ok</span>(<span class="self">self</span>.<span class="ident">base_client</span>.<span class="ident">store</span>().<span class="ident">remove_media_content</span>(<span class="ident">request</span>).<span class="kw">await</span><span class="question-mark">?</span>)
+        <span class="prelude-val">Ok</span>(<span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">base_client</span>.<span class="ident">store</span>().<span class="ident">remove_media_content</span>(<span class="ident">request</span>).<span class="kw">await</span><span class="question-mark">?</span>)
     }
 
     <span class="doccomment">/// Delete all the media content corresponding to the given</span>
@@ -5984,7 +5818,7 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// * `uri` - The `MxcUri` of the files.</span>
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">remove_media_content_for_uri</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">uri</span>: <span class="kw-2">&amp;</span><span class="ident">MxcUri</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-        <span class="prelude-val">Ok</span>(<span class="self">self</span>.<span class="ident">base_client</span>.<span class="ident">store</span>().<span class="ident">remove_media_content_for_uri</span>(<span class="ident">uri</span>).<span class="kw">await</span><span class="question-mark">?</span>)
+        <span class="prelude-val">Ok</span>(<span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">base_client</span>.<span class="ident">store</span>().<span class="ident">remove_media_content_for_uri</span>(<span class="ident">uri</span>).<span class="kw">await</span><span class="question-mark">?</span>)
     }
 
     <span class="doccomment">/// Get the file of the given media event content.</span>
@@ -6503,7 +6337,7 @@
             .<span class="ident">add_state_event</span>(<span class="ident">EventsJson::PowerLevels</span>)
             .<span class="ident">build_sync_response</span>();
 
-        <span class="ident">client</span>.<span class="ident">base_client</span>.<span class="ident">receive_sync_response</span>(<span class="ident">response</span>).<span class="kw">await</span>.<span class="ident">unwrap</span>();
+        <span class="ident">client</span>.<span class="ident">inner</span>.<span class="ident">base_client</span>.<span class="ident">receive_sync_response</span>(<span class="ident">response</span>).<span class="kw">await</span>.<span class="ident">unwrap</span>();
         <span class="kw">let</span> <span class="ident">room_id</span> <span class="op">=</span> <span class="macro">room_id!</span>(<span class="string">&quot;!SVkFJHzfwvuaIEawgC:localhost&quot;</span>);
 
         <span class="macro">assert_eq!</span>(<span class="ident">client</span>.<span class="ident">homeserver</span>().<span class="kw">await</span>, <span class="ident">Url::parse</span>(<span class="kw-2">&amp;</span><span class="ident">mockito::server_url</span>()).<span class="ident">unwrap</span>());

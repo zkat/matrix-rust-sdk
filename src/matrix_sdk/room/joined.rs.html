@@ -854,6 +854,10 @@
 <span id="854">854</span>
 <span id="855">855</span>
 <span id="856">856</span>
+<span id="857">857</span>
+<span id="858">858</span>
+<span id="859">859</span>
+<span id="860">860</span>
 </pre><pre class="rust"><code><span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;encryption&quot;</span>)]</span>
 <span class="kw">use</span> <span class="ident">std::sync::Arc</span>;
 <span class="kw">use</span> <span class="ident">std</span>::{<span class="ident">io::Read</span>, <span class="ident">ops::Deref</span>};
@@ -1026,37 +1030,39 @@
     <span class="doccomment">/// if let Some(room) = client.get_joined_room(&amp;room_id) {</span>
     <span class="doccomment">///     room.typing_notice(true).await?</span>
     <span class="doccomment">/// }</span>
-    <span class="doccomment">/// # matrix_sdk::Result::Ok(()) });</span>
+    <span class="doccomment">/// # Result::&lt;_, matrix_sdk::Error&gt;::Ok(()) });</span>
     <span class="doccomment">/// ```</span>
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">typing_notice</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">typing</span>: <span class="ident">bool</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="comment">// Only send a request to the homeserver if the old timeout has elapsed</span>
         <span class="comment">// or the typing notice changed state within the</span>
         <span class="comment">// TYPING_NOTICE_TIMEOUT</span>
-        <span class="kw">let</span> <span class="ident">send</span> <span class="op">=</span>
-            <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">typing_time</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">client</span>.<span class="ident">typing_notice_times</span>.<span class="ident">get</span>(<span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">room_id</span>()) {
-                <span class="kw">if</span> <span class="ident">typing_time</span>.<span class="ident">elapsed</span>() <span class="op">&gt;</span> <span class="ident">TYPING_NOTICE_RESEND_TIMEOUT</span> {
-                    <span class="comment">// We always reactivate the typing notice if typing is true or</span>
-                    <span class="comment">// we may need to deactivate it if it&#39;s</span>
-                    <span class="comment">// currently active if typing is false</span>
-                    <span class="ident">typing</span> <span class="op">|</span><span class="op">|</span> <span class="ident">typing_time</span>.<span class="ident">elapsed</span>() <span class="op">&lt;</span><span class="op">=</span> <span class="ident">TYPING_NOTICE_TIMEOUT</span>
-                } <span class="kw">else</span> {
-                    <span class="comment">// Only send a request when we need to deactivate typing</span>
-                    <span class="op">!</span><span class="ident">typing</span>
-                }
+        <span class="kw">let</span> <span class="ident">send</span> <span class="op">=</span> <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">typing_time</span>) <span class="op">=</span>
+            <span class="self">self</span>.<span class="ident">client</span>.<span class="ident">inner</span>.<span class="ident">typing_notice_times</span>.<span class="ident">get</span>(<span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">room_id</span>())
+        {
+            <span class="kw">if</span> <span class="ident">typing_time</span>.<span class="ident">elapsed</span>() <span class="op">&gt;</span> <span class="ident">TYPING_NOTICE_RESEND_TIMEOUT</span> {
+                <span class="comment">// We always reactivate the typing notice if typing is true or</span>
+                <span class="comment">// we may need to deactivate it if it&#39;s</span>
+                <span class="comment">// currently active if typing is false</span>
+                <span class="ident">typing</span> <span class="op">|</span><span class="op">|</span> <span class="ident">typing_time</span>.<span class="ident">elapsed</span>() <span class="op">&lt;</span><span class="op">=</span> <span class="ident">TYPING_NOTICE_TIMEOUT</span>
             } <span class="kw">else</span> {
-                <span class="comment">// Typing notice is currently deactivated, therefore, send a request</span>
-                <span class="comment">// only when it&#39;s about to be activated</span>
-                <span class="ident">typing</span>
-            };
+                <span class="comment">// Only send a request when we need to deactivate typing</span>
+                <span class="op">!</span><span class="ident">typing</span>
+            }
+        } <span class="kw">else</span> {
+            <span class="comment">// Typing notice is currently deactivated, therefore, send a request</span>
+            <span class="comment">// only when it&#39;s about to be activated</span>
+            <span class="ident">typing</span>
+        };
 
         <span class="kw">if</span> <span class="ident">send</span> {
             <span class="kw">let</span> <span class="ident">typing</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">typing</span> {
                 <span class="self">self</span>.<span class="ident">client</span>
+                    .<span class="ident">inner</span>
                     .<span class="ident">typing_notice_times</span>
                     .<span class="ident">insert</span>(<span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">room_id</span>().<span class="ident">clone</span>(), <span class="ident">Instant::now</span>());
                 <span class="ident">Typing::Yes</span>(<span class="ident">TYPING_NOTICE_TIMEOUT</span>)
             } <span class="kw">else</span> {
-                <span class="self">self</span>.<span class="ident">client</span>.<span class="ident">typing_notice_times</span>.<span class="ident">remove</span>(<span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">room_id</span>());
+                <span class="self">self</span>.<span class="ident">client</span>.<span class="ident">inner</span>.<span class="ident">typing_notice_times</span>.<span class="ident">remove</span>(<span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">room_id</span>());
                 <span class="ident">Typing::No</span>
             };
 
@@ -1134,7 +1140,7 @@
     <span class="doccomment">/// if let Some(room) = client.get_joined_room(&amp;room_id) {</span>
     <span class="doccomment">///     room.enable_encryption().await?</span>
     <span class="doccomment">/// }</span>
-    <span class="doccomment">/// # matrix_sdk::Result::Ok(()) });</span>
+    <span class="doccomment">/// # Result::&lt;_, matrix_sdk::Error&gt;::Ok(()) });</span>
     <span class="doccomment">/// ```</span>
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">enable_encryption</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="kw">use</span> <span class="ident">ruma</span>::{
@@ -1150,7 +1156,7 @@
             <span class="comment">// TODO do we want to return an error here if we time out? This</span>
             <span class="comment">// could be quite useful if someone wants to enable encryption and</span>
             <span class="comment">// send a message right after it&#39;s enabled.</span>
-            <span class="self">self</span>.<span class="ident">client</span>.<span class="ident">sync_beat</span>.<span class="ident">listen</span>().<span class="ident">wait_timeout</span>(<span class="ident">SYNC_WAIT_TIME</span>);
+            <span class="self">self</span>.<span class="ident">client</span>.<span class="ident">inner</span>.<span class="ident">sync_beat</span>.<span class="ident">listen</span>().<span class="ident">wait_timeout</span>(<span class="ident">SYNC_WAIT_TIME</span>);
         }
 
         <span class="prelude-val">Ok</span>(())
@@ -1167,7 +1173,7 @@
         <span class="comment">// TODO expose this publicly so people can pre-share a group session if</span>
         <span class="comment">// e.g. a user starts to type a message for a room.</span>
         <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">mutex</span>) <span class="op">=</span>
-            <span class="self">self</span>.<span class="ident">client</span>.<span class="ident">group_session_locks</span>.<span class="ident">get</span>(<span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">room_id</span>()).<span class="ident">map</span>(<span class="op">|</span><span class="ident">m</span><span class="op">|</span> <span class="ident">m</span>.<span class="ident">clone</span>())
+            <span class="self">self</span>.<span class="ident">client</span>.<span class="ident">inner</span>.<span class="ident">group_session_locks</span>.<span class="ident">get</span>(<span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">room_id</span>()).<span class="ident">map</span>(<span class="op">|</span><span class="ident">m</span><span class="op">|</span> <span class="ident">m</span>.<span class="ident">clone</span>())
         {
             <span class="comment">// If a group session share request is already going on,</span>
             <span class="comment">// await the release of the lock.</span>
@@ -1176,7 +1182,10 @@
             <span class="comment">// Otherwise create a new lock and share the group</span>
             <span class="comment">// session.</span>
             <span class="kw">let</span> <span class="ident">mutex</span> <span class="op">=</span> <span class="ident">Arc::new</span>(<span class="ident">Mutex::new</span>(()));
-            <span class="self">self</span>.<span class="ident">client</span>.<span class="ident">group_session_locks</span>.<span class="ident">insert</span>(<span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">room_id</span>().<span class="ident">clone</span>(), <span class="ident">mutex</span>.<span class="ident">clone</span>());
+            <span class="self">self</span>.<span class="ident">client</span>
+                .<span class="ident">inner</span>
+                .<span class="ident">group_session_locks</span>
+                .<span class="ident">insert</span>(<span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">room_id</span>().<span class="ident">clone</span>(), <span class="ident">mutex</span>.<span class="ident">clone</span>());
 
             <span class="kw">let</span> <span class="ident">_guard</span> <span class="op">=</span> <span class="ident">mutex</span>.<span class="ident">lock</span>().<span class="kw">await</span>;
 
@@ -1190,13 +1199,13 @@
 
             <span class="kw">let</span> <span class="ident">response</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">share_group_session</span>().<span class="kw">await</span>;
 
-            <span class="self">self</span>.<span class="ident">client</span>.<span class="ident">group_session_locks</span>.<span class="ident">remove</span>(<span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">room_id</span>());
+            <span class="self">self</span>.<span class="ident">client</span>.<span class="ident">inner</span>.<span class="ident">group_session_locks</span>.<span class="ident">remove</span>(<span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">room_id</span>());
 
             <span class="comment">// If one of the responses failed invalidate the group</span>
             <span class="comment">// session as using it would end up in undecryptable</span>
             <span class="comment">// messages.</span>
             <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Err</span>(<span class="ident">r</span>) <span class="op">=</span> <span class="ident">response</span> {
-                <span class="self">self</span>.<span class="ident">client</span>.<span class="ident">base_client</span>.<span class="ident">invalidate_group_session</span>(<span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">room_id</span>()).<span class="kw">await</span><span class="question-mark">?</span>;
+                <span class="self">self</span>.<span class="ident">client</span>.<span class="ident">base_client</span>().<span class="ident">invalidate_group_session</span>(<span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">room_id</span>()).<span class="kw">await</span><span class="question-mark">?</span>;
                 <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">r</span>);
             }
         }
@@ -1213,12 +1222,12 @@
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;encryption&quot;</span>)]</span>
     <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">share_group_session</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">requests</span> <span class="op">=</span>
-            <span class="self">self</span>.<span class="ident">client</span>.<span class="ident">base_client</span>.<span class="ident">share_group_session</span>(<span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">room_id</span>()).<span class="kw">await</span><span class="question-mark">?</span>;
+            <span class="self">self</span>.<span class="ident">client</span>.<span class="ident">base_client</span>().<span class="ident">share_group_session</span>(<span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">room_id</span>()).<span class="kw">await</span><span class="question-mark">?</span>;
 
         <span class="kw">for</span> <span class="ident">request</span> <span class="kw">in</span> <span class="ident">requests</span>.<span class="ident">drain</span>(..) {
             <span class="kw">let</span> <span class="ident">response</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">client</span>.<span class="ident">send_to_device</span>(<span class="kw-2">&amp;</span><span class="ident">request</span>).<span class="kw">await</span><span class="question-mark">?</span>;
 
-            <span class="self">self</span>.<span class="ident">client</span>.<span class="ident">base_client</span>.<span class="ident">mark_request_as_sent</span>(<span class="kw-2">&amp;</span><span class="ident">request</span>.<span class="ident">txn_id</span>, <span class="kw-2">&amp;</span><span class="ident">response</span>).<span class="kw">await</span><span class="question-mark">?</span>;
+            <span class="self">self</span>.<span class="ident">client</span>.<span class="ident">mark_request_as_sent</span>(<span class="kw-2">&amp;</span><span class="ident">request</span>.<span class="ident">txn_id</span>, <span class="kw-2">&amp;</span><span class="ident">response</span>).<span class="kw">await</span><span class="question-mark">?</span>;
         }
 
         <span class="prelude-val">Ok</span>(())
@@ -1305,7 +1314,7 @@
     <span class="doccomment">/// if let Some(room) = client.get_joined_room(&amp;room_id) {</span>
     <span class="doccomment">///     room.send(content, Some(txn_id)).await?;</span>
     <span class="doccomment">/// }</span>
-    <span class="doccomment">/// # matrix_sdk::Result::Ok(()) });</span>
+    <span class="doccomment">/// # Result::&lt;_, matrix_sdk::Error&gt;::Ok(()) });</span>
     <span class="doccomment">/// ```</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// [`SyncMessageEvent`]: ruma::events::SyncMessageEvent</span>
@@ -1373,7 +1382,7 @@
     <span class="doccomment">/// if let Some(room) = client.get_joined_room(&amp;room_id) {</span>
     <span class="doccomment">///     room.send_raw(content, &quot;m.room.message&quot;, None).await?;</span>
     <span class="doccomment">/// }</span>
-    <span class="doccomment">/// # matrix_sdk::Result::Ok(()) });</span>
+    <span class="doccomment">/// # Result::&lt;_, matrix_sdk::Error&gt;::Ok(()) });</span>
     <span class="doccomment">/// ```</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// [`SyncMessageEvent`]: ruma::events::SyncMessageEvent</span>
@@ -1410,8 +1419,7 @@
 
             <span class="self">self</span>.<span class="ident">preshare_group_session</span>().<span class="kw">await</span><span class="question-mark">?</span>;
 
-            <span class="kw">let</span> <span class="ident">olm</span> <span class="op">=</span>
-                <span class="self">self</span>.<span class="ident">client</span>.<span class="ident">base_client</span>.<span class="ident">olm_machine</span>().<span class="kw">await</span>.<span class="ident">expect</span>(<span class="string">&quot;Olm machine wasn&#39;t started&quot;</span>);
+            <span class="kw">let</span> <span class="ident">olm</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">client</span>.<span class="ident">olm_machine</span>().<span class="kw">await</span>.<span class="ident">expect</span>(<span class="string">&quot;Olm machine wasn&#39;t started&quot;</span>);
 
             <span class="kw">let</span> <span class="ident">encrypted_content</span> <span class="op">=</span>
                 <span class="ident">olm</span>.<span class="ident">encrypt_raw</span>(<span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">room_id</span>(), <span class="ident">content</span>, <span class="ident">event_type</span>).<span class="kw">await</span><span class="question-mark">?</span>;
@@ -1487,7 +1495,7 @@
     <span class="doccomment">///         None,</span>
     <span class="doccomment">///     ).await?;</span>
     <span class="doccomment">/// }</span>
-    <span class="doccomment">/// # matrix_sdk::Result::Ok(()) });</span>
+    <span class="doccomment">/// # Result::&lt;_, matrix_sdk::Error&gt;::Ok(()) });</span>
     <span class="doccomment">/// ```</span>
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">send_attachment</span><span class="op">&lt;</span><span class="ident">R</span>: <span class="ident">Read</span><span class="op">&gt;</span>(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
@@ -1554,7 +1562,7 @@
     <span class="doccomment">/// if let Some(room) = client.get_joined_room(&amp;room_id) {</span>
     <span class="doccomment">///     room.send_state_event(content, &quot;&quot;).await?;</span>
     <span class="doccomment">/// }</span>
-    <span class="doccomment">/// # matrix_sdk::Result::Ok(()) });</span>
+    <span class="doccomment">/// # Result::&lt;_, matrix_sdk::Error&gt;::Ok(()) });</span>
     <span class="doccomment">/// ```</span>
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">send_state_event</span>(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
@@ -1647,7 +1655,7 @@
     <span class="doccomment">///     let reason = Some(&quot;Indecent material&quot;);</span>
     <span class="doccomment">///     room.redact(&amp;event_id, reason, None).await?;</span>
     <span class="doccomment">/// }</span>
-    <span class="doccomment">/// # matrix_sdk::Result::Ok(()) });</span>
+    <span class="doccomment">/// # Result::&lt;_, matrix_sdk::Error&gt;::Ok(()) });</span>
     <span class="doccomment">/// ```</span>
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">redact</span>(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
@@ -1690,7 +1698,7 @@
     <span class="doccomment">///</span>
     <span class="doccomment">///     room.set_tag(&quot;u.work&quot;, tag_info ).await?;</span>
     <span class="doccomment">/// }</span>
-    <span class="doccomment">/// # matrix_sdk::Result::Ok(()) });</span>
+    <span class="doccomment">/// # Result::&lt;_, matrix_sdk::Error&gt;::Ok(()) });</span>
     <span class="doccomment">/// ```</span>
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">set_tag</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">tag</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">tag_info</span>: <span class="ident">TagInfo</span>) -&gt; <span class="ident">HttpResult</span><span class="op">&lt;</span><span class="ident">create_tag::Response</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">user_id</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">client</span>.<span class="ident">user_id</span>().<span class="kw">await</span>.<span class="ident">ok_or</span>(<span class="ident">HttpError::AuthenticationRequired</span>)<span class="question-mark">?</span>;

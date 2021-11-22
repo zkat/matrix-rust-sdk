@@ -250,7 +250,7 @@
 <span class="comment">// See the License for the specific language governing permissions and</span>
 <span class="comment">// limitations under the License.</span>
 
-<span class="kw">use</span> <span class="ident">std</span>::{<span class="ident">net::ToSocketAddrs</span>, <span class="ident">result::Result</span> <span class="kw">as</span> <span class="ident">StdResult</span>};
+<span class="kw">use</span> <span class="ident">std::net::ToSocketAddrs</span>;
 
 <span class="kw">use</span> <span class="ident">matrix_sdk</span>::{
     <span class="ident">bytes::Bytes</span>,
@@ -406,7 +406,7 @@
         <span class="ident">_user_id</span>: <span class="ident">String</span>,
         <span class="ident">appservice</span>: <span class="ident">AppService</span>,
         <span class="ident">request</span>: <span class="ident">http::Request</span><span class="op">&lt;</span><span class="ident">Bytes</span><span class="op">&gt;</span>,
-    ) -&gt; <span class="ident">StdResult</span><span class="op">&lt;</span><span class="kw">impl</span> <span class="ident">warp::Reply</span>, <span class="ident">Rejection</span><span class="op">&gt;</span> {
+    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="kw">impl</span> <span class="ident">warp::Reply</span>, <span class="ident">Rejection</span><span class="op">&gt;</span> {
         <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">user_exists</span>) <span class="op">=</span> <span class="ident">appservice</span>.<span class="ident">event_handler</span>.<span class="ident">users</span>.<span class="ident">lock</span>().<span class="kw">await</span>.<span class="ident">as_mut</span>() {
             <span class="kw">let</span> <span class="ident">request</span> <span class="op">=</span>
                 <span class="ident">query_user::IncomingRequest::try_from_http_request</span>(<span class="ident">request</span>).<span class="ident">map_err</span>(<span class="ident">Error::from</span>)<span class="question-mark">?</span>;
@@ -423,7 +423,7 @@
         <span class="ident">_room_id</span>: <span class="ident">String</span>,
         <span class="ident">appservice</span>: <span class="ident">AppService</span>,
         <span class="ident">request</span>: <span class="ident">http::Request</span><span class="op">&lt;</span><span class="ident">Bytes</span><span class="op">&gt;</span>,
-    ) -&gt; <span class="ident">StdResult</span><span class="op">&lt;</span><span class="kw">impl</span> <span class="ident">warp::Reply</span>, <span class="ident">Rejection</span><span class="op">&gt;</span> {
+    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="kw">impl</span> <span class="ident">warp::Reply</span>, <span class="ident">Rejection</span><span class="op">&gt;</span> {
         <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">room_exists</span>) <span class="op">=</span> <span class="ident">appservice</span>.<span class="ident">event_handler</span>.<span class="ident">rooms</span>.<span class="ident">lock</span>().<span class="kw">await</span>.<span class="ident">as_mut</span>() {
             <span class="kw">let</span> <span class="ident">request</span> <span class="op">=</span>
                 <span class="ident">query_room::IncomingRequest::try_from_http_request</span>(<span class="ident">request</span>).<span class="ident">map_err</span>(<span class="ident">Error::from</span>)<span class="question-mark">?</span>;
@@ -440,7 +440,7 @@
         <span class="ident">_txn_id</span>: <span class="ident">String</span>,
         <span class="ident">appservice</span>: <span class="ident">AppService</span>,
         <span class="ident">request</span>: <span class="ident">http::Request</span><span class="op">&lt;</span><span class="ident">Bytes</span><span class="op">&gt;</span>,
-    ) -&gt; <span class="ident">StdResult</span><span class="op">&lt;</span><span class="kw">impl</span> <span class="ident">warp::Reply</span>, <span class="ident">Rejection</span><span class="op">&gt;</span> {
+    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="kw">impl</span> <span class="ident">warp::Reply</span>, <span class="ident">Rejection</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">incoming_transaction</span>: <span class="ident">ruma::api::appservice::event::push_events::v1::IncomingRequest</span> <span class="op">=</span>
             <span class="ident">ruma::api::IncomingRequest::try_from_http_request</span>(<span class="ident">request</span>).<span class="ident">map_err</span>(<span class="ident">Error::from</span>)<span class="question-mark">?</span>;
 
@@ -462,7 +462,7 @@
     <span class="ident">message</span>: <span class="ident">String</span>,
 }
 
-<span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">handle_rejection</span>(<span class="ident">err</span>: <span class="ident">Rejection</span>) -&gt; <span class="ident">std::result::Result</span><span class="op">&lt;</span><span class="kw">impl</span> <span class="ident">Reply</span>, <span class="ident">Rejection</span><span class="op">&gt;</span> {
+<span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">handle_rejection</span>(<span class="ident">err</span>: <span class="ident">Rejection</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="kw">impl</span> <span class="ident">Reply</span>, <span class="ident">Rejection</span><span class="op">&gt;</span> {
     <span class="kw">if</span> <span class="ident">err</span>.<span class="ident">find</span>::<span class="op">&lt;</span><span class="ident">Unauthorized</span><span class="op">&gt;</span>().<span class="ident">is_some</span>() <span class="op">|</span><span class="op">|</span> <span class="ident">err</span>.<span class="ident">find</span>::<span class="op">&lt;</span><span class="ident">warp::reject::InvalidQuery</span><span class="op">&gt;</span>().<span class="ident">is_some</span>() {
         <span class="kw">let</span> <span class="ident">code</span> <span class="op">=</span> <span class="ident">http::StatusCode::UNAUTHORIZED</span>;
         <span class="kw">let</span> <span class="ident">message</span> <span class="op">=</span> <span class="string">&quot;UNAUTHORIZED&quot;</span>;
