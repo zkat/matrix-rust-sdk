@@ -717,6 +717,33 @@
 <span id="716">716</span>
 <span id="717">717</span>
 <span id="718">718</span>
+<span id="719">719</span>
+<span id="720">720</span>
+<span id="721">721</span>
+<span id="722">722</span>
+<span id="723">723</span>
+<span id="724">724</span>
+<span id="725">725</span>
+<span id="726">726</span>
+<span id="727">727</span>
+<span id="728">728</span>
+<span id="729">729</span>
+<span id="730">730</span>
+<span id="731">731</span>
+<span id="732">732</span>
+<span id="733">733</span>
+<span id="734">734</span>
+<span id="735">735</span>
+<span id="736">736</span>
+<span id="737">737</span>
+<span id="738">738</span>
+<span id="739">739</span>
+<span id="740">740</span>
+<span id="741">741</span>
+<span id="742">742</span>
+<span id="743">743</span>
+<span id="744">744</span>
+<span id="745">745</span>
 </pre><pre class="rust"><code><span class="comment">// Copyright 2020 The Matrix.org Foundation C.I.C.</span>
 <span class="comment">//</span>
 <span class="comment">// Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);</span>
@@ -1123,6 +1150,18 @@
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">users_for_key_query</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">KeysQueryRequest</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">users</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">store</span>.<span class="ident">users_for_key_query</span>();
 
+        <span class="comment">// We always want to track our own user, but in case we aren&#39;t in an encrypted</span>
+        <span class="comment">// room yet, we won&#39;t be tracking ourselves yet. This ensures we are always</span>
+        <span class="comment">// tracking ourselves.</span>
+        <span class="comment">//</span>
+        <span class="comment">// The check for emptiness is done first for performance.</span>
+        <span class="kw">let</span> <span class="ident">users</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">users</span>.<span class="ident">is_empty</span>() <span class="op">&amp;&amp;</span> <span class="op">!</span><span class="self">self</span>.<span class="ident">store</span>.<span class="ident">tracked_users</span>().<span class="ident">contains</span>(<span class="self">self</span>.<span class="ident">user_id</span>()) {
+            <span class="self">self</span>.<span class="ident">update_tracked_users</span>([<span class="self">self</span>.<span class="ident">user_id</span>()]).<span class="kw">await</span>;
+            <span class="self">self</span>.<span class="ident">store</span>.<span class="ident">users_for_key_query</span>()
+        } <span class="kw">else</span> {
+            <span class="ident">users</span>
+        };
+
         <span class="kw">if</span> <span class="ident">users</span>.<span class="ident">is_empty</span>() {
             <span class="ident">Vec::new</span>()
         } <span class="kw">else</span> {
@@ -1384,7 +1423,7 @@
     <span class="attribute">#[<span class="ident">async_test</span>]</span>
     <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">test_manager_creation</span>() {
         <span class="kw">let</span> <span class="ident">manager</span> <span class="op">=</span> <span class="ident">manager</span>();
-        <span class="macro">assert!</span>(<span class="ident">manager</span>.<span class="ident">users_for_key_query</span>().<span class="kw">await</span>.<span class="ident">is_empty</span>())
+        <span class="macro">assert!</span>(<span class="ident">manager</span>.<span class="ident">store</span>.<span class="ident">tracked_users</span>().<span class="ident">is_empty</span>())
     }
 
     <span class="attribute">#[<span class="ident">async_test</span>]</span>
@@ -1433,6 +1472,21 @@
         <span class="kw">let</span> <span class="ident">identity</span> <span class="op">=</span> <span class="ident">identity</span>.<span class="ident">other</span>().<span class="ident">unwrap</span>();
 
         <span class="macro">assert!</span>(<span class="ident">identity</span>.<span class="ident">is_device_signed</span>(<span class="kw-2">&amp;</span><span class="ident">device</span>).<span class="ident">is_ok</span>())
+    }
+
+    <span class="attribute">#[<span class="ident">async_test</span>]</span>
+    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">no_tracked_users_key_query_request</span>() {
+        <span class="kw">let</span> <span class="ident">manager</span> <span class="op">=</span> <span class="ident">manager</span>();
+
+        <span class="macro">assert!</span>(<span class="ident">manager</span>.<span class="ident">store</span>.<span class="ident">tracked_users</span>().<span class="ident">is_empty</span>(), <span class="string">&quot;No users are initially tracked&quot;</span>);
+
+        <span class="kw">let</span> <span class="ident">requests</span> <span class="op">=</span> <span class="ident">manager</span>.<span class="ident">users_for_key_query</span>().<span class="kw">await</span>;
+
+        <span class="macro">assert!</span>(<span class="op">!</span><span class="ident">requests</span>.<span class="ident">is_empty</span>(), <span class="string">&quot;We query the keys for our own user&quot;</span>);
+        <span class="macro">assert!</span>(
+            <span class="ident">manager</span>.<span class="ident">store</span>.<span class="ident">tracked_users</span>().<span class="ident">contains</span>(<span class="ident">manager</span>.<span class="ident">user_id</span>()),
+            <span class="string">&quot;Our own user is now tracked&quot;</span>
+        );
     }
 }
 </code></pre></div>
