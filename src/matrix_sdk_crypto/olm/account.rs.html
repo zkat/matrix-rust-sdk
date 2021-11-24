@@ -1212,7 +1212,6 @@
 <span id="1211">1211</span>
 <span id="1212">1212</span>
 <span id="1213">1213</span>
-<span id="1214">1214</span>
 </pre><pre class="rust"><code><span class="comment">// Copyright 2020 The Matrix.org Foundation C.I.C.</span>
 <span class="comment">//</span>
 <span class="comment">// Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);</span>
@@ -1961,17 +1960,16 @@
 
     <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">unsigned_device_keys</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">DeviceKeys</span> {
         <span class="kw">let</span> <span class="ident">identity_keys</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">identity_keys</span>();
-
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">keys</span> <span class="op">=</span> <span class="ident">BTreeMap::new</span>();
-
-        <span class="ident">keys</span>.<span class="ident">insert</span>(
-            <span class="ident">DeviceKeyId::from_parts</span>(<span class="ident">DeviceKeyAlgorithm::Curve25519</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">device_id</span>),
-            <span class="ident">identity_keys</span>.<span class="ident">curve25519</span>().<span class="ident">to_owned</span>(),
-        );
-        <span class="ident">keys</span>.<span class="ident">insert</span>(
-            <span class="ident">DeviceKeyId::from_parts</span>(<span class="ident">DeviceKeyAlgorithm::Ed25519</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">device_id</span>),
-            <span class="ident">identity_keys</span>.<span class="ident">ed25519</span>().<span class="ident">to_owned</span>(),
-        );
+        <span class="kw">let</span> <span class="ident">keys</span> <span class="op">=</span> <span class="ident">BTreeMap::from</span>([
+            (
+                <span class="ident">DeviceKeyId::from_parts</span>(<span class="ident">DeviceKeyAlgorithm::Curve25519</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">device_id</span>),
+                <span class="ident">identity_keys</span>.<span class="ident">curve25519</span>().<span class="ident">to_owned</span>(),
+            ),
+            (
+                <span class="ident">DeviceKeyId::from_parts</span>(<span class="ident">DeviceKeyAlgorithm::Ed25519</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">device_id</span>),
+                <span class="ident">identity_keys</span>.<span class="ident">ed25519</span>().<span class="ident">to_owned</span>(),
+            ),
+        ]);
 
         <span class="ident">DeviceKeys::new</span>(
             (<span class="kw-2">*</span><span class="self">self</span>.<span class="ident">user_id</span>).<span class="ident">clone</span>(),
