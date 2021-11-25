@@ -2171,6 +2171,13 @@
 <span id="2170">2170</span>
 <span id="2171">2171</span>
 <span id="2172">2172</span>
+<span id="2173">2173</span>
+<span id="2174">2174</span>
+<span id="2175">2175</span>
+<span id="2176">2176</span>
+<span id="2177">2177</span>
+<span id="2178">2178</span>
+<span id="2179">2179</span>
 </pre><pre class="rust"><code><span class="comment">// Copyright 2020 The Matrix.org Foundation C.I.C.</span>
 <span class="comment">//</span>
 <span class="comment">// Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);</span>
@@ -2188,7 +2195,7 @@
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;sled_cryptostore&quot;</span>)]</span>
 <span class="kw">use</span> <span class="ident">std::path::Path</span>;
 <span class="kw">use</span> <span class="ident">std</span>::{
-    <span class="ident">collections</span>::{<span class="ident">BTreeMap</span>, <span class="ident">HashSet</span>},
+    <span class="ident">collections</span>::{<span class="ident">BTreeMap</span>, <span class="ident">BTreeSet</span>, <span class="ident">HashSet</span>},
     <span class="ident">mem</span>,
     <span class="ident">sync::Arc</span>,
 };
@@ -3532,6 +3539,7 @@
         };
 
         <span class="kw">let</span> <span class="ident">total_count</span> <span class="op">=</span> <span class="ident">exported_keys</span>.<span class="ident">len</span>();
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">keys</span> <span class="op">=</span> <span class="ident">BTreeMap::new</span>();
 
         <span class="kw">for</span> (<span class="ident">i</span>, <span class="ident">key</span>) <span class="kw">in</span> <span class="ident">exported_keys</span>.<span class="ident">into_iter</span>().<span class="ident">enumerate</span>() {
             <span class="kw">let</span> <span class="ident">session</span> <span class="op">=</span> <span class="ident">InboundGroupSession::from_export</span>(<span class="ident">key</span>)<span class="question-mark">?</span>;
@@ -3545,6 +3553,12 @@
                     <span class="ident">session</span>.<span class="ident">mark_as_backed_up</span>()
                 }
 
+                <span class="ident">keys</span>.<span class="ident">entry</span>(<span class="ident">session</span>.<span class="ident">room_id</span>().<span class="ident">to_owned</span>())
+                    .<span class="ident">or_insert_with</span>(<span class="ident">BTreeMap::new</span>)
+                    .<span class="ident">entry</span>(<span class="ident">session</span>.<span class="ident">sender_key</span>().<span class="ident">to_owned</span>())
+                    .<span class="ident">or_insert_with</span>(<span class="ident">BTreeSet::new</span>)
+                    .<span class="ident">insert</span>(<span class="ident">session</span>.<span class="ident">session_id</span>().<span class="ident">to_owned</span>());
+
                 <span class="ident">sessions</span>.<span class="ident">push</span>(<span class="ident">session</span>)
             }
 
@@ -3557,9 +3571,9 @@
 
         <span class="self">self</span>.<span class="ident">store</span>.<span class="ident">save_changes</span>(<span class="ident">changes</span>).<span class="kw">await</span><span class="question-mark">?</span>;
 
-        <span class="macro">info!</span>(<span class="ident">total_count</span>, <span class="ident">imported_count</span>, <span class="string">&quot;Successfully imported room keys&quot;</span>);
+        <span class="macro">info!</span>(<span class="ident">total_count</span>, <span class="ident">imported_count</span>, <span class="ident">room_keys</span> <span class="op">=</span><span class="question-mark">?</span> <span class="ident">keys</span>, <span class="string">&quot;Successfully imported room keys&quot;</span>);
 
-        <span class="prelude-val">Ok</span>(<span class="ident">RoomKeyImportResult::new</span>(<span class="ident">imported_count</span>, <span class="ident">total_count</span>))
+        <span class="prelude-val">Ok</span>(<span class="ident">RoomKeyImportResult::new</span>(<span class="ident">imported_count</span>, <span class="ident">total_count</span>, <span class="ident">keys</span>))
     }
 
     <span class="doccomment">/// Export the keys that match the given predicate.</span>
