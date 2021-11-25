@@ -353,6 +353,12 @@
 <span id="352">352</span>
 <span id="353">353</span>
 <span id="354">354</span>
+<span id="355">355</span>
+<span id="356">356</span>
+<span id="357">357</span>
+<span id="358">358</span>
+<span id="359">359</span>
+<span id="360">360</span>
 </pre><pre class="rust"><code><span class="comment">// Copyright 2020 The Matrix.org Foundation C.I.C.</span>
 <span class="comment">//</span>
 <span class="comment">// Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);</span>
@@ -438,7 +444,7 @@
 <span class="doccomment">/// # block_on(async {</span>
 <span class="doccomment">/// # let export = Cursor::new(&quot;&quot;.to_owned());</span>
 <span class="doccomment">/// let exported_keys = decrypt_key_export(export, &quot;1234&quot;).unwrap();</span>
-<span class="doccomment">/// machine.import_keys(exported_keys, |_, _| {}).await.unwrap();</span>
+<span class="doccomment">/// machine.import_keys(exported_keys, false, |_, _| {}).await.unwrap();</span>
 <span class="doccomment">/// # });</span>
 <span class="doccomment">/// ```</span>
 <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">decrypt_key_export</span>(
@@ -667,7 +673,7 @@
 
         <span class="macro">assert_eq!</span>(<span class="ident">export</span>, <span class="ident">decrypted</span>);
         <span class="macro">assert_eq!</span>(
-            <span class="ident">machine</span>.<span class="ident">import_keys</span>(<span class="ident">decrypted</span>, <span class="op">|</span><span class="kw">_</span>, <span class="kw">_</span><span class="op">|</span> {}).<span class="kw">await</span>.<span class="ident">unwrap</span>(),
+            <span class="ident">machine</span>.<span class="ident">import_keys</span>(<span class="ident">decrypted</span>, <span class="bool-val">false</span>, <span class="op">|</span><span class="kw">_</span>, <span class="kw">_</span><span class="op">|</span> {}).<span class="kw">await</span>.<span class="ident">unwrap</span>(),
             <span class="ident">RoomKeyImportResult::new</span>(<span class="number">0</span>, <span class="number">1</span>)
         );
     }
@@ -681,21 +687,27 @@
         <span class="kw">let</span> <span class="ident">export</span> <span class="op">=</span> <span class="macro">vec!</span>[<span class="ident">session</span>.<span class="ident">export_at_index</span>(<span class="number">10</span>).<span class="kw">await</span>];
 
         <span class="macro">assert_eq!</span>(
-            <span class="ident">machine</span>.<span class="ident">import_keys</span>(<span class="ident">export</span>.<span class="ident">clone</span>(), <span class="op">|</span><span class="kw">_</span>, <span class="kw">_</span><span class="op">|</span> {}).<span class="kw">await</span><span class="question-mark">?</span>,
+            <span class="ident">machine</span>.<span class="ident">import_keys</span>(<span class="ident">export</span>.<span class="ident">clone</span>(), <span class="bool-val">false</span>, <span class="op">|</span><span class="kw">_</span>, <span class="kw">_</span><span class="op">|</span> {}).<span class="kw">await</span><span class="question-mark">?</span>,
             <span class="ident">RoomKeyImportResult::new</span>(<span class="number">1</span>, <span class="number">1</span>)
         );
-        <span class="macro">assert_eq!</span>(<span class="ident">machine</span>.<span class="ident">import_keys</span>(<span class="ident">export</span>, <span class="op">|</span><span class="kw">_</span>, <span class="kw">_</span><span class="op">|</span> {}).<span class="kw">await</span><span class="question-mark">?</span>, <span class="ident">RoomKeyImportResult::new</span>(<span class="number">0</span>, <span class="number">1</span>));
+        <span class="macro">assert_eq!</span>(
+            <span class="ident">machine</span>.<span class="ident">import_keys</span>(<span class="ident">export</span>, <span class="bool-val">false</span>, <span class="op">|</span><span class="kw">_</span>, <span class="kw">_</span><span class="op">|</span> {}).<span class="kw">await</span><span class="question-mark">?</span>,
+            <span class="ident">RoomKeyImportResult::new</span>(<span class="number">0</span>, <span class="number">1</span>)
+        );
 
         <span class="kw">let</span> <span class="ident">better_export</span> <span class="op">=</span> <span class="macro">vec!</span>[<span class="ident">session</span>.<span class="ident">export</span>().<span class="kw">await</span>];
 
         <span class="macro">assert_eq!</span>(
-            <span class="ident">machine</span>.<span class="ident">import_keys</span>(<span class="ident">better_export</span>, <span class="op">|</span><span class="kw">_</span>, <span class="kw">_</span><span class="op">|</span> {}).<span class="kw">await</span><span class="question-mark">?</span>,
+            <span class="ident">machine</span>.<span class="ident">import_keys</span>(<span class="ident">better_export</span>, <span class="bool-val">false</span>, <span class="op">|</span><span class="kw">_</span>, <span class="kw">_</span><span class="op">|</span> {}).<span class="kw">await</span><span class="question-mark">?</span>,
             <span class="ident">RoomKeyImportResult::new</span>(<span class="number">1</span>, <span class="number">1</span>)
         );
 
         <span class="kw">let</span> <span class="ident">another_session</span> <span class="op">=</span> <span class="ident">machine</span>.<span class="ident">create_inbound_session</span>(<span class="kw-2">&amp;</span><span class="ident">room_id</span>).<span class="kw">await</span><span class="question-mark">?</span>;
         <span class="kw">let</span> <span class="ident">export</span> <span class="op">=</span> <span class="macro">vec!</span>[<span class="ident">another_session</span>.<span class="ident">export_at_index</span>(<span class="number">10</span>).<span class="kw">await</span>];
-        <span class="macro">assert_eq!</span>(<span class="ident">machine</span>.<span class="ident">import_keys</span>(<span class="ident">export</span>, <span class="op">|</span><span class="kw">_</span>, <span class="kw">_</span><span class="op">|</span> {}).<span class="kw">await</span><span class="question-mark">?</span>, <span class="ident">RoomKeyImportResult::new</span>(<span class="number">1</span>, <span class="number">1</span>));
+        <span class="macro">assert_eq!</span>(
+            <span class="ident">machine</span>.<span class="ident">import_keys</span>(<span class="ident">export</span>, <span class="bool-val">false</span>, <span class="op">|</span><span class="kw">_</span>, <span class="kw">_</span><span class="op">|</span> {}).<span class="kw">await</span><span class="question-mark">?</span>,
+            <span class="ident">RoomKeyImportResult::new</span>(<span class="number">1</span>, <span class="number">1</span>)
+        );
 
         <span class="prelude-val">Ok</span>(())
     }
