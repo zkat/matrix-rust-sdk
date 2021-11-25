@@ -611,7 +611,7 @@
     <span class="ident">EventId</span>, <span class="ident">MxcUri</span>, <span class="ident">RoomAliasId</span>, <span class="ident">RoomId</span>, <span class="ident">UserId</span>,
 };
 <span class="kw">use</span> <span class="ident">serde</span>::{<span class="ident">Deserialize</span>, <span class="ident">Serialize</span>};
-<span class="kw">use</span> <span class="ident">tracing::info</span>;
+<span class="kw">use</span> <span class="ident">tracing::debug</span>;
 
 <span class="kw">use</span> <span class="kw">super</span>::{<span class="ident">BaseRoomInfo</span>, <span class="ident">RoomMember</span>};
 <span class="kw">use</span> <span class="kw">crate</span>::{
@@ -933,12 +933,12 @@
             <span class="ident">members</span><span class="question-mark">?</span>
         };
 
-        <span class="macro">info!</span>(
-            <span class="string">&quot;Calculating name for {}, own user {} hero count {} heroes {:#?}&quot;</span>,
-            <span class="self">self</span>.<span class="ident">room_id</span>(),
-            <span class="self">self</span>.<span class="ident">own_user_id</span>,
-            <span class="ident">heroes_count</span>,
-            <span class="ident">summary</span>.<span class="ident">heroes</span>
+        <span class="macro">debug!</span>(
+            <span class="ident">room_id</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">room_id</span>().<span class="ident">as_str</span>(),
+            <span class="ident">own_user</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">own_user_id</span>.<span class="ident">as_str</span>(),
+            <span class="ident">heroes_count</span> <span class="op">=</span> <span class="ident">heroes_count</span>,
+            <span class="ident">heroes</span> <span class="op">=</span><span class="question-mark">?</span> <span class="ident">summary</span>.<span class="ident">heroes</span>,
+            <span class="string">&quot;Calculating name for a room&quot;</span>,
         );
 
         <span class="kw">let</span> <span class="ident">inner</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">read</span>().<span class="ident">unwrap</span>();
