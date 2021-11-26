@@ -1444,6 +1444,76 @@
 <span id="1443">1443</span>
 <span id="1444">1444</span>
 <span id="1445">1445</span>
+<span id="1446">1446</span>
+<span id="1447">1447</span>
+<span id="1448">1448</span>
+<span id="1449">1449</span>
+<span id="1450">1450</span>
+<span id="1451">1451</span>
+<span id="1452">1452</span>
+<span id="1453">1453</span>
+<span id="1454">1454</span>
+<span id="1455">1455</span>
+<span id="1456">1456</span>
+<span id="1457">1457</span>
+<span id="1458">1458</span>
+<span id="1459">1459</span>
+<span id="1460">1460</span>
+<span id="1461">1461</span>
+<span id="1462">1462</span>
+<span id="1463">1463</span>
+<span id="1464">1464</span>
+<span id="1465">1465</span>
+<span id="1466">1466</span>
+<span id="1467">1467</span>
+<span id="1468">1468</span>
+<span id="1469">1469</span>
+<span id="1470">1470</span>
+<span id="1471">1471</span>
+<span id="1472">1472</span>
+<span id="1473">1473</span>
+<span id="1474">1474</span>
+<span id="1475">1475</span>
+<span id="1476">1476</span>
+<span id="1477">1477</span>
+<span id="1478">1478</span>
+<span id="1479">1479</span>
+<span id="1480">1480</span>
+<span id="1481">1481</span>
+<span id="1482">1482</span>
+<span id="1483">1483</span>
+<span id="1484">1484</span>
+<span id="1485">1485</span>
+<span id="1486">1486</span>
+<span id="1487">1487</span>
+<span id="1488">1488</span>
+<span id="1489">1489</span>
+<span id="1490">1490</span>
+<span id="1491">1491</span>
+<span id="1492">1492</span>
+<span id="1493">1493</span>
+<span id="1494">1494</span>
+<span id="1495">1495</span>
+<span id="1496">1496</span>
+<span id="1497">1497</span>
+<span id="1498">1498</span>
+<span id="1499">1499</span>
+<span id="1500">1500</span>
+<span id="1501">1501</span>
+<span id="1502">1502</span>
+<span id="1503">1503</span>
+<span id="1504">1504</span>
+<span id="1505">1505</span>
+<span id="1506">1506</span>
+<span id="1507">1507</span>
+<span id="1508">1508</span>
+<span id="1509">1509</span>
+<span id="1510">1510</span>
+<span id="1511">1511</span>
+<span id="1512">1512</span>
+<span id="1513">1513</span>
+<span id="1514">1514</span>
+<span id="1515">1515</span>
 </pre><pre class="rust"><code><span class="comment">// Copyright 2020 The Matrix.org Foundation C.I.C.</span>
 <span class="comment">//</span>
 <span class="comment">// Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);</span>
@@ -1459,7 +1529,7 @@
 <span class="comment">// limitations under the License.</span>
 
 <span class="kw">use</span> <span class="ident">std</span>::{
-    <span class="ident">collections</span>::{<span class="ident">HashMap</span>, <span class="ident">HashSet</span>},
+    <span class="ident">collections</span>::{<span class="ident">BTreeMap</span>, <span class="ident">HashMap</span>, <span class="ident">HashSet</span>},
     <span class="ident">convert</span>::{<span class="ident">TryFrom</span>, <span class="ident">TryInto</span>},
     <span class="ident">path</span>::{<span class="ident">Path</span>, <span class="ident">PathBuf</span>},
     <span class="ident">sync</span>::{<span class="ident">Arc</span>, <span class="ident">RwLock</span>},
@@ -1469,15 +1539,17 @@
 <span class="kw">use</span> <span class="ident">matrix_sdk_common</span>::{<span class="ident">async_trait</span>, <span class="ident">locks::Mutex</span>, <span class="ident">uuid</span>};
 <span class="kw">use</span> <span class="ident">olm_rs</span>::{<span class="ident">account::IdentityKeys</span>, <span class="ident">PicklingMode</span>};
 <span class="kw">use</span> <span class="ident">ruma</span>::{
+    <span class="ident">encryption::DeviceKeys</span>,
     <span class="ident">events</span>::{<span class="ident">room_key_request::RequestedKeyInfo</span>, <span class="ident">secret::request::SecretName</span>},
-    <span class="ident">DeviceId</span>, <span class="ident">DeviceIdBox</span>, <span class="ident">RoomId</span>, <span class="ident">UserId</span>,
+    <span class="ident">DeviceId</span>, <span class="ident">DeviceIdBox</span>, <span class="ident">DeviceKeyId</span>, <span class="ident">EventEncryptionAlgorithm</span>, <span class="ident">RoomId</span>, <span class="ident">UserId</span>,
 };
+<span class="kw">use</span> <span class="ident">serde</span>::{<span class="ident">Deserialize</span>, <span class="ident">Serialize</span>};
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">sled::Error</span>;
 <span class="kw">use</span> <span class="ident">sled</span>::{
     <span class="ident">transaction</span>::{<span class="ident">ConflictableTransactionError</span>, <span class="ident">TransactionError</span>},
     <span class="ident">Config</span>, <span class="ident">Db</span>, <span class="ident">IVec</span>, <span class="ident">Transactional</span>, <span class="ident">Tree</span>,
 };
-<span class="kw">use</span> <span class="ident">tracing::trace</span>;
+<span class="kw">use</span> <span class="ident">tracing::debug</span>;
 <span class="kw">use</span> <span class="ident">uuid::Uuid</span>;
 
 <span class="kw">use</span> <span class="kw">super</span>::{
@@ -1488,12 +1560,13 @@
     <span class="ident">gossiping</span>::{<span class="ident">GossipRequest</span>, <span class="ident">SecretInfo</span>},
     <span class="ident">identities</span>::{<span class="ident">ReadOnlyDevice</span>, <span class="ident">ReadOnlyUserIdentities</span>},
     <span class="ident">olm</span>::{<span class="ident">OutboundGroupSession</span>, <span class="ident">PickledInboundGroupSession</span>, <span class="ident">PrivateCrossSigningIdentity</span>},
+    <span class="ident">LocalTrust</span>,
 };
 
 <span class="doccomment">/// This needs to be 32 bytes long since AES-GCM requires it, otherwise we will</span>
 <span class="doccomment">/// panic once we try to pickle a Signing object.</span>
 <span class="kw">const</span> <span class="ident">DEFAULT_PICKLE</span>: <span class="kw-2">&amp;</span><span class="ident">str</span> <span class="op">=</span> <span class="string">&quot;DEFAULT_PICKLE_PASSPHRASE_123456&quot;</span>;
-<span class="kw">const</span> <span class="ident">DATABASE_VERSION</span>: <span class="ident">u8</span> <span class="op">=</span> <span class="number">1</span>;
+<span class="kw">const</span> <span class="ident">DATABASE_VERSION</span>: <span class="ident">u8</span> <span class="op">=</span> <span class="number">3</span>;
 
 <span class="kw">trait</span> <span class="ident">EncodeKey</span> {
     <span class="kw">const</span> <span class="ident">SEPARATOR</span>: <span class="ident">u8</span> <span class="op">=</span> <span class="number">0xff</span>;
@@ -1540,6 +1613,12 @@
 <span class="kw">impl</span> <span class="ident">EncodeKey</span> <span class="kw">for</span> <span class="kw-2">&amp;</span><span class="ident">UserId</span> {
     <span class="kw">fn</span> <span class="ident">encode</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">as_str</span>().<span class="ident">encode</span>()
+    }
+}
+
+<span class="kw">impl</span> <span class="ident">EncodeKey</span> <span class="kw">for</span> <span class="kw-2">&amp;</span><span class="ident">ReadOnlyDevice</span> {
+    <span class="kw">fn</span> <span class="ident">encode</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span> {
+        (<span class="self">self</span>.<span class="ident">user_id</span>().<span class="ident">as_str</span>(), <span class="self">self</span>.<span class="ident">device_id</span>().<span class="ident">as_str</span>()).<span class="ident">encode</span>()
     }
 }
 
@@ -1698,11 +1777,7 @@
             .<span class="ident">unwrap_or_default</span>();
 
         <span class="kw">if</span> <span class="ident">version</span> <span class="op">!</span><span class="op">=</span> <span class="ident">DATABASE_VERSION</span> {
-            <span class="macro">trace!</span>(
-                <span class="ident">version</span> <span class="op">=</span> <span class="ident">version</span>,
-                <span class="ident">new_version</span> <span class="op">=</span> <span class="ident">DATABASE_VERSION</span>,
-                <span class="string">&quot;Upgrading the Sled crypto store&quot;</span>
-            );
+            <span class="macro">debug!</span>(<span class="ident">version</span>, <span class="ident">new_version</span> <span class="op">=</span> <span class="ident">DATABASE_VERSION</span>, <span class="string">&quot;Upgrading the Sled crypto store&quot;</span>);
         }
 
         <span class="kw">if</span> <span class="ident">version</span> <span class="op">==</span> <span class="number">0</span> {
@@ -1710,6 +1785,71 @@
             <span class="comment">// rotate the group sessions relatively often anyways so we just</span>
             <span class="comment">// clear the tree.</span>
             <span class="self">self</span>.<span class="ident">outbound_group_sessions</span>.<span class="ident">clear</span>()<span class="question-mark">?</span>;
+        }
+
+        <span class="kw">if</span> <span class="ident">version</span> <span class="op">&lt;</span><span class="op">=</span> <span class="number">1</span> {
+            <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Serialize</span>, <span class="ident">Deserialize</span>)]</span>
+            <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">OldReadOnlyDevice</span> {
+                <span class="ident">user_id</span>: <span class="ident">UserId</span>,
+                <span class="ident">device_id</span>: <span class="ident">DeviceIdBox</span>,
+                <span class="ident">algorithms</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">EventEncryptionAlgorithm</span><span class="op">&gt;</span>,
+                <span class="ident">keys</span>: <span class="ident">BTreeMap</span><span class="op">&lt;</span><span class="ident">DeviceKeyId</span>, <span class="ident">String</span><span class="op">&gt;</span>,
+                <span class="ident">signatures</span>: <span class="ident">BTreeMap</span><span class="op">&lt;</span><span class="ident">UserId</span>, <span class="ident">BTreeMap</span><span class="op">&lt;</span><span class="ident">DeviceKeyId</span>, <span class="ident">String</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+                <span class="ident">display_name</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
+                <span class="ident">deleted</span>: <span class="ident">bool</span>,
+                <span class="ident">trust_state</span>: <span class="ident">LocalTrust</span>,
+            }
+
+            <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy::from_over_into</span>)]</span>
+            <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">ReadOnlyDevice</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">OldReadOnlyDevice</span> {
+                <span class="kw">fn</span> <span class="ident">into</span>(<span class="self">self</span>) -&gt; <span class="ident">ReadOnlyDevice</span> {
+                    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">device_keys</span> <span class="op">=</span> <span class="ident">DeviceKeys::new</span>(
+                        <span class="self">self</span>.<span class="ident">user_id</span>,
+                        <span class="self">self</span>.<span class="ident">device_id</span>,
+                        <span class="self">self</span>.<span class="ident">algorithms</span>,
+                        <span class="self">self</span>.<span class="ident">keys</span>,
+                        <span class="self">self</span>.<span class="ident">signatures</span>,
+                    );
+                    <span class="ident">device_keys</span>.<span class="ident">unsigned</span>.<span class="ident">device_display_name</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">display_name</span>;
+
+                    <span class="ident">ReadOnlyDevice::new</span>(<span class="ident">device_keys</span>, <span class="self">self</span>.<span class="ident">trust_state</span>)
+                }
+            }
+
+            <span class="kw">let</span> <span class="ident">devices</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">ReadOnlyDevice</span><span class="op">&gt;</span> <span class="op">=</span> <span class="self">self</span>
+                .<span class="ident">devices</span>
+                .<span class="ident">iter</span>()
+                .<span class="ident">map</span>(<span class="op">|</span><span class="ident">d</span><span class="op">|</span> <span class="ident">serde_json::from_slice</span>(<span class="kw-2">&amp;</span><span class="ident">d</span><span class="question-mark">?</span>.<span class="number">1</span>).<span class="ident">map_err</span>(<span class="ident">CryptoStoreError::Serialization</span>))
+                .<span class="ident">map</span>(<span class="op">|</span><span class="ident">d</span><span class="op">|</span> {
+                    <span class="kw">let</span> <span class="ident">d</span>: <span class="ident">OldReadOnlyDevice</span> <span class="op">=</span> <span class="ident">d</span><span class="question-mark">?</span>;
+                    <span class="prelude-val">Ok</span>(<span class="ident">d</span>.<span class="ident">into</span>())
+                })
+                .<span class="ident">collect</span>::<span class="op">&lt;</span><span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">ReadOnlyDevice</span><span class="op">&gt;</span>, <span class="ident">CryptoStoreError</span><span class="op">&gt;</span><span class="op">&gt;</span>()<span class="question-mark">?</span>;
+
+            <span class="self">self</span>.<span class="ident">devices</span>.<span class="ident">transaction</span>(<span class="kw">move</span> <span class="op">|</span><span class="ident">tree</span><span class="op">|</span> {
+                <span class="kw">for</span> <span class="ident">device</span> <span class="kw">in</span> <span class="kw-2">&amp;</span><span class="ident">devices</span> {
+                    <span class="kw">let</span> <span class="ident">key</span> <span class="op">=</span> <span class="ident">device</span>.<span class="ident">encode</span>();
+                    <span class="kw">let</span> <span class="ident">device</span> <span class="op">=</span>
+                        <span class="ident">serde_json::to_vec</span>(<span class="ident">device</span>).<span class="ident">map_err</span>(<span class="ident">ConflictableTransactionError::Abort</span>)<span class="question-mark">?</span>;
+                    <span class="ident">tree</span>.<span class="ident">insert</span>(<span class="ident">key</span>, <span class="ident">device</span>)<span class="question-mark">?</span>;
+                }
+
+                <span class="prelude-val">Ok</span>(())
+            })<span class="question-mark">?</span>;
+        }
+
+        <span class="kw">if</span> <span class="ident">version</span> <span class="op">&lt;</span><span class="op">=</span> <span class="number">2</span> {
+            <span class="comment">// We&#39;re treating our own device now differently, we&#39;re checking if</span>
+            <span class="comment">// the keys match to what we have locally, remove the unchecked</span>
+            <span class="comment">// device and mark our own user as dirty.</span>
+            <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">pickle</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">account</span>.<span class="ident">get</span>(<span class="string">&quot;account&quot;</span>.<span class="ident">encode</span>())<span class="question-mark">?</span> {
+                <span class="kw">let</span> <span class="ident">pickle</span> <span class="op">=</span> <span class="ident">serde_json::from_slice</span>(<span class="kw-2">&amp;</span><span class="ident">pickle</span>)<span class="question-mark">?</span>;
+                <span class="kw">let</span> <span class="ident">account</span> <span class="op">=</span> <span class="ident">ReadOnlyAccount::from_pickle</span>(<span class="ident">pickle</span>, <span class="self">self</span>.<span class="ident">get_pickle_mode</span>())<span class="question-mark">?</span>;
+
+                <span class="self">self</span>.<span class="ident">devices</span>
+                    .<span class="ident">remove</span>((<span class="ident">account</span>.<span class="ident">user_id</span>().<span class="ident">as_str</span>(), <span class="ident">account</span>.<span class="ident">device_id</span>.<span class="ident">as_str</span>()).<span class="ident">encode</span>())<span class="question-mark">?</span>;
+                <span class="self">self</span>.<span class="ident">tracked_users</span>.<span class="ident">insert</span>(<span class="ident">account</span>.<span class="ident">user_id</span>().<span class="ident">as_str</span>(), <span class="kw-2">&amp;</span>[<span class="bool-val">true</span> <span class="kw">as</span> <span class="ident">u8</span>])<span class="question-mark">?</span>;
+            }
         }
 
         <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">insert</span>(<span class="string">&quot;store_version&quot;</span>, <span class="ident">DATABASE_VERSION</span>.<span class="ident">to_be_bytes</span>().<span class="ident">as_ref</span>())<span class="question-mark">?</span>;
@@ -1950,14 +2090,14 @@
                     }
 
                     <span class="kw">for</span> <span class="ident">device</span> <span class="kw">in</span> <span class="ident">device_changes</span>.<span class="ident">new</span>.<span class="ident">iter</span>().<span class="ident">chain</span>(<span class="kw-2">&amp;</span><span class="ident">device_changes</span>.<span class="ident">changed</span>) {
-                        <span class="kw">let</span> <span class="ident">key</span> <span class="op">=</span> (<span class="ident">device</span>.<span class="ident">user_id</span>().<span class="ident">as_str</span>(), <span class="ident">device</span>.<span class="ident">device_id</span>().<span class="ident">as_str</span>()).<span class="ident">encode</span>();
+                        <span class="kw">let</span> <span class="ident">key</span> <span class="op">=</span> <span class="ident">device</span>.<span class="ident">encode</span>();
                         <span class="kw">let</span> <span class="ident">device</span> <span class="op">=</span> <span class="ident">serde_json::to_vec</span>(<span class="kw-2">&amp;</span><span class="ident">device</span>)
                             .<span class="ident">map_err</span>(<span class="ident">ConflictableTransactionError::Abort</span>)<span class="question-mark">?</span>;
                         <span class="ident">devices</span>.<span class="ident">insert</span>(<span class="ident">key</span>, <span class="ident">device</span>)<span class="question-mark">?</span>;
                     }
 
                     <span class="kw">for</span> <span class="ident">device</span> <span class="kw">in</span> <span class="kw-2">&amp;</span><span class="ident">device_changes</span>.<span class="ident">deleted</span> {
-                        <span class="kw">let</span> <span class="ident">key</span> <span class="op">=</span> (<span class="ident">device</span>.<span class="ident">user_id</span>().<span class="ident">as_str</span>(), <span class="ident">device</span>.<span class="ident">device_id</span>().<span class="ident">as_str</span>()).<span class="ident">encode</span>();
+                        <span class="kw">let</span> <span class="ident">key</span> <span class="op">=</span> <span class="ident">device</span>.<span class="ident">encode</span>();
                         <span class="ident">devices</span>.<span class="ident">remove</span>(<span class="ident">key</span>)<span class="question-mark">?</span>;
                     }
 

@@ -786,8 +786,6 @@
 <span id="785">785</span>
 <span id="786">786</span>
 <span id="787">787</span>
-<span id="788">788</span>
-<span id="789">789</span>
 </pre><pre class="rust"><code><span class="comment">// Copyright 2020 The Matrix.org Foundation C.I.C.</span>
 <span class="comment">//</span>
 <span class="comment">// Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);</span>
@@ -1213,7 +1211,7 @@
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         <span class="ident">device</span>: <span class="kw-2">&amp;</span><span class="ident">ReadOnlyDevice</span>,
     ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">SignatureUploadRequest</span>, <span class="ident">SignatureError</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">device_keys</span> <span class="op">=</span> <span class="ident">device</span>.<span class="ident">as_device_keys</span>();
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">device_keys</span> <span class="op">=</span> <span class="ident">device</span>.<span class="ident">as_device_keys</span>().<span class="ident">to_owned</span>();
         <span class="ident">device_keys</span>.<span class="ident">signatures</span>.<span class="ident">clear</span>();
         <span class="self">self</span>.<span class="ident">sign_device_keys</span>(<span class="kw-2">&amp;mut</span> <span class="ident">device_keys</span>).<span class="kw">await</span>
     }
@@ -1444,8 +1442,6 @@
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
 <span class="kw">mod</span> <span class="ident">test</span> {
-    <span class="kw">use</span> <span class="ident">std::sync::Arc</span>;
-
     <span class="kw">use</span> <span class="ident">matrix_sdk_test::async_test</span>;
     <span class="kw">use</span> <span class="ident">ruma</span>::{<span class="ident">user_id</span>, <span class="ident">UserId</span>};
 
@@ -1547,9 +1543,9 @@
         <span class="kw">let</span> <span class="ident">self_signing</span> <span class="op">=</span> <span class="ident">identity</span>.<span class="ident">self_signing_key</span>.<span class="ident">lock</span>().<span class="kw">await</span>;
         <span class="kw">let</span> <span class="ident">self_signing</span> <span class="op">=</span> <span class="ident">self_signing</span>.<span class="ident">as_ref</span>().<span class="ident">unwrap</span>();
 
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">device_keys</span> <span class="op">=</span> <span class="ident">device</span>.<span class="ident">as_device_keys</span>();
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">device_keys</span> <span class="op">=</span> <span class="ident">device</span>.<span class="ident">as_device_keys</span>().<span class="ident">to_owned</span>();
         <span class="ident">self_signing</span>.<span class="ident">sign_device</span>(<span class="kw-2">&amp;mut</span> <span class="ident">device_keys</span>).<span class="kw">await</span>.<span class="ident">unwrap</span>();
-        <span class="ident">device</span>.<span class="ident">signatures</span> <span class="op">=</span> <span class="ident">Arc::new</span>(<span class="ident">device_keys</span>.<span class="ident">signatures</span>);
+        <span class="ident">device</span>.<span class="ident">update_device</span>(<span class="kw-2">&amp;</span><span class="ident">device_keys</span>).<span class="ident">unwrap</span>();
 
         <span class="kw">let</span> <span class="ident">public_key</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">self_signing</span>.<span class="ident">public_key</span>;
         <span class="ident">public_key</span>.<span class="ident">verify_device</span>(<span class="kw-2">&amp;</span><span class="ident">device</span>).<span class="ident">unwrap</span>()

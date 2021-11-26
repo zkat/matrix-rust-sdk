@@ -694,22 +694,6 @@
 <span id="693">693</span>
 <span id="694">694</span>
 <span id="695">695</span>
-<span id="696">696</span>
-<span id="697">697</span>
-<span id="698">698</span>
-<span id="699">699</span>
-<span id="700">700</span>
-<span id="701">701</span>
-<span id="702">702</span>
-<span id="703">703</span>
-<span id="704">704</span>
-<span id="705">705</span>
-<span id="706">706</span>
-<span id="707">707</span>
-<span id="708">708</span>
-<span id="709">709</span>
-<span id="710">710</span>
-<span id="711">711</span>
 </pre><pre class="rust"><code><span class="comment">// Copyright 2020 The Matrix.org Foundation C.I.C.</span>
 <span class="comment">//</span>
 <span class="comment">// Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);</span>
@@ -765,12 +749,7 @@
 <span class="doccomment">/// A read-only version of a `Device`.</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Serialize</span>, <span class="ident">Deserialize</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">ReadOnlyDevice</span> {
-    <span class="ident">user_id</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">UserId</span><span class="op">&gt;</span>,
-    <span class="ident">device_id</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">DeviceId</span><span class="op">&gt;</span>,
-    <span class="ident">algorithms</span>: <span class="ident">Arc</span><span class="op">&lt;</span>[<span class="ident">EventEncryptionAlgorithm</span>]<span class="op">&gt;</span>,
-    <span class="ident">keys</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">BTreeMap</span><span class="op">&lt;</span><span class="ident">DeviceKeyId</span>, <span class="ident">String</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">signatures</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">BTreeMap</span><span class="op">&lt;</span><span class="ident">UserId</span>, <span class="ident">BTreeMap</span><span class="op">&lt;</span><span class="ident">DeviceKeyId</span>, <span class="ident">String</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-    <span class="ident">display_name</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">inner</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">DeviceKeys</span><span class="op">&gt;</span>,
     <span class="attribute">#[<span class="ident">serde</span>(
         <span class="ident">serialize_with</span> <span class="op">=</span> <span class="string">&quot;atomic_bool_serializer&quot;</span>,
         <span class="ident">deserialize_with</span> <span class="op">=</span> <span class="string">&quot;atomic_bool_deserializer&quot;</span>
@@ -788,7 +767,7 @@
         <span class="ident">f</span>.<span class="ident">debug_struct</span>(<span class="string">&quot;ReadOnlyDevice&quot;</span>)
             .<span class="ident">field</span>(<span class="string">&quot;user_id&quot;</span>, <span class="self">self</span>.<span class="ident">user_id</span>())
             .<span class="ident">field</span>(<span class="string">&quot;device_id&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">device_id</span>())
-            .<span class="ident">field</span>(<span class="string">&quot;display_name&quot;</span>, <span class="self">self</span>.<span class="ident">display_name</span>())
+            .<span class="ident">field</span>(<span class="string">&quot;display_name&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">display_name</span>())
             .<span class="ident">field</span>(<span class="string">&quot;keys&quot;</span>, <span class="self">self</span>.<span class="ident">keys</span>())
             .<span class="ident">field</span>(<span class="string">&quot;deleted&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">deleted</span>.<span class="ident">load</span>(<span class="ident">Ordering::SeqCst</span>))
             .<span class="ident">field</span>(<span class="string">&quot;trust_state&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">trust_state</span>)
@@ -1024,10 +1003,26 @@
         })
     }
 
+    <span class="kw">fn</span> <span class="ident">own_user_id</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">UserId</span> {
+        <span class="self">self</span>.<span class="ident">verification_machine</span>.<span class="ident">own_user_id</span>()
+    }
+
+    <span class="kw">fn</span> <span class="ident">own_device_id</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">DeviceId</span> {
+        <span class="self">self</span>.<span class="ident">verification_machine</span>.<span class="ident">own_device_id</span>()
+    }
+
     <span class="doccomment">/// Returns true if there is at least one devices of this user that is</span>
     <span class="doccomment">/// considered to be verified, false otherwise.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// This won&#39;t consider your own device as verified, as your own device is</span>
+    <span class="doccomment">/// always implicitly verified.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_any_verified</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">values</span>().<span class="ident">any</span>(<span class="op">|</span><span class="ident">d</span><span class="op">|</span> <span class="ident">d</span>.<span class="ident">verified</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">own_identity</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">device_owner_identity</span>))
+        <span class="self">self</span>.<span class="ident">inner</span>
+            .<span class="ident">values</span>()
+            .<span class="ident">filter</span>(<span class="op">|</span><span class="ident">d</span><span class="op">|</span> {
+                <span class="op">!</span>(<span class="ident">d</span>.<span class="ident">user_id</span>() <span class="op">==</span> <span class="self">self</span>.<span class="ident">own_user_id</span>() <span class="op">&amp;&amp;</span> <span class="ident">d</span>.<span class="ident">device_id</span>() <span class="op">==</span> <span class="self">self</span>.<span class="ident">own_device_id</span>())
+            })
+            .<span class="ident">any</span>(<span class="op">|</span><span class="ident">d</span><span class="op">|</span> <span class="ident">d</span>.<span class="ident">verified</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">own_identity</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">device_owner_identity</span>))
     }
 
     <span class="doccomment">/// Iterator over all the device ids of the user devices.</span>
@@ -1072,56 +1067,46 @@
 }
 
 <span class="kw">impl</span> <span class="ident">ReadOnlyDevice</span> {
-    <span class="doccomment">/// Create a new Device.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(
-        <span class="ident">user_id</span>: <span class="ident">UserId</span>,
-        <span class="ident">device_id</span>: <span class="ident">Box</span><span class="op">&lt;</span><span class="ident">DeviceId</span><span class="op">&gt;</span>,
-        <span class="ident">display_name</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
-        <span class="ident">trust_state</span>: <span class="ident">LocalTrust</span>,
-        <span class="ident">algorithms</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">EventEncryptionAlgorithm</span><span class="op">&gt;</span>,
-        <span class="ident">keys</span>: <span class="ident">BTreeMap</span><span class="op">&lt;</span><span class="ident">DeviceKeyId</span>, <span class="ident">String</span><span class="op">&gt;</span>,
-        <span class="ident">signatures</span>: <span class="ident">BTreeMap</span><span class="op">&lt;</span><span class="ident">UserId</span>, <span class="ident">BTreeMap</span><span class="op">&lt;</span><span class="ident">DeviceKeyId</span>, <span class="ident">String</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-    ) -&gt; <span class="self">Self</span> {
+    <span class="doccomment">/// Create a new Device, this constructor skips signature verification of</span>
+    <span class="doccomment">/// the keys, `TryFrom` should be used for completely new devices we</span>
+    <span class="doccomment">/// receive.</span>
+    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;sled_cryptostore&quot;</span>)]</span>
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">device_keys</span>: <span class="ident">DeviceKeys</span>, <span class="ident">trust_state</span>: <span class="ident">LocalTrust</span>) -&gt; <span class="self">Self</span> {
         <span class="self">Self</span> {
-            <span class="ident">user_id</span>: <span class="ident">Arc::new</span>(<span class="ident">user_id</span>),
-            <span class="ident">device_id</span>: <span class="ident">device_id</span>.<span class="ident">into</span>(),
-            <span class="ident">display_name</span>: <span class="ident">Arc::new</span>(<span class="ident">display_name</span>),
+            <span class="ident">inner</span>: <span class="ident">device_keys</span>.<span class="ident">into</span>(),
             <span class="ident">trust_state</span>: <span class="ident">Arc::new</span>(<span class="ident">Atomic::new</span>(<span class="ident">trust_state</span>)),
-            <span class="ident">signatures</span>: <span class="ident">Arc::new</span>(<span class="ident">signatures</span>),
-            <span class="ident">algorithms</span>: <span class="ident">algorithms</span>.<span class="ident">into</span>(),
-            <span class="ident">keys</span>: <span class="ident">Arc::new</span>(<span class="ident">keys</span>),
             <span class="ident">deleted</span>: <span class="ident">Arc::new</span>(<span class="ident">AtomicBool::new</span>(<span class="bool-val">false</span>)),
         }
     }
 
     <span class="doccomment">/// The user id of the device owner.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">user_id</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">UserId</span> {
-        <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">user_id</span>
+        <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">user_id</span>
     }
 
     <span class="doccomment">/// The unique ID of the device.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">device_id</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">DeviceId</span> {
-        <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">device_id</span>
+        <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">device_id</span>
     }
 
     <span class="doccomment">/// Get the human readable name of the device.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">display_name</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span> {
-        <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">display_name</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">display_name</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span> {
+        <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">unsigned</span>.<span class="ident">device_display_name</span>.<span class="ident">as_deref</span>()
     }
 
     <span class="doccomment">/// Get the key of the given key algorithm belonging to this device.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_key</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">algorithm</span>: <span class="ident">DeviceKeyAlgorithm</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">String</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">keys</span>.<span class="ident">get</span>(<span class="kw-2">&amp;</span><span class="ident">DeviceKeyId::from_parts</span>(<span class="ident">algorithm</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">device_id</span>))
+        <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">keys</span>.<span class="ident">get</span>(<span class="kw-2">&amp;</span><span class="ident">DeviceKeyId::from_parts</span>(<span class="ident">algorithm</span>, <span class="self">self</span>.<span class="ident">device_id</span>()))
     }
 
     <span class="doccomment">/// Get a map containing all the device keys.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">keys</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">BTreeMap</span><span class="op">&lt;</span><span class="ident">DeviceKeyId</span>, <span class="ident">String</span><span class="op">&gt;</span> {
-        <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">keys</span>
+        <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">keys</span>
     }
 
     <span class="doccomment">/// Get a map containing all the device signatures.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">signatures</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">BTreeMap</span><span class="op">&lt;</span><span class="ident">UserId</span>, <span class="ident">BTreeMap</span><span class="op">&lt;</span><span class="ident">DeviceKeyId</span>, <span class="ident">String</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">signatures</span>
+        <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">signatures</span>
     }
 
     <span class="doccomment">/// Get the trust state of the device.</span>
@@ -1151,7 +1136,7 @@
 
     <span class="doccomment">/// Get the list of algorithms this device supports.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">algorithms</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>[<span class="ident">EventEncryptionAlgorithm</span>] {
-        <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">algorithms</span>
+        <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">algorithms</span>
     }
 
     <span class="doccomment">/// Is the device deleted.</span>
@@ -1240,13 +1225,7 @@
     <span class="doccomment">/// Update a device with a new device keys struct.</span>
     <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">update_device</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">device_keys</span>: <span class="kw-2">&amp;</span><span class="ident">DeviceKeys</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">SignatureError</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">verify_device_keys</span>(<span class="ident">device_keys</span>)<span class="question-mark">?</span>;
-
-        <span class="kw">let</span> <span class="ident">display_name</span> <span class="op">=</span> <span class="ident">Arc::new</span>(<span class="ident">device_keys</span>.<span class="ident">unsigned</span>.<span class="ident">device_display_name</span>.<span class="ident">clone</span>());
-
-        <span class="self">self</span>.<span class="ident">algorithms</span> <span class="op">=</span> <span class="ident">device_keys</span>.<span class="ident">algorithms</span>.<span class="ident">as_slice</span>().<span class="ident">into</span>();
-        <span class="self">self</span>.<span class="ident">keys</span> <span class="op">=</span> <span class="ident">Arc::new</span>(<span class="ident">device_keys</span>.<span class="ident">keys</span>.<span class="ident">clone</span>());
-        <span class="self">self</span>.<span class="ident">signatures</span> <span class="op">=</span> <span class="ident">Arc::new</span>(<span class="ident">device_keys</span>.<span class="ident">signatures</span>.<span class="ident">clone</span>());
-        <span class="self">self</span>.<span class="ident">display_name</span> <span class="op">=</span> <span class="ident">display_name</span>;
+        <span class="self">self</span>.<span class="ident">inner</span> <span class="op">=</span> <span class="ident">device_keys</span>.<span class="ident">clone</span>().<span class="ident">into</span>();
 
         <span class="prelude-val">Ok</span>(())
     }
@@ -1258,21 +1237,15 @@
         <span class="kw">let</span> <span class="ident">utility</span> <span class="op">=</span> <span class="ident">Utility::new</span>();
 
         <span class="ident">utility</span>.<span class="ident">verify_json</span>(
-            <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">user_id</span>,
+            <span class="self">self</span>.<span class="ident">user_id</span>(),
             <span class="kw-2">&amp;</span><span class="ident">DeviceKeyId::from_parts</span>(<span class="ident">DeviceKeyAlgorithm::Ed25519</span>, <span class="self">self</span>.<span class="ident">device_id</span>()),
             <span class="ident">signing_key</span>,
             <span class="ident">json</span>,
         )
     }
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">as_device_keys</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">DeviceKeys</span> {
-        <span class="ident">DeviceKeys::new</span>(
-            <span class="self">self</span>.<span class="ident">user_id</span>().<span class="ident">clone</span>(),
-            <span class="self">self</span>.<span class="ident">device_id</span>().<span class="ident">into</span>(),
-            <span class="self">self</span>.<span class="ident">algorithms</span>().<span class="ident">to_vec</span>(),
-            <span class="self">self</span>.<span class="ident">keys</span>().<span class="ident">clone</span>(),
-            <span class="self">self</span>.<span class="ident">signatures</span>().<span class="ident">to_owned</span>(),
-        )
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">as_device_keys</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">DeviceKeys</span> {
+        <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">inner</span>
     }
 
     <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">verify_device_keys</span>(
@@ -1312,12 +1285,7 @@
 
     <span class="kw">fn</span> <span class="ident">try_from</span>(<span class="ident">device_keys</span>: <span class="kw-2">&amp;</span><span class="ident">DeviceKeys</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident"><span class="self">Self</span>::Error</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">device</span> <span class="op">=</span> <span class="self">Self</span> {
-            <span class="ident">user_id</span>: <span class="ident">Arc::new</span>(<span class="ident">device_keys</span>.<span class="ident">user_id</span>.<span class="ident">clone</span>()),
-            <span class="ident">device_id</span>: <span class="ident">device_keys</span>.<span class="ident">device_id</span>.<span class="ident">clone</span>().<span class="ident">into</span>(),
-            <span class="ident">algorithms</span>: <span class="ident">device_keys</span>.<span class="ident">algorithms</span>.<span class="ident">as_slice</span>().<span class="ident">into</span>(),
-            <span class="ident">signatures</span>: <span class="ident">Arc::new</span>(<span class="ident">device_keys</span>.<span class="ident">signatures</span>.<span class="ident">clone</span>()),
-            <span class="ident">keys</span>: <span class="ident">Arc::new</span>(<span class="ident">device_keys</span>.<span class="ident">keys</span>.<span class="ident">clone</span>()),
-            <span class="ident">display_name</span>: <span class="ident">Arc::new</span>(<span class="ident">device_keys</span>.<span class="ident">unsigned</span>.<span class="ident">device_display_name</span>.<span class="ident">clone</span>()),
+            <span class="ident">inner</span>: <span class="ident">device_keys</span>.<span class="ident">clone</span>().<span class="ident">into</span>(),
             <span class="ident">deleted</span>: <span class="ident">Arc::new</span>(<span class="ident">AtomicBool::new</span>(<span class="bool-val">false</span>)),
             <span class="ident">trust_state</span>: <span class="ident">Arc::new</span>(<span class="ident">Atomic::new</span>(<span class="ident">LocalTrust::Unset</span>)),
         };
@@ -1381,9 +1349,9 @@
 
         <span class="macro">assert_eq!</span>(<span class="kw-2">&amp;</span><span class="ident">user_id</span>, <span class="ident">device</span>.<span class="ident">user_id</span>());
         <span class="macro">assert_eq!</span>(<span class="ident">device_id</span>, <span class="ident">device</span>.<span class="ident">device_id</span>());
-        <span class="macro">assert_eq!</span>(<span class="ident">device</span>.<span class="ident">algorithms</span>.<span class="ident">len</span>(), <span class="number">2</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">device</span>.<span class="ident">algorithms</span>().<span class="ident">len</span>(), <span class="number">2</span>);
         <span class="macro">assert_eq!</span>(<span class="ident">LocalTrust::Unset</span>, <span class="ident">device</span>.<span class="ident">local_trust_state</span>());
-        <span class="macro">assert_eq!</span>(<span class="string">&quot;Alice&#39;s mobile phone&quot;</span>, <span class="ident">device</span>.<span class="ident">display_name</span>().<span class="ident">as_ref</span>().<span class="ident">unwrap</span>());
+        <span class="macro">assert_eq!</span>(<span class="string">&quot;Alice&#39;s mobile phone&quot;</span>, <span class="ident">device</span>.<span class="ident">display_name</span>().<span class="ident">unwrap</span>());
         <span class="macro">assert_eq!</span>(
             <span class="ident">device</span>.<span class="ident">get_key</span>(<span class="ident">DeviceKeyAlgorithm::Curve25519</span>).<span class="ident">unwrap</span>(),
             <span class="string">&quot;xfgbLIC5WAl1OIkpOzoxpCe8FsRDT6nch7NQsOb15nc&quot;</span>
@@ -1398,7 +1366,7 @@
     <span class="kw">fn</span> <span class="ident">update_a_device</span>() {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">device</span> <span class="op">=</span> <span class="ident">get_device</span>();
 
-        <span class="macro">assert_eq!</span>(<span class="string">&quot;Alice&#39;s mobile phone&quot;</span>, <span class="ident">device</span>.<span class="ident">display_name</span>().<span class="ident">as_ref</span>().<span class="ident">unwrap</span>());
+        <span class="macro">assert_eq!</span>(<span class="string">&quot;Alice&#39;s mobile phone&quot;</span>, <span class="ident">device</span>.<span class="ident">display_name</span>().<span class="ident">unwrap</span>());
 
         <span class="kw">let</span> <span class="ident">display_name</span> <span class="op">=</span> <span class="string">&quot;Alice&#39;s work computer&quot;</span>.<span class="ident">to_owned</span>();
 
