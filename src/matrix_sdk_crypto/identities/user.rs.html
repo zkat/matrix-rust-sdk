@@ -1081,11 +1081,6 @@
 <span id="1080">1080</span>
 <span id="1081">1081</span>
 <span id="1082">1082</span>
-<span id="1083">1083</span>
-<span id="1084">1084</span>
-<span id="1085">1085</span>
-<span id="1086">1086</span>
-<span id="1087">1087</span>
 </pre><pre class="rust"><code><span class="comment">// Copyright 2020 The Matrix.org Foundation C.I.C.</span>
 <span class="comment">//</span>
 <span class="comment">// Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);</span>
@@ -1116,7 +1111,7 @@
     <span class="ident">events</span>::{
         <span class="ident">key::verification::VerificationMethod</span>, <span class="ident">room::message::KeyVerificationRequestEventContent</span>,
     },
-    <span class="ident">DeviceIdBox</span>, <span class="ident">DeviceKeyId</span>, <span class="ident">EventId</span>, <span class="ident">RoomId</span>, <span class="ident">UserId</span>,
+    <span class="ident">DeviceId</span>, <span class="ident">DeviceKeyId</span>, <span class="ident">EventId</span>, <span class="ident">RoomId</span>, <span class="ident">UserId</span>,
 };
 <span class="kw">use</span> <span class="ident">serde</span>::{<span class="ident">Deserialize</span>, <span class="ident">Serialize</span>};
 <span class="kw">use</span> <span class="ident">serde_json::to_value</span>;
@@ -1253,7 +1248,7 @@
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         <span class="ident">methods</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">VerificationMethod</span><span class="op">&gt;</span><span class="op">&gt;</span>,
     ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(<span class="ident">VerificationRequest</span>, <span class="ident">OutgoingVerificationRequest</span>), <span class="ident">CryptoStoreError</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">devices</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">DeviceIdBox</span><span class="op">&gt;</span> <span class="op">=</span> <span class="self">self</span>
+        <span class="kw">let</span> <span class="ident">devices</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Box</span><span class="op">&lt;</span><span class="ident">DeviceId</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="op">=</span> <span class="self">self</span>
             .<span class="ident">verification_machine</span>
             .<span class="ident">store</span>
             .<span class="ident">get_user_devices</span>(<span class="self">self</span>.<span class="ident">user_id</span>())
@@ -1528,7 +1523,7 @@
     }
 
     <span class="doccomment">/// Get the signatures map of this cross signing key.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">signatures</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">BTreeMap</span><span class="op">&lt;</span><span class="ident">UserId</span>, <span class="ident">BTreeMap</span><span class="op">&lt;</span><span class="ident">String</span>, <span class="ident">String</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">signatures</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">BTreeMap</span><span class="op">&lt;</span><span class="ident">Box</span><span class="op">&lt;</span><span class="ident">UserId</span><span class="op">&gt;</span>, <span class="ident">BTreeMap</span><span class="op">&lt;</span><span class="ident">String</span>, <span class="ident">String</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="number">0</span>.<span class="ident">signatures</span>
     }
 
@@ -1563,7 +1558,7 @@
     ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">SignatureError</span><span class="op">&gt;</span> {
         <span class="kw">let</span> (<span class="ident">key_id</span>, <span class="ident">key</span>) <span class="op">=</span> <span class="self">self</span>.<span class="number">0</span>.<span class="ident">keys</span>.<span class="ident">iter</span>().<span class="ident">next</span>().<span class="ident">ok_or</span>(<span class="ident">SignatureError::MissingSigningKey</span>)<span class="question-mark">?</span>;
 
-        <span class="kw">let</span> <span class="ident">key_id</span> <span class="op">=</span> <span class="ident">DeviceKeyId::try_from</span>(<span class="ident">key_id</span>.<span class="ident">as_str</span>())<span class="question-mark">?</span>;
+        <span class="kw">let</span> <span class="ident">key_id</span> <span class="op">=</span> <span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">DeviceKeyId</span><span class="op">&gt;</span><span class="ident">::try_from</span>(<span class="ident">key_id</span>.<span class="ident">as_str</span>())<span class="question-mark">?</span>;
 
         <span class="comment">// FIXME `KeyUsage is missing PartialEq.</span>
         <span class="comment">// if self.0.usage.contains(&amp;KeyUsage::Master) {</span>
@@ -1571,14 +1566,14 @@
         <span class="comment">// }</span>
         <span class="kw">let</span> <span class="ident">subkey</span>: <span class="ident">CrossSigningSubKeys</span> <span class="op">=</span> <span class="ident">subkey</span>.<span class="ident">into</span>();
 
-        <span class="kw">if</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="number">0</span>.<span class="ident">user_id</span> <span class="op">!</span><span class="op">=</span> <span class="ident">subkey</span>.<span class="ident">user_id</span>() {
+        <span class="kw">if</span> <span class="self">self</span>.<span class="number">0</span>.<span class="ident">user_id</span> <span class="op">!</span><span class="op">=</span> <span class="ident">subkey</span>.<span class="ident">user_id</span>() {
             <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">SignatureError::UserIdMismatch</span>);
         }
 
         <span class="kw">let</span> <span class="ident">utility</span> <span class="op">=</span> <span class="ident">Utility::new</span>();
         <span class="ident">utility</span>.<span class="ident">verify_json</span>(
             <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="number">0</span>.<span class="ident">user_id</span>,
-            <span class="kw-2">&amp;</span><span class="ident">key_id</span>,
+            <span class="ident">key_id</span>,
             <span class="ident">key</span>,
             <span class="kw-2">&amp;mut</span> <span class="ident">to_value</span>(<span class="ident">subkey</span>.<span class="ident">cross_signing_key</span>()).<span class="ident">map_err</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="ident">SignatureError::NotAnObject</span>)<span class="question-mark">?</span>,
         )
@@ -1625,7 +1620,7 @@
         <span class="kw">let</span> <span class="ident">utility</span> <span class="op">=</span> <span class="ident">Utility::new</span>();
         <span class="ident">utility</span>.<span class="ident">verify_json</span>(
             <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="number">0</span>.<span class="ident">user_id</span>,
-            <span class="kw-2">&amp;</span><span class="ident">DeviceKeyId::try_from</span>(<span class="ident">key_id</span>.<span class="ident">as_str</span>())<span class="question-mark">?</span>,
+            <span class="ident">key_id</span>.<span class="ident">as_str</span>().<span class="ident">try_into</span>()<span class="question-mark">?</span>,
             <span class="ident">key</span>,
             <span class="kw-2">&amp;mut</span> <span class="ident">to_value</span>(<span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="ident">master_key</span>.<span class="number">0</span>).<span class="ident">map_err</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="ident">SignatureError::NotAnObject</span>)<span class="question-mark">?</span>,
         )
@@ -1660,12 +1655,7 @@
 
         <span class="kw">let</span> <span class="ident">utility</span> <span class="op">=</span> <span class="ident">Utility::new</span>();
 
-        <span class="ident">utility</span>.<span class="ident">verify_json</span>(
-            <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="number">0</span>.<span class="ident">user_id</span>,
-            <span class="kw-2">&amp;</span><span class="ident">DeviceKeyId::try_from</span>(<span class="ident">key_id</span>.<span class="ident">as_str</span>())<span class="question-mark">?</span>,
-            <span class="ident">key</span>,
-            <span class="kw-2">&amp;mut</span> <span class="ident">device</span>,
-        )
+        <span class="ident">utility</span>.<span class="ident">verify_json</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="number">0</span>.<span class="ident">user_id</span>, <span class="ident">key_id</span>.<span class="ident">as_str</span>().<span class="ident">try_into</span>()<span class="question-mark">?</span>, <span class="ident">key</span>, <span class="kw-2">&amp;mut</span> <span class="ident">device</span>)
     }
 
     <span class="doccomment">/// Check if the given device is signed by this self signing key.</span>
@@ -1806,7 +1796,7 @@
     ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">SignatureError</span><span class="op">&gt;</span> {
         <span class="ident">master_key</span>.<span class="ident">verify_subkey</span>(<span class="kw-2">&amp;</span><span class="ident">self_signing_key</span>)<span class="question-mark">?</span>;
 
-        <span class="prelude-val">Ok</span>(<span class="self">Self</span> { <span class="ident">user_id</span>: <span class="ident">Arc::new</span>(<span class="ident">master_key</span>.<span class="number">0</span>.<span class="ident">user_id</span>.<span class="ident">clone</span>()), <span class="ident">master_key</span>, <span class="ident">self_signing_key</span> })
+        <span class="prelude-val">Ok</span>(<span class="self">Self</span> { <span class="ident">user_id</span>: <span class="ident">master_key</span>.<span class="number">0</span>.<span class="ident">user_id</span>.<span class="ident">clone</span>().<span class="ident">into</span>(), <span class="ident">master_key</span>, <span class="ident">self_signing_key</span> })
     }
 
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
@@ -1815,7 +1805,7 @@
         <span class="kw">let</span> <span class="ident">self_signing_key</span> <span class="op">=</span>
             <span class="ident">identity</span>.<span class="ident">self_signing_key</span>.<span class="ident">lock</span>().<span class="kw">await</span>.<span class="ident">as_ref</span>().<span class="ident">unwrap</span>().<span class="ident">public_key</span>.<span class="ident">clone</span>();
 
-        <span class="self">Self</span> { <span class="ident">user_id</span>: <span class="ident">Arc::new</span>(<span class="ident">identity</span>.<span class="ident">user_id</span>().<span class="ident">clone</span>()), <span class="ident">master_key</span>, <span class="ident">self_signing_key</span> }
+        <span class="self">Self</span> { <span class="ident">user_id</span>: <span class="ident">identity</span>.<span class="ident">user_id</span>().<span class="ident">into</span>(), <span class="ident">master_key</span>, <span class="ident">self_signing_key</span> }
     }
 
     <span class="doccomment">/// Get the user id of this identity.</span>
@@ -1919,7 +1909,7 @@
         <span class="ident">master_key</span>.<span class="ident">verify_subkey</span>(<span class="kw-2">&amp;</span><span class="ident">user_signing_key</span>)<span class="question-mark">?</span>;
 
         <span class="prelude-val">Ok</span>(<span class="self">Self</span> {
-            <span class="ident">user_id</span>: <span class="ident">Arc::new</span>(<span class="ident">master_key</span>.<span class="number">0</span>.<span class="ident">user_id</span>.<span class="ident">clone</span>()),
+            <span class="ident">user_id</span>: <span class="ident">master_key</span>.<span class="number">0</span>.<span class="ident">user_id</span>.<span class="ident">clone</span>().<span class="ident">into</span>(),
             <span class="ident">master_key</span>,
             <span class="ident">self_signing_key</span>,
             <span class="ident">user_signing_key</span>,
@@ -2057,9 +2047,9 @@
     <span class="kw">fn</span> <span class="ident">own_identity</span>(<span class="ident">response</span>: <span class="kw-2">&amp;</span><span class="ident">KeyQueryResponse</span>) -&gt; <span class="ident">ReadOnlyOwnUserIdentity</span> {
         <span class="kw">let</span> <span class="ident">user_id</span> <span class="op">=</span> <span class="macro">user_id!</span>(<span class="string">&quot;@example:localhost&quot;</span>);
 
-        <span class="kw">let</span> <span class="ident">master_key</span> <span class="op">=</span> <span class="ident">response</span>.<span class="ident">master_keys</span>.<span class="ident">get</span>(<span class="kw-2">&amp;</span><span class="ident">user_id</span>).<span class="ident">unwrap</span>();
-        <span class="kw">let</span> <span class="ident">user_signing</span> <span class="op">=</span> <span class="ident">response</span>.<span class="ident">user_signing_keys</span>.<span class="ident">get</span>(<span class="kw-2">&amp;</span><span class="ident">user_id</span>).<span class="ident">unwrap</span>();
-        <span class="kw">let</span> <span class="ident">self_signing</span> <span class="op">=</span> <span class="ident">response</span>.<span class="ident">self_signing_keys</span>.<span class="ident">get</span>(<span class="kw-2">&amp;</span><span class="ident">user_id</span>).<span class="ident">unwrap</span>();
+        <span class="kw">let</span> <span class="ident">master_key</span> <span class="op">=</span> <span class="ident">response</span>.<span class="ident">master_keys</span>.<span class="ident">get</span>(<span class="ident">user_id</span>).<span class="ident">unwrap</span>();
+        <span class="kw">let</span> <span class="ident">user_signing</span> <span class="op">=</span> <span class="ident">response</span>.<span class="ident">user_signing_keys</span>.<span class="ident">get</span>(<span class="ident">user_id</span>).<span class="ident">unwrap</span>();
+        <span class="kw">let</span> <span class="ident">self_signing</span> <span class="op">=</span> <span class="ident">response</span>.<span class="ident">self_signing_keys</span>.<span class="ident">get</span>(<span class="ident">user_id</span>).<span class="ident">unwrap</span>();
 
         <span class="ident">ReadOnlyOwnUserIdentity::new</span>(<span class="ident">master_key</span>.<span class="ident">into</span>(), <span class="ident">self_signing</span>.<span class="ident">into</span>(), <span class="ident">user_signing</span>.<span class="ident">into</span>())
             .<span class="ident">unwrap</span>()
@@ -2073,8 +2063,8 @@
         <span class="kw">let</span> <span class="ident">user_id</span> <span class="op">=</span> <span class="macro">user_id!</span>(<span class="string">&quot;@example2:localhost&quot;</span>);
         <span class="kw">let</span> <span class="ident">response</span> <span class="op">=</span> <span class="ident">other_key_query</span>();
 
-        <span class="kw">let</span> <span class="ident">master_key</span> <span class="op">=</span> <span class="ident">response</span>.<span class="ident">master_keys</span>.<span class="ident">get</span>(<span class="kw-2">&amp;</span><span class="ident">user_id</span>).<span class="ident">unwrap</span>();
-        <span class="kw">let</span> <span class="ident">self_signing</span> <span class="op">=</span> <span class="ident">response</span>.<span class="ident">self_signing_keys</span>.<span class="ident">get</span>(<span class="kw-2">&amp;</span><span class="ident">user_id</span>).<span class="ident">unwrap</span>();
+        <span class="kw">let</span> <span class="ident">master_key</span> <span class="op">=</span> <span class="ident">response</span>.<span class="ident">master_keys</span>.<span class="ident">get</span>(<span class="ident">user_id</span>).<span class="ident">unwrap</span>();
+        <span class="kw">let</span> <span class="ident">self_signing</span> <span class="op">=</span> <span class="ident">response</span>.<span class="ident">self_signing_keys</span>.<span class="ident">get</span>(<span class="ident">user_id</span>).<span class="ident">unwrap</span>();
 
         <span class="ident">ReadOnlyUserIdentity::new</span>(<span class="ident">master_key</span>.<span class="ident">into</span>(), <span class="ident">self_signing</span>.<span class="ident">into</span>()).<span class="ident">unwrap</span>()
     }
@@ -2084,9 +2074,9 @@
         <span class="kw">let</span> <span class="ident">user_id</span> <span class="op">=</span> <span class="macro">user_id!</span>(<span class="string">&quot;@example:localhost&quot;</span>);
         <span class="kw">let</span> <span class="ident">response</span> <span class="op">=</span> <span class="ident">own_key_query</span>();
 
-        <span class="kw">let</span> <span class="ident">master_key</span> <span class="op">=</span> <span class="ident">response</span>.<span class="ident">master_keys</span>.<span class="ident">get</span>(<span class="kw-2">&amp;</span><span class="ident">user_id</span>).<span class="ident">unwrap</span>();
-        <span class="kw">let</span> <span class="ident">user_signing</span> <span class="op">=</span> <span class="ident">response</span>.<span class="ident">user_signing_keys</span>.<span class="ident">get</span>(<span class="kw-2">&amp;</span><span class="ident">user_id</span>).<span class="ident">unwrap</span>();
-        <span class="kw">let</span> <span class="ident">self_signing</span> <span class="op">=</span> <span class="ident">response</span>.<span class="ident">self_signing_keys</span>.<span class="ident">get</span>(<span class="kw-2">&amp;</span><span class="ident">user_id</span>).<span class="ident">unwrap</span>();
+        <span class="kw">let</span> <span class="ident">master_key</span> <span class="op">=</span> <span class="ident">response</span>.<span class="ident">master_keys</span>.<span class="ident">get</span>(<span class="ident">user_id</span>).<span class="ident">unwrap</span>();
+        <span class="kw">let</span> <span class="ident">user_signing</span> <span class="op">=</span> <span class="ident">response</span>.<span class="ident">user_signing_keys</span>.<span class="ident">get</span>(<span class="ident">user_id</span>).<span class="ident">unwrap</span>();
+        <span class="kw">let</span> <span class="ident">self_signing</span> <span class="op">=</span> <span class="ident">response</span>.<span class="ident">self_signing_keys</span>.<span class="ident">get</span>(<span class="ident">user_id</span>).<span class="ident">unwrap</span>();
 
         <span class="ident">ReadOnlyOwnUserIdentity::new</span>(<span class="ident">master_key</span>.<span class="ident">into</span>(), <span class="ident">self_signing</span>.<span class="ident">into</span>(), <span class="ident">user_signing</span>.<span class="ident">into</span>())
             .<span class="ident">unwrap</span>();
@@ -2107,7 +2097,7 @@
         <span class="macro">assert!</span>(<span class="ident">identity</span>.<span class="ident">is_device_signed</span>(<span class="kw-2">&amp;</span><span class="ident">second</span>).<span class="ident">is_ok</span>());
 
         <span class="kw">let</span> <span class="ident">private_identity</span> <span class="op">=</span>
-            <span class="ident">Arc::new</span>(<span class="ident">Mutex::new</span>(<span class="ident">PrivateCrossSigningIdentity::empty</span>(<span class="ident">second</span>.<span class="ident">user_id</span>().<span class="ident">clone</span>())));
+            <span class="ident">Arc::new</span>(<span class="ident">Mutex::new</span>(<span class="ident">PrivateCrossSigningIdentity::empty</span>(<span class="ident">second</span>.<span class="ident">user_id</span>().<span class="ident">to_owned</span>())));
         <span class="kw">let</span> <span class="ident">verification_machine</span> <span class="op">=</span> <span class="ident">VerificationMachine::new</span>(
             <span class="ident">ReadOnlyAccount::new</span>(<span class="ident">second</span>.<span class="ident">user_id</span>(), <span class="ident">second</span>.<span class="ident">device_id</span>()),
             <span class="ident">private_identity</span>,
@@ -2174,5 +2164,5 @@
     }
 }
 </code></pre></div>
-</section><section id="search" class="content hidden"></section><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="matrix_sdk_crypto" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.59.0-nightly (db9d361a4 2021-11-28)" ></div>
+</section><section id="search" class="content hidden"></section><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="matrix_sdk_crypto" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.59.0-nightly (6db0a0e9a 2021-11-29)" ></div>
 </body></html>

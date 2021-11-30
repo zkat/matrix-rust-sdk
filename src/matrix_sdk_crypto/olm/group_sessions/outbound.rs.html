@@ -626,6 +626,7 @@
 <span id="625">625</span>
 <span id="626">626</span>
 <span id="627">627</span>
+<span id="628">628</span>
 </pre><pre class="rust"><code><span class="comment">// Copyright 2020 The Matrix.org Foundation C.I.C.</span>
 <span class="comment">//</span>
 <span class="comment">// Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);</span>
@@ -673,7 +674,7 @@
         <span class="ident">room_key::ToDeviceRoomKeyEventContent</span>,
         <span class="ident">AnyToDeviceEventContent</span>,
     },
-    <span class="ident">DeviceId</span>, <span class="ident">DeviceIdBox</span>, <span class="ident">DeviceKeyAlgorithm</span>, <span class="ident">EventEncryptionAlgorithm</span>, <span class="ident">RoomId</span>, <span class="ident">UserId</span>,
+    <span class="ident">DeviceId</span>, <span class="ident">DeviceKeyAlgorithm</span>, <span class="ident">EventEncryptionAlgorithm</span>, <span class="ident">RoomId</span>, <span class="ident">UserId</span>,
 };
 <span class="kw">use</span> <span class="ident">serde</span>::{<span class="ident">Deserialize</span>, <span class="ident">Serialize</span>};
 <span class="kw">use</span> <span class="ident">serde_json</span>::{<span class="ident">json</span>, <span class="ident">Value</span>};
@@ -756,7 +757,8 @@
     <span class="ident">shared</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">AtomicBool</span><span class="op">&gt;</span>,
     <span class="ident">invalidated</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">AtomicBool</span><span class="op">&gt;</span>,
     <span class="ident">settings</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">EncryptionSettings</span><span class="op">&gt;</span>,
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">shared_with_set</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">DashMap</span><span class="op">&lt;</span><span class="ident">UserId</span>, <span class="ident">DashMap</span><span class="op">&lt;</span><span class="ident">DeviceIdBox</span>, <span class="ident">ShareInfo</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+    <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy::type_complexity</span>)]</span>
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">shared_with_set</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">DashMap</span><span class="op">&lt;</span><span class="ident">Box</span><span class="op">&lt;</span><span class="ident">UserId</span><span class="op">&gt;</span>, <span class="ident">DashMap</span><span class="op">&lt;</span><span class="ident">Box</span><span class="op">&lt;</span><span class="ident">DeviceId</span><span class="op">&gt;</span>, <span class="ident">ShareInfo</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span>,
     <span class="ident">to_share_with_set</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">DashMap</span><span class="op">&lt;</span><span class="ident">Uuid</span>, (<span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">ToDeviceRequest</span><span class="op">&gt;</span>, <span class="ident">ShareInfoSet</span>)<span class="op">&gt;</span><span class="op">&gt;</span>,
 }
 
@@ -764,7 +766,7 @@
 <span class="doccomment">///</span>
 <span class="doccomment">/// Holds the `ShareInfo` for all the user/device pairs that will receive the</span>
 <span class="doccomment">/// room key.</span>
-<span class="kw">pub</span> <span class="kw">type</span> <span class="ident">ShareInfoSet</span> <span class="op">=</span> <span class="ident">BTreeMap</span><span class="op">&lt;</span><span class="ident">UserId</span>, <span class="ident">BTreeMap</span><span class="op">&lt;</span><span class="ident">DeviceIdBox</span>, <span class="ident">ShareInfo</span><span class="op">&gt;</span><span class="op">&gt;</span>;
+<span class="kw">pub</span> <span class="kw">type</span> <span class="ident">ShareInfoSet</span> <span class="op">=</span> <span class="ident">BTreeMap</span><span class="op">&lt;</span><span class="ident">Box</span><span class="op">&lt;</span><span class="ident">UserId</span><span class="op">&gt;</span>, <span class="ident">BTreeMap</span><span class="op">&lt;</span><span class="ident">Box</span><span class="op">&lt;</span><span class="ident">DeviceId</span><span class="op">&gt;</span>, <span class="ident">ShareInfo</span><span class="op">&gt;</span><span class="op">&gt;</span>;
 
 <span class="doccomment">/// Struct holding info about the share state of a outbound group session.</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Serialize</span>, <span class="ident">Deserialize</span>)]</span>
@@ -802,7 +804,7 @@
 
         <span class="ident">OutboundGroupSession</span> {
             <span class="ident">inner</span>: <span class="ident">Arc::new</span>(<span class="ident">Mutex::new</span>(<span class="ident">session</span>)),
-            <span class="ident">room_id</span>: <span class="ident">Arc::new</span>(<span class="ident">room_id</span>.<span class="ident">to_owned</span>()),
+            <span class="ident">room_id</span>: <span class="ident">room_id</span>.<span class="ident">into</span>(),
             <span class="ident">device_id</span>,
             <span class="ident">account_identity_keys</span>: <span class="ident">identity_keys</span>,
             <span class="ident">session_id</span>: <span class="ident">session_id</span>.<span class="ident">into</span>(),
@@ -842,7 +844,7 @@
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">mark_request_as_sent</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">request_id</span>: <span class="kw-2">&amp;</span><span class="ident">Uuid</span>) {
         <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>((<span class="kw">_</span>, (<span class="kw">_</span>, <span class="ident">r</span>))) <span class="op">=</span> <span class="self">self</span>.<span class="ident">to_share_with_set</span>.<span class="ident">remove</span>(<span class="ident">request_id</span>) {
             <span class="kw">let</span> <span class="ident">recipients</span>: <span class="ident">BTreeMap</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">UserId</span>, <span class="ident">BTreeSet</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">DeviceId</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="op">=</span>
-                <span class="ident">r</span>.<span class="ident">iter</span>().<span class="ident">map</span>(<span class="op">|</span>(<span class="ident">u</span>, <span class="ident">d</span>)<span class="op">|</span> (<span class="ident">u</span>, <span class="ident">d</span>.<span class="ident">keys</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">d</span><span class="op">|</span> <span class="ident">d</span>.<span class="ident">as_ref</span>()).<span class="ident">collect</span>())).<span class="ident">collect</span>();
+                <span class="ident">r</span>.<span class="ident">iter</span>().<span class="ident">map</span>(<span class="op">|</span>(<span class="ident">u</span>, <span class="ident">d</span>)<span class="op">|</span> (<span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="kw-2">*</span><span class="ident">u</span>, <span class="ident">d</span>.<span class="ident">keys</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">d</span><span class="op">|</span> <span class="ident">d</span>.<span class="ident">as_ref</span>()).<span class="ident">collect</span>())).<span class="ident">collect</span>();
 
             <span class="macro">info!</span>(
                 <span class="question-mark">?</span><span class="ident">request_id</span>,
@@ -1217,7 +1219,7 @@
     <span class="doccomment">/// Has the session been invalidated.</span>
     <span class="kw">pub</span> <span class="ident">invalidated</span>: <span class="ident">bool</span>,
     <span class="doccomment">/// The set of users the session has been already shared with.</span>
-    <span class="kw">pub</span> <span class="ident">shared_with_set</span>: <span class="ident">BTreeMap</span><span class="op">&lt;</span><span class="ident">UserId</span>, <span class="ident">BTreeMap</span><span class="op">&lt;</span><span class="ident">DeviceIdBox</span>, <span class="ident">ShareInfo</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+    <span class="kw">pub</span> <span class="ident">shared_with_set</span>: <span class="ident">BTreeMap</span><span class="op">&lt;</span><span class="ident">Box</span><span class="op">&lt;</span><span class="ident">UserId</span><span class="op">&gt;</span>, <span class="ident">BTreeMap</span><span class="op">&lt;</span><span class="ident">Box</span><span class="op">&lt;</span><span class="ident">DeviceId</span><span class="op">&gt;</span>, <span class="ident">ShareInfo</span><span class="op">&gt;</span><span class="op">&gt;</span>,
     <span class="doccomment">/// Requests that need to be sent out to share the session.</span>
     <span class="kw">pub</span> <span class="ident">requests</span>: <span class="ident">BTreeMap</span><span class="op">&lt;</span><span class="ident">Uuid</span>, (<span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">ToDeviceRequest</span><span class="op">&gt;</span>, <span class="ident">ShareInfoSet</span>)<span class="op">&gt;</span>,
 }
@@ -1254,5 +1256,5 @@
     }
 }
 </code></pre></div>
-</section><section id="search" class="content hidden"></section><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="matrix_sdk_crypto" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.59.0-nightly (db9d361a4 2021-11-28)" ></div>
+</section><section id="search" class="content hidden"></section><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="matrix_sdk_crypto" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.59.0-nightly (6db0a0e9a 2021-11-29)" ></div>
 </body></html>

@@ -728,7 +728,7 @@
         <span class="ident">key::verification::VerificationMethod</span>, <span class="ident">room::encrypted::ToDeviceRoomEncryptedEventContent</span>,
         <span class="ident">AnyToDeviceEventContent</span>,
     },
-    <span class="ident">DeviceId</span>, <span class="ident">DeviceIdBox</span>, <span class="ident">DeviceKeyAlgorithm</span>, <span class="ident">DeviceKeyId</span>, <span class="ident">EventEncryptionAlgorithm</span>, <span class="ident">UserId</span>,
+    <span class="ident">DeviceId</span>, <span class="ident">DeviceKeyAlgorithm</span>, <span class="ident">DeviceKeyId</span>, <span class="ident">EventEncryptionAlgorithm</span>, <span class="ident">UserId</span>,
 };
 <span class="kw">use</span> <span class="ident">serde</span>::{<span class="ident">Deserialize</span>, <span class="ident">Deserializer</span>, <span class="ident">Serialize</span>, <span class="ident">Serializer</span>};
 <span class="kw">use</span> <span class="ident">serde_json</span>::{<span class="ident">json</span>, <span class="ident">Value</span>};
@@ -765,7 +765,7 @@
 <span class="kw">impl</span> <span class="ident">std::fmt::Debug</span> <span class="kw">for</span> <span class="ident">ReadOnlyDevice</span> {
     <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">std::fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">std::fmt::Result</span> {
         <span class="ident">f</span>.<span class="ident">debug_struct</span>(<span class="string">&quot;ReadOnlyDevice&quot;</span>)
-            .<span class="ident">field</span>(<span class="string">&quot;user_id&quot;</span>, <span class="self">self</span>.<span class="ident">user_id</span>())
+            .<span class="ident">field</span>(<span class="string">&quot;user_id&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">user_id</span>())
             .<span class="ident">field</span>(<span class="string">&quot;device_id&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">device_id</span>())
             .<span class="ident">field</span>(<span class="string">&quot;display_name&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">display_name</span>())
             .<span class="ident">field</span>(<span class="string">&quot;keys&quot;</span>, <span class="self">self</span>.<span class="ident">keys</span>())
@@ -986,7 +986,7 @@
 <span class="doccomment">/// A read only view over all devices belonging to a user.</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">UserDevices</span> {
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">inner</span>: <span class="ident">HashMap</span><span class="op">&lt;</span><span class="ident">DeviceIdBox</span>, <span class="ident">ReadOnlyDevice</span><span class="op">&gt;</span>,
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">inner</span>: <span class="ident">HashMap</span><span class="op">&lt;</span><span class="ident">Box</span><span class="op">&lt;</span><span class="ident">DeviceId</span><span class="op">&gt;</span>, <span class="ident">ReadOnlyDevice</span><span class="op">&gt;</span>,
     <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">verification_machine</span>: <span class="ident">VerificationMachine</span>,
     <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">own_identity</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ReadOnlyOwnUserIdentity</span><span class="op">&gt;</span>,
     <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">device_owner_identity</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ReadOnlyUserIdentities</span><span class="op">&gt;</span>,
@@ -1026,7 +1026,7 @@
     }
 
     <span class="doccomment">/// Iterator over all the device ids of the user devices.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">keys</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw">impl</span> <span class="ident">Iterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">DeviceIdBox</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">keys</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw">impl</span> <span class="ident">Iterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">Box</span><span class="op">&lt;</span><span class="ident">DeviceId</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">keys</span>()
     }
 
@@ -1100,12 +1100,12 @@
     }
 
     <span class="doccomment">/// Get a map containing all the device keys.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">keys</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">BTreeMap</span><span class="op">&lt;</span><span class="ident">DeviceKeyId</span>, <span class="ident">String</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">keys</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">BTreeMap</span><span class="op">&lt;</span><span class="ident">Box</span><span class="op">&lt;</span><span class="ident">DeviceKeyId</span><span class="op">&gt;</span>, <span class="ident">String</span><span class="op">&gt;</span> {
         <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">keys</span>
     }
 
     <span class="doccomment">/// Get a map containing all the device signatures.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">signatures</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">BTreeMap</span><span class="op">&lt;</span><span class="ident">UserId</span>, <span class="ident">BTreeMap</span><span class="op">&lt;</span><span class="ident">DeviceKeyId</span>, <span class="ident">String</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">signatures</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">BTreeMap</span><span class="op">&lt;</span><span class="ident">Box</span><span class="op">&lt;</span><span class="ident">UserId</span><span class="op">&gt;</span>, <span class="ident">BTreeMap</span><span class="op">&lt;</span><span class="ident">Box</span><span class="op">&lt;</span><span class="ident">DeviceKeyId</span><span class="op">&gt;</span>, <span class="ident">String</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">signatures</span>
     }
 
@@ -1347,7 +1347,7 @@
 
         <span class="kw">let</span> <span class="ident">device</span> <span class="op">=</span> <span class="ident">get_device</span>();
 
-        <span class="macro">assert_eq!</span>(<span class="kw-2">&amp;</span><span class="ident">user_id</span>, <span class="ident">device</span>.<span class="ident">user_id</span>());
+        <span class="macro">assert_eq!</span>(<span class="ident">user_id</span>, <span class="ident">device</span>.<span class="ident">user_id</span>());
         <span class="macro">assert_eq!</span>(<span class="ident">device_id</span>, <span class="ident">device</span>.<span class="ident">device_id</span>());
         <span class="macro">assert_eq!</span>(<span class="ident">device</span>.<span class="ident">algorithms</span>().<span class="ident">len</span>(), <span class="number">2</span>);
         <span class="macro">assert_eq!</span>(<span class="ident">LocalTrust::Unset</span>, <span class="ident">device</span>.<span class="ident">local_trust_state</span>());
@@ -1390,5 +1390,5 @@
     }
 }
 </code></pre></div>
-</section><section id="search" class="content hidden"></section><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="matrix_sdk_crypto" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.59.0-nightly (db9d361a4 2021-11-28)" ></div>
+</section><section id="search" class="content hidden"></section><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="matrix_sdk_crypto" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.59.0-nightly (6db0a0e9a 2021-11-29)" ></div>
 </body></html>

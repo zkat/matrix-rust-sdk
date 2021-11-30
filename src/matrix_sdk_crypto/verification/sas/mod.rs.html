@@ -895,8 +895,8 @@
     <span class="doccomment">/// sent out through the server to the other device.</span>
     <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy::too_many_arguments</span>)]</span>
     <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">start_in_room</span>(
-        <span class="ident">flow_id</span>: <span class="ident">EventId</span>,
-        <span class="ident">room_id</span>: <span class="ident">RoomId</span>,
+        <span class="ident">flow_id</span>: <span class="ident">Box</span><span class="op">&lt;</span><span class="ident">EventId</span><span class="op">&gt;</span>,
+        <span class="ident">room_id</span>: <span class="ident">Box</span><span class="op">&lt;</span><span class="ident">RoomId</span><span class="op">&gt;</span>,
         <span class="ident">private_identity</span>: <span class="ident">PrivateCrossSigningIdentity</span>,
         <span class="ident">other_device</span>: <span class="ident">ReadOnlyDevice</span>,
         <span class="ident">store</span>: <span class="ident">VerificationStore</span>,
@@ -1224,7 +1224,7 @@
 <span class="kw">mod</span> <span class="ident">test</span> {
     <span class="kw">use</span> <span class="ident">std</span>::{<span class="ident">convert::TryFrom</span>, <span class="ident">sync::Arc</span>};
 
-    <span class="kw">use</span> <span class="ident">ruma</span>::{<span class="ident">DeviceId</span>, <span class="ident">UserId</span>};
+    <span class="kw">use</span> <span class="ident">ruma</span>::{<span class="ident">device_id</span>, <span class="ident">user_id</span>, <span class="ident">DeviceId</span>, <span class="ident">UserId</span>};
 
     <span class="kw">use</span> <span class="ident"><span class="kw">super</span>::Sas</span>;
     <span class="kw">use</span> <span class="kw">crate</span>::{
@@ -1237,28 +1237,28 @@
         <span class="ident">ReadOnlyAccount</span>, <span class="ident">ReadOnlyDevice</span>,
     };
 
-    <span class="kw">fn</span> <span class="ident">alice_id</span>() -&gt; <span class="ident">UserId</span> {
-        <span class="ident">UserId::try_from</span>(<span class="string">&quot;@alice:example.org&quot;</span>).<span class="ident">unwrap</span>()
+    <span class="kw">fn</span> <span class="ident">alice_id</span>() -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">UserId</span> {
+        <span class="macro">user_id!</span>(<span class="string">&quot;@alice:example.org&quot;</span>)
     }
 
-    <span class="kw">fn</span> <span class="ident">alice_device_id</span>() -&gt; <span class="ident">Box</span><span class="op">&lt;</span><span class="ident">DeviceId</span><span class="op">&gt;</span> {
-        <span class="string">&quot;JLAFKJWSCS&quot;</span>.<span class="ident">into</span>()
+    <span class="kw">fn</span> <span class="ident">alice_device_id</span>() -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">DeviceId</span> {
+        <span class="macro">device_id!</span>(<span class="string">&quot;JLAFKJWSCS&quot;</span>)
     }
 
-    <span class="kw">fn</span> <span class="ident">bob_id</span>() -&gt; <span class="ident">UserId</span> {
-        <span class="ident">UserId::try_from</span>(<span class="string">&quot;@bob:example.org&quot;</span>).<span class="ident">unwrap</span>()
+    <span class="kw">fn</span> <span class="ident">bob_id</span>() -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">UserId</span> {
+        <span class="macro">user_id!</span>(<span class="string">&quot;@bob:example.org&quot;</span>)
     }
 
-    <span class="kw">fn</span> <span class="ident">bob_device_id</span>() -&gt; <span class="ident">Box</span><span class="op">&lt;</span><span class="ident">DeviceId</span><span class="op">&gt;</span> {
-        <span class="string">&quot;BOBDEVCIE&quot;</span>.<span class="ident">into</span>()
+    <span class="kw">fn</span> <span class="ident">bob_device_id</span>() -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">DeviceId</span> {
+        <span class="macro">device_id!</span>(<span class="string">&quot;BOBDEVCIE&quot;</span>)
     }
 
     <span class="attribute">#[<span class="ident">tokio::test</span>]</span>
     <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">sas_wrapper_full</span>() {
-        <span class="kw">let</span> <span class="ident">alice</span> <span class="op">=</span> <span class="ident">ReadOnlyAccount::new</span>(<span class="kw-2">&amp;</span><span class="ident">alice_id</span>(), <span class="kw-2">&amp;</span><span class="ident">alice_device_id</span>());
+        <span class="kw">let</span> <span class="ident">alice</span> <span class="op">=</span> <span class="ident">ReadOnlyAccount::new</span>(<span class="ident">alice_id</span>(), <span class="ident">alice_device_id</span>());
         <span class="kw">let</span> <span class="ident">alice_device</span> <span class="op">=</span> <span class="ident">ReadOnlyDevice::from_account</span>(<span class="kw-2">&amp;</span><span class="ident">alice</span>).<span class="kw">await</span>;
 
-        <span class="kw">let</span> <span class="ident">bob</span> <span class="op">=</span> <span class="ident">ReadOnlyAccount::new</span>(<span class="kw-2">&amp;</span><span class="ident">bob_id</span>(), <span class="kw-2">&amp;</span><span class="ident">bob_device_id</span>());
+        <span class="kw">let</span> <span class="ident">bob</span> <span class="op">=</span> <span class="ident">ReadOnlyAccount::new</span>(<span class="ident">bob_id</span>(), <span class="ident">bob_device_id</span>());
         <span class="kw">let</span> <span class="ident">bob_device</span> <span class="op">=</span> <span class="ident">ReadOnlyDevice::from_account</span>(<span class="kw-2">&amp;</span><span class="ident">bob</span>).<span class="kw">await</span>;
 
         <span class="kw">let</span> <span class="ident">alice_store</span> <span class="op">=</span>
@@ -1270,7 +1270,7 @@
         <span class="kw">let</span> <span class="ident">bob_store</span> <span class="op">=</span> <span class="ident">VerificationStore</span> { <span class="ident">account</span>: <span class="ident">bob</span>.<span class="ident">clone</span>(), <span class="ident">inner</span>: <span class="ident">Arc::new</span>(<span class="ident">bob_store</span>) };
 
         <span class="kw">let</span> (<span class="ident">alice</span>, <span class="ident">content</span>) <span class="op">=</span> <span class="ident">Sas::start</span>(
-            <span class="ident">PrivateCrossSigningIdentity::empty</span>(<span class="ident">alice_id</span>()),
+            <span class="ident">PrivateCrossSigningIdentity::empty</span>(<span class="ident">alice_id</span>().<span class="ident">to_owned</span>()),
             <span class="ident">bob_device</span>,
             <span class="ident">alice_store</span>,
             <span class="prelude-val">None</span>,
@@ -1287,7 +1287,7 @@
             <span class="ident">flow_id</span>,
             <span class="kw-2">&amp;</span><span class="ident">content</span>,
             <span class="ident">bob_store</span>,
-            <span class="ident">PrivateCrossSigningIdentity::empty</span>(<span class="ident">bob_id</span>()),
+            <span class="ident">PrivateCrossSigningIdentity::empty</span>(<span class="ident">bob_id</span>().<span class="ident">to_owned</span>()),
             <span class="ident">alice_device</span>,
             <span class="prelude-val">None</span>,
             <span class="prelude-val">None</span>,
@@ -1332,5 +1332,5 @@
     }
 }
 </code></pre></div>
-</section><section id="search" class="content hidden"></section><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="matrix_sdk_crypto" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.59.0-nightly (db9d361a4 2021-11-28)" ></div>
+</section><section id="search" class="content hidden"></section><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="matrix_sdk_crypto" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.59.0-nightly (6db0a0e9a 2021-11-29)" ></div>
 </body></html>

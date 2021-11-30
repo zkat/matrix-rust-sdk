@@ -710,7 +710,7 @@
         },
         <span class="ident">client::r0::account::register</span>,
     },
-    <span class="ident">assign</span>, <span class="ident">identifiers</span>, <span class="ident">DeviceId</span>, <span class="ident">ServerNameBox</span>, <span class="ident">UserId</span>,
+    <span class="ident">assign</span>, <span class="ident">identifiers</span>, <span class="ident">DeviceId</span>, <span class="ident">ServerName</span>, <span class="ident">UserId</span>,
 };
 <span class="kw">use</span> <span class="ident">serde::de::DeserializeOwned</span>;
 <span class="kw">use</span> <span class="ident">tracing::info</span>;
@@ -806,7 +806,7 @@
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">AppService</span> {
     <span class="ident">homeserver_url</span>: <span class="ident">Url</span>,
-    <span class="ident">server_name</span>: <span class="ident">ServerNameBox</span>,
+    <span class="ident">server_name</span>: <span class="ident">Box</span><span class="op">&lt;</span><span class="ident">ServerName</span><span class="op">&gt;</span>,
     <span class="ident">registration</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">AppServiceRegistration</span><span class="op">&gt;</span>,
     <span class="ident">clients</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">DashMap</span><span class="op">&lt;</span><span class="ident">Localpart</span>, <span class="ident">Client</span><span class="op">&gt;</span><span class="op">&gt;</span>,
     <span class="ident">event_handler</span>: <span class="ident">event_handler::EventHandler</span>,
@@ -830,7 +830,7 @@
     <span class="doccomment">/// [AppService Registration]: https://matrix.org/docs/spec/application_service/r0.1.2#registration</span>
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">new</span>(
         <span class="ident">homeserver_url</span>: <span class="kw">impl</span> <span class="ident">TryInto</span><span class="op">&lt;</span><span class="ident">Url</span>, <span class="ident">Error</span> <span class="op">=</span> <span class="ident">url::ParseError</span><span class="op">&gt;</span>,
-        <span class="ident">server_name</span>: <span class="kw">impl</span> <span class="ident">TryInto</span><span class="op">&lt;</span><span class="ident">ServerNameBox</span>, <span class="ident">Error</span> <span class="op">=</span> <span class="ident">identifiers::Error</span><span class="op">&gt;</span>,
+        <span class="ident">server_name</span>: <span class="kw">impl</span> <span class="ident">TryInto</span><span class="op">&lt;</span><span class="ident">Box</span><span class="op">&lt;</span><span class="ident">ServerName</span><span class="op">&gt;</span>, <span class="ident">Error</span> <span class="op">=</span> <span class="ident">identifiers::Error</span><span class="op">&gt;</span>,
         <span class="ident">registration</span>: <span class="ident">AppServiceRegistration</span>,
     ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">appservice</span> <span class="op">=</span> <span class="ident"><span class="self">Self</span>::new_with_config</span>(
@@ -848,7 +848,7 @@
     <span class="doccomment">/// [`Client`]</span>
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">new_with_config</span>(
         <span class="ident">homeserver_url</span>: <span class="kw">impl</span> <span class="ident">TryInto</span><span class="op">&lt;</span><span class="ident">Url</span>, <span class="ident">Error</span> <span class="op">=</span> <span class="ident">url::ParseError</span><span class="op">&gt;</span>,
-        <span class="ident">server_name</span>: <span class="kw">impl</span> <span class="ident">TryInto</span><span class="op">&lt;</span><span class="ident">ServerNameBox</span>, <span class="ident">Error</span> <span class="op">=</span> <span class="ident">identifiers::Error</span><span class="op">&gt;</span>,
+        <span class="ident">server_name</span>: <span class="kw">impl</span> <span class="ident">TryInto</span><span class="op">&lt;</span><span class="ident">Box</span><span class="op">&lt;</span><span class="ident">ServerName</span><span class="op">&gt;</span>, <span class="ident">Error</span> <span class="op">=</span> <span class="ident">identifiers::Error</span><span class="op">&gt;</span>,
         <span class="ident">registration</span>: <span class="ident">AppServiceRegistration</span>,
         <span class="ident">client_config</span>: <span class="ident">ClientConfig</span>,
     ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
@@ -1204,5 +1204,5 @@
     <span class="prelude-val">Ok</span>(<span class="ident">request</span>)
 }
 </code></pre></div>
-</section><section id="search" class="content hidden"></section><div id="rustdoc-vars" data-root-path="../../" data-current-crate="matrix_sdk_appservice" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.59.0-nightly (db9d361a4 2021-11-28)" ></div>
+</section><section id="search" class="content hidden"></section><div id="rustdoc-vars" data-root-path="../../" data-current-crate="matrix_sdk_appservice" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.59.0-nightly (6db0a0e9a 2021-11-29)" ></div>
 </body></html>

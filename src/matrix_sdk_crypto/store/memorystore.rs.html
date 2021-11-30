@@ -412,7 +412,6 @@
 <span id="411">411</span>
 <span id="412">412</span>
 <span id="413">413</span>
-<span id="414">414</span>
 </pre><pre class="rust"><code><span class="comment">// Copyright 2020 The Matrix.org Foundation C.I.C.</span>
 <span class="comment">//</span>
 <span class="comment">// Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);</span>
@@ -434,7 +433,7 @@
 
 <span class="kw">use</span> <span class="ident">dashmap</span>::{<span class="ident">DashMap</span>, <span class="ident">DashSet</span>};
 <span class="kw">use</span> <span class="ident">matrix_sdk_common</span>::{<span class="ident">async_trait</span>, <span class="ident">locks::Mutex</span>, <span class="ident">uuid::Uuid</span>};
-<span class="kw">use</span> <span class="ident">ruma</span>::{<span class="ident">DeviceId</span>, <span class="ident">DeviceIdBox</span>, <span class="ident">RoomId</span>, <span class="ident">UserId</span>};
+<span class="kw">use</span> <span class="ident">ruma</span>::{<span class="ident">DeviceId</span>, <span class="ident">RoomId</span>, <span class="ident">UserId</span>};
 
 <span class="kw">use</span> <span class="kw">super</span>::{
     <span class="ident">caches</span>::{<span class="ident">DeviceStore</span>, <span class="ident">GroupSessionStore</span>, <span class="ident">SessionStore</span>},
@@ -461,11 +460,11 @@
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">MemoryStore</span> {
     <span class="ident">sessions</span>: <span class="ident">SessionStore</span>,
     <span class="ident">inbound_group_sessions</span>: <span class="ident">GroupSessionStore</span>,
-    <span class="ident">tracked_users</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">DashSet</span><span class="op">&lt;</span><span class="ident">UserId</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-    <span class="ident">users_for_key_query</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">DashSet</span><span class="op">&lt;</span><span class="ident">UserId</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+    <span class="ident">tracked_users</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">DashSet</span><span class="op">&lt;</span><span class="ident">Box</span><span class="op">&lt;</span><span class="ident">UserId</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+    <span class="ident">users_for_key_query</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">DashSet</span><span class="op">&lt;</span><span class="ident">Box</span><span class="op">&lt;</span><span class="ident">UserId</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span>,
     <span class="ident">olm_hashes</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">DashMap</span><span class="op">&lt;</span><span class="ident">String</span>, <span class="ident">DashSet</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span>,
     <span class="ident">devices</span>: <span class="ident">DeviceStore</span>,
-    <span class="ident">identities</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">DashMap</span><span class="op">&lt;</span><span class="ident">UserId</span>, <span class="ident">ReadOnlyUserIdentities</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+    <span class="ident">identities</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">DashMap</span><span class="op">&lt;</span><span class="ident">Box</span><span class="op">&lt;</span><span class="ident">UserId</span><span class="op">&gt;</span>, <span class="ident">ReadOnlyUserIdentities</span><span class="op">&gt;</span><span class="op">&gt;</span>,
     <span class="ident">outgoing_key_requests</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">DashMap</span><span class="op">&lt;</span><span class="ident">Uuid</span>, <span class="ident">GossipRequest</span><span class="op">&gt;</span><span class="op">&gt;</span>,
     <span class="ident">key_requests_by_info</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">DashMap</span><span class="op">&lt;</span><span class="ident">String</span>, <span class="ident">Uuid</span><span class="op">&gt;</span><span class="op">&gt;</span>,
 }
@@ -622,11 +621,11 @@
         <span class="op">!</span><span class="self">self</span>.<span class="ident">users_for_key_query</span>.<span class="ident">is_empty</span>()
     }
 
-    <span class="kw">fn</span> <span class="ident">users_for_key_query</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">HashSet</span><span class="op">&lt;</span><span class="ident">UserId</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">users_for_key_query</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">HashSet</span><span class="op">&lt;</span><span class="ident">Box</span><span class="op">&lt;</span><span class="ident">UserId</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">users_for_key_query</span>.<span class="ident">iter</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">u</span><span class="op">|</span> <span class="ident">u</span>.<span class="ident">clone</span>()).<span class="ident">collect</span>()
     }
 
-    <span class="kw">fn</span> <span class="ident">tracked_users</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">HashSet</span><span class="op">&lt;</span><span class="ident">UserId</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">tracked_users</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">HashSet</span><span class="op">&lt;</span><span class="ident">Box</span><span class="op">&lt;</span><span class="ident">UserId</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">tracked_users</span>.<span class="ident">iter</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">u</span><span class="op">|</span> <span class="ident">u</span>.<span class="ident">to_owned</span>()).<span class="ident">collect</span>()
     }
 
@@ -644,12 +643,12 @@
         <span class="comment">// The counter would top out at 2 since there won&#39;t be a race between 3</span>
         <span class="comment">// different key queries syncs.</span>
         <span class="kw">if</span> <span class="ident">dirty</span> {
-            <span class="self">self</span>.<span class="ident">users_for_key_query</span>.<span class="ident">insert</span>(<span class="ident">user</span>.<span class="ident">clone</span>());
+            <span class="self">self</span>.<span class="ident">users_for_key_query</span>.<span class="ident">insert</span>(<span class="ident">user</span>.<span class="ident">to_owned</span>());
         } <span class="kw">else</span> {
             <span class="self">self</span>.<span class="ident">users_for_key_query</span>.<span class="ident">remove</span>(<span class="ident">user</span>);
         }
 
-        <span class="prelude-val">Ok</span>(<span class="self">self</span>.<span class="ident">tracked_users</span>.<span class="ident">insert</span>(<span class="ident">user</span>.<span class="ident">clone</span>()))
+        <span class="prelude-val">Ok</span>(<span class="self">self</span>.<span class="ident">tracked_users</span>.<span class="ident">insert</span>(<span class="ident">user</span>.<span class="ident">to_owned</span>()))
     }
 
     <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">get_device</span>(
@@ -663,7 +662,7 @@
     <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">get_user_devices</span>(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         <span class="ident">user_id</span>: <span class="kw-2">&amp;</span><span class="ident">UserId</span>,
-    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">HashMap</span><span class="op">&lt;</span><span class="ident">DeviceIdBox</span>, <span class="ident">ReadOnlyDevice</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">HashMap</span><span class="op">&lt;</span><span class="ident">Box</span><span class="op">&lt;</span><span class="ident">DeviceId</span><span class="op">&gt;</span>, <span class="ident">ReadOnlyDevice</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="prelude-val">Ok</span>(<span class="self">self</span>.<span class="ident">devices</span>.<span class="ident">user_devices</span>(<span class="ident">user_id</span>))
     }
 
@@ -754,12 +753,11 @@
         <span class="kw">let</span> (<span class="ident">account</span>, <span class="kw">_</span>) <span class="op">=</span> <span class="ident">get_account_and_session</span>().<span class="kw">await</span>;
         <span class="kw">let</span> <span class="ident">room_id</span> <span class="op">=</span> <span class="macro">room_id!</span>(<span class="string">&quot;!test:localhost&quot;</span>);
 
-        <span class="kw">let</span> (<span class="ident">outbound</span>, <span class="kw">_</span>) <span class="op">=</span>
-            <span class="ident">account</span>.<span class="ident">create_group_session_pair_with_defaults</span>(<span class="kw-2">&amp;</span><span class="ident">room_id</span>).<span class="kw">await</span>.<span class="ident">unwrap</span>();
+        <span class="kw">let</span> (<span class="ident">outbound</span>, <span class="kw">_</span>) <span class="op">=</span> <span class="ident">account</span>.<span class="ident">create_group_session_pair_with_defaults</span>(<span class="ident">room_id</span>).<span class="kw">await</span>.<span class="ident">unwrap</span>();
         <span class="kw">let</span> <span class="ident">inbound</span> <span class="op">=</span> <span class="ident">InboundGroupSession::new</span>(
             <span class="string">&quot;test_key&quot;</span>,
             <span class="string">&quot;test_key&quot;</span>,
-            <span class="kw-2">&amp;</span><span class="ident">room_id</span>,
+            <span class="ident">room_id</span>,
             <span class="ident">outbound</span>.<span class="ident">session_key</span>().<span class="kw">await</span>,
             <span class="prelude-val">None</span>,
         )
@@ -769,7 +767,7 @@
         <span class="kw">let</span> <span class="kw">_</span> <span class="op">=</span> <span class="ident">store</span>.<span class="ident">save_inbound_group_sessions</span>(<span class="macro">vec!</span>[<span class="ident">inbound</span>.<span class="ident">clone</span>()]).<span class="kw">await</span>;
 
         <span class="kw">let</span> <span class="ident">loaded_session</span> <span class="op">=</span> <span class="ident">store</span>
-            .<span class="ident">get_inbound_group_session</span>(<span class="kw-2">&amp;</span><span class="ident">room_id</span>, <span class="string">&quot;test_key&quot;</span>, <span class="ident">outbound</span>.<span class="ident">session_id</span>())
+            .<span class="ident">get_inbound_group_session</span>(<span class="ident">room_id</span>, <span class="string">&quot;test_key&quot;</span>, <span class="ident">outbound</span>.<span class="ident">session_id</span>())
             .<span class="kw">await</span>
             .<span class="ident">unwrap</span>()
             .<span class="ident">unwrap</span>();
@@ -828,5 +826,5 @@
     }
 }
 </code></pre></div>
-</section><section id="search" class="content hidden"></section><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="matrix_sdk_crypto" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.59.0-nightly (db9d361a4 2021-11-28)" ></div>
+</section><section id="search" class="content hidden"></section><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="matrix_sdk_crypto" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.59.0-nightly (6db0a0e9a 2021-11-29)" ></div>
 </body></html>

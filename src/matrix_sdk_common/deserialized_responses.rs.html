@@ -361,7 +361,7 @@
         <span class="ident">AnyRoomEvent</span>, <span class="ident">AnySyncRoomEvent</span>, <span class="ident">Unsigned</span>,
     },
     <span class="ident">serde::Raw</span>,
-    <span class="ident">DeviceIdBox</span>, <span class="ident">DeviceKeyAlgorithm</span>, <span class="ident">EventId</span>, <span class="ident">MilliSecondsSinceUnixEpoch</span>, <span class="ident">RoomId</span>, <span class="ident">UserId</span>,
+    <span class="ident">DeviceId</span>, <span class="ident">DeviceKeyAlgorithm</span>, <span class="ident">EventId</span>, <span class="ident">MilliSecondsSinceUnixEpoch</span>, <span class="ident">RoomId</span>, <span class="ident">UserId</span>,
 };
 <span class="kw">use</span> <span class="ident">serde</span>::{<span class="ident">Deserialize</span>, <span class="ident">Serialize</span>};
 
@@ -373,9 +373,9 @@
     <span class="doccomment">/// event itself ambiguous because of the event.</span>
     <span class="kw">pub</span> <span class="ident">member_ambiguous</span>: <span class="ident">bool</span>,
     <span class="doccomment">/// Has another user been disambiguated because of this event.</span>
-    <span class="kw">pub</span> <span class="ident">disambiguated_member</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">UserId</span><span class="op">&gt;</span>,
+    <span class="kw">pub</span> <span class="ident">disambiguated_member</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Box</span><span class="op">&lt;</span><span class="ident">UserId</span><span class="op">&gt;</span><span class="op">&gt;</span>,
     <span class="doccomment">/// Has another user become ambiguous because of this event.</span>
-    <span class="kw">pub</span> <span class="ident">ambiguated_member</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">UserId</span><span class="op">&gt;</span>,
+    <span class="kw">pub</span> <span class="ident">ambiguated_member</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Box</span><span class="op">&lt;</span><span class="ident">UserId</span><span class="op">&gt;</span><span class="op">&gt;</span>,
 }
 
 <span class="doccomment">/// Collection of ambiguioty changes that room member events trigger.</span>
@@ -383,7 +383,7 @@
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">AmbiguityChanges</span> {
     <span class="doccomment">/// A map from room id to a map of an event id to the `AmbiguityChange` that</span>
     <span class="doccomment">/// the event with the given id caused.</span>
-    <span class="kw">pub</span> <span class="ident">changes</span>: <span class="ident">BTreeMap</span><span class="op">&lt;</span><span class="ident">RoomId</span>, <span class="ident">BTreeMap</span><span class="op">&lt;</span><span class="ident">EventId</span>, <span class="ident">AmbiguityChange</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+    <span class="kw">pub</span> <span class="ident">changes</span>: <span class="ident">BTreeMap</span><span class="op">&lt;</span><span class="ident">Box</span><span class="op">&lt;</span><span class="ident">RoomId</span><span class="op">&gt;</span>, <span class="ident">BTreeMap</span><span class="op">&lt;</span><span class="ident">Box</span><span class="op">&lt;</span><span class="ident">EventId</span><span class="op">&gt;</span>, <span class="ident">AmbiguityChange</span><span class="op">&gt;</span><span class="op">&gt;</span>,
 }
 
 <span class="doccomment">/// The verification state of the device that sent an event to us.</span>
@@ -420,10 +420,10 @@
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">EncryptionInfo</span> {
     <span class="doccomment">/// The user ID of the event sender, note this is untrusted data unless the</span>
     <span class="doccomment">/// `verification_state` is as well trusted.</span>
-    <span class="kw">pub</span> <span class="ident">sender</span>: <span class="ident">UserId</span>,
+    <span class="kw">pub</span> <span class="ident">sender</span>: <span class="ident">Box</span><span class="op">&lt;</span><span class="ident">UserId</span><span class="op">&gt;</span>,
     <span class="doccomment">/// The device ID of the device that sent us the event, note this is</span>
     <span class="doccomment">/// untrusted data unless `verification_state` is as well trusted.</span>
-    <span class="kw">pub</span> <span class="ident">sender_device</span>: <span class="ident">DeviceIdBox</span>,
+    <span class="kw">pub</span> <span class="ident">sender_device</span>: <span class="ident">Box</span><span class="op">&lt;</span><span class="ident">DeviceId</span><span class="op">&gt;</span>,
     <span class="doccomment">/// Information about the algorithm that was used to encrypt the event.</span>
     <span class="kw">pub</span> <span class="ident">algorithm_info</span>: <span class="ident">AlgorithmInfo</span>,
     <span class="doccomment">/// The verification state of the device that sent us the event, note this</span>
@@ -472,7 +472,7 @@
     <span class="doccomment">/// Collection of ambiguity changes that room member events trigger.</span>
     <span class="kw">pub</span> <span class="ident">ambiguity_changes</span>: <span class="ident">AmbiguityChanges</span>,
     <span class="doccomment">/// New notifications per room.</span>
-    <span class="kw">pub</span> <span class="ident">notifications</span>: <span class="ident">BTreeMap</span><span class="op">&lt;</span><span class="ident">RoomId</span>, <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Notification</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+    <span class="kw">pub</span> <span class="ident">notifications</span>: <span class="ident">BTreeMap</span><span class="op">&lt;</span><span class="ident">Box</span><span class="op">&lt;</span><span class="ident">RoomId</span><span class="op">&gt;</span>, <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Notification</span><span class="op">&gt;</span><span class="op">&gt;</span>,
 }
 
 <span class="kw">impl</span> <span class="ident">SyncResponse</span> {
@@ -493,11 +493,11 @@
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Default</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Rooms</span> {
     <span class="doccomment">/// The rooms that the user has left or been banned from.</span>
-    <span class="kw">pub</span> <span class="ident">leave</span>: <span class="ident">BTreeMap</span><span class="op">&lt;</span><span class="ident">RoomId</span>, <span class="ident">LeftRoom</span><span class="op">&gt;</span>,
+    <span class="kw">pub</span> <span class="ident">leave</span>: <span class="ident">BTreeMap</span><span class="op">&lt;</span><span class="ident">Box</span><span class="op">&lt;</span><span class="ident">RoomId</span><span class="op">&gt;</span>, <span class="ident">LeftRoom</span><span class="op">&gt;</span>,
     <span class="doccomment">/// The rooms that the user has joined.</span>
-    <span class="kw">pub</span> <span class="ident">join</span>: <span class="ident">BTreeMap</span><span class="op">&lt;</span><span class="ident">RoomId</span>, <span class="ident">JoinedRoom</span><span class="op">&gt;</span>,
+    <span class="kw">pub</span> <span class="ident">join</span>: <span class="ident">BTreeMap</span><span class="op">&lt;</span><span class="ident">Box</span><span class="op">&lt;</span><span class="ident">RoomId</span><span class="op">&gt;</span>, <span class="ident">JoinedRoom</span><span class="op">&gt;</span>,
     <span class="doccomment">/// The rooms that the user has been invited to.</span>
-    <span class="kw">pub</span> <span class="ident">invite</span>: <span class="ident">BTreeMap</span><span class="op">&lt;</span><span class="ident">RoomId</span>, <span class="ident">InvitedRoom</span><span class="op">&gt;</span>,
+    <span class="kw">pub</span> <span class="ident">invite</span>: <span class="ident">BTreeMap</span><span class="op">&lt;</span><span class="ident">Box</span><span class="op">&lt;</span><span class="ident">RoomId</span><span class="op">&gt;</span>, <span class="ident">InvitedRoom</span><span class="op">&gt;</span>,
 }
 
 <span class="doccomment">/// Updates to joined rooms.</span>
@@ -595,11 +595,11 @@
 <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">try_from</span> <span class="op">=</span> <span class="string">&quot;SyncRoomMemberEvent&quot;</span>, <span class="ident">into</span> <span class="op">=</span> <span class="string">&quot;SyncRoomMemberEvent&quot;</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">MemberEvent</span> {
     <span class="kw">pub</span> <span class="ident">content</span>: <span class="ident">RoomMemberEventContent</span>,
-    <span class="kw">pub</span> <span class="ident">event_id</span>: <span class="ident">EventId</span>,
+    <span class="kw">pub</span> <span class="ident">event_id</span>: <span class="ident">Box</span><span class="op">&lt;</span><span class="ident">EventId</span><span class="op">&gt;</span>,
     <span class="kw">pub</span> <span class="ident">origin_server_ts</span>: <span class="ident">MilliSecondsSinceUnixEpoch</span>,
     <span class="kw">pub</span> <span class="ident">prev_content</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">RoomMemberEventContent</span><span class="op">&gt;</span>,
-    <span class="kw">pub</span> <span class="ident">sender</span>: <span class="ident">UserId</span>,
-    <span class="kw">pub</span> <span class="ident">state_key</span>: <span class="ident">UserId</span>,
+    <span class="kw">pub</span> <span class="ident">sender</span>: <span class="ident">Box</span><span class="op">&lt;</span><span class="ident">UserId</span><span class="op">&gt;</span>,
+    <span class="kw">pub</span> <span class="ident">state_key</span>: <span class="ident">Box</span><span class="op">&lt;</span><span class="ident">UserId</span><span class="op">&gt;</span>,
     <span class="kw">pub</span> <span class="ident">unsigned</span>: <span class="ident">Unsigned</span>,
 }
 
@@ -613,7 +613,7 @@
             <span class="ident">origin_server_ts</span>: <span class="ident">event</span>.<span class="ident">origin_server_ts</span>,
             <span class="ident">prev_content</span>: <span class="ident">event</span>.<span class="ident">prev_content</span>,
             <span class="ident">sender</span>: <span class="ident">event</span>.<span class="ident">sender</span>,
-            <span class="ident">state_key</span>: <span class="ident">UserId::try_from</span>(<span class="ident">event</span>.<span class="ident">state_key</span>)<span class="question-mark">?</span>,
+            <span class="ident">state_key</span>: <span class="ident">event</span>.<span class="ident">state_key</span>.<span class="ident">try_into</span>()<span class="question-mark">?</span>,
             <span class="ident">unsigned</span>: <span class="ident">event</span>.<span class="ident">unsigned</span>,
         })
     }
@@ -629,7 +629,7 @@
             <span class="ident">origin_server_ts</span>: <span class="ident">event</span>.<span class="ident">origin_server_ts</span>,
             <span class="ident">prev_content</span>: <span class="ident">event</span>.<span class="ident">prev_content</span>,
             <span class="ident">sender</span>: <span class="ident">event</span>.<span class="ident">sender</span>,
-            <span class="ident">state_key</span>: <span class="ident">UserId::try_from</span>(<span class="ident">event</span>.<span class="ident">state_key</span>)<span class="question-mark">?</span>,
+            <span class="ident">state_key</span>: <span class="ident">event</span>.<span class="ident">state_key</span>.<span class="ident">try_into</span>()<span class="question-mark">?</span>,
             <span class="ident">unsigned</span>: <span class="ident">event</span>.<span class="ident">unsigned</span>,
         })
     }
@@ -653,8 +653,8 @@
 <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">try_from</span> <span class="op">=</span> <span class="string">&quot;StrippedRoomMemberEvent&quot;</span>, <span class="ident">into</span> <span class="op">=</span> <span class="string">&quot;StrippedRoomMemberEvent&quot;</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">StrippedMemberEvent</span> {
     <span class="kw">pub</span> <span class="ident">content</span>: <span class="ident">RoomMemberEventContent</span>,
-    <span class="kw">pub</span> <span class="ident">sender</span>: <span class="ident">UserId</span>,
-    <span class="kw">pub</span> <span class="ident">state_key</span>: <span class="ident">UserId</span>,
+    <span class="kw">pub</span> <span class="ident">sender</span>: <span class="ident">Box</span><span class="op">&lt;</span><span class="ident">UserId</span><span class="op">&gt;</span>,
+    <span class="kw">pub</span> <span class="ident">state_key</span>: <span class="ident">Box</span><span class="op">&lt;</span><span class="ident">UserId</span><span class="op">&gt;</span>,
 }
 
 <span class="kw">impl</span> <span class="ident">TryFrom</span><span class="op">&lt;</span><span class="ident">StrippedRoomMemberEvent</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">StrippedMemberEvent</span> {
@@ -664,7 +664,7 @@
         <span class="prelude-val">Ok</span>(<span class="ident">StrippedMemberEvent</span> {
             <span class="ident">content</span>: <span class="ident">event</span>.<span class="ident">content</span>,
             <span class="ident">sender</span>: <span class="ident">event</span>.<span class="ident">sender</span>,
-            <span class="ident">state_key</span>: <span class="ident">UserId::try_from</span>(<span class="ident">event</span>.<span class="ident">state_key</span>)<span class="question-mark">?</span>,
+            <span class="ident">state_key</span>: <span class="ident">event</span>.<span class="ident">state_key</span>.<span class="ident">try_into</span>()<span class="question-mark">?</span>,
         })
     }
 }
@@ -690,5 +690,5 @@
     <span class="kw">pub</span> <span class="ident">ambiguity_changes</span>: <span class="ident">AmbiguityChanges</span>,
 }
 </code></pre></div>
-</section><section id="search" class="content hidden"></section><div id="rustdoc-vars" data-root-path="../../" data-current-crate="matrix_sdk_common" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.59.0-nightly (db9d361a4 2021-11-28)" ></div>
+</section><section id="search" class="content hidden"></section><div id="rustdoc-vars" data-root-path="../../" data-current-crate="matrix_sdk_common" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.59.0-nightly (6db0a0e9a 2021-11-29)" ></div>
 </body></html>

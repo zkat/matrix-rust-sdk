@@ -483,24 +483,6 @@
 <span id="482">482</span>
 <span id="483">483</span>
 <span id="484">484</span>
-<span id="485">485</span>
-<span id="486">486</span>
-<span id="487">487</span>
-<span id="488">488</span>
-<span id="489">489</span>
-<span id="490">490</span>
-<span id="491">491</span>
-<span id="492">492</span>
-<span id="493">493</span>
-<span id="494">494</span>
-<span id="495">495</span>
-<span id="496">496</span>
-<span id="497">497</span>
-<span id="498">498</span>
-<span id="499">499</span>
-<span id="500">500</span>
-<span id="501">501</span>
-<span id="502">502</span>
 </pre><pre class="rust"><code><span class="comment">// Copyright 2020 The Matrix.org Foundation C.I.C.</span>
 <span class="comment">//</span>
 <span class="comment">// Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);</span>
@@ -529,7 +511,7 @@
     },
     <span class="ident">assign</span>,
     <span class="ident">events</span>::{<span class="ident">dummy::ToDeviceDummyEventContent</span>, <span class="ident">AnyToDeviceEventContent</span>},
-    <span class="ident">DeviceId</span>, <span class="ident">DeviceIdBox</span>, <span class="ident">DeviceKeyAlgorithm</span>, <span class="ident">EventEncryptionAlgorithm</span>, <span class="ident">UserId</span>,
+    <span class="ident">DeviceId</span>, <span class="ident">DeviceKeyAlgorithm</span>, <span class="ident">EventEncryptionAlgorithm</span>, <span class="ident">UserId</span>,
 };
 <span class="kw">use</span> <span class="ident">tracing</span>::{<span class="ident">debug</span>, <span class="ident">error</span>, <span class="ident">info</span>, <span class="ident">warn</span>};
 
@@ -550,8 +532,8 @@
     <span class="doccomment">/// Submodules can insert user/device pairs into this map and the</span>
     <span class="doccomment">/// user/device paris will be added to the list of users when</span>
     <span class="doccomment">/// [`get_missing_sessions`](#method.get_missing_sessions) is called.</span>
-    <span class="ident">users_for_key_claim</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">DashMap</span><span class="op">&lt;</span><span class="ident">UserId</span>, <span class="ident">DashSet</span><span class="op">&lt;</span><span class="ident">DeviceIdBox</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-    <span class="ident">wedged_devices</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">DashMap</span><span class="op">&lt;</span><span class="ident">UserId</span>, <span class="ident">DashSet</span><span class="op">&lt;</span><span class="ident">DeviceIdBox</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+    <span class="ident">users_for_key_claim</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">DashMap</span><span class="op">&lt;</span><span class="ident">Box</span><span class="op">&lt;</span><span class="ident">UserId</span><span class="op">&gt;</span>, <span class="ident">DashSet</span><span class="op">&lt;</span><span class="ident">Box</span><span class="op">&lt;</span><span class="ident">DeviceId</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+    <span class="ident">wedged_devices</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">DashMap</span><span class="op">&lt;</span><span class="ident">Box</span><span class="op">&lt;</span><span class="ident">UserId</span><span class="op">&gt;</span>, <span class="ident">DashSet</span><span class="op">&lt;</span><span class="ident">Box</span><span class="op">&lt;</span><span class="ident">DeviceId</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span>,
     <span class="ident">key_request_machine</span>: <span class="ident">GossipMachine</span>,
     <span class="ident">outgoing_to_device_requests</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">DashMap</span><span class="op">&lt;</span><span class="ident">Uuid</span>, <span class="ident">OutgoingRequest</span><span class="op">&gt;</span><span class="op">&gt;</span>,
 }
@@ -562,7 +544,7 @@
 
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(
         <span class="ident">account</span>: <span class="ident">Account</span>,
-        <span class="ident">users_for_key_claim</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">DashMap</span><span class="op">&lt;</span><span class="ident">UserId</span>, <span class="ident">DashSet</span><span class="op">&lt;</span><span class="ident">DeviceIdBox</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+        <span class="ident">users_for_key_claim</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">DashMap</span><span class="op">&lt;</span><span class="ident">Box</span><span class="op">&lt;</span><span class="ident">UserId</span><span class="op">&gt;</span>, <span class="ident">DashSet</span><span class="op">&lt;</span><span class="ident">Box</span><span class="op">&lt;</span><span class="ident">DeviceId</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span>,
         <span class="ident">key_request_machine</span>: <span class="ident">GossipMachine</span>,
         <span class="ident">store</span>: <span class="ident">Store</span>,
     ) -&gt; <span class="self">Self</span> {
@@ -600,7 +582,7 @@
 
                     <span class="kw">if</span> <span class="ident">session</span>.<span class="ident">creation_time</span>.<span class="ident">elapsed</span>() <span class="op">&gt;</span> <span class="ident"><span class="self">Self</span>::UNWEDGING_INTERVAL</span> {
                         <span class="self">self</span>.<span class="ident">users_for_key_claim</span>
-                            .<span class="ident">entry</span>(<span class="ident">device</span>.<span class="ident">user_id</span>().<span class="ident">clone</span>())
+                            .<span class="ident">entry</span>(<span class="ident">device</span>.<span class="ident">user_id</span>().<span class="ident">to_owned</span>())
                             .<span class="ident">or_insert_with</span>(<span class="ident">DashSet::new</span>)
                             .<span class="ident">insert</span>(<span class="ident">device</span>.<span class="ident">device_id</span>().<span class="ident">into</span>());
                         <span class="self">self</span>.<span class="ident">wedged_devices</span>
@@ -836,14 +818,14 @@
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
 <span class="kw">mod</span> <span class="ident">test</span> {
-    <span class="kw">use</span> <span class="ident">std</span>::{<span class="ident">collections::BTreeMap</span>, <span class="ident">sync::Arc</span>};
+    <span class="kw">use</span> <span class="ident">std</span>::{<span class="ident">collections::BTreeMap</span>, <span class="ident">iter</span>, <span class="ident">sync::Arc</span>};
 
     <span class="kw">use</span> <span class="ident">dashmap::DashMap</span>;
     <span class="kw">use</span> <span class="ident">matrix_sdk_common::locks::Mutex</span>;
     <span class="kw">use</span> <span class="ident">matrix_sdk_test::async_test</span>;
     <span class="kw">use</span> <span class="ident">ruma</span>::{
-        <span class="ident">api::client::r0::keys::claim_keys::Response</span> <span class="kw">as</span> <span class="ident">KeyClaimResponse</span>, <span class="ident">user_id</span>, <span class="ident">DeviceIdBox</span>,
-        <span class="ident">UserId</span>,
+        <span class="ident">api::client::r0::keys::claim_keys::Response</span> <span class="kw">as</span> <span class="ident">KeyClaimResponse</span>, <span class="ident">device_id</span>, <span class="ident">user_id</span>,
+        <span class="ident">DeviceId</span>, <span class="ident">UserId</span>,
     };
 
     <span class="kw">use</span> <span class="ident"><span class="kw">super</span>::SessionManager</span>;
@@ -856,31 +838,31 @@
         <span class="ident">verification::VerificationMachine</span>,
     };
 
-    <span class="kw">fn</span> <span class="ident">user_id</span>() -&gt; <span class="ident">UserId</span> {
+    <span class="kw">fn</span> <span class="ident">user_id</span>() -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">UserId</span> {
         <span class="macro">user_id!</span>(<span class="string">&quot;@example:localhost&quot;</span>)
     }
 
-    <span class="kw">fn</span> <span class="ident">device_id</span>() -&gt; <span class="ident">DeviceIdBox</span> {
-        <span class="string">&quot;DEVICEID&quot;</span>.<span class="ident">into</span>()
+    <span class="kw">fn</span> <span class="ident">device_id</span>() -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">DeviceId</span> {
+        <span class="macro">device_id!</span>(<span class="string">&quot;DEVICEID&quot;</span>)
     }
 
     <span class="kw">fn</span> <span class="ident">bob_account</span>() -&gt; <span class="ident">ReadOnlyAccount</span> {
-        <span class="ident">ReadOnlyAccount::new</span>(<span class="kw-2">&amp;</span><span class="macro">user_id!</span>(<span class="string">&quot;@bob:localhost&quot;</span>), <span class="string">&quot;BOBDEVICE&quot;</span>.<span class="ident">into</span>())
+        <span class="ident">ReadOnlyAccount::new</span>(<span class="macro">user_id!</span>(<span class="string">&quot;@bob:localhost&quot;</span>), <span class="macro">device_id!</span>(<span class="string">&quot;BOBDEVICE&quot;</span>))
     }
 
     <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">session_manager</span>() -&gt; <span class="ident">SessionManager</span> {
-        <span class="kw">let</span> <span class="ident">user_id</span> <span class="op">=</span> <span class="ident">user_id</span>();
+        <span class="kw">let</span> <span class="ident">user_id</span> <span class="op">=</span> <span class="ident">user_id</span>().<span class="ident">to_owned</span>();
         <span class="kw">let</span> <span class="ident">device_id</span> <span class="op">=</span> <span class="ident">device_id</span>();
 
         <span class="kw">let</span> <span class="ident">users_for_key_claim</span> <span class="op">=</span> <span class="ident">Arc::new</span>(<span class="ident">DashMap::new</span>());
-        <span class="kw">let</span> <span class="ident">account</span> <span class="op">=</span> <span class="ident">ReadOnlyAccount::new</span>(<span class="kw-2">&amp;</span><span class="ident">user_id</span>, <span class="kw-2">&amp;</span><span class="ident">device_id</span>);
+        <span class="kw">let</span> <span class="ident">account</span> <span class="op">=</span> <span class="ident">ReadOnlyAccount::new</span>(<span class="kw-2">&amp;</span><span class="ident">user_id</span>, <span class="ident">device_id</span>);
         <span class="kw">let</span> <span class="ident">store</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">CryptoStore</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">Arc::new</span>(<span class="ident">MemoryStore::new</span>());
         <span class="ident">store</span>.<span class="ident">save_account</span>(<span class="ident">account</span>.<span class="ident">clone</span>()).<span class="kw">await</span>.<span class="ident">unwrap</span>();
         <span class="kw">let</span> <span class="ident">identity</span> <span class="op">=</span> <span class="ident">Arc::new</span>(<span class="ident">Mutex::new</span>(<span class="ident">PrivateCrossSigningIdentity::empty</span>(<span class="ident">user_id</span>.<span class="ident">clone</span>())));
         <span class="kw">let</span> <span class="ident">verification</span> <span class="op">=</span>
             <span class="ident">VerificationMachine::new</span>(<span class="ident">account</span>.<span class="ident">clone</span>(), <span class="ident">identity</span>.<span class="ident">clone</span>(), <span class="ident">store</span>.<span class="ident">clone</span>());
 
-        <span class="kw">let</span> <span class="ident">user_id</span> <span class="op">=</span> <span class="ident">Arc::new</span>(<span class="ident">user_id</span>);
+        <span class="kw">let</span> <span class="ident">user_id</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">UserId</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">user_id</span>.<span class="ident">into</span>();
         <span class="kw">let</span> <span class="ident">device_id</span> <span class="op">=</span> <span class="ident">device_id</span>.<span class="ident">into</span>();
 
         <span class="kw">let</span> <span class="ident">store</span> <span class="op">=</span> <span class="ident">Store::new</span>(<span class="ident">user_id</span>.<span class="ident">clone</span>(), <span class="ident">identity</span>, <span class="ident">store</span>, <span class="ident">verification</span>);
@@ -909,11 +891,8 @@
 
         <span class="ident">manager</span>.<span class="ident">store</span>.<span class="ident">save_devices</span>(<span class="kw-2">&amp;</span>[<span class="ident">bob_device</span>]).<span class="kw">await</span>.<span class="ident">unwrap</span>();
 
-        <span class="kw">let</span> (<span class="kw">_</span>, <span class="ident">request</span>) <span class="op">=</span> <span class="ident">manager</span>
-            .<span class="ident">get_missing_sessions</span>(<span class="kw-2">&amp;mut</span> [<span class="ident">bob</span>.<span class="ident">user_id</span>().<span class="ident">clone</span>()].<span class="ident">iter</span>())
-            .<span class="kw">await</span>
-            .<span class="ident">unwrap</span>()
-            .<span class="ident">unwrap</span>();
+        <span class="kw">let</span> (<span class="kw">_</span>, <span class="ident">request</span>) <span class="op">=</span>
+            <span class="ident">manager</span>.<span class="ident">get_missing_sessions</span>(<span class="ident">iter::once</span>(<span class="ident">bob</span>.<span class="ident">user_id</span>())).<span class="kw">await</span>.<span class="ident">unwrap</span>().<span class="ident">unwrap</span>();
 
         <span class="macro">assert!</span>(<span class="ident">request</span>.<span class="ident">one_time_keys</span>.<span class="ident">contains_key</span>(<span class="ident">bob</span>.<span class="ident">user_id</span>()));
 
@@ -923,19 +902,15 @@
 
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">one_time_keys</span> <span class="op">=</span> <span class="ident">BTreeMap::new</span>();
         <span class="ident">one_time_keys</span>
-            .<span class="ident">entry</span>(<span class="ident">bob</span>.<span class="ident">user_id</span>().<span class="ident">clone</span>())
+            .<span class="ident">entry</span>(<span class="ident">bob</span>.<span class="ident">user_id</span>().<span class="ident">to_owned</span>())
             .<span class="ident">or_insert_with</span>(<span class="ident">BTreeMap::new</span>)
-            .<span class="ident">insert</span>(<span class="ident">bob</span>.<span class="ident">device_id</span>().<span class="ident">into</span>(), <span class="ident">one_time</span>);
+            .<span class="ident">insert</span>(<span class="ident">bob</span>.<span class="ident">device_id</span>().<span class="ident">to_owned</span>(), <span class="ident">one_time</span>);
 
         <span class="kw">let</span> <span class="ident">response</span> <span class="op">=</span> <span class="ident">KeyClaimResponse::new</span>(<span class="ident">one_time_keys</span>);
 
         <span class="ident">manager</span>.<span class="ident">receive_keys_claim_response</span>(<span class="kw-2">&amp;</span><span class="ident">response</span>).<span class="kw">await</span>.<span class="ident">unwrap</span>();
 
-        <span class="macro">assert!</span>(<span class="ident">manager</span>
-            .<span class="ident">get_missing_sessions</span>(<span class="kw-2">&amp;mut</span> [<span class="ident">bob</span>.<span class="ident">user_id</span>().<span class="ident">clone</span>()].<span class="ident">iter</span>())
-            .<span class="kw">await</span>
-            .<span class="ident">unwrap</span>()
-            .<span class="ident">is_none</span>());
+        <span class="macro">assert!</span>(<span class="ident">manager</span>.<span class="ident">get_missing_sessions</span>(<span class="ident">iter::once</span>(<span class="ident">bob</span>.<span class="ident">user_id</span>())).<span class="kw">await</span>.<span class="ident">unwrap</span>().<span class="ident">is_none</span>());
     }
 
     <span class="comment">// This test doesn&#39;t run on macos because we&#39;re modifying the session</span>
@@ -956,11 +931,7 @@
         <span class="ident">manager</span>.<span class="ident">store</span>.<span class="ident">save_devices</span>(<span class="kw-2">&amp;</span>[<span class="ident">bob_device</span>.<span class="ident">clone</span>()]).<span class="kw">await</span>.<span class="ident">unwrap</span>();
         <span class="ident">manager</span>.<span class="ident">store</span>.<span class="ident">save_sessions</span>(<span class="kw-2">&amp;</span>[<span class="ident">session</span>]).<span class="kw">await</span>.<span class="ident">unwrap</span>();
 
-        <span class="macro">assert!</span>(<span class="ident">manager</span>
-            .<span class="ident">get_missing_sessions</span>(<span class="kw-2">&amp;mut</span> [<span class="ident">bob</span>.<span class="ident">user_id</span>().<span class="ident">clone</span>()].<span class="ident">iter</span>())
-            .<span class="kw">await</span>
-            .<span class="ident">unwrap</span>()
-            .<span class="ident">is_none</span>());
+        <span class="macro">assert!</span>(<span class="ident">manager</span>.<span class="ident">get_missing_sessions</span>(<span class="ident">iter::once</span>(<span class="ident">bob</span>.<span class="ident">user_id</span>())).<span class="kw">await</span>.<span class="ident">unwrap</span>().<span class="ident">is_none</span>());
 
         <span class="kw">let</span> <span class="ident">curve_key</span> <span class="op">=</span> <span class="ident">bob_device</span>.<span class="ident">get_key</span>(<span class="ident">DeviceKeyAlgorithm::Curve25519</span>).<span class="ident">unwrap</span>();
 
@@ -970,11 +941,8 @@
         <span class="macro">assert!</span>(<span class="ident">manager</span>.<span class="ident">is_device_wedged</span>(<span class="kw-2">&amp;</span><span class="ident">bob_device</span>));
         <span class="macro">assert!</span>(<span class="ident">manager</span>.<span class="ident">users_for_key_claim</span>.<span class="ident">contains_key</span>(<span class="ident">bob</span>.<span class="ident">user_id</span>()));
 
-        <span class="kw">let</span> (<span class="kw">_</span>, <span class="ident">request</span>) <span class="op">=</span> <span class="ident">manager</span>
-            .<span class="ident">get_missing_sessions</span>(<span class="kw-2">&amp;mut</span> [<span class="ident">bob</span>.<span class="ident">user_id</span>().<span class="ident">clone</span>()].<span class="ident">iter</span>())
-            .<span class="kw">await</span>
-            .<span class="ident">unwrap</span>()
-            .<span class="ident">unwrap</span>();
+        <span class="kw">let</span> (<span class="kw">_</span>, <span class="ident">request</span>) <span class="op">=</span>
+            <span class="ident">manager</span>.<span class="ident">get_missing_sessions</span>(<span class="ident">iter::once</span>(<span class="ident">bob</span>.<span class="ident">user_id</span>())).<span class="kw">await</span>.<span class="ident">unwrap</span>().<span class="ident">unwrap</span>();
 
         <span class="macro">assert!</span>(<span class="ident">request</span>.<span class="ident">one_time_keys</span>.<span class="ident">contains_key</span>(<span class="ident">bob</span>.<span class="ident">user_id</span>()));
 
@@ -984,9 +952,9 @@
 
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">one_time_keys</span> <span class="op">=</span> <span class="ident">BTreeMap::new</span>();
         <span class="ident">one_time_keys</span>
-            .<span class="ident">entry</span>(<span class="ident">bob</span>.<span class="ident">user_id</span>().<span class="ident">clone</span>())
+            .<span class="ident">entry</span>(<span class="ident">bob</span>.<span class="ident">user_id</span>().<span class="ident">to_owned</span>())
             .<span class="ident">or_insert_with</span>(<span class="ident">BTreeMap::new</span>)
-            .<span class="ident">insert</span>(<span class="ident">bob</span>.<span class="ident">device_id</span>().<span class="ident">into</span>(), <span class="ident">one_time</span>);
+            .<span class="ident">insert</span>(<span class="ident">bob</span>.<span class="ident">device_id</span>().<span class="ident">to_owned</span>(), <span class="ident">one_time</span>);
 
         <span class="kw">let</span> <span class="ident">response</span> <span class="op">=</span> <span class="ident">KeyClaimResponse::new</span>(<span class="ident">one_time_keys</span>);
 
@@ -995,14 +963,10 @@
         <span class="ident">manager</span>.<span class="ident">receive_keys_claim_response</span>(<span class="kw-2">&amp;</span><span class="ident">response</span>).<span class="kw">await</span>.<span class="ident">unwrap</span>();
 
         <span class="macro">assert!</span>(<span class="op">!</span><span class="ident">manager</span>.<span class="ident">is_device_wedged</span>(<span class="kw-2">&amp;</span><span class="ident">bob_device</span>));
-        <span class="macro">assert!</span>(<span class="ident">manager</span>
-            .<span class="ident">get_missing_sessions</span>(<span class="kw-2">&amp;mut</span> [<span class="ident">bob</span>.<span class="ident">user_id</span>().<span class="ident">clone</span>()].<span class="ident">iter</span>())
-            .<span class="kw">await</span>
-            .<span class="ident">unwrap</span>()
-            .<span class="ident">is_none</span>());
+        <span class="macro">assert!</span>(<span class="ident">manager</span>.<span class="ident">get_missing_sessions</span>(<span class="ident">iter::once</span>(<span class="ident">bob</span>.<span class="ident">user_id</span>())).<span class="kw">await</span>.<span class="ident">unwrap</span>().<span class="ident">is_none</span>());
         <span class="macro">assert!</span>(<span class="op">!</span><span class="ident">manager</span>.<span class="ident">outgoing_to_device_requests</span>.<span class="ident">is_empty</span>())
     }
 }
 </code></pre></div>
-</section><section id="search" class="content hidden"></section><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="matrix_sdk_crypto" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.59.0-nightly (db9d361a4 2021-11-28)" ></div>
+</section><section id="search" class="content hidden"></section><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="matrix_sdk_crypto" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.59.0-nightly (6db0a0e9a 2021-11-29)" ></div>
 </body></html>

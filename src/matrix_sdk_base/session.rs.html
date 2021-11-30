@@ -72,7 +72,7 @@
 
 <span class="doccomment">//! User sessions.</span>
 
-<span class="kw">use</span> <span class="ident">ruma</span>::{<span class="ident">DeviceIdBox</span>, <span class="ident">UserId</span>};
+<span class="kw">use</span> <span class="ident">ruma</span>::{<span class="ident">DeviceId</span>, <span class="ident">UserId</span>};
 <span class="kw">use</span> <span class="ident">serde</span>::{<span class="ident">Deserialize</span>, <span class="ident">Serialize</span>};
 
 <span class="doccomment">/// A user session, containing an access token and information about the</span>
@@ -82,12 +82,12 @@
 <span class="doccomment">///</span>
 <span class="doccomment">/// ```</span>
 <span class="doccomment">/// use matrix_sdk_base::Session;</span>
-<span class="doccomment">/// use ruma::{DeviceIdBox, user_id};</span>
+<span class="doccomment">/// use ruma::{device_id, user_id};</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// let session = Session {</span>
 <span class="doccomment">///     access_token: &quot;My-Token&quot;.to_owned(),</span>
-<span class="doccomment">///     user_id: user_id!(&quot;@example:localhost&quot;),</span>
-<span class="doccomment">///     device_id: DeviceIdBox::from(&quot;MYDEVICEID&quot;),</span>
+<span class="doccomment">///     user_id: user_id!(&quot;@example:localhost&quot;).to_owned(),</span>
+<span class="doccomment">///     device_id: device_id!(&quot;MYDEVICEID&quot;).to_owned(),</span>
 <span class="doccomment">/// };</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// assert_eq!(session.device_id.as_str(), &quot;MYDEVICEID&quot;);</span>
@@ -97,9 +97,9 @@
     <span class="doccomment">/// The access token used for this session.</span>
     <span class="kw">pub</span> <span class="ident">access_token</span>: <span class="ident">String</span>,
     <span class="doccomment">/// The user the access token was issued for.</span>
-    <span class="kw">pub</span> <span class="ident">user_id</span>: <span class="ident">UserId</span>,
+    <span class="kw">pub</span> <span class="ident">user_id</span>: <span class="ident">Box</span><span class="op">&lt;</span><span class="ident">UserId</span><span class="op">&gt;</span>,
     <span class="doccomment">/// The ID of the client device</span>
-    <span class="kw">pub</span> <span class="ident">device_id</span>: <span class="ident">DeviceIdBox</span>,
+    <span class="kw">pub</span> <span class="ident">device_id</span>: <span class="ident">Box</span><span class="op">&lt;</span><span class="ident">DeviceId</span><span class="op">&gt;</span>,
 }
 
 <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">ruma::api::client::r0::session::login::Response</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Session</span> {
@@ -112,5 +112,5 @@
     }
 }
 </code></pre></div>
-</section><section id="search" class="content hidden"></section><div id="rustdoc-vars" data-root-path="../../" data-current-crate="matrix_sdk_base" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.59.0-nightly (db9d361a4 2021-11-28)" ></div>
+</section><section id="search" class="content hidden"></section><div id="rustdoc-vars" data-root-path="../../" data-current-crate="matrix_sdk_base" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.59.0-nightly (6db0a0e9a 2021-11-29)" ></div>
 </body></html>

@@ -263,7 +263,7 @@
     <span class="kw">pub</span> <span class="ident">algorithm</span>: <span class="ident">EventEncryptionAlgorithm</span>,
 
     <span class="doccomment">/// The room where the session is used.</span>
-    <span class="kw">pub</span> <span class="ident">room_id</span>: <span class="ident">RoomId</span>,
+    <span class="kw">pub</span> <span class="ident">room_id</span>: <span class="ident">Box</span><span class="op">&lt;</span><span class="ident">RoomId</span><span class="op">&gt;</span>,
 
     <span class="doccomment">/// The Curve25519 key of the device which initiated the session originally.</span>
     <span class="kw">pub</span> <span class="ident">sender_key</span>: <span class="ident">String</span>,
@@ -377,7 +377,7 @@
         <span class="ident">time</span>::{<span class="ident">Duration</span>, <span class="ident">Instant</span>},
     };
 
-    <span class="kw">use</span> <span class="ident">ruma</span>::{<span class="ident">events::room::message::RoomMessageEventContent</span>, <span class="ident">room_id</span>, <span class="ident">user_id</span>};
+    <span class="kw">use</span> <span class="ident">ruma</span>::{<span class="ident">device_id</span>, <span class="ident">events::room::message::RoomMessageEventContent</span>, <span class="ident">room_id</span>, <span class="ident">user_id</span>};
 
     <span class="kw">use</span> <span class="ident"><span class="kw">super</span>::EncryptionSettings</span>;
     <span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">MegolmError</span>, <span class="ident">ReadOnlyAccount</span>};
@@ -387,9 +387,9 @@
     <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">expiration</span>() -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">MegolmError</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">settings</span> <span class="op">=</span> <span class="ident">EncryptionSettings</span> { <span class="ident">rotation_period_msgs</span>: <span class="number">1</span>, ..<span class="ident">Default::default</span>() };
 
-        <span class="kw">let</span> <span class="ident">account</span> <span class="op">=</span> <span class="ident">ReadOnlyAccount::new</span>(<span class="kw-2">&amp;</span><span class="macro">user_id!</span>(<span class="string">&quot;@alice:example.org&quot;</span>), <span class="string">&quot;DEVICEID&quot;</span>.<span class="ident">into</span>());
+        <span class="kw">let</span> <span class="ident">account</span> <span class="op">=</span> <span class="ident">ReadOnlyAccount::new</span>(<span class="macro">user_id!</span>(<span class="string">&quot;@alice:example.org&quot;</span>), <span class="macro">device_id!</span>(<span class="string">&quot;DEVICEID&quot;</span>));
         <span class="kw">let</span> (<span class="ident">session</span>, <span class="kw">_</span>) <span class="op">=</span> <span class="ident">account</span>
-            .<span class="ident">create_group_session_pair</span>(<span class="kw-2">&amp;</span><span class="macro">room_id!</span>(<span class="string">&quot;!test_room:example.org&quot;</span>), <span class="ident">settings</span>)
+            .<span class="ident">create_group_session_pair</span>(<span class="macro">room_id!</span>(<span class="string">&quot;!test_room:example.org&quot;</span>), <span class="ident">settings</span>)
             .<span class="kw">await</span>
             .<span class="ident">unwrap</span>();
 
@@ -408,7 +408,7 @@
         };
 
         <span class="kw">let</span> (<span class="kw-2">mut</span> <span class="ident">session</span>, <span class="kw">_</span>) <span class="op">=</span> <span class="ident">account</span>
-            .<span class="ident">create_group_session_pair</span>(<span class="kw-2">&amp;</span><span class="macro">room_id!</span>(<span class="string">&quot;!test_room:example.org&quot;</span>), <span class="ident">settings</span>)
+            .<span class="ident">create_group_session_pair</span>(<span class="macro">room_id!</span>(<span class="string">&quot;!test_room:example.org&quot;</span>), <span class="ident">settings</span>)
             .<span class="kw">await</span>
             .<span class="ident">unwrap</span>();
 
@@ -420,5 +420,5 @@
     }
 }
 </code></pre></div>
-</section><section id="search" class="content hidden"></section><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="matrix_sdk_crypto" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.59.0-nightly (db9d361a4 2021-11-28)" ></div>
+</section><section id="search" class="content hidden"></section><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="matrix_sdk_crypto" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.59.0-nightly (6db0a0e9a 2021-11-29)" ></div>
 </body></html>
