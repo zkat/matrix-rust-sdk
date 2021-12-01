@@ -1573,8 +1573,10 @@ pub(crate) mod test {
             AnyMessageEventContent, AnySyncMessageEvent, AnySyncRoomEvent, AnyToDeviceEvent,
             AnyToDeviceEventContent, SyncMessageEvent, ToDeviceEvent, Unsigned,
         },
-        room_id, uint, user_id, DeviceId, DeviceKeyAlgorithm, DeviceKeyId,
-        MilliSecondsSinceUnixEpoch, UserId,
+        room_id,
+        serde::Raw,
+        uint, user_id, DeviceId, DeviceKeyAlgorithm, DeviceKeyId, MilliSecondsSinceUnixEpoch,
+        UserId,
     };
     use serde_json::json;
 
@@ -1586,7 +1588,7 @@ pub(crate) mod test {
     };
 
     /// These keys need to be periodically uploaded to the server.
-    type OneTimeKeys = BTreeMap<Box<DeviceKeyId>, OneTimeKey>;
+    type OneTimeKeys = BTreeMap<Box<DeviceKeyId>, Raw<OneTimeKey>>;
 
     fn alice_id() -> &'static UserId {
         user_id!("@alice:example.org")

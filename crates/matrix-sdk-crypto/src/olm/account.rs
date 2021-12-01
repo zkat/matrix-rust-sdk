@@ -32,7 +32,7 @@ use olm_rs::{
 };
 use ruma::{
     api::client::r0::keys::{upload_keys, upload_signatures::Request as SignatureUploadRequest},
-    encryption::{CrossSigningKey, DeviceKeys, OneTimeKey, SignedKey},
+    encryption::{CrossSigningKey, DeviceKeys},
     events::{
         room::encrypted::{
             EncryptedEventScheme, OlmV1Curve25519AesSha2Content, ToDeviceRoomEncryptedEvent,
@@ -56,6 +56,7 @@ use crate::{
     identities::{MasterPubkey, ReadOnlyDevice},
     requests::UploadSigningKeysRequest,
     store::{Changes, Store},
+    types::{OneTimeKey, SignedKey},
     utilities::encode,
     CryptoStoreError, OlmError, SignatureError,
 };
@@ -692,8 +693,8 @@ impl ReadOnlyAccount {
         &self,
     ) -> Option<(
         Option<DeviceKeys>,
-        Option<BTreeMap<Box<DeviceKeyId>, OneTimeKey>>,
-        Option<BTreeMap<Box<DeviceKeyId>, OneTimeKey>>,
+        Option<BTreeMap<Box<DeviceKeyId>, Raw<ruma::encryption::OneTimeKey>>>,
+        Option<BTreeMap<Box<DeviceKeyId>, Raw<ruma::encryption::OneTimeKey>>>,
     )> {
         if !self.should_upload_keys().await {
             return None;
@@ -884,7 +885,9 @@ impl ReadOnlyAccount {
         self.sign(&canonical_json.to_string()).await
     }
 
-    async fn signed_fallback_keys(&self) -> Option<BTreeMap<Box<DeviceKeyId>, OneTimeKey>> {
+    async fn signed_fallback_keys(
+        &self,
+    ) -> Option<BTreeMap<Box<DeviceKeyId>, Raw<ruma::encryption::OneTimeKey>>> {
         if let Some(fallback_key) = self.fallback_key().await {
             let mut fallback_key_map = BTreeMap::new();
             let key_id = fallback_key.index();
@@ -894,7 +897,7 @@ impl ReadOnlyAccount {
 
             fallback_key_map.insert(
                 DeviceKeyId::from_parts(DeviceKeyAlgorithm::SignedCurve25519, key_id.into()),
-                OneTimeKey::SignedKey(signed_key),
+                signed_key.to_raw(),
             );
 
             Some(fallback_key_map)
@@ -935,7 +938,7 @@ impl ReadOnlyAccount {
 
     pub(crate) async fn signed_one_time_keys_helper(
         &self,
-    ) -> Result<BTreeMap<Box<DeviceKeyId>, OneTimeKey>, ()> {
+    ) -> Result<BTreeMap<Box<DeviceKeyId>, Raw<ruma::encryption::OneTimeKey>>, ()> {
         let one_time_keys = self.one_time_keys().await;
         let mut one_time_key_map = BTreeMap::new();
 
@@ -947,7 +950,7 @@ impl ReadOnlyAccount {
                     DeviceKeyAlgorithm::SignedCurve25519,
                     key_id.as_str().into(),
                 ),
-                OneTimeKey::SignedKey(signed_key),
+                signed_key.to_raw(),
             );
         }
 
@@ -959,7 +962,7 @@ impl ReadOnlyAccount {
     /// If no one-time keys need to be uploaded returns an empty error.
     pub(crate) async fn signed_one_time_keys(
         &self,
-    ) -> Result<BTreeMap<Box<DeviceKeyId>, OneTimeKey>, ()> {
+    ) -> Result<BTreeMap<Box<DeviceKeyId>, Raw<ruma::encryption::OneTimeKey>>, ()> {
         let _ = self.generate_one_time_keys().await?;
         self.signed_one_time_keys_helper().await
     }
@@ -983,7 +986,7 @@ impl ReadOnlyAccount {
             .inner
             .lock()
             .await
-            .create_outbound_session(their_identity_key, &their_one_time_key.key)?;
+            .create_outbound_session(their_identity_key, &their_one_time_key.key())?;
 
         let now = Instant::now();
         let session_id = session.session_id();
@@ -1014,7 +1017,7 @@ impl ReadOnlyAccount {
     pub(crate) async fn create_outbound_session(
         &self,
         device: ReadOnlyDevice,
-        key_map: &BTreeMap<Box<DeviceKeyId>, Raw<OneTimeKey>>,
+        key_map: &BTreeMap<Box<DeviceKeyId>, Raw<ruma::encryption::OneTimeKey>>,
     ) -> Result<Session, SessionCreationError> {
         let one_time_key = key_map.values().next().ok_or_else(|| {
             SessionCreationError::OneTimeKeyMissing(
@@ -1023,7 +1026,8 @@ impl ReadOnlyAccount {
             )
         })?;
 
-        let one_time_key = match one_time_key.deserialize().unwrap() {
+        // TODO remove the unwrap.
+        let one_time_key: SignedKey = match one_time_key.deserialize_as().unwrap() {
             OneTimeKey::SignedKey(k) => k,
             OneTimeKey::Key(_) => {
                 return Err(SessionCreationError::OneTimeKeyNotSigned(
@@ -1221,10 +1225,13 @@ impl PartialEq for ReadOnlyAccount {
 
 #[cfg(test)]
 mod test {
-    use std::{collections::BTreeSet, ops::Deref};
+    use std::{
+        collections::{BTreeMap, BTreeSet},
+        ops::Deref,
+    };
 
     use matrix_sdk_test::async_test;
-    use ruma::{device_id, identifiers::DeviceId, user_id, DeviceKeyId, UserId};
+    use ruma::{device_id, user_id, DeviceId, DeviceKeyAlgorithm, DeviceKeyId, UserId};
 
     use super::ReadOnlyAccount;
     use crate::error::OlmResult as Result;

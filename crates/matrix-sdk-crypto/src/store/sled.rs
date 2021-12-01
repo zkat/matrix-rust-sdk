@@ -1017,8 +1017,8 @@ mod test {
     use matrix_sdk_test::async_test;
     use olm_rs::outbound_group_session::OlmOutboundGroupSession;
     use ruma::{
-        device_id, encryption::SignedKey, events::room_key_request::RequestedKeyInfo, room_id,
-        user_id, DeviceId, EventEncryptionAlgorithm, UserId,
+        device_id, events::room_key_request::RequestedKeyInfo, room_id, user_id, DeviceId,
+        EventEncryptionAlgorithm, UserId,
     };
     use tempfile::tempdir;
 
@@ -1034,6 +1034,7 @@ mod test {
             ReadOnlyAccount, Session,
         },
         store::{Changes, DeviceChanges, IdentityChanges},
+        types::SignedKey,
     };
 
     fn alice_id() -> &'static UserId {

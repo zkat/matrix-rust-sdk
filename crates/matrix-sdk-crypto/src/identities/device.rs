@@ -26,7 +26,7 @@ use atomic::Atomic;
 use matrix_sdk_common::locks::Mutex;
 use ruma::{
     api::client::r0::keys::upload_signatures::Request as SignatureUploadRequest,
-    encryption::{DeviceKeys, SignedKey},
+    encryption::DeviceKeys,
     events::{
         forwarded_room_key::ToDeviceForwardedRoomKeyEventContent,
         key::verification::VerificationMethod, room::encrypted::ToDeviceRoomEncryptedEventContent,
@@ -44,6 +44,7 @@ use crate::{
     identities::{ReadOnlyOwnUserIdentity, ReadOnlyUserIdentities},
     olm::{InboundGroupSession, Session, Utility},
     store::{Changes, CryptoStore, DeviceChanges, Result as StoreResult},
+    types::SignedKey,
     verification::VerificationMachine,
     OutgoingVerificationRequest, Sas, ToDeviceRequest, VerificationRequest,
 };

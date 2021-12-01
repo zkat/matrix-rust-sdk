@@ -64,9 +64,7 @@ pub(crate) mod test {
     use matches::assert_matches;
     use olm_rs::session::OlmMessage;
     use ruma::{
-        device_id,
-        encryption::SignedKey,
-        event_id,
+        device_id, event_id,
         events::{
             forwarded_room_key::ToDeviceForwardedRoomKeyEventContent,
             room::message::{Relation, Replacement, RoomMessageEventContent},
@@ -78,6 +76,7 @@ pub(crate) mod test {
 
     use crate::{
         olm::{InboundGroupSession, ReadOnlyAccount, Session},
+        types::SignedKey,
         MegolmError,
     };
 
