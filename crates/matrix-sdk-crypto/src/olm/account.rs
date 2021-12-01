@@ -996,6 +996,7 @@ impl ReadOnlyAccount {
             inner: Arc::new(Mutex::new(session)),
             session_id: session_id.into(),
             sender_key: their_identity_key.into(),
+            created_using_fallback_key: their_one_time_key.fallback(),
             creation_time: Arc::new(now),
             last_use_time: Arc::new(now),
         })
@@ -1097,6 +1098,7 @@ impl ReadOnlyAccount {
             inner: Arc::new(Mutex::new(session)),
             session_id: session_id.into(),
             sender_key: their_identity_key.into(),
+            created_using_fallback_key: false,
             creation_time: Arc::new(now),
             last_use_time: Arc::new(now),
         })

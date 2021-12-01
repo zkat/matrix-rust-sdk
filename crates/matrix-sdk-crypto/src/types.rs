@@ -59,10 +59,10 @@ impl SignedKey {
         &mut self.signatures
     }
 
-    // /// Is the key considered to be a fallback key.
-    // pub fn fallback(&self) -> bool {
-    //     self.fallback.map(|f| f.unwrap_or_default()).unwrap_or_default()
-    // }
+    /// Is the key considered to be a fallback key.
+    pub fn fallback(&self) -> bool {
+        self.fallback.map(|f| f.unwrap_or_default()).unwrap_or_default()
+    }
 
     pub fn to_raw(self) -> Raw<ruma::encryption::OneTimeKey> {
         let key = OneTimeKey::SignedKey(self);
