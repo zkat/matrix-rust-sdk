@@ -879,9 +879,14 @@ impl ReadOnlyAccount {
     /// # Panic
     ///
     /// Panics if the json value can't be serialized.
-    pub async fn sign_json(&self, json: Value) -> String {
+    pub async fn sign_json(&self, mut json: Value) -> String {
+        let object = json.as_object_mut().expect("Canonical json value isn't an object");
+        object.remove("unsigned");
+        object.remove("signatures");
+
         let canonical_json: CanonicalJsonValue =
             json.try_into().expect("Can't canonicalize the json value");
+
         self.sign(&canonical_json.to_string()).await
     }
 
@@ -907,33 +912,26 @@ impl ReadOnlyAccount {
     }
 
     async fn sign_key(&self, key: &str, fallback: bool) -> SignedKey {
-        let mut signature_map = BTreeMap::new();
-        let mut signatures = BTreeMap::new();
-
-        let key_json = if fallback {
-            json!({
-                "key": key,
-                "fallback": true,
-            })
+        let mut key = if fallback {
+            SignedKey::new_fallback(key.to_owned())
         } else {
-            json!({
-                "key": key,
-            })
+            SignedKey::new(key.to_owned())
         };
 
-        let signature = self.sign_json(key_json).await;
+        let signature =
+            self.sign_json(serde_json::to_value(&key).expect("Can't serialize a signed key")).await;
 
-        signature_map.insert(
-            DeviceKeyId::from_parts(DeviceKeyAlgorithm::Ed25519, &self.device_id),
-            signature,
-        );
-        signatures.insert((*self.user_id).to_owned(), signature_map);
+        let signatures = BTreeMap::from([(
+            self.user_id().to_owned(),
+            BTreeMap::from([(
+                DeviceKeyId::from_parts(DeviceKeyAlgorithm::Ed25519, &self.device_id),
+                signature,
+            )]),
+        )]);
 
-        if fallback {
-            SignedKey::new_fallback(key.to_owned(), signatures)
-        } else {
-            SignedKey::new(key.to_owned(), signatures)
-        }
+        *key.signatures() = signatures;
+
+        key
     }
 
     pub(crate) async fn signed_one_time_keys_helper(

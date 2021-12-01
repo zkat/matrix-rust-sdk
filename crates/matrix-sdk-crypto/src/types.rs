@@ -34,14 +34,19 @@ where
 
 impl SignedKey {
     /// Creates a new `SignedKey` with the given key and signatures.
-    pub fn new(key: String, signatures: SignedKeySignatures) -> Self {
-        Self { key, signatures, fallback: None, other: BTreeMap::new() }
+    pub fn new(key: String) -> Self {
+        Self { key, signatures: BTreeMap::new(), fallback: None, other: BTreeMap::new() }
     }
 
     /// Creates a new `SignedKey`, that represents a fallback key, with the
     /// given key and signatures.
-    pub fn new_fallback(key: String, signatures: SignedKeySignatures) -> Self {
-        Self { key, signatures, fallback: Some(Some(true)), other: BTreeMap::new() }
+    pub fn new_fallback(key: String) -> Self {
+        Self {
+            key,
+            signatures: BTreeMap::new(),
+            fallback: Some(Some(true)),
+            other: BTreeMap::new(),
+        }
     }
 
     /// Base64-encoded 32-byte Curve25519 public key.
@@ -49,10 +54,10 @@ impl SignedKey {
         &self.key
     }
 
-    // /// Signatures for the key object.
-    // pub fn signatures(&self) -> &SignedKeySignatures {
-    //     &self.signatures
-    // }
+    /// Signatures for the key object.
+    pub fn signatures(&mut self) -> &mut SignedKeySignatures {
+        &mut self.signatures
+    }
 
     // /// Is the key considered to be a fallback key.
     // pub fn fallback(&self) -> bool {

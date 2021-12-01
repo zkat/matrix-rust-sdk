@@ -1011,8 +1011,6 @@ impl CryptoStore for SledStore {
 
 #[cfg(test)]
 mod test {
-    use std::collections::BTreeMap;
-
     use matrix_sdk_common::uuid::Uuid;
     use matrix_sdk_test::async_test;
     use olm_rs::outbound_group_session::OlmOutboundGroupSession;
@@ -1082,7 +1080,7 @@ mod test {
         bob.generate_one_time_keys_helper(1).await;
         let one_time_key =
             bob.one_time_keys().await.curve25519().iter().next().unwrap().1.to_owned();
-        let one_time_key = SignedKey::new(one_time_key, BTreeMap::new());
+        let one_time_key = SignedKey::new(one_time_key);
         let sender_key = bob.identity_keys().curve25519().to_owned();
         let session =
             alice.create_outbound_session_helper(&sender_key, &one_time_key).await.unwrap();

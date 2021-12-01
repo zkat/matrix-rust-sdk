@@ -59,7 +59,7 @@ where
 
 #[cfg(test)]
 pub(crate) mod test {
-    use std::{collections::BTreeMap, convert::TryInto};
+    use std::convert::TryInto;
 
     use matches::assert_matches;
     use olm_rs::session::OlmMessage;
@@ -103,7 +103,7 @@ pub(crate) mod test {
         bob.generate_one_time_keys_helper(1).await;
         let one_time_key =
             bob.one_time_keys().await.curve25519().iter().next().unwrap().1.to_owned();
-        let one_time_key = SignedKey::new(one_time_key, BTreeMap::new());
+        let one_time_key = SignedKey::new(one_time_key);
         let sender_key = bob.identity_keys().curve25519().to_owned();
         let session =
             alice.create_outbound_session_helper(&sender_key, &one_time_key).await.unwrap();
@@ -164,7 +164,7 @@ pub(crate) mod test {
 
         let one_time_key = one_time_keys.curve25519().iter().next().unwrap().1.to_owned();
 
-        let one_time_key = SignedKey::new(one_time_key, BTreeMap::new());
+        let one_time_key = SignedKey::new(one_time_key);
 
         let mut bob_session = bob
             .create_outbound_session_helper(alice_keys.curve25519(), &one_time_key)
