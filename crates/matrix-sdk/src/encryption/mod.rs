@@ -526,15 +526,21 @@ impl Client {
     /// # anyhow::Result::<()>::Ok(()) });
     #[cfg(feature = "encryption")]
     pub async fn bootstrap_cross_signing(&self, auth_data: Option<AuthData<'_>>) -> Result<()> {
+        use serde_json::value::to_raw_value;
+
         let olm = self.olm_machine().await.ok_or(Error::AuthenticationRequired)?;
 
         let (request, signature_request) = olm.bootstrap_cross_signing(false).await?;
 
+        let to_raw = |k| {
+            Raw::from_json(to_raw_value(&k).expect("Can't serialize newly created cross signing keys"))
+        };
+
         let request = assign!(UploadSigningKeysRequest::new(), {
             auth: auth_data,
-            master_key: request.master_key,
-            self_signing_key: request.self_signing_key,
-            user_signing_key: request.user_signing_key,
+            master_key: request.master_key.map(to_raw),
+            self_signing_key: request.self_signing_key.map(to_raw),
+            user_signing_key: request.user_signing_key.map(to_raw),
         });
 
         self.send(request, None).await?;

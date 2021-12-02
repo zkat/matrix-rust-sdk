@@ -46,9 +46,10 @@ use ruma::{
         secret::request::SecretName,
         AnyMessageEventContent, AnyRoomEvent, AnyToDeviceEvent, EventContent,
     },
+    serde::Raw,
     DeviceId, DeviceKeyAlgorithm, DeviceKeyId, EventEncryptionAlgorithm, RoomId, UInt, UserId,
 };
-use serde_json::Value;
+use serde_json::{value::to_raw_value, Value};
 use tracing::{debug, error, info, trace, warn};
 
 #[cfg(feature = "backups_v1")]
@@ -562,6 +563,10 @@ impl OlmMachine {
     /// [`OlmMachine`]: struct.OlmMachine.html
     async fn keys_for_upload(&self) -> Option<upload_keys::Request> {
         let (device_keys, one_time_keys, fallback_keys) = self.account.keys_for_upload().await?;
+
+        let device_keys = device_keys
+            .map(|d| Raw::from_json(to_raw_value(&d).expect("Coulnd't serialize device keys")));
+
         Some(assign!(upload_keys::Request::new(), { device_keys, one_time_keys, fallback_keys }))
     }
 
