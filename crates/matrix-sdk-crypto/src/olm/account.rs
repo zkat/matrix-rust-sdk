@@ -1025,21 +1025,21 @@ impl ReadOnlyAccount {
             )
         })?;
 
-        // TODO remove the unwrap.
-        let one_time_key: SignedKey = match one_time_key.deserialize_as().unwrap() {
-            OneTimeKey::SignedKey(k) => k,
-            OneTimeKey::Key(_) => {
+        let one_time_key: SignedKey = match one_time_key.deserialize_as() {
+            Ok(OneTimeKey::SignedKey(k)) => k,
+            Ok(OneTimeKey::Key(_)) => {
                 return Err(SessionCreationError::OneTimeKeyNotSigned(
                     device.user_id().to_owned(),
                     device.device_id().into(),
                 ));
             }
-            _ => {
+            Ok(_) => {
                 return Err(SessionCreationError::OneTimeKeyUnknown(
                     device.user_id().to_owned(),
                     device.device_id().into(),
                 ));
             }
+            Err(e) => return Err(SessionCreationError::InvalidJson(e)),
         };
 
         device.verify_one_time_key(&one_time_key).map_err(|e| {
