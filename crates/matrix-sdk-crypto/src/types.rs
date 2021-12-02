@@ -64,7 +64,8 @@ impl SignedKey {
         self.fallback.map(|f| f.unwrap_or_default()).unwrap_or_default()
     }
 
-    pub fn to_raw(self) -> Raw<ruma::encryption::OneTimeKey> {
+    /// Serialize the one-time key into a Raw version.
+    pub fn to_raw<T>(self) -> Raw<T> {
         let key = OneTimeKey::SignedKey(self);
         Raw::from_json(to_raw_value(&key).expect("Coulnd't serialize one-time key"))
     }
