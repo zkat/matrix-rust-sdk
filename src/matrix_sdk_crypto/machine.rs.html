@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `crates&#x2F;matrix-sdk-crypto&#x2F;src&#x2F;machine.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>machine.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css"disabled><link rel="stylesheet" type="text/css" href="../../dark.css"disabled><link rel="stylesheet" type="text/css" href="../../light.css"id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script src="../../crates.js"></script><script defer src="../../main.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `crates&#x2F;matrix-sdk-crypto&#x2F;src&#x2F;machine.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>machine.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script src="../../crates.js"></script><script defer src="../../main.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script>
     <noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu" role="button">&#9776;</div><a class="sidebar-logo" href='../../matrix_sdk_crypto/index.html'><div class='logo-container rust-logo'><img src='../../rust-logo.png' alt='logo'></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container rust-logo" href='../../matrix_sdk_crypto/index.html'><img src='../../rust-logo.png' alt='logo'></a><nav class="sub"><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu" title="themes"><img width="18" height="18" alt="Pick another theme!" src="../../brush.svg"></button><div id="theme-choices" role="menu"></div></div><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><button type="button" id="help-button" title="help">?</button><a id="settings-menu" href="../../settings.html" title="settings"><img width="18" height="18" alt="Change settings" src="../../wheel.svg"></a></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">   1</span>
 <span id="2">   2</span>
 <span id="3">   3</span>
@@ -2167,6 +2167,20 @@
 <span id="2166">2166</span>
 <span id="2167">2167</span>
 <span id="2168">2168</span>
+<span id="2169">2169</span>
+<span id="2170">2170</span>
+<span id="2171">2171</span>
+<span id="2172">2172</span>
+<span id="2173">2173</span>
+<span id="2174">2174</span>
+<span id="2175">2175</span>
+<span id="2176">2176</span>
+<span id="2177">2177</span>
+<span id="2178">2178</span>
+<span id="2179">2179</span>
+<span id="2180">2180</span>
+<span id="2181">2181</span>
+<span id="2182">2182</span>
 </pre><pre class="rust"><code><span class="comment">// Copyright 2020 The Matrix.org Foundation C.I.C.</span>
 <span class="comment">//</span>
 <span class="comment">// Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);</span>
@@ -2215,9 +2229,10 @@
         <span class="ident">secret::request::SecretName</span>,
         <span class="ident">AnyMessageEventContent</span>, <span class="ident">AnyRoomEvent</span>, <span class="ident">AnyToDeviceEvent</span>, <span class="ident">EventContent</span>,
     },
+    <span class="ident">serde::Raw</span>,
     <span class="ident">DeviceId</span>, <span class="ident">DeviceKeyAlgorithm</span>, <span class="ident">DeviceKeyId</span>, <span class="ident">EventEncryptionAlgorithm</span>, <span class="ident">RoomId</span>, <span class="ident">UInt</span>, <span class="ident">UserId</span>,
 };
-<span class="kw">use</span> <span class="ident">serde_json::Value</span>;
+<span class="kw">use</span> <span class="ident">serde_json</span>::{<span class="ident">value::to_raw_value</span>, <span class="ident">Value</span>};
 <span class="kw">use</span> <span class="ident">tracing</span>::{<span class="ident">debug</span>, <span class="ident">error</span>, <span class="ident">info</span>, <span class="ident">trace</span>, <span class="ident">warn</span>};
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;backups_v1&quot;</span>)]</span>
@@ -2731,7 +2746,13 @@
     <span class="doccomment">/// [`OlmMachine`]: struct.OlmMachine.html</span>
     <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">keys_for_upload</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">upload_keys::Request</span><span class="op">&gt;</span> {
         <span class="kw">let</span> (<span class="ident">device_keys</span>, <span class="ident">one_time_keys</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">account</span>.<span class="ident">keys_for_upload</span>().<span class="kw">await</span><span class="question-mark">?</span>;
-        <span class="prelude-val">Some</span>(<span class="macro">assign!</span>(<span class="ident">upload_keys::Request::new</span>(), { <span class="ident">device_keys</span>, <span class="ident">one_time_keys</span> }))
+
+        <span class="kw">let</span> <span class="ident">device_keys</span> <span class="op">=</span> <span class="ident">device_keys</span>
+            .<span class="ident">map</span>(<span class="op">|</span><span class="ident">d</span><span class="op">|</span> <span class="ident">Raw::from_json</span>(<span class="ident">to_raw_value</span>(<span class="kw-2">&amp;</span><span class="ident">d</span>).<span class="ident">expect</span>(<span class="string">&quot;Coulnd&#39;t serialize device keys&quot;</span>)));
+
+        <span class="prelude-val">Some</span>(
+            <span class="macro">assign!</span>(<span class="ident">upload_keys::Request::new</span>(), { <span class="ident">device_keys</span>, <span class="ident">one_time_keys</span>, <span class="ident">fallback_keys</span>: <span class="ident">BTreeMap::new</span>(), }),
+        )
     }
 
     <span class="doccomment">/// Decrypt a to-device event.</span>
@@ -3028,8 +3049,12 @@
         <span class="self">self</span>.<span class="ident">verification_machine</span>.<span class="ident">get_requests</span>(<span class="ident">user_id</span>)
     }
 
-    <span class="kw">fn</span> <span class="ident">update_one_time_key_count</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">key_count</span>: <span class="kw-2">&amp;</span><span class="ident">BTreeMap</span><span class="op">&lt;</span><span class="ident">DeviceKeyAlgorithm</span>, <span class="ident">UInt</span><span class="op">&gt;</span>) {
-        <span class="self">self</span>.<span class="ident">account</span>.<span class="ident">update_uploaded_key_count</span>(<span class="ident">key_count</span>);
+    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">update_key_counts</span>(
+        <span class="kw-2">&amp;</span><span class="self">self</span>,
+        <span class="ident">one_time_key_count</span>: <span class="kw-2">&amp;</span><span class="ident">BTreeMap</span><span class="op">&lt;</span><span class="ident">DeviceKeyAlgorithm</span>, <span class="ident">UInt</span><span class="op">&gt;</span>,
+        <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">unused_variables</span>)]</span> <span class="ident">unused_fallback_keys</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span>[<span class="ident">DeviceKeyAlgorithm</span>]<span class="op">&gt;</span>,
+    ) {
+        <span class="self">self</span>.<span class="ident">account</span>.<span class="ident">update_uploaded_key_count</span>(<span class="ident">one_time_key_count</span>);
     }
 
     <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">handle_to_device_event</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">event</span>: <span class="kw-2">&amp;</span><span class="ident">AnyToDeviceEvent</span>) {
@@ -3082,6 +3107,7 @@
         <span class="ident">to_device_events</span>: <span class="ident">ToDevice</span>,
         <span class="ident">changed_devices</span>: <span class="kw-2">&amp;</span><span class="ident">DeviceLists</span>,
         <span class="ident">one_time_keys_counts</span>: <span class="kw-2">&amp;</span><span class="ident">BTreeMap</span><span class="op">&lt;</span><span class="ident">DeviceKeyAlgorithm</span>, <span class="ident">UInt</span><span class="op">&gt;</span>,
+        <span class="ident">unused_fallback_keys</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span>[<span class="ident">DeviceKeyAlgorithm</span>]<span class="op">&gt;</span>,
     ) -&gt; <span class="ident">OlmResult</span><span class="op">&lt;</span><span class="ident">ToDevice</span><span class="op">&gt;</span> {
         <span class="comment">// Remove verification objects that have expired or are done.</span>
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">events</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">verification_machine</span>.<span class="ident">garbage_collect</span>();
@@ -3091,7 +3117,7 @@
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">changes</span> <span class="op">=</span>
             <span class="ident">Changes</span> { <span class="ident">account</span>: <span class="prelude-val">Some</span>(<span class="self">self</span>.<span class="ident">account</span>.<span class="ident">inner</span>.<span class="ident">clone</span>()), ..<span class="ident">Default::default</span>() };
 
-        <span class="self">self</span>.<span class="ident">update_one_time_key_count</span>(<span class="ident">one_time_keys_counts</span>);
+        <span class="self">self</span>.<span class="ident">update_key_counts</span>(<span class="ident">one_time_keys_counts</span>, <span class="ident">unused_fallback_keys</span>).<span class="kw">await</span>;
 
         <span class="kw">for</span> <span class="ident">user_id</span> <span class="kw">in</span> <span class="kw-2">&amp;</span><span class="ident">changed_devices</span>.<span class="ident">changed</span> {
             <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Err</span>(<span class="ident">e</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">identity_manager</span>.<span class="ident">mark_user_as_changed</span>(<span class="ident">user_id</span>).<span class="kw">await</span> {
@@ -3737,8 +3763,10 @@
             <span class="ident">AnyMessageEventContent</span>, <span class="ident">AnySyncMessageEvent</span>, <span class="ident">AnySyncRoomEvent</span>, <span class="ident">AnyToDeviceEvent</span>,
             <span class="ident">AnyToDeviceEventContent</span>, <span class="ident">SyncMessageEvent</span>, <span class="ident">ToDeviceEvent</span>, <span class="ident">Unsigned</span>,
         },
-        <span class="ident">room_id</span>, <span class="ident">uint</span>, <span class="ident">user_id</span>, <span class="ident">DeviceId</span>, <span class="ident">DeviceKeyAlgorithm</span>, <span class="ident">DeviceKeyId</span>,
-        <span class="ident">MilliSecondsSinceUnixEpoch</span>, <span class="ident">UserId</span>,
+        <span class="ident">room_id</span>,
+        <span class="ident">serde::Raw</span>,
+        <span class="ident">uint</span>, <span class="ident">user_id</span>, <span class="ident">DeviceId</span>, <span class="ident">DeviceKeyAlgorithm</span>, <span class="ident">DeviceKeyId</span>, <span class="ident">MilliSecondsSinceUnixEpoch</span>,
+        <span class="ident">UserId</span>,
     };
     <span class="kw">use</span> <span class="ident">serde_json::json</span>;
 
@@ -3750,7 +3778,7 @@
     };
 
     <span class="doccomment">/// These keys need to be periodically uploaded to the server.</span>
-    <span class="kw">type</span> <span class="ident">OneTimeKeys</span> <span class="op">=</span> <span class="ident">BTreeMap</span><span class="op">&lt;</span><span class="ident">Box</span><span class="op">&lt;</span><span class="ident">DeviceKeyId</span><span class="op">&gt;</span>, <span class="ident">OneTimeKey</span><span class="op">&gt;</span>;
+    <span class="kw">type</span> <span class="ident">OneTimeKeys</span> <span class="op">=</span> <span class="ident">BTreeMap</span><span class="op">&lt;</span><span class="ident">Box</span><span class="op">&lt;</span><span class="ident">DeviceKeyId</span><span class="op">&gt;</span>, <span class="ident">Raw</span><span class="op">&lt;</span><span class="ident">OneTimeKey</span><span class="op">&gt;</span><span class="op">&gt;</span>;
 
     <span class="kw">fn</span> <span class="ident">alice_id</span>() -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">UserId</span> {
         <span class="macro">user_id!</span>(<span class="string">&quot;@alice:example.org&quot;</span>)
@@ -3804,7 +3832,7 @@
         <span class="kw">let</span> <span class="ident">response</span> <span class="op">=</span> <span class="ident">keys_upload_response</span>();
         <span class="ident">machine</span>.<span class="ident">receive_keys_upload_response</span>(<span class="kw-2">&amp;</span><span class="ident">response</span>).<span class="kw">await</span>.<span class="ident">unwrap</span>();
 
-        (<span class="ident">machine</span>, <span class="ident">request</span>.<span class="ident">one_time_keys</span>.<span class="ident">unwrap</span>())
+        (<span class="ident">machine</span>, <span class="ident">request</span>.<span class="ident">one_time_keys</span>)
     }
 
     <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">get_machine_after_query</span>() -&gt; (<span class="ident">OlmMachine</span>, <span class="ident">OneTimeKeys</span>) {
@@ -4005,7 +4033,7 @@
             <span class="kw-2">&amp;</span><span class="ident">machine</span>.<span class="ident">user_id</span>,
             <span class="kw-2">&amp;</span><span class="ident">DeviceKeyId::from_parts</span>(<span class="ident">DeviceKeyAlgorithm::Ed25519</span>, <span class="ident">machine</span>.<span class="ident">device_id</span>()),
             <span class="ident">ed25519_key</span>,
-            <span class="kw-2">&amp;mut</span> <span class="macro">json!</span>(<span class="kw-2">&amp;mut</span> <span class="ident">request</span>.<span class="ident">one_time_keys</span>.<span class="ident">as_mut</span>().<span class="ident">unwrap</span>().<span class="ident">values_mut</span>().<span class="ident">next</span>()),
+            <span class="kw-2">&amp;mut</span> <span class="macro">json!</span>(<span class="kw-2">&amp;mut</span> <span class="ident">request</span>.<span class="ident">one_time_keys</span>.<span class="ident">values_mut</span>().<span class="ident">next</span>()),
         );
         <span class="macro">assert!</span>(<span class="ident">ret</span>.<span class="ident">is_ok</span>());
 
@@ -4021,7 +4049,7 @@
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">response</span> <span class="op">=</span> <span class="ident">keys_upload_response</span>();
         <span class="ident">response</span>.<span class="ident">one_time_key_counts</span>.<span class="ident">insert</span>(
             <span class="ident">DeviceKeyAlgorithm::SignedCurve25519</span>,
-            (<span class="ident">request</span>.<span class="ident">one_time_keys</span>.<span class="ident">unwrap</span>().<span class="ident">len</span>() <span class="kw">as</span> <span class="ident">u64</span>).<span class="ident">try_into</span>().<span class="ident">unwrap</span>(),
+            (<span class="ident">request</span>.<span class="ident">one_time_keys</span>.<span class="ident">len</span>() <span class="kw">as</span> <span class="ident">u64</span>).<span class="ident">try_into</span>().<span class="ident">unwrap</span>(),
         );
 
         <span class="ident">machine</span>.<span class="ident">receive_keys_upload_response</span>(<span class="kw-2">&amp;</span><span class="ident">response</span>).<span class="kw">await</span>.<span class="ident">unwrap</span>();
@@ -4336,5 +4364,5 @@
     }
 }
 </code></pre></div>
-</section><section id="search" class="content hidden"></section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="matrix_sdk_crypto" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.59.0-nightly (e2116acae 2021-12-05)" ></div>
+</section><section id="search" class="content hidden"></section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="matrix_sdk_crypto" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.59.0-nightly (6bda5b331 2021-12-12)" ></div>
 </body></html>
