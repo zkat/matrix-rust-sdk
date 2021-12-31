@@ -3664,6 +3664,25 @@
 <span id="3662">3662</span>
 <span id="3663">3663</span>
 <span id="3664">3664</span>
+<span id="3665">3665</span>
+<span id="3666">3666</span>
+<span id="3667">3667</span>
+<span id="3668">3668</span>
+<span id="3669">3669</span>
+<span id="3670">3670</span>
+<span id="3671">3671</span>
+<span id="3672">3672</span>
+<span id="3673">3673</span>
+<span id="3674">3674</span>
+<span id="3675">3675</span>
+<span id="3676">3676</span>
+<span id="3677">3677</span>
+<span id="3678">3678</span>
+<span id="3679">3679</span>
+<span id="3680">3680</span>
+<span id="3681">3681</span>
+<span id="3682">3682</span>
+<span id="3683">3683</span>
 </pre><pre class="rust"><code><span class="comment">// Copyright 2020 Damir Jelić</span>
 <span class="comment">// Copyright 2020 The Matrix.org Foundation C.I.C.</span>
 <span class="comment">//</span>
@@ -3983,7 +4002,26 @@
         <span class="kw-2">*</span><span class="ident">homeserver</span> <span class="op">=</span> <span class="ident">homeserver_url</span>;
     }
 
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">get_supported_versions</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">HttpResult</span><span class="op">&lt;</span><span class="ident">get_supported_versions::Response</span><span class="op">&gt;</span> {
+    <span class="doccomment">/// Get the versions supported by the homeserver.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// This method should be used to check that a server is a valid Matrix</span>
+    <span class="doccomment">/// homeserver.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// # Example</span>
+    <span class="doccomment">/// ```no_run</span>
+    <span class="doccomment">/// # use futures::executor::block_on;</span>
+    <span class="doccomment">/// # block_on(async {</span>
+    <span class="doccomment">/// use matrix_sdk::{Client};</span>
+    <span class="doccomment">/// use url::Url;</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// let homeserver = Url::parse(&quot;http://example.com&quot;)?;</span>
+    <span class="doccomment">/// let client = Client::new(homeserver)?;</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// // Check that it is a valid homeserver.</span>
+    <span class="doccomment">/// client.get_supported_versions().await?;</span>
+    <span class="doccomment">/// # Result::&lt;_, anyhow::Error&gt;::Ok(()) });</span>
+    <span class="doccomment">/// ```</span>
+    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">get_supported_versions</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">HttpResult</span><span class="op">&lt;</span><span class="ident">get_supported_versions::Response</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">send</span>(
             <span class="ident">get_supported_versions::Request::new</span>(),
             <span class="prelude-val">Some</span>(<span class="ident">RequestConfig::new</span>().<span class="ident">disable_retry</span>()),
