@@ -1,6 +1,9 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `crates&#x2F;matrix-sdk-crypto&#x2F;src&#x2F;store&#x2F;sled.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>sled.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script src="../../../crates.js"></script><script defer src="../../../main.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script>
-    <noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu" role="button">&#9776;</div><a class="sidebar-logo" href="../../../matrix_sdk_crypto/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.png" alt="logo"></div>
-        </a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../matrix_sdk_crypto/index.html"><img class="rust-logo" src="../../../rust-logo.png" alt="logo"></a><nav class="sub"><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu" title="themes"><img width="18" height="18" alt="Pick another theme!" src="../../../brush.svg"></button><div id="theme-choices" role="menu"></div></div><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><button type="button" id="help-button" title="help">?</button><a id="settings-menu" href="../../../settings.html" title="settings"><img width="18" height="18" alt="Change settings" src="../../../wheel.svg"></a></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">   1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `crates/matrix-sdk-crypto/src/store/sled.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>sled.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script src="../../../crates.js"></script><script defer src="../../../main.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script>
+    <noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../matrix_sdk_crypto/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div>
+        </a><h2 class="location"></h2>
+    </nav>
+    <nav class="sidebar"><a class="sidebar-logo" href="../../../matrix_sdk_crypto/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div>
+        </a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../matrix_sdk_crypto/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><div class="theme-picker hidden"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu" title="themes"><img width="22" height="22" alt="Pick another theme!" src="../../../brush.svg"></button><div id="theme-choices" role="menu"></div></div><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><button type="button" id="help-button" title="help">?</button><a id="settings-menu" href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">   1</span>
 <span id="2">   2</span>
 <span id="3">   3</span>
 <span id="4">   4</span>
@@ -1521,6 +1524,20 @@
 <span id="1519">1519</span>
 <span id="1520">1520</span>
 <span id="1521">1521</span>
+<span id="1522">1522</span>
+<span id="1523">1523</span>
+<span id="1524">1524</span>
+<span id="1525">1525</span>
+<span id="1526">1526</span>
+<span id="1527">1527</span>
+<span id="1528">1528</span>
+<span id="1529">1529</span>
+<span id="1530">1530</span>
+<span id="1531">1531</span>
+<span id="1532">1532</span>
+<span id="1533">1533</span>
+<span id="1534">1534</span>
+<span id="1535">1535</span>
 </pre><pre class="rust"><code><span class="comment">// Copyright 2020 The Matrix.org Foundation C.I.C.</span>
 <span class="comment">//</span>
 <span class="comment">// Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);</span>
@@ -1543,12 +1560,12 @@
 };
 
 <span class="kw">use</span> <span class="ident">dashmap::DashSet</span>;
-<span class="kw">use</span> <span class="ident">matrix_sdk_common</span>::{<span class="ident">async_trait</span>, <span class="ident">locks::Mutex</span>, <span class="ident">uuid</span>};
+<span class="kw">use</span> <span class="ident">matrix_sdk_common</span>::{<span class="ident">async_trait</span>, <span class="ident">locks::Mutex</span>};
 <span class="kw">use</span> <span class="ident">olm_rs</span>::{<span class="ident">account::IdentityKeys</span>, <span class="ident">PicklingMode</span>};
 <span class="kw">use</span> <span class="ident">ruma</span>::{
     <span class="ident">encryption::DeviceKeys</span>,
     <span class="ident">events</span>::{<span class="ident">room_key_request::RequestedKeyInfo</span>, <span class="ident">secret::request::SecretName</span>},
-    <span class="ident">DeviceId</span>, <span class="ident">DeviceKeyId</span>, <span class="ident">EventEncryptionAlgorithm</span>, <span class="ident">RoomId</span>, <span class="ident">UserId</span>,
+    <span class="ident">DeviceId</span>, <span class="ident">DeviceKeyId</span>, <span class="ident">EventEncryptionAlgorithm</span>, <span class="ident">RoomId</span>, <span class="ident">TransactionId</span>, <span class="ident">UserId</span>,
 };
 <span class="kw">use</span> <span class="ident">serde</span>::{<span class="ident">Deserialize</span>, <span class="ident">Serialize</span>};
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">sled::Error</span>;
@@ -1557,7 +1574,6 @@
     <span class="ident">Config</span>, <span class="ident">Db</span>, <span class="ident">IVec</span>, <span class="ident">Transactional</span>, <span class="ident">Tree</span>,
 };
 <span class="kw">use</span> <span class="ident">tracing::debug</span>;
-<span class="kw">use</span> <span class="ident">uuid::Uuid</span>;
 
 <span class="kw">use</span> <span class="kw">super</span>::{
     <span class="ident">caches::SessionStore</span>, <span class="ident">BackupKeys</span>, <span class="ident">Changes</span>, <span class="ident">CryptoStore</span>, <span class="ident">CryptoStoreError</span>, <span class="ident">InboundGroupSession</span>,
@@ -1580,9 +1596,21 @@
     <span class="kw">fn</span> <span class="ident">encode</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>;
 }
 
-<span class="kw">impl</span> <span class="ident">EncodeKey</span> <span class="kw">for</span> <span class="ident">Uuid</span> {
+<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">EncodeKey</span><span class="op">&gt;</span> <span class="ident">EncodeKey</span> <span class="kw">for</span> <span class="kw-2">&amp;</span><span class="ident">T</span> {
     <span class="kw">fn</span> <span class="ident">encode</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">as_u128</span>().<span class="ident">to_be_bytes</span>().<span class="ident">to_vec</span>()
+        <span class="ident">T::encode</span>(<span class="self">self</span>)
+    }
+}
+
+<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">EncodeKey</span><span class="op">&gt;</span> <span class="ident">EncodeKey</span> <span class="kw">for</span> <span class="ident">Box</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">encode</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span> {
+        <span class="ident">T::encode</span>(<span class="self">self</span>)
+    }
+}
+
+<span class="kw">impl</span> <span class="ident">EncodeKey</span> <span class="kw">for</span> <span class="ident">TransactionId</span> {
+    <span class="kw">fn</span> <span class="ident">encode</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span> {
+        <span class="self">self</span>.<span class="ident">as_str</span>().<span class="ident">encode</span>()
     }
 }
 
@@ -1601,7 +1629,7 @@
     }
 }
 
-<span class="kw">impl</span> <span class="ident">EncodeKey</span> <span class="kw">for</span> <span class="kw-2">&amp;</span><span class="ident">RequestedKeyInfo</span> {
+<span class="kw">impl</span> <span class="ident">EncodeKey</span> <span class="kw">for</span> <span class="ident">RequestedKeyInfo</span> {
     <span class="kw">fn</span> <span class="ident">encode</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span> {
         [
             <span class="self">self</span>.<span class="ident">room_id</span>.<span class="ident">as_bytes</span>(),
@@ -1617,25 +1645,31 @@
     }
 }
 
-<span class="kw">impl</span> <span class="ident">EncodeKey</span> <span class="kw">for</span> <span class="kw-2">&amp;</span><span class="ident">UserId</span> {
+<span class="kw">impl</span> <span class="ident">EncodeKey</span> <span class="kw">for</span> <span class="ident">UserId</span> {
     <span class="kw">fn</span> <span class="ident">encode</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">as_str</span>().<span class="ident">encode</span>()
     }
 }
 
-<span class="kw">impl</span> <span class="ident">EncodeKey</span> <span class="kw">for</span> <span class="kw-2">&amp;</span><span class="ident">ReadOnlyDevice</span> {
+<span class="kw">impl</span> <span class="ident">EncodeKey</span> <span class="kw">for</span> <span class="ident">ReadOnlyDevice</span> {
     <span class="kw">fn</span> <span class="ident">encode</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span> {
         (<span class="self">self</span>.<span class="ident">user_id</span>().<span class="ident">as_str</span>(), <span class="self">self</span>.<span class="ident">device_id</span>().<span class="ident">as_str</span>()).<span class="ident">encode</span>()
     }
 }
 
-<span class="kw">impl</span> <span class="ident">EncodeKey</span> <span class="kw">for</span> <span class="kw-2">&amp;</span><span class="ident">RoomId</span> {
+<span class="kw">impl</span> <span class="ident">EncodeKey</span> <span class="kw">for</span> <span class="ident">RoomId</span> {
     <span class="kw">fn</span> <span class="ident">encode</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">as_str</span>().<span class="ident">encode</span>()
     }
 }
 
-<span class="kw">impl</span> <span class="ident">EncodeKey</span> <span class="kw">for</span> <span class="kw-2">&amp;</span><span class="ident">str</span> {
+<span class="kw">impl</span> <span class="ident">EncodeKey</span> <span class="kw">for</span> <span class="ident">String</span> {
+    <span class="kw">fn</span> <span class="ident">encode</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span> {
+        <span class="self">self</span>.<span class="ident">as_str</span>().<span class="ident">encode</span>()
+    }
+}
+
+<span class="kw">impl</span> <span class="ident">EncodeKey</span> <span class="kw">for</span> <span class="ident">str</span> {
     <span class="kw">fn</span> <span class="ident">encode</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span> {
         [<span class="self">self</span>.<span class="ident">as_bytes</span>(), <span class="kw-2">&amp;</span>[<span class="ident"><span class="self">Self</span>::SEPARATOR</span>]].<span class="ident">concat</span>()
     }
@@ -1947,7 +1981,7 @@
     }
 
     <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">load_tracked_users</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-        <span class="kw">for</span> <span class="ident">value</span> <span class="kw">in</span> <span class="self">self</span>.<span class="ident">tracked_users</span>.<span class="ident">iter</span>() {
+        <span class="kw">for</span> <span class="ident">value</span> <span class="kw">in</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">tracked_users</span> {
             <span class="kw">let</span> (<span class="ident">user</span>, <span class="ident">dirty</span>) <span class="op">=</span> <span class="ident">value</span><span class="question-mark">?</span>;
             <span class="kw">let</span> <span class="ident">user</span> <span class="op">=</span> <span class="ident">Box</span>::<span class="op">&lt;</span><span class="ident">UserId</span><span class="op">&gt;</span><span class="ident">::try_from</span>(<span class="ident">String::from_utf8_lossy</span>(<span class="kw-2">&amp;</span><span class="ident">user</span>).<span class="ident">to_string</span>())<span class="question-mark">?</span>;
             <span class="kw">let</span> <span class="ident">dirty</span> <span class="op">=</span> <span class="ident">dirty</span>.<span class="ident">get</span>(<span class="number">0</span>).<span class="ident">map</span>(<span class="op">|</span><span class="ident">d</span><span class="op">|</span> <span class="kw-2">*</span><span class="ident">d</span> <span class="op">==</span> <span class="number">1</span>).<span class="ident">unwrap_or</span>(<span class="bool-val">true</span>);
@@ -2136,7 +2170,7 @@
 
                     <span class="kw">for</span> (<span class="ident">key</span>, <span class="ident">session</span>) <span class="kw">in</span> <span class="kw-2">&amp;</span><span class="ident">outbound_session_changes</span> {
                         <span class="ident">outbound_sessions</span>.<span class="ident">insert</span>(
-                            (<span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="kw-2">*</span><span class="ident">key</span>).<span class="ident">encode</span>(),
+                            <span class="ident">key</span>.<span class="ident">encode</span>(),
                             <span class="ident">serde_json::to_vec</span>(<span class="kw-2">&amp;</span><span class="ident">session</span>)
                                 .<span class="ident">map_err</span>(<span class="ident">ConflictableTransactionError::Abort</span>)<span class="question-mark">?</span>,
                         )<span class="question-mark">?</span>;
@@ -2151,10 +2185,8 @@
                     }
 
                     <span class="kw">for</span> <span class="ident">key_request</span> <span class="kw">in</span> <span class="kw-2">&amp;</span><span class="ident">key_requests</span> {
-                        <span class="ident">secret_requests_by_info</span>.<span class="ident">insert</span>(
-                            (<span class="kw-2">&amp;</span><span class="ident">key_request</span>.<span class="ident">info</span>).<span class="ident">encode</span>(),
-                            <span class="ident">key_request</span>.<span class="ident">request_id</span>.<span class="ident">encode</span>(),
-                        )<span class="question-mark">?</span>;
+                        <span class="ident">secret_requests_by_info</span>
+                            .<span class="ident">insert</span>(<span class="ident">key_request</span>.<span class="ident">info</span>.<span class="ident">encode</span>(), <span class="ident">key_request</span>.<span class="ident">request_id</span>.<span class="ident">encode</span>())<span class="question-mark">?</span>;
 
                         <span class="kw">let</span> <span class="ident">key_request_id</span> <span class="op">=</span> <span class="ident">key_request</span>.<span class="ident">request_id</span>.<span class="ident">encode</span>();
 
@@ -2437,7 +2469,7 @@
 
     <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">get_outgoing_secret_requests</span>(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
-        <span class="ident">request_id</span>: <span class="ident">Uuid</span>,
+        <span class="ident">request_id</span>: <span class="kw-2">&amp;</span><span class="ident">TransactionId</span>,
     ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">GossipRequest</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">request_id</span> <span class="op">=</span> <span class="ident">request_id</span>.<span class="ident">encode</span>();
 
@@ -2467,7 +2499,7 @@
         <span class="ident">requests</span>
     }
 
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">delete_outgoing_secret_requests</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">request_id</span>: <span class="ident">Uuid</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">delete_outgoing_secret_requests</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">request_id</span>: <span class="kw-2">&amp;</span><span class="ident">TransactionId</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">ret</span>: <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">TransactionError</span><span class="op">&lt;</span><span class="ident">serde_json::Error</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="op">=</span> (
             <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">outgoing_secret_requests</span>,
             <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">unsent_secret_requests</span>,
@@ -2488,11 +2520,11 @@
                         .<span class="ident">map_err</span>(<span class="ident">ConflictableTransactionError::Abort</span>)<span class="question-mark">?</span>;
 
                     <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">request</span>) <span class="op">=</span> <span class="ident">sent_request</span> {
-                        <span class="ident">key_requests_by_info</span>.<span class="ident">remove</span>((<span class="kw-2">&amp;</span><span class="ident">request</span>.<span class="ident">info</span>).<span class="ident">encode</span>())<span class="question-mark">?</span>;
+                        <span class="ident">key_requests_by_info</span>.<span class="ident">remove</span>(<span class="ident">request</span>.<span class="ident">info</span>.<span class="ident">encode</span>())<span class="question-mark">?</span>;
                     }
 
                     <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">request</span>) <span class="op">=</span> <span class="ident">unsent_request</span> {
-                        <span class="ident">key_requests_by_info</span>.<span class="ident">remove</span>((<span class="kw-2">&amp;</span><span class="ident">request</span>.<span class="ident">info</span>).<span class="ident">encode</span>())<span class="question-mark">?</span>;
+                        <span class="ident">key_requests_by_info</span>.<span class="ident">remove</span>(<span class="ident">request</span>.<span class="ident">info</span>.<span class="ident">encode</span>())<span class="question-mark">?</span>;
                     }
 
                     <span class="prelude-val">Ok</span>(())
@@ -2540,12 +2572,11 @@
 <span class="kw">mod</span> <span class="ident">test</span> {
     <span class="kw">use</span> <span class="ident">std::collections::BTreeMap</span>;
 
-    <span class="kw">use</span> <span class="ident">matrix_sdk_common::uuid::Uuid</span>;
     <span class="kw">use</span> <span class="ident">matrix_sdk_test::async_test</span>;
     <span class="kw">use</span> <span class="ident">olm_rs::outbound_group_session::OlmOutboundGroupSession</span>;
     <span class="kw">use</span> <span class="ident">ruma</span>::{
         <span class="ident">device_id</span>, <span class="ident">encryption::SignedKey</span>, <span class="ident">events::room_key_request::RequestedKeyInfo</span>, <span class="ident">room_id</span>,
-        <span class="ident">user_id</span>, <span class="ident">DeviceId</span>, <span class="ident">EventEncryptionAlgorithm</span>, <span class="ident">UserId</span>,
+        <span class="ident">serde::Base64</span>, <span class="ident">user_id</span>, <span class="ident">DeviceId</span>, <span class="ident">EventEncryptionAlgorithm</span>, <span class="ident">TransactionId</span>, <span class="ident">UserId</span>,
     };
     <span class="kw">use</span> <span class="ident">tempfile::tempdir</span>;
 
@@ -2607,7 +2638,7 @@
 
         <span class="ident">bob</span>.<span class="ident">generate_one_time_keys_helper</span>(<span class="number">1</span>).<span class="kw">await</span>;
         <span class="kw">let</span> <span class="ident">one_time_key</span> <span class="op">=</span>
-            <span class="ident">bob</span>.<span class="ident">one_time_keys</span>().<span class="kw">await</span>.<span class="ident">curve25519</span>().<span class="ident">iter</span>().<span class="ident">next</span>().<span class="ident">unwrap</span>().<span class="number">1</span>.<span class="ident">to_owned</span>();
+            <span class="ident">Base64::parse</span>(<span class="ident">bob</span>.<span class="ident">one_time_keys</span>().<span class="kw">await</span>.<span class="ident">curve25519</span>().<span class="ident">values</span>().<span class="ident">next</span>().<span class="ident">unwrap</span>()).<span class="ident">unwrap</span>();
         <span class="kw">let</span> <span class="ident">one_time_key</span> <span class="op">=</span> <span class="ident">SignedKey::new</span>(<span class="ident">one_time_key</span>, <span class="ident">BTreeMap::new</span>());
         <span class="kw">let</span> <span class="ident">sender_key</span> <span class="op">=</span> <span class="ident">bob</span>.<span class="ident">identity_keys</span>().<span class="ident">curve25519</span>().<span class="ident">to_owned</span>();
         <span class="kw">let</span> <span class="ident">session</span> <span class="op">=</span>
@@ -2986,7 +3017,7 @@
     <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">key_request_saving</span>() {
         <span class="kw">let</span> (<span class="ident">account</span>, <span class="ident">store</span>, <span class="ident">_dir</span>) <span class="op">=</span> <span class="ident">get_loaded_store</span>().<span class="kw">await</span>;
 
-        <span class="kw">let</span> <span class="ident">id</span> <span class="op">=</span> <span class="ident">Uuid::new_v4</span>();
+        <span class="kw">let</span> <span class="ident">id</span> <span class="op">=</span> <span class="ident">TransactionId::new</span>();
         <span class="kw">let</span> <span class="ident">info</span>: <span class="ident">SecretInfo</span> <span class="op">=</span> <span class="ident">RequestedKeyInfo::new</span>(
             <span class="ident">EventEncryptionAlgorithm::MegolmV1AesSha2</span>,
             <span class="macro">room_id!</span>(<span class="string">&quot;!test:localhost&quot;</span>).<span class="ident">to_owned</span>(),
@@ -2997,12 +3028,12 @@
 
         <span class="kw">let</span> <span class="ident">request</span> <span class="op">=</span> <span class="ident">GossipRequest</span> {
             <span class="ident">request_recipient</span>: <span class="ident">account</span>.<span class="ident">user_id</span>().<span class="ident">to_owned</span>(),
-            <span class="ident">request_id</span>: <span class="ident">id</span>,
+            <span class="ident">request_id</span>: <span class="ident">id</span>.<span class="ident">clone</span>(),
             <span class="ident">info</span>: <span class="ident">info</span>.<span class="ident">clone</span>(),
             <span class="ident">sent_out</span>: <span class="bool-val">false</span>,
         };
 
-        <span class="macro">assert!</span>(<span class="ident">store</span>.<span class="ident">get_outgoing_secret_requests</span>(<span class="ident">id</span>).<span class="kw">await</span>.<span class="ident">unwrap</span>().<span class="ident">is_none</span>());
+        <span class="macro">assert!</span>(<span class="ident">store</span>.<span class="ident">get_outgoing_secret_requests</span>(<span class="kw-2">&amp;</span><span class="ident">id</span>).<span class="kw">await</span>.<span class="ident">unwrap</span>().<span class="ident">is_none</span>());
 
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">changes</span> <span class="op">=</span> <span class="ident">Changes::default</span>();
         <span class="ident">changes</span>.<span class="ident">key_requests</span>.<span class="ident">push</span>(<span class="ident">request</span>.<span class="ident">clone</span>());
@@ -3010,7 +3041,7 @@
 
         <span class="kw">let</span> <span class="ident">request</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">request</span>);
 
-        <span class="kw">let</span> <span class="ident">stored_request</span> <span class="op">=</span> <span class="ident">store</span>.<span class="ident">get_outgoing_secret_requests</span>(<span class="ident">id</span>).<span class="kw">await</span>.<span class="ident">unwrap</span>();
+        <span class="kw">let</span> <span class="ident">stored_request</span> <span class="op">=</span> <span class="ident">store</span>.<span class="ident">get_outgoing_secret_requests</span>(<span class="kw-2">&amp;</span><span class="ident">id</span>).<span class="kw">await</span>.<span class="ident">unwrap</span>();
         <span class="macro">assert_eq!</span>(<span class="ident">request</span>, <span class="ident">stored_request</span>);
 
         <span class="kw">let</span> <span class="ident">stored_request</span> <span class="op">=</span> <span class="ident">store</span>.<span class="ident">get_secret_request_by_info</span>(<span class="kw-2">&amp;</span><span class="ident">info</span>).<span class="kw">await</span>.<span class="ident">unwrap</span>();
@@ -3019,7 +3050,7 @@
 
         <span class="kw">let</span> <span class="ident">request</span> <span class="op">=</span> <span class="ident">GossipRequest</span> {
             <span class="ident">request_recipient</span>: <span class="ident">account</span>.<span class="ident">user_id</span>().<span class="ident">to_owned</span>(),
-            <span class="ident">request_id</span>: <span class="ident">id</span>,
+            <span class="ident">request_id</span>: <span class="ident">id</span>.<span class="ident">clone</span>(),
             <span class="ident">info</span>: <span class="ident">info</span>.<span class="ident">clone</span>(),
             <span class="ident">sent_out</span>: <span class="bool-val">true</span>,
         };
@@ -3029,12 +3060,12 @@
         <span class="ident">store</span>.<span class="ident">save_changes</span>(<span class="ident">changes</span>).<span class="kw">await</span>.<span class="ident">unwrap</span>();
 
         <span class="macro">assert!</span>(<span class="ident">store</span>.<span class="ident">get_unsent_secret_requests</span>().<span class="kw">await</span>.<span class="ident">unwrap</span>().<span class="ident">is_empty</span>());
-        <span class="kw">let</span> <span class="ident">stored_request</span> <span class="op">=</span> <span class="ident">store</span>.<span class="ident">get_outgoing_secret_requests</span>(<span class="ident">id</span>).<span class="kw">await</span>.<span class="ident">unwrap</span>();
+        <span class="kw">let</span> <span class="ident">stored_request</span> <span class="op">=</span> <span class="ident">store</span>.<span class="ident">get_outgoing_secret_requests</span>(<span class="kw-2">&amp;</span><span class="ident">id</span>).<span class="kw">await</span>.<span class="ident">unwrap</span>();
         <span class="macro">assert_eq!</span>(<span class="prelude-val">Some</span>(<span class="ident">request</span>), <span class="ident">stored_request</span>);
 
-        <span class="ident">store</span>.<span class="ident">delete_outgoing_secret_requests</span>(<span class="ident">id</span>).<span class="kw">await</span>.<span class="ident">unwrap</span>();
+        <span class="ident">store</span>.<span class="ident">delete_outgoing_secret_requests</span>(<span class="kw-2">&amp;</span><span class="ident">id</span>).<span class="kw">await</span>.<span class="ident">unwrap</span>();
 
-        <span class="kw">let</span> <span class="ident">stored_request</span> <span class="op">=</span> <span class="ident">store</span>.<span class="ident">get_outgoing_secret_requests</span>(<span class="ident">id</span>).<span class="kw">await</span>.<span class="ident">unwrap</span>();
+        <span class="kw">let</span> <span class="ident">stored_request</span> <span class="op">=</span> <span class="ident">store</span>.<span class="ident">get_outgoing_secret_requests</span>(<span class="kw-2">&amp;</span><span class="ident">id</span>).<span class="kw">await</span>.<span class="ident">unwrap</span>();
         <span class="macro">assert_eq!</span>(<span class="prelude-val">None</span>, <span class="ident">stored_request</span>);
 
         <span class="kw">let</span> <span class="ident">stored_request</span> <span class="op">=</span> <span class="ident">store</span>.<span class="ident">get_secret_request_by_info</span>(<span class="kw-2">&amp;</span><span class="ident">info</span>).<span class="kw">await</span>.<span class="ident">unwrap</span>();
@@ -3043,5 +3074,5 @@
     }
 }
 </code></pre></div>
-</section><section id="search" class="content hidden"></section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="matrix_sdk_crypto" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.59.0-nightly (399ba6bb3 2022-01-03)" ></div>
+</section><section id="search" class="content hidden"></section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="matrix_sdk_crypto" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.60.0-nightly (498eeb72f 2022-01-31)" ></div>
 </body></html>

@@ -1,6 +1,9 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `crates&#x2F;matrix-sdk-crypto&#x2F;src&#x2F;verification&#x2F;sas&#x2F;helpers.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>helpers.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../storage.js"></script><script src="../../../../crates.js"></script><script defer src="../../../../main.js"></script><script defer src="../../../../source-script.js"></script><script defer src="../../../../source-files.js"></script>
-    <noscript><link rel="stylesheet" href="../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu" role="button">&#9776;</div><a class="sidebar-logo" href="../../../../matrix_sdk_crypto/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.png" alt="logo"></div>
-        </a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../../matrix_sdk_crypto/index.html"><img class="rust-logo" src="../../../../rust-logo.png" alt="logo"></a><nav class="sub"><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu" title="themes"><img width="18" height="18" alt="Pick another theme!" src="../../../../brush.svg"></button><div id="theme-choices" role="menu"></div></div><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><button type="button" id="help-button" title="help">?</button><a id="settings-menu" href="../../../../settings.html" title="settings"><img width="18" height="18" alt="Change settings" src="../../../../wheel.svg"></a></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">  1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `crates/matrix-sdk-crypto/src/verification/sas/helpers.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>helpers.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../storage.js"></script><script src="../../../../crates.js"></script><script defer src="../../../../main.js"></script><script defer src="../../../../source-script.js"></script><script defer src="../../../../source-files.js"></script>
+    <noscript><link rel="stylesheet" href="../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../../matrix_sdk_crypto/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div>
+        </a><h2 class="location"></h2>
+    </nav>
+    <nav class="sidebar"><a class="sidebar-logo" href="../../../../matrix_sdk_crypto/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div>
+        </a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../../matrix_sdk_crypto/index.html"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></a><nav class="sub"><div class="theme-picker hidden"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu" title="themes"><img width="22" height="22" alt="Pick another theme!" src="../../../../brush.svg"></button><div id="theme-choices" role="menu"></div></div><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><button type="button" id="help-button" title="help">?</button><a id="settings-menu" href="../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../wheel.svg"></a></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">  1</span>
 <span id="2">  2</span>
 <span id="3">  3</span>
 <span id="4">  4</span>
@@ -625,6 +628,29 @@
 <span id="623">623</span>
 <span id="624">624</span>
 <span id="625">625</span>
+<span id="626">626</span>
+<span id="627">627</span>
+<span id="628">628</span>
+<span id="629">629</span>
+<span id="630">630</span>
+<span id="631">631</span>
+<span id="632">632</span>
+<span id="633">633</span>
+<span id="634">634</span>
+<span id="635">635</span>
+<span id="636">636</span>
+<span id="637">637</span>
+<span id="638">638</span>
+<span id="639">639</span>
+<span id="640">640</span>
+<span id="641">641</span>
+<span id="642">642</span>
+<span id="643">643</span>
+<span id="644">644</span>
+<span id="645">645</span>
+<span id="646">646</span>
+<span id="647">647</span>
+<span id="648">648</span>
 </pre><pre class="rust"><code><span class="comment">// Copyright 2020 The Matrix.org Foundation C.I.C.</span>
 <span class="comment">//</span>
 <span class="comment">// Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);</span>
@@ -651,6 +677,7 @@
         },
         <span class="ident">AnyMessageEventContent</span>, <span class="ident">AnyToDeviceEventContent</span>,
     },
+    <span class="ident">serde::Base64</span>,
     <span class="ident">DeviceKeyAlgorithm</span>, <span class="ident">DeviceKeyId</span>, <span class="ident">UserId</span>,
 };
 <span class="kw">use</span> <span class="ident">sha2</span>::{<span class="ident">Digest</span>, <span class="ident">Sha256</span>};
@@ -659,7 +686,6 @@
 <span class="kw">use</span> <span class="kw">super</span>::{<span class="ident">FlowId</span>, <span class="ident">OutgoingContent</span>};
 <span class="kw">use</span> <span class="kw">crate</span>::{
     <span class="ident">identities</span>::{<span class="ident">ReadOnlyDevice</span>, <span class="ident">ReadOnlyUserIdentities</span>},
-    <span class="ident">utilities::encode</span>,
     <span class="ident">verification::event_enums</span>::{<span class="ident">MacContent</span>, <span class="ident">StartContent</span>},
     <span class="ident">Emoji</span>, <span class="ident">ReadOnlyAccount</span>, <span class="ident">ReadOnlyOwnUserIdentity</span>,
 };
@@ -682,11 +708,18 @@
 <span class="doccomment">///</span>
 <span class="doccomment">/// * `content` - The `m.key.verification.start` event content that started the</span>
 <span class="doccomment">/// interactive verification process.</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">calculate_commitment</span>(<span class="ident">public_key</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">content</span>: <span class="kw-2">&amp;</span><span class="ident">StartContent</span>) -&gt; <span class="ident">String</span> {
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">calculate_commitment</span>(<span class="ident">public_key</span>: <span class="kw-2">&amp;</span><span class="ident">Base64</span>, <span class="ident">content</span>: <span class="kw-2">&amp;</span><span class="ident">StartContent</span>) -&gt; <span class="ident">Base64</span> {
     <span class="kw">let</span> <span class="ident">content</span> <span class="op">=</span> <span class="ident">content</span>.<span class="ident">canonical_json</span>();
     <span class="kw">let</span> <span class="ident">content_string</span> <span class="op">=</span> <span class="ident">content</span>.<span class="ident">to_string</span>();
 
-    <span class="ident">encode</span>(<span class="ident">Sha256::new</span>().<span class="ident">chain</span>(<span class="kw-2">&amp;</span><span class="ident">public_key</span>).<span class="ident">chain</span>(<span class="kw-2">&amp;</span><span class="ident">content_string</span>).<span class="ident">finalize</span>())
+    <span class="ident">Base64::new</span>(
+        <span class="ident">Sha256::new</span>()
+            .<span class="ident">chain</span>(<span class="ident">public_key</span>.<span class="ident">encode</span>())
+            .<span class="ident">chain</span>(<span class="kw-2">&amp;</span><span class="ident">content_string</span>)
+            .<span class="ident">finalize</span>()
+            .<span class="ident">as_slice</span>()
+            .<span class="ident">to_owned</span>(),
+    )
 }
 
 <span class="doccomment">/// Get a tuple of an emoji and a description of the emoji using a number.</span>
@@ -825,11 +858,13 @@
     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">keys</span> <span class="op">=</span> <span class="ident">content</span>.<span class="ident">mac</span>().<span class="ident">keys</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">k</span><span class="op">|</span> <span class="ident">k</span>.<span class="ident">as_str</span>()).<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span><span class="op">&gt;</span>();
     <span class="ident">keys</span>.<span class="ident">sort_unstable</span>();
 
-    <span class="kw">let</span> <span class="ident">keys</span> <span class="op">=</span> <span class="ident">sas</span>
-        .<span class="ident">calculate_mac</span>(<span class="kw-2">&amp;</span><span class="ident">keys</span>.<span class="ident">join</span>(<span class="string">&quot;,&quot;</span>), <span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">&quot;{}KEY_IDS&quot;</span>, <span class="kw-2">&amp;</span><span class="ident">info</span>))
-        .<span class="ident">expect</span>(<span class="string">&quot;Can&#39;t calculate SAS MAC&quot;</span>);
+    <span class="kw">let</span> <span class="ident">keys</span> <span class="op">=</span> <span class="ident">Base64::parse</span>(
+        <span class="ident">sas</span>.<span class="ident">calculate_mac</span>(<span class="kw-2">&amp;</span><span class="ident">keys</span>.<span class="ident">join</span>(<span class="string">&quot;,&quot;</span>), <span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">&quot;{}KEY_IDS&quot;</span>, <span class="kw-2">&amp;</span><span class="ident">info</span>))
+            .<span class="ident">expect</span>(<span class="string">&quot;Can&#39;t calculate SAS MAC&quot;</span>),
+    )
+    .<span class="ident">expect</span>(<span class="string">&quot;Can&#39;t base64-decode SAS MAC&quot;</span>);
 
-    <span class="kw">if</span> <span class="ident">keys</span> <span class="op">!</span><span class="op">=</span> <span class="ident">content</span>.<span class="ident">keys</span>() {
+    <span class="kw">if</span> <span class="ident">keys</span> <span class="op">!</span><span class="op">=</span> <span class="kw-2">*</span><span class="ident">content</span>.<span class="ident">keys</span>() {
         <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">CancelCode::KeyMismatch</span>);
     }
 
@@ -847,13 +882,14 @@
         };
 
         <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">key</span>) <span class="op">=</span> <span class="ident">ids</span>.<span class="ident">other_device</span>.<span class="ident">keys</span>().<span class="ident">get</span>(<span class="kw-2">&amp;</span><span class="ident">key_id</span>) {
-            <span class="kw">if</span> <span class="ident">key_mac</span>
-                <span class="op">==</span> <span class="kw-2">&amp;</span><span class="ident">sas</span>
-                    .<span class="ident">calculate_mac</span>(<span class="ident">key</span>, <span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">&quot;{}{}&quot;</span>, <span class="ident">info</span>, <span class="ident">key_id</span>))
-                    .<span class="ident">expect</span>(<span class="string">&quot;Can&#39;t calculate SAS MAC&quot;</span>)
-            {
-                <span class="macro">trace!</span>(<span class="string">&quot;Successfully verified the device key {} from {}&quot;</span>, <span class="ident">key_id</span>, <span class="ident">sender</span>);
+            <span class="kw">let</span> <span class="ident">calculated_mac</span> <span class="op">=</span> <span class="ident">Base64::parse</span>(
+                <span class="ident">sas</span>.<span class="ident">calculate_mac</span>(<span class="ident">key</span>, <span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">&quot;{}{}&quot;</span>, <span class="ident">info</span>, <span class="ident">key_id</span>))
+                    .<span class="ident">expect</span>(<span class="string">&quot;Can&#39;t calculate SAS MAC&quot;</span>),
+            )
+            .<span class="ident">expect</span>(<span class="string">&quot;Can&#39;t base64-decode SAS MAC&quot;</span>);
 
+            <span class="kw">if</span> <span class="kw-2">*</span><span class="ident">key_mac</span> <span class="op">==</span> <span class="ident">calculated_mac</span> {
+                <span class="macro">trace!</span>(<span class="string">&quot;Successfully verified the device key {} from {}&quot;</span>, <span class="ident">key_id</span>, <span class="ident">sender</span>);
                 <span class="ident">verified_devices</span>.<span class="ident">push</span>(<span class="ident">ids</span>.<span class="ident">other_device</span>.<span class="ident">clone</span>());
             } <span class="kw">else</span> {
                 <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">CancelCode::KeyMismatch</span>);
@@ -862,11 +898,13 @@
             <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">key</span>) <span class="op">=</span> <span class="ident">identity</span>.<span class="ident">master_key</span>().<span class="ident">get_key</span>(<span class="kw-2">&amp;</span><span class="ident">key_id</span>) {
                 <span class="comment">// TODO we should check that the master key signs the device,</span>
                 <span class="comment">// this way we know the master key also trusts the device</span>
-                <span class="kw">if</span> <span class="ident">key_mac</span>
-                    <span class="op">==</span> <span class="kw-2">&amp;</span><span class="ident">sas</span>
-                        .<span class="ident">calculate_mac</span>(<span class="ident">key</span>, <span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">&quot;{}{}&quot;</span>, <span class="ident">info</span>, <span class="ident">key_id</span>))
-                        .<span class="ident">expect</span>(<span class="string">&quot;Can&#39;t calculate SAS MAC&quot;</span>)
-                {
+                <span class="kw">let</span> <span class="ident">calculated_mac</span> <span class="op">=</span> <span class="ident">Base64::parse</span>(
+                    <span class="ident">sas</span>.<span class="ident">calculate_mac</span>(<span class="ident">key</span>, <span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">&quot;{}{}&quot;</span>, <span class="ident">info</span>, <span class="ident">key_id</span>))
+                        .<span class="ident">expect</span>(<span class="string">&quot;Can&#39;t calculate SAS MAC&quot;</span>),
+                )
+                .<span class="ident">expect</span>(<span class="string">&quot;Can&#39;t base64-decode SAS MAC&quot;</span>);
+
+                <span class="kw">if</span> <span class="kw-2">*</span><span class="ident">key_mac</span> <span class="op">==</span> <span class="ident">calculated_mac</span> {
                     <span class="macro">trace!</span>(<span class="string">&quot;Successfully verified the master key {} from {}&quot;</span>, <span class="ident">key_id</span>, <span class="ident">sender</span>);
                     <span class="ident">verified_identities</span>.<span class="ident">push</span>(<span class="ident">identity</span>.<span class="ident">clone</span>())
                 } <span class="kw">else</span> {
@@ -921,7 +959,7 @@
 <span class="doccomment">///</span>
 <span class="doccomment">/// This will panic if the public key of the other side wasn&#39;t set.</span>
 <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_mac_content</span>(<span class="ident">sas</span>: <span class="kw-2">&amp;</span><span class="ident">OlmSas</span>, <span class="ident">ids</span>: <span class="kw-2">&amp;</span><span class="ident">SasIds</span>, <span class="ident">flow_id</span>: <span class="kw-2">&amp;</span><span class="ident">FlowId</span>) -&gt; <span class="ident">OutgoingContent</span> {
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">mac</span>: <span class="ident">BTreeMap</span><span class="op">&lt;</span><span class="ident">String</span>, <span class="ident">String</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">BTreeMap::new</span>();
+    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">mac</span>: <span class="ident">BTreeMap</span><span class="op">&lt;</span><span class="ident">String</span>, <span class="ident">Base64</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">BTreeMap::new</span>();
 
     <span class="kw">let</span> <span class="ident">key_id</span> <span class="op">=</span> <span class="ident">DeviceKeyId::from_parts</span>(<span class="ident">DeviceKeyAlgorithm::Ed25519</span>, <span class="ident">ids</span>.<span class="ident">account</span>.<span class="ident">device_id</span>());
     <span class="kw">let</span> <span class="ident">key</span> <span class="op">=</span> <span class="ident">ids</span>.<span class="ident">account</span>.<span class="ident">identity_keys</span>().<span class="ident">ed25519</span>();
@@ -929,7 +967,11 @@
 
     <span class="ident">mac</span>.<span class="ident">insert</span>(
         <span class="ident">key_id</span>.<span class="ident">to_string</span>(),
-        <span class="ident">sas</span>.<span class="ident">calculate_mac</span>(<span class="ident">key</span>, <span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">&quot;{}{}&quot;</span>, <span class="ident">info</span>, <span class="ident">key_id</span>)).<span class="ident">expect</span>(<span class="string">&quot;Can&#39;t calculate SAS MAC&quot;</span>),
+        <span class="ident">Base64::parse</span>(
+            <span class="ident">sas</span>.<span class="ident">calculate_mac</span>(<span class="ident">key</span>, <span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">&quot;{}{}&quot;</span>, <span class="ident">info</span>, <span class="ident">key_id</span>))
+                .<span class="ident">expect</span>(<span class="string">&quot;Can&#39;t calculate SAS MAC&quot;</span>),
+        )
+        .<span class="ident">expect</span>(<span class="string">&quot;Can&#39;t base64-decode SAS MAC&quot;</span>),
     );
 
     <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">own_identity</span>) <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">ids</span>.<span class="ident">own_identity</span> {
@@ -937,9 +979,11 @@
             <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">key</span>) <span class="op">=</span> <span class="ident">own_identity</span>.<span class="ident">master_key</span>().<span class="ident">get_first_key</span>() {
                 <span class="kw">let</span> <span class="ident">key_id</span> <span class="op">=</span> <span class="macro">format!</span>(<span class="string">&quot;{}:{}&quot;</span>, <span class="ident">DeviceKeyAlgorithm::Ed25519</span>, <span class="kw-2">&amp;</span><span class="ident">key</span>);
 
-                <span class="kw">let</span> <span class="ident">calculated_mac</span> <span class="op">=</span> <span class="ident">sas</span>
-                    .<span class="ident">calculate_mac</span>(<span class="ident">key</span>, <span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">&quot;{}{}&quot;</span>, <span class="ident">info</span>, <span class="kw-2">&amp;</span><span class="ident">key_id</span>))
-                    .<span class="ident">expect</span>(<span class="string">&quot;Can&#39;t calculate SAS Master key MAC&quot;</span>);
+                <span class="kw">let</span> <span class="ident">calculated_mac</span> <span class="op">=</span> <span class="ident">Base64::parse</span>(
+                    <span class="ident">sas</span>.<span class="ident">calculate_mac</span>(<span class="ident">key</span>, <span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">&quot;{}{}&quot;</span>, <span class="ident">info</span>, <span class="kw-2">&amp;</span><span class="ident">key_id</span>))
+                        .<span class="ident">expect</span>(<span class="string">&quot;Can&#39;t calculate SAS Master key MAC&quot;</span>),
+                )
+                .<span class="ident">expect</span>(<span class="string">&quot;Can&#39;t base64-decode SAS Master key MAC&quot;</span>);
 
                 <span class="ident">mac</span>.<span class="ident">insert</span>(<span class="ident">key_id</span>, <span class="ident">calculated_mac</span>);
             }
@@ -948,15 +992,18 @@
 
     <span class="comment">// TODO Add the cross signing master key here if we trust/have it.</span>
 
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">keys</span> <span class="op">=</span> <span class="ident">mac</span>.<span class="ident">keys</span>().<span class="ident">cloned</span>().<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span><span class="op">&gt;</span>();
-    <span class="ident">keys</span>.<span class="ident">sort</span>();
-    <span class="kw">let</span> <span class="ident">keys</span> <span class="op">=</span> <span class="ident">sas</span>
-        .<span class="ident">calculate_mac</span>(<span class="kw-2">&amp;</span><span class="ident">keys</span>.<span class="ident">join</span>(<span class="string">&quot;,&quot;</span>), <span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">&quot;{}KEY_IDS&quot;</span>, <span class="kw-2">&amp;</span><span class="ident">info</span>))
-        .<span class="ident">expect</span>(<span class="string">&quot;Can&#39;t calculate SAS MAC&quot;</span>);
+    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">keys</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">mac</span>.<span class="ident">keys</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">s</span><span class="op">|</span> <span class="ident">s</span>.<span class="ident">as_str</span>()).<span class="ident">collect</span>();
+    <span class="ident">keys</span>.<span class="ident">sort_unstable</span>();
+
+    <span class="kw">let</span> <span class="ident">keys</span> <span class="op">=</span> <span class="ident">Base64::parse</span>(
+        <span class="ident">sas</span>.<span class="ident">calculate_mac</span>(<span class="kw-2">&amp;</span><span class="ident">keys</span>.<span class="ident">join</span>(<span class="string">&quot;,&quot;</span>), <span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">&quot;{}KEY_IDS&quot;</span>, <span class="kw-2">&amp;</span><span class="ident">info</span>))
+            .<span class="ident">expect</span>(<span class="string">&quot;Can&#39;t calculate SAS MAC&quot;</span>),
+    )
+    .<span class="ident">expect</span>(<span class="string">&quot;Can&#39;t base64-decode SAS MAC&quot;</span>);
 
     <span class="kw">match</span> <span class="ident">flow_id</span> {
         <span class="ident">FlowId::ToDevice</span>(<span class="ident">s</span>) =&gt; <span class="ident">AnyToDeviceEventContent::KeyVerificationMac</span>(
-            <span class="ident">ToDeviceKeyVerificationMacEventContent::new</span>(<span class="ident">s</span>.<span class="ident">to_string</span>(), <span class="ident">mac</span>, <span class="ident">keys</span>),
+            <span class="ident">ToDeviceKeyVerificationMacEventContent::new</span>(<span class="ident">s</span>.<span class="ident">clone</span>(), <span class="ident">mac</span>, <span class="ident">keys</span>),
         )
         .<span class="ident">into</span>(),
         <span class="ident">FlowId::InRoom</span>(<span class="ident">r</span>, <span class="ident">e</span>) =&gt; (
@@ -1170,7 +1217,9 @@
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
 <span class="kw">mod</span> <span class="ident">test</span> {
     <span class="kw">use</span> <span class="ident">proptest::prelude</span>::<span class="kw-2">*</span>;
-    <span class="kw">use</span> <span class="ident">ruma::events::key::verification::start::ToDeviceKeyVerificationStartEventContent</span>;
+    <span class="kw">use</span> <span class="ident">ruma</span>::{
+        <span class="ident">events::key::verification::start::ToDeviceKeyVerificationStartEventContent</span>, <span class="ident">serde::Base64</span>,
+    };
     <span class="kw">use</span> <span class="ident">serde_json::json</span>;
 
     <span class="kw">use</span> <span class="kw">super</span>::{
@@ -1181,9 +1230,9 @@
 
     <span class="attribute">#[<span class="ident">test</span>]</span>
     <span class="kw">fn</span> <span class="ident">commitment_calculation</span>() {
-        <span class="kw">let</span> <span class="ident">commitment</span> <span class="op">=</span> <span class="string">&quot;CCQmB4JCdB0FW21FdAnHj/Hu8+W9+Nb0vgwPEnZZQ4g&quot;</span>;
+        <span class="kw">let</span> <span class="ident">commitment</span> <span class="op">=</span> <span class="ident">Base64::parse</span>(<span class="string">&quot;CCQmB4JCdB0FW21FdAnHj/Hu8+W9+Nb0vgwPEnZZQ4g&quot;</span>).<span class="ident">unwrap</span>();
 
-        <span class="kw">let</span> <span class="ident">public_key</span> <span class="op">=</span> <span class="string">&quot;Q/NmNFEUS1fS+YeEmiZkjjblKTitrKOAk7cPEumcMlg&quot;</span>;
+        <span class="kw">let</span> <span class="ident">public_key</span> <span class="op">=</span> <span class="ident">Base64::parse</span>(<span class="string">&quot;Q/NmNFEUS1fS+YeEmiZkjjblKTitrKOAk7cPEumcMlg&quot;</span>).<span class="ident">unwrap</span>();
         <span class="kw">let</span> <span class="ident">content</span> <span class="op">=</span> <span class="macro">json!</span>({
             <span class="string">&quot;from_device&quot;</span>:<span class="string">&quot;XOWLHHFSWM&quot;</span>,
             <span class="string">&quot;transaction_id&quot;</span>:<span class="string">&quot;bYxBsirjUJO9osar6ST4i2M2NjrYLA7l&quot;</span>,
@@ -1197,9 +1246,9 @@
         <span class="kw">let</span> <span class="ident">content</span>: <span class="ident">ToDeviceKeyVerificationStartEventContent</span> <span class="op">=</span>
             <span class="ident">serde_json::from_value</span>(<span class="ident">content</span>).<span class="ident">unwrap</span>();
         <span class="kw">let</span> <span class="ident">content</span> <span class="op">=</span> <span class="ident">StartContent::from</span>(<span class="kw-2">&amp;</span><span class="ident">content</span>);
-        <span class="kw">let</span> <span class="ident">calculated_commitment</span> <span class="op">=</span> <span class="ident">calculate_commitment</span>(<span class="ident">public_key</span>, <span class="kw-2">&amp;</span><span class="ident">content</span>);
+        <span class="kw">let</span> <span class="ident">calculated_commitment</span> <span class="op">=</span> <span class="ident">calculate_commitment</span>(<span class="kw-2">&amp;</span><span class="ident">public_key</span>, <span class="kw-2">&amp;</span><span class="ident">content</span>);
 
-        <span class="macro">assert_eq!</span>(<span class="ident">commitment</span>, <span class="kw-2">&amp;</span><span class="ident">calculated_commitment</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">commitment</span>, <span class="ident">calculated_commitment</span>);
     }
 
     <span class="attribute">#[<span class="ident">test</span>]</span>
@@ -1233,8 +1282,8 @@
         <span class="kw">fn</span> <span class="ident">proptest_emoji</span>(<span class="ident">bytes</span> <span class="kw">in</span> <span class="ident">prop::array::uniform6</span>(<span class="number">0u8</span>..)) {
             <span class="kw">let</span> <span class="ident">numbers</span> <span class="op">=</span> <span class="ident">bytes_to_emoji_index</span>(<span class="ident">bytes</span>.<span class="ident">to_vec</span>());
 
-            <span class="kw">for</span> <span class="ident">number</span> <span class="kw">in</span> <span class="ident">numbers</span>.<span class="ident">iter</span>() {
-                <span class="macro">prop_assert!</span>(<span class="kw-2">*</span><span class="ident">number</span> <span class="op">&lt;</span> <span class="number">64</span>);
+            <span class="kw">for</span> <span class="ident">number</span> <span class="kw">in</span> <span class="ident">numbers</span> {
+                <span class="macro">prop_assert!</span>(<span class="ident">number</span> <span class="op">&lt;</span> <span class="number">64</span>);
             }
         }
     }
@@ -1251,5 +1300,5 @@
     }
 }
 </code></pre></div>
-</section><section id="search" class="content hidden"></section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="matrix_sdk_crypto" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.59.0-nightly (399ba6bb3 2022-01-03)" ></div>
+</section><section id="search" class="content hidden"></section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="matrix_sdk_crypto" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.60.0-nightly (498eeb72f 2022-01-31)" ></div>
 </body></html>

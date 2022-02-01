@@ -1,6 +1,9 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `crates&#x2F;matrix-sdk-crypto&#x2F;src&#x2F;gossiping&#x2F;machine.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>machine.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script src="../../../crates.js"></script><script defer src="../../../main.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script>
-    <noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu" role="button">&#9776;</div><a class="sidebar-logo" href="../../../matrix_sdk_crypto/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.png" alt="logo"></div>
-        </a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../matrix_sdk_crypto/index.html"><img class="rust-logo" src="../../../rust-logo.png" alt="logo"></a><nav class="sub"><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu" title="themes"><img width="18" height="18" alt="Pick another theme!" src="../../../brush.svg"></button><div id="theme-choices" role="menu"></div></div><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><button type="button" id="help-button" title="help">?</button><a id="settings-menu" href="../../../settings.html" title="settings"><img width="18" height="18" alt="Change settings" src="../../../wheel.svg"></a></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">   1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `crates/matrix-sdk-crypto/src/gossiping/machine.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>machine.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script src="../../../crates.js"></script><script defer src="../../../main.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script>
+    <noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../matrix_sdk_crypto/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div>
+        </a><h2 class="location"></h2>
+    </nav>
+    <nav class="sidebar"><a class="sidebar-logo" href="../../../matrix_sdk_crypto/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div>
+        </a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../matrix_sdk_crypto/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><div class="theme-picker hidden"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu" title="themes"><img width="22" height="22" alt="Pick another theme!" src="../../../brush.svg"></button><div id="theme-choices" role="menu"></div></div><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><button type="button" id="help-button" title="help">?</button><a id="settings-menu" href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">   1</span>
 <span id="2">   2</span>
 <span id="3">   3</span>
 <span id="4">   4</span>
@@ -1697,6 +1700,7 @@
 <span id="1695">1695</span>
 <span id="1696">1696</span>
 <span id="1697">1697</span>
+<span id="1698">1698</span>
 </pre><pre class="rust"><code><span class="comment">// Copyright 2020 The Matrix.org Foundation C.I.C.</span>
 <span class="comment">//</span>
 <span class="comment">// Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);</span>
@@ -1722,7 +1726,6 @@
 <span class="kw">use</span> <span class="ident">std</span>::{<span class="ident">collections::BTreeMap</span>, <span class="ident">sync::Arc</span>};
 
 <span class="kw">use</span> <span class="ident">dashmap</span>::{<span class="ident">mapref::entry::Entry</span>, <span class="ident">DashMap</span>, <span class="ident">DashSet</span>};
-<span class="kw">use</span> <span class="ident">matrix_sdk_common::uuid::Uuid</span>;
 <span class="kw">use</span> <span class="ident">ruma</span>::{
     <span class="ident">api::client::r0::keys::claim_keys::Request</span> <span class="kw">as</span> <span class="ident">KeysClaimRequest</span>,
     <span class="ident">events</span>::{
@@ -1739,7 +1742,7 @@
         },
         <span class="ident">AnyToDeviceEvent</span>, <span class="ident">AnyToDeviceEventContent</span>,
     },
-    <span class="ident">DeviceId</span>, <span class="ident">DeviceKeyAlgorithm</span>, <span class="ident">EventEncryptionAlgorithm</span>, <span class="ident">RoomId</span>, <span class="ident">UserId</span>,
+    <span class="ident">DeviceId</span>, <span class="ident">DeviceKeyAlgorithm</span>, <span class="ident">EventEncryptionAlgorithm</span>, <span class="ident">RoomId</span>, <span class="ident">TransactionId</span>, <span class="ident">UserId</span>,
 };
 <span class="kw">use</span> <span class="ident">tracing</span>::{<span class="ident">debug</span>, <span class="ident">info</span>, <span class="ident">trace</span>, <span class="ident">warn</span>};
 
@@ -1759,7 +1762,7 @@
     <span class="ident">device_id</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">DeviceId</span><span class="op">&gt;</span>,
     <span class="ident">store</span>: <span class="ident">Store</span>,
     <span class="ident">outbound_group_sessions</span>: <span class="ident">GroupSessionCache</span>,
-    <span class="ident">outgoing_requests</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">DashMap</span><span class="op">&lt;</span><span class="ident">Uuid</span>, <span class="ident">OutgoingRequest</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+    <span class="ident">outgoing_requests</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">DashMap</span><span class="op">&lt;</span><span class="ident">Box</span><span class="op">&lt;</span><span class="ident">TransactionId</span><span class="op">&gt;</span>, <span class="ident">OutgoingRequest</span><span class="op">&gt;</span><span class="op">&gt;</span>,
     <span class="ident">incoming_key_requests</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">DashMap</span><span class="op">&lt;</span><span class="ident">RequestInfo</span>, <span class="ident">RequestEvent</span><span class="op">&gt;</span><span class="op">&gt;</span>,
     <span class="ident">wait_queue</span>: <span class="ident">WaitQueue</span>,
     <span class="ident">users_for_key_claim</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">DashMap</span><span class="op">&lt;</span><span class="ident">Box</span><span class="op">&lt;</span><span class="ident">UserId</span><span class="op">&gt;</span>, <span class="ident">DashSet</span><span class="op">&lt;</span><span class="ident">Box</span><span class="op">&lt;</span><span class="ident">DeviceId</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span>,
@@ -1832,7 +1835,7 @@
         <span class="kw">if</span> <span class="op">!</span><span class="ident">users_for_key_claim</span>.<span class="ident">is_empty</span>() {
             <span class="kw">let</span> <span class="ident">key_claim_request</span> <span class="op">=</span> <span class="ident">KeysClaimRequest::new</span>(<span class="ident">users_for_key_claim</span>);
             <span class="ident">key_requests</span>.<span class="ident">push</span>(<span class="ident">OutgoingRequest</span> {
-                <span class="ident">request_id</span>: <span class="ident">Uuid::new_v4</span>(),
+                <span class="ident">request_id</span>: <span class="ident">TransactionId::new</span>(),
                 <span class="ident">request</span>: <span class="ident">Arc::new</span>(<span class="ident">key_claim_request</span>.<span class="ident">into</span>()),
             });
         }
@@ -2138,9 +2141,11 @@
             <span class="ident">AnyToDeviceEventContent::RoomEncrypted</span>(<span class="ident">content</span>),
         );
 
-        <span class="kw">let</span> <span class="ident">request</span> <span class="op">=</span>
-            <span class="ident">OutgoingRequest</span> { <span class="ident">request_id</span>: <span class="ident">request</span>.<span class="ident">txn_id</span>, <span class="ident">request</span>: <span class="ident">Arc::new</span>(<span class="ident">request</span>.<span class="ident">into</span>()) };
-        <span class="self">self</span>.<span class="ident">outgoing_requests</span>.<span class="ident">insert</span>(<span class="ident">request</span>.<span class="ident">request_id</span>, <span class="ident">request</span>);
+        <span class="kw">let</span> <span class="ident">request</span> <span class="op">=</span> <span class="ident">OutgoingRequest</span> {
+            <span class="ident">request_id</span>: <span class="ident">request</span>.<span class="ident">txn_id</span>.<span class="ident">clone</span>(),
+            <span class="ident">request</span>: <span class="ident">Arc::new</span>(<span class="ident">request</span>.<span class="ident">into</span>()),
+        };
+        <span class="self">self</span>.<span class="ident">outgoing_requests</span>.<span class="ident">insert</span>(<span class="ident">request</span>.<span class="ident">request_id</span>.<span class="ident">clone</span>(), <span class="ident">request</span>);
 
         <span class="prelude-val">Ok</span>(<span class="ident">used_session</span>)
     }
@@ -2160,9 +2165,11 @@
             <span class="ident">AnyToDeviceEventContent::RoomEncrypted</span>(<span class="ident">content</span>),
         );
 
-        <span class="kw">let</span> <span class="ident">request</span> <span class="op">=</span>
-            <span class="ident">OutgoingRequest</span> { <span class="ident">request_id</span>: <span class="ident">request</span>.<span class="ident">txn_id</span>, <span class="ident">request</span>: <span class="ident">Arc::new</span>(<span class="ident">request</span>.<span class="ident">into</span>()) };
-        <span class="self">self</span>.<span class="ident">outgoing_requests</span>.<span class="ident">insert</span>(<span class="ident">request</span>.<span class="ident">request_id</span>, <span class="ident">request</span>);
+        <span class="kw">let</span> <span class="ident">request</span> <span class="op">=</span> <span class="ident">OutgoingRequest</span> {
+            <span class="ident">request_id</span>: <span class="ident">request</span>.<span class="ident">txn_id</span>.<span class="ident">clone</span>(),
+            <span class="ident">request</span>: <span class="ident">Arc::new</span>(<span class="ident">request</span>.<span class="ident">into</span>()),
+        };
+        <span class="self">self</span>.<span class="ident">outgoing_requests</span>.<span class="ident">insert</span>(<span class="ident">request</span>.<span class="ident">request_id</span>.<span class="ident">clone</span>(), <span class="ident">request</span>);
 
         <span class="prelude-val">Ok</span>(<span class="ident">used_session</span>)
     }
@@ -2332,7 +2339,7 @@
     ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">OutgoingRequest</span>, <span class="ident">CryptoStoreError</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">request</span> <span class="op">=</span> <span class="ident">GossipRequest</span> {
             <span class="ident">request_recipient</span>: <span class="self">self</span>.<span class="ident">user_id</span>().<span class="ident">to_owned</span>(),
-            <span class="ident">request_id</span>: <span class="ident">Uuid::new_v4</span>(),
+            <span class="ident">request_id</span>: <span class="ident">TransactionId::new</span>(),
             <span class="ident">info</span>: <span class="ident">key_info</span>,
             <span class="ident">sent_out</span>: <span class="bool-val">false</span>,
         };
@@ -2406,11 +2413,14 @@
 
     <span class="doccomment">/// Delete the given outgoing key info.</span>
     <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">delete_key_info</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">info</span>: <span class="kw-2">&amp;</span><span class="ident">GossipRequest</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">CryptoStoreError</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">store</span>.<span class="ident">delete_outgoing_secret_requests</span>(<span class="ident">info</span>.<span class="ident">request_id</span>).<span class="kw">await</span>
+        <span class="self">self</span>.<span class="ident">store</span>.<span class="ident">delete_outgoing_secret_requests</span>(<span class="kw-2">&amp;</span><span class="ident">info</span>.<span class="ident">request_id</span>).<span class="kw">await</span>
     }
 
     <span class="doccomment">/// Mark the outgoing request as sent.</span>
-    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">mark_outgoing_request_as_sent</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">id</span>: <span class="ident">Uuid</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">CryptoStoreError</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">mark_outgoing_request_as_sent</span>(
+        <span class="kw-2">&amp;</span><span class="self">self</span>,
+        <span class="ident">id</span>: <span class="kw-2">&amp;</span><span class="ident">TransactionId</span>,
+    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">CryptoStoreError</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">info</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">store</span>.<span class="ident">get_outgoing_secret_requests</span>(<span class="ident">id</span>).<span class="kw">await</span><span class="question-mark">?</span>;
 
         <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="kw-2">mut</span> <span class="ident">info</span>) <span class="op">=</span> <span class="ident">info</span> {
@@ -2424,7 +2434,7 @@
             <span class="self">self</span>.<span class="ident">save_outgoing_key_info</span>(<span class="ident">info</span>).<span class="kw">await</span><span class="question-mark">?</span>;
         }
 
-        <span class="self">self</span>.<span class="ident">outgoing_requests</span>.<span class="ident">remove</span>(<span class="kw-2">&amp;</span><span class="ident">id</span>);
+        <span class="self">self</span>.<span class="ident">outgoing_requests</span>.<span class="ident">remove</span>(<span class="ident">id</span>);
 
         <span class="prelude-val">Ok</span>(())
     }
@@ -2446,7 +2456,7 @@
         <span class="self">self</span>.<span class="ident">delete_key_info</span>(<span class="kw-2">&amp;</span><span class="ident">key_info</span>).<span class="kw">await</span><span class="question-mark">?</span>;
 
         <span class="kw">let</span> <span class="ident">request</span> <span class="op">=</span> <span class="ident">key_info</span>.<span class="ident">to_cancellation</span>(<span class="self">self</span>.<span class="ident">device_id</span>());
-        <span class="self">self</span>.<span class="ident">outgoing_requests</span>.<span class="ident">insert</span>(<span class="ident">request</span>.<span class="ident">request_id</span>, <span class="ident">request</span>);
+        <span class="self">self</span>.<span class="ident">outgoing_requests</span>.<span class="ident">insert</span>(<span class="ident">request</span>.<span class="ident">request_id</span>.<span class="ident">clone</span>(), <span class="ident">request</span>);
 
         <span class="prelude-val">Ok</span>(())
     }
@@ -2462,12 +2472,7 @@
             <span class="string">&quot;Received a m.secret.send event&quot;</span>
         );
 
-        <span class="kw">let</span> <span class="ident">request_id</span> <span class="op">=</span> <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Ok</span>(<span class="ident">r</span>) <span class="op">=</span> <span class="ident">Uuid::parse_str</span>(<span class="kw-2">&amp;</span><span class="ident">event</span>.<span class="ident">content</span>.<span class="ident">request_id</span>) {
-            <span class="ident">r</span>
-        } <span class="kw">else</span> {
-            <span class="macro">warn!</span>(<span class="string">&quot;Received a m.secret.send event but the request ID is invalid&quot;</span>);
-            <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="prelude-val">None</span>);
-        };
+        <span class="kw">let</span> <span class="ident">request_id</span> <span class="op">=</span> <span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">TransactionId</span><span class="op">&gt;</span><span class="ident">::from</span>(<span class="ident">event</span>.<span class="ident">content</span>.<span class="ident">request_id</span>.<span class="ident">as_str</span>());
 
         <span class="kw">let</span> <span class="ident">secret</span> <span class="op">=</span> <span class="ident">std::mem::take</span>(<span class="kw-2">&amp;mut</span> <span class="ident">event</span>.<span class="ident">content</span>.<span class="ident">secret</span>);
 
@@ -2765,7 +2770,7 @@
 
         <span class="macro">assert!</span>(<span class="ident">cancel</span>.<span class="ident">is_none</span>());
 
-        <span class="ident">machine</span>.<span class="ident">mark_outgoing_request_as_sent</span>(<span class="ident">request</span>.<span class="ident">request_id</span>).<span class="kw">await</span>.<span class="ident">unwrap</span>();
+        <span class="ident">machine</span>.<span class="ident">mark_outgoing_request_as_sent</span>(<span class="kw-2">&amp;</span><span class="ident">request</span>.<span class="ident">request_id</span>).<span class="kw">await</span>.<span class="ident">unwrap</span>();
 
         <span class="kw">let</span> (<span class="ident">cancel</span>, <span class="kw">_</span>) <span class="op">=</span> <span class="ident">machine</span>
             .<span class="ident">request_key</span>(<span class="ident">session</span>.<span class="ident">room_id</span>(), <span class="kw-2">&amp;</span><span class="ident">session</span>.<span class="ident">sender_key</span>, <span class="ident">session</span>.<span class="ident">session_id</span>())
@@ -2815,7 +2820,7 @@
 
         <span class="kw">let</span> <span class="ident">request</span> <span class="op">=</span> <span class="ident">requests</span>.<span class="ident">get</span>(<span class="number">0</span>).<span class="ident">unwrap</span>();
 
-        <span class="ident">machine</span>.<span class="ident">mark_outgoing_request_as_sent</span>(<span class="ident">request</span>.<span class="ident">request_id</span>).<span class="kw">await</span>.<span class="ident">unwrap</span>();
+        <span class="ident">machine</span>.<span class="ident">mark_outgoing_request_as_sent</span>(<span class="kw-2">&amp;</span><span class="ident">request</span>.<span class="ident">request_id</span>).<span class="kw">await</span>.<span class="ident">unwrap</span>();
         <span class="macro">assert!</span>(<span class="ident">machine</span>.<span class="ident">outgoing_to_device_requests</span>().<span class="kw">await</span>.<span class="ident">unwrap</span>().<span class="ident">is_empty</span>());
     }
 
@@ -2844,7 +2849,7 @@
 
         <span class="kw">let</span> <span class="ident">requests</span> <span class="op">=</span> <span class="ident">machine</span>.<span class="ident">outgoing_to_device_requests</span>().<span class="kw">await</span>.<span class="ident">unwrap</span>();
         <span class="kw">let</span> <span class="ident">request</span> <span class="op">=</span> <span class="ident">requests</span>.<span class="ident">get</span>(<span class="number">0</span>).<span class="ident">unwrap</span>();
-        <span class="kw">let</span> <span class="ident">id</span> <span class="op">=</span> <span class="ident">request</span>.<span class="ident">request_id</span>;
+        <span class="kw">let</span> <span class="ident">id</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">request</span>.<span class="ident">request_id</span>;
 
         <span class="ident">machine</span>.<span class="ident">mark_outgoing_request_as_sent</span>(<span class="ident">id</span>).<span class="kw">await</span>.<span class="ident">unwrap</span>();
 
@@ -2877,9 +2882,9 @@
 
         <span class="comment">// Get the cancel request.</span>
         <span class="kw">let</span> <span class="ident">request</span> <span class="op">=</span> <span class="ident">machine</span>.<span class="ident">outgoing_requests</span>.<span class="ident">iter</span>().<span class="ident">next</span>().<span class="ident">unwrap</span>();
-        <span class="kw">let</span> <span class="ident">id</span> <span class="op">=</span> <span class="ident">request</span>.<span class="ident">request_id</span>;
+        <span class="kw">let</span> <span class="ident">id</span> <span class="op">=</span> <span class="ident">request</span>.<span class="ident">request_id</span>.<span class="ident">clone</span>();
         <span class="ident">drop</span>(<span class="ident">request</span>);
-        <span class="ident">machine</span>.<span class="ident">mark_outgoing_request_as_sent</span>(<span class="ident">id</span>).<span class="kw">await</span>.<span class="ident">unwrap</span>();
+        <span class="ident">machine</span>.<span class="ident">mark_outgoing_request_as_sent</span>(<span class="kw-2">&amp;</span><span class="ident">id</span>).<span class="kw">await</span>.<span class="ident">unwrap</span>();
 
         <span class="ident">machine</span>
             .<span class="ident">create_outgoing_key_request</span>(
@@ -2893,7 +2898,7 @@
         <span class="kw">let</span> <span class="ident">requests</span> <span class="op">=</span> <span class="ident">machine</span>.<span class="ident">outgoing_to_device_requests</span>().<span class="kw">await</span>.<span class="ident">unwrap</span>();
         <span class="kw">let</span> <span class="ident">request</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">requests</span>[<span class="number">0</span>];
 
-        <span class="ident">machine</span>.<span class="ident">mark_outgoing_request_as_sent</span>(<span class="ident">request</span>.<span class="ident">request_id</span>).<span class="kw">await</span>.<span class="ident">unwrap</span>();
+        <span class="ident">machine</span>.<span class="ident">mark_outgoing_request_as_sent</span>(<span class="kw-2">&amp;</span><span class="ident">request</span>.<span class="ident">request_id</span>).<span class="kw">await</span>.<span class="ident">unwrap</span>();
 
         <span class="kw">let</span> <span class="ident">export</span> <span class="op">=</span> <span class="ident">session</span>.<span class="ident">export_at_index</span>(<span class="number">15</span>).<span class="kw">await</span>;
 
@@ -3090,7 +3095,7 @@
         <span class="comment">// Get the request and convert it into a event.</span>
         <span class="kw">let</span> <span class="ident">requests</span> <span class="op">=</span> <span class="ident">alice_machine</span>.<span class="ident">outgoing_to_device_requests</span>().<span class="kw">await</span>.<span class="ident">unwrap</span>();
         <span class="kw">let</span> <span class="ident">request</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">requests</span>[<span class="number">0</span>];
-        <span class="kw">let</span> <span class="ident">id</span> <span class="op">=</span> <span class="ident">request</span>.<span class="ident">request_id</span>;
+        <span class="kw">let</span> <span class="ident">id</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">request</span>.<span class="ident">request_id</span>;
         <span class="kw">let</span> <span class="ident">content</span> <span class="op">=</span> <span class="ident">request</span>
             .<span class="ident">request</span>
             .<span class="ident">to_device</span>()
@@ -3119,7 +3124,7 @@
         <span class="kw">let</span> <span class="ident">requests</span> <span class="op">=</span> <span class="ident">bob_machine</span>.<span class="ident">outgoing_to_device_requests</span>().<span class="kw">await</span>.<span class="ident">unwrap</span>();
         <span class="kw">let</span> <span class="ident">request</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">requests</span>[<span class="number">0</span>];
 
-        <span class="kw">let</span> <span class="ident">id</span> <span class="op">=</span> <span class="ident">request</span>.<span class="ident">request_id</span>;
+        <span class="kw">let</span> <span class="ident">id</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">request</span>.<span class="ident">request_id</span>;
         <span class="kw">let</span> <span class="ident">content</span> <span class="op">=</span> <span class="ident">request</span>
             .<span class="ident">request</span>
             .<span class="ident">to_device</span>()
@@ -3193,7 +3198,7 @@
             <span class="ident">content</span>: <span class="ident">ToDeviceSecretRequestEventContent::new</span>(
                 <span class="ident">RequestAction::Request</span>(<span class="ident">SecretName::CrossSigningMasterKey</span>),
                 <span class="ident">bob_account</span>.<span class="ident">device_id</span>().<span class="ident">to_owned</span>(),
-                <span class="string">&quot;request_id&quot;</span>.<span class="ident">to_owned</span>(),
+                <span class="string">&quot;request_id&quot;</span>.<span class="ident">into</span>(),
             ),
         };
 
@@ -3222,7 +3227,7 @@
             <span class="ident">content</span>: <span class="ident">ToDeviceSecretRequestEventContent::new</span>(
                 <span class="ident">RequestAction::Request</span>(<span class="ident">SecretName::CrossSigningMasterKey</span>),
                 <span class="ident">second_account</span>.<span class="ident">device_id</span>().<span class="ident">into</span>(),
-                <span class="string">&quot;request_id&quot;</span>.<span class="ident">to_owned</span>(),
+                <span class="string">&quot;request_id&quot;</span>.<span class="ident">into</span>(),
             ),
         };
 
@@ -3294,7 +3299,7 @@
         <span class="comment">// Get the request and convert it into a event.</span>
         <span class="kw">let</span> <span class="ident">requests</span> <span class="op">=</span> <span class="ident">alice_machine</span>.<span class="ident">outgoing_to_device_requests</span>().<span class="kw">await</span>.<span class="ident">unwrap</span>();
         <span class="kw">let</span> <span class="ident">request</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">requests</span>[<span class="number">0</span>];
-        <span class="kw">let</span> <span class="ident">id</span> <span class="op">=</span> <span class="ident">request</span>.<span class="ident">request_id</span>;
+        <span class="kw">let</span> <span class="ident">id</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">request</span>.<span class="ident">request_id</span>;
         <span class="kw">let</span> <span class="ident">content</span> <span class="op">=</span> <span class="ident">request</span>
             .<span class="ident">request</span>
             .<span class="ident">to_device</span>()
@@ -3343,7 +3348,7 @@
 
         <span class="kw">let</span> <span class="ident">request</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">requests</span>[<span class="number">0</span>];
 
-        <span class="kw">let</span> <span class="ident">id</span> <span class="op">=</span> <span class="ident">request</span>.<span class="ident">request_id</span>;
+        <span class="kw">let</span> <span class="ident">id</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">request</span>.<span class="ident">request_id</span>;
         <span class="kw">let</span> <span class="ident">content</span> <span class="op">=</span> <span class="ident">request</span>
             .<span class="ident">request</span>
             .<span class="ident">to_device</span>()
@@ -3395,5 +3400,5 @@
     }
 }
 </code></pre></div>
-</section><section id="search" class="content hidden"></section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="matrix_sdk_crypto" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.59.0-nightly (399ba6bb3 2022-01-03)" ></div>
+</section><section id="search" class="content hidden"></section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="matrix_sdk_crypto" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.60.0-nightly (498eeb72f 2022-01-31)" ></div>
 </body></html>
