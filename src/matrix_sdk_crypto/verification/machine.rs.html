@@ -670,20 +670,6 @@
 <span id="665">665</span>
 <span id="666">666</span>
 <span id="667">667</span>
-<span id="668">668</span>
-<span id="669">669</span>
-<span id="670">670</span>
-<span id="671">671</span>
-<span id="672">672</span>
-<span id="673">673</span>
-<span id="674">674</span>
-<span id="675">675</span>
-<span id="676">676</span>
-<span id="677">677</span>
-<span id="678">678</span>
-<span id="679">679</span>
-<span id="680">680</span>
-<span id="681">681</span>
 </pre><pre class="rust"><code><span class="comment">// Copyright 2020 The Matrix.org Foundation C.I.C.</span>
 <span class="comment">//</span>
 <span class="comment">// Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);</span>
@@ -704,7 +690,7 @@
 };
 
 <span class="kw">use</span> <span class="ident">dashmap::DashMap</span>;
-<span class="kw">use</span> <span class="ident">matrix_sdk_common::locks::Mutex</span>;
+<span class="kw">use</span> <span class="ident">matrix_sdk_common</span>::{<span class="ident">locks::Mutex</span>, <span class="ident">util::milli_seconds_since_unix_epoch</span>};
 <span class="kw">use</span> <span class="ident">ruma</span>::{
     <span class="ident">events</span>::{
         <span class="ident">key::verification::VerificationMethod</span>, <span class="ident">AnyToDeviceEvent</span>, <span class="ident">AnyToDeviceEventContent</span>,
@@ -876,7 +862,6 @@
         <span class="self">self</span>.<span class="ident">verifications</span>.<span class="ident">get_sas</span>(<span class="ident">user_id</span>, <span class="ident">flow_id</span>)
     }
 
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">target_arch</span> <span class="op">=</span> <span class="string">&quot;wasm32&quot;</span>))]</span>
     <span class="kw">fn</span> <span class="ident">is_timestamp_valid</span>(<span class="ident">timestamp</span>: <span class="kw-2">&amp;</span><span class="ident">MilliSecondsSinceUnixEpoch</span>) -&gt; <span class="ident">bool</span> {
         <span class="kw">use</span> <span class="ident">ruma</span>::{<span class="ident">uint</span>, <span class="ident">UInt</span>};
 
@@ -887,19 +872,10 @@
         <span class="kw">let</span> <span class="ident">timestamp_threshold</span>: <span class="ident">UInt</span> <span class="op">=</span> <span class="macro">uint!</span>(<span class="number">300</span>);
 
         <span class="kw">let</span> <span class="ident">timestamp</span> <span class="op">=</span> <span class="ident">timestamp</span>.<span class="ident">as_secs</span>();
-        <span class="kw">let</span> <span class="ident">now</span> <span class="op">=</span> <span class="ident">MilliSecondsSinceUnixEpoch::now</span>().<span class="ident">as_secs</span>();
+        <span class="kw">let</span> <span class="ident">now</span> <span class="op">=</span> <span class="ident">milli_seconds_since_unix_epoch</span>().<span class="ident">as_secs</span>();
 
         <span class="op">!</span>(<span class="ident">now</span>.<span class="ident">saturating_sub</span>(<span class="ident">timestamp</span>) <span class="op">&gt;</span> <span class="ident">old_timestamp_threshold</span>
             <span class="op">|</span><span class="op">|</span> <span class="ident">timestamp</span>.<span class="ident">saturating_sub</span>(<span class="ident">now</span>) <span class="op">&gt;</span> <span class="ident">timestamp_threshold</span>)
-    }
-
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">target_arch</span> <span class="op">=</span> <span class="string">&quot;wasm32&quot;</span>)]</span>
-    <span class="kw">fn</span> <span class="ident">is_timestamp_valid</span>(<span class="ident">timestamp</span>: <span class="kw-2">&amp;</span><span class="ident">MilliSecondsSinceUnixEpoch</span>) -&gt; <span class="ident">bool</span> {
-        <span class="comment">// TODO the non-wasm method with the same name uses</span>
-        <span class="comment">// `MilliSecondsSinceUnixEpoch::now()` which internally uses</span>
-        <span class="comment">// `SystemTime::now()` this panics under WASM, thus we&#39;re returning here</span>
-        <span class="comment">// true for now.</span>
-        <span class="bool-val">true</span>
     }
 
     <span class="kw">fn</span> <span class="ident">queue_up_content</span>(
@@ -1213,14 +1189,10 @@
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
 <span class="kw">mod</span> <span class="ident">test</span> {
+    <span class="kw">use</span> <span class="ident">std</span>::{<span class="ident">convert::TryFrom</span>, <span class="ident">sync::Arc</span>, <span class="ident">time::Duration</span>};
 
-    <span class="kw">use</span> <span class="ident">std</span>::{
-        <span class="ident">convert::TryFrom</span>,
-        <span class="ident">sync::Arc</span>,
-        <span class="ident">time</span>::{<span class="ident">Duration</span>, <span class="ident">Instant</span>},
-    };
-
-    <span class="kw">use</span> <span class="ident">matrix_sdk_common::locks::Mutex</span>;
+    <span class="kw">use</span> <span class="ident">matrix_sdk_common</span>::{<span class="ident">instant::Instant</span>, <span class="ident">locks::Mutex</span>};
+    <span class="kw">use</span> <span class="ident">matrix_sdk_test::async_test</span>;
     <span class="kw">use</span> <span class="ident">ruma</span>::{<span class="ident">device_id</span>, <span class="ident">user_id</span>, <span class="ident">DeviceId</span>, <span class="ident">UserId</span>};
 
     <span class="kw">use</span> <span class="kw">super</span>::{<span class="ident">Sas</span>, <span class="ident">VerificationMachine</span>};
@@ -1287,8 +1259,8 @@
         (<span class="ident">machine</span>, <span class="ident">bob_sas</span>)
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">create</span>() {
+    <span class="attribute">#[<span class="ident">async_test</span>]</span>
+    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">create</span>() {
         <span class="kw">let</span> <span class="ident">alice</span> <span class="op">=</span> <span class="ident">ReadOnlyAccount::new</span>(<span class="ident">alice_id</span>(), <span class="ident">alice_device_id</span>());
         <span class="kw">let</span> <span class="ident">identity</span> <span class="op">=</span>
             <span class="ident">Arc::new</span>(<span class="ident">Mutex::new</span>(<span class="ident">PrivateCrossSigningIdentity::empty</span>(<span class="ident">alice_id</span>().<span class="ident">to_owned</span>())));
@@ -1296,7 +1268,7 @@
         <span class="kw">let</span> <span class="kw">_</span> <span class="op">=</span> <span class="ident">VerificationMachine::new</span>(<span class="ident">alice</span>, <span class="ident">identity</span>, <span class="ident">Arc::new</span>(<span class="ident">store</span>));
     }
 
-    <span class="attribute">#[<span class="ident">tokio::test</span>]</span>
+    <span class="attribute">#[<span class="ident">async_test</span>]</span>
     <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">full_flow</span>() {
         <span class="kw">let</span> (<span class="ident">alice_machine</span>, <span class="ident">bob</span>) <span class="op">=</span> <span class="ident">setup_verification_machine</span>().<span class="kw">await</span>;
 
@@ -1346,8 +1318,8 @@
         <span class="macro">assert!</span>(<span class="ident">bob</span>.<span class="ident">is_done</span>());
     }
 
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">target_os</span> <span class="op">=</span> <span class="string">&quot;linux&quot;</span>)]</span>
-    <span class="attribute">#[<span class="ident">tokio::test</span>]</span>
+    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">target_os</span> <span class="op">=</span> <span class="string">&quot;macos&quot;</span>))]</span>
+    <span class="attribute">#[<span class="ident">async_test</span>]</span>
     <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">timing_out</span>() {
         <span class="kw">let</span> (<span class="ident">alice_machine</span>, <span class="ident">bob</span>) <span class="op">=</span> <span class="ident">setup_verification_machine</span>().<span class="kw">await</span>;
         <span class="kw">let</span> <span class="ident">alice</span> <span class="op">=</span> <span class="ident">alice_machine</span>.<span class="ident">get_sas</span>(<span class="ident">bob</span>.<span class="ident">user_id</span>(), <span class="ident">bob</span>.<span class="ident">flow_id</span>().<span class="ident">as_str</span>()).<span class="ident">unwrap</span>();
@@ -1366,5 +1338,5 @@
     }
 }
 </code></pre></div>
-</section><section id="search" class="content hidden"></section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="matrix_sdk_crypto" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.60.0-nightly (2681f253b 2022-02-01)" ></div>
+</section><section id="search" class="content hidden"></section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="matrix_sdk_crypto" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.60.0-nightly (27f5d830e 2022-02-02)" ></div>
 </body></html>

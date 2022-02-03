@@ -1031,6 +1031,7 @@
 <span id="1026">1026</span>
 <span id="1027">1027</span>
 <span id="1028">1028</span>
+<span id="1029">1029</span>
 </pre><pre class="rust"><code><span class="comment">// Copyright 2021 The Matrix.org Foundation C.I.C.</span>
 <span class="comment">// Copyright 2021 Damir Jelić</span>
 <span class="comment">//</span>
@@ -1278,11 +1279,12 @@
 <span class="doccomment">//! [spec]: https://spec.matrix.org/unstable/client-server-api/#relationship-between-access-tokens-and-devices</span>
 <span class="doccomment">//! [device keys]: https://spec.matrix.org/unstable/client-server-api/#device-keys</span>
 
+<span class="attribute">#![<span class="ident">cfg_attr</span>(<span class="ident">target_arch</span> <span class="op">=</span> <span class="string">&quot;wasm32&quot;</span>, <span class="ident">allow</span>(<span class="ident">unused_imports</span>))]</span>
 <span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">identities</span>;
 <span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">verification</span>;
 <span class="kw">use</span> <span class="ident">std</span>::{
     <span class="ident">collections</span>::{<span class="ident">BTreeMap</span>, <span class="ident">HashSet</span>},
-    <span class="ident">io</span>::{<span class="ident">Read</span>,<span class="ident">Write</span>},
+    <span class="ident">io</span>::{<span class="ident">Read</span>, <span class="ident">Write</span>},
     <span class="ident">path::PathBuf</span>,
     <span class="ident">result::Result</span> <span class="kw">as</span> <span class="ident">StdResult</span>, <span class="ident">iter</span>,
 };
@@ -1405,7 +1407,7 @@
     <span class="doccomment">/// # block_on(async {</span>
     <span class="doccomment">/// # let alice = Box::&lt;UserId&gt;::try_from(&quot;@alice:example.org&quot;)?;</span>
     <span class="doccomment">/// # let homeserver = Url::parse(&quot;http://example.com&quot;)?;</span>
-    <span class="doccomment">/// # let client = Client::new(homeserver)?;</span>
+    <span class="doccomment">/// # let client = Client::new(homeserver).await?;</span>
     <span class="doccomment">/// if let Some(device) = client.get_device(&amp;alice, device_id!(&quot;DEVICEID&quot;)).await? {</span>
     <span class="doccomment">///     println!(&quot;{:?}&quot;, device.verified());</span>
     <span class="doccomment">///</span>
@@ -1445,7 +1447,7 @@
     <span class="doccomment">/// # block_on(async {</span>
     <span class="doccomment">/// # let alice = Box::&lt;UserId&gt;::try_from(&quot;@alice:example.org&quot;)?;</span>
     <span class="doccomment">/// # let homeserver = Url::parse(&quot;http://example.com&quot;)?;</span>
-    <span class="doccomment">/// # let client = Client::new(homeserver)?;</span>
+    <span class="doccomment">/// # let client = Client::new(homeserver).await?;</span>
     <span class="doccomment">/// let devices = client.get_user_devices(&amp;alice).await?;</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// for device in devices.devices() {</span>
@@ -1484,7 +1486,7 @@
     <span class="doccomment">/// # block_on(async {</span>
     <span class="doccomment">/// # let alice = Box::&lt;UserId&gt;::try_from(&quot;@alice:example.org&quot;)?;</span>
     <span class="doccomment">/// # let homeserver = Url::parse(&quot;http://example.com&quot;)?;</span>
-    <span class="doccomment">/// # let client = Client::new(homeserver)?;</span>
+    <span class="doccomment">/// # let client = Client::new(homeserver).await?;</span>
     <span class="doccomment">/// let user = client.get_user_identity(&amp;alice).await?;</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// if let Some(user) = user {</span>
@@ -1540,7 +1542,7 @@
     <span class="doccomment">/// # block_on(async {</span>
     <span class="doccomment">/// # let user_id = Box::&lt;UserId&gt;::try_from(&quot;@alice:example.org&quot;)?;</span>
     <span class="doccomment">/// # let homeserver = Url::parse(&quot;http://example.com&quot;)?;</span>
-    <span class="doccomment">/// # let client = Client::new(homeserver)?;</span>
+    <span class="doccomment">/// # let client = Client::new(homeserver).await?;</span>
     <span class="doccomment">/// if let Err(e) = client.bootstrap_cross_signing(None).await {</span>
     <span class="doccomment">///     if let Some(response) = e.uiaa_response() {</span>
     <span class="doccomment">///         let auth_data = uiaa::AuthData::Password(assign!(</span>
@@ -1617,7 +1619,7 @@
     <span class="doccomment">/// # use url::Url;</span>
     <span class="doccomment">/// # block_on(async {</span>
     <span class="doccomment">/// # let homeserver = Url::parse(&quot;http://localhost:8080&quot;)?;</span>
-    <span class="doccomment">/// # let mut client = Client::new(homeserver)?;</span>
+    <span class="doccomment">/// # let mut client = Client::new(homeserver).await?;</span>
     <span class="doccomment">/// let path = PathBuf::from(&quot;/home/example/e2e-keys.txt&quot;);</span>
     <span class="doccomment">/// // Export all room keys.</span>
     <span class="doccomment">/// client</span>
@@ -1684,7 +1686,7 @@
     <span class="doccomment">/// # use url::Url;</span>
     <span class="doccomment">/// # block_on(async {</span>
     <span class="doccomment">/// # let homeserver = Url::parse(&quot;http://localhost:8080&quot;)?;</span>
-    <span class="doccomment">/// # let mut client = Client::new(homeserver)?;</span>
+    <span class="doccomment">/// # let mut client = Client::new(homeserver).await?;</span>
     <span class="doccomment">/// let path = PathBuf::from(&quot;/home/example/e2e-keys.txt&quot;);</span>
     <span class="doccomment">/// let result = client.import_keys(path, &quot;secret-passphrase&quot;).await?;</span>
     <span class="doccomment">///</span>
@@ -2060,5 +2062,5 @@
     }
 }
 </code></pre></div>
-</section><section id="search" class="content hidden"></section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="matrix_sdk" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.60.0-nightly (2681f253b 2022-02-01)" ></div>
+</section><section id="search" class="content hidden"></section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="matrix_sdk" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.60.0-nightly (27f5d830e 2022-02-02)" ></div>
 </body></html>

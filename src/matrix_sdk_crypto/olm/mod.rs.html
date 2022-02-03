@@ -374,9 +374,11 @@
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
 <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">mod</span> <span class="ident">test</span> {
+
     <span class="kw">use</span> <span class="ident">std</span>::{<span class="ident">collections::BTreeMap</span>, <span class="ident">convert::TryInto</span>};
 
     <span class="kw">use</span> <span class="ident">matches::assert_matches</span>;
+    <span class="kw">use</span> <span class="ident">matrix_sdk_test::async_test</span>;
     <span class="kw">use</span> <span class="ident">olm_rs::session::OlmMessage</span>;
     <span class="kw">use</span> <span class="ident">ruma</span>::{
         <span class="ident">device_id</span>,
@@ -393,10 +395,7 @@
     };
     <span class="kw">use</span> <span class="ident">serde_json::json</span>;
 
-    <span class="kw">use</span> <span class="kw">crate</span>::{
-        <span class="ident">olm</span>::{<span class="ident">InboundGroupSession</span>, <span class="ident">ReadOnlyAccount</span>, <span class="ident">Session</span>},
-        <span class="ident">MegolmError</span>,
-    };
+    <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::olm</span>::{<span class="ident">InboundGroupSession</span>, <span class="ident">ReadOnlyAccount</span>, <span class="ident">Session</span>};
 
     <span class="kw">fn</span> <span class="ident">alice_id</span>() -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">UserId</span> {
         <span class="macro">user_id!</span>(<span class="string">&quot;@alice:example.org&quot;</span>)
@@ -447,7 +446,7 @@
         <span class="macro">assert!</span>(<span class="ident">account</span>.<span class="ident">shared</span>());
     }
 
-    <span class="attribute">#[<span class="ident">tokio::test</span>]</span>
+    <span class="attribute">#[<span class="ident">async_test</span>]</span>
     <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">one_time_keys_creation</span>() {
         <span class="kw">let</span> <span class="ident">account</span> <span class="op">=</span> <span class="ident">ReadOnlyAccount::new</span>(<span class="ident">alice_id</span>(), <span class="ident">alice_device_id</span>());
         <span class="kw">let</span> <span class="ident">one_time_keys</span> <span class="op">=</span> <span class="ident">account</span>.<span class="ident">one_time_keys</span>().<span class="kw">await</span>;
@@ -471,7 +470,7 @@
         <span class="macro">assert!</span>(<span class="ident">one_time_keys</span>.<span class="ident">curve25519</span>().<span class="ident">is_empty</span>());
     }
 
-    <span class="attribute">#[<span class="ident">tokio::test</span>]</span>
+    <span class="attribute">#[<span class="ident">async_test</span>]</span>
     <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">session_creation</span>() {
         <span class="kw">let</span> <span class="ident">alice</span> <span class="op">=</span> <span class="ident">ReadOnlyAccount::new</span>(<span class="ident">alice_id</span>(), <span class="ident">alice_device_id</span>());
         <span class="kw">let</span> <span class="ident">bob</span> <span class="op">=</span> <span class="ident">ReadOnlyAccount::new</span>(<span class="ident">bob_id</span>(), <span class="ident">bob_device_id</span>());
@@ -513,7 +512,7 @@
         <span class="macro">assert_eq!</span>(<span class="ident">plaintext</span>, <span class="ident">decyrpted</span>);
     }
 
-    <span class="attribute">#[<span class="ident">tokio::test</span>]</span>
+    <span class="attribute">#[<span class="ident">async_test</span>]</span>
     <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">group_session_creation</span>() {
         <span class="kw">let</span> <span class="ident">alice</span> <span class="op">=</span> <span class="ident">ReadOnlyAccount::new</span>(<span class="ident">alice_id</span>(), <span class="ident">alice_device_id</span>());
         <span class="kw">let</span> <span class="ident">room_id</span> <span class="op">=</span> <span class="macro">room_id!</span>(<span class="string">&quot;!test:localhost&quot;</span>);
@@ -544,8 +543,8 @@
         <span class="macro">assert_eq!</span>(<span class="ident">plaintext</span>, <span class="ident">inbound</span>.<span class="ident">decrypt_helper</span>(<span class="ident">ciphertext</span>).<span class="kw">await</span>.<span class="ident">unwrap</span>().<span class="number">0</span>);
     }
 
-    <span class="attribute">#[<span class="ident">tokio::test</span>]</span>
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">edit_decryption</span>() -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">MegolmError</span><span class="op">&gt;</span> {
+    <span class="attribute">#[<span class="ident">async_test</span>]</span>
+    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">edit_decryption</span>() {
         <span class="kw">let</span> <span class="ident">alice</span> <span class="op">=</span> <span class="ident">ReadOnlyAccount::new</span>(<span class="ident">alice_id</span>(), <span class="ident">alice_device_id</span>());
         <span class="kw">let</span> <span class="ident">room_id</span> <span class="op">=</span> <span class="macro">room_id!</span>(<span class="string">&quot;!test:localhost&quot;</span>);
         <span class="kw">let</span> <span class="ident">event_id</span> <span class="op">=</span> <span class="macro">event_id!</span>(<span class="string">&quot;$1234adfad:asdf&quot;</span>);
@@ -569,19 +568,20 @@
             <span class="ident">room_id</span>,
             <span class="ident">outbound</span>.<span class="ident">session_key</span>().<span class="kw">await</span>,
             <span class="prelude-val">None</span>,
-        )<span class="question-mark">?</span>;
+        )
+        .<span class="ident">unwrap</span>();
 
         <span class="macro">assert_eq!</span>(<span class="number">0</span>, <span class="ident">inbound</span>.<span class="ident">first_known_index</span>());
 
         <span class="macro">assert_eq!</span>(<span class="ident">outbound</span>.<span class="ident">session_id</span>(), <span class="ident">inbound</span>.<span class="ident">session_id</span>());
 
         <span class="kw">let</span> <span class="ident">encrypted_content</span> <span class="op">=</span>
-            <span class="ident">outbound</span>.<span class="ident">encrypt</span>(<span class="ident">serde_json::to_value</span>(<span class="ident">content</span>)<span class="question-mark">?</span>, <span class="string">&quot;m.room.message&quot;</span>).<span class="kw">await</span>;
+            <span class="ident">outbound</span>.<span class="ident">encrypt</span>(<span class="ident">serde_json::to_value</span>(<span class="ident">content</span>).<span class="ident">unwrap</span>(), <span class="string">&quot;m.room.message&quot;</span>).<span class="kw">await</span>;
 
         <span class="kw">let</span> <span class="ident">event</span> <span class="op">=</span> <span class="macro">json!</span>({
             <span class="string">&quot;sender&quot;</span>: <span class="ident">alice</span>.<span class="ident">user_id</span>(),
             <span class="string">&quot;event_id&quot;</span>: <span class="ident">event_id</span>,
-            <span class="string">&quot;origin_server_ts&quot;</span>: <span class="number">0</span>,
+            <span class="string">&quot;origin_server_ts&quot;</span>: <span class="number">0u64</span>,
             <span class="string">&quot;room_id&quot;</span>: <span class="ident">room_id</span>,
             <span class="string">&quot;type&quot;</span>: <span class="string">&quot;m.room.encrypted&quot;</span>,
             <span class="string">&quot;content&quot;</span>: <span class="ident">encrypted_content</span>,
@@ -597,18 +597,18 @@
                 <span class="macro">panic!</span>(<span class="string">&quot;Invalid event type&quot;</span>)
             };
 
-        <span class="kw">let</span> <span class="ident">decrypted</span> <span class="op">=</span> <span class="ident">inbound</span>.<span class="ident">decrypt</span>(<span class="kw-2">&amp;</span><span class="ident">event</span>).<span class="kw">await</span><span class="question-mark">?</span>.<span class="number">0</span>;
+        <span class="kw">let</span> <span class="ident">decrypted</span> <span class="op">=</span> <span class="ident">inbound</span>.<span class="ident">decrypt</span>(<span class="kw-2">&amp;</span><span class="ident">event</span>).<span class="kw">await</span>.<span class="ident">unwrap</span>().<span class="number">0</span>;
 
-        <span class="kw">if</span> <span class="kw">let</span> <span class="ident">AnyRoomEvent::Message</span>(<span class="ident">AnyMessageEvent::RoomMessage</span>(<span class="ident">e</span>)) <span class="op">=</span> <span class="ident">decrypted</span>.<span class="ident">deserialize</span>()<span class="question-mark">?</span> {
+        <span class="kw">if</span> <span class="kw">let</span> <span class="ident">AnyRoomEvent::Message</span>(<span class="ident">AnyMessageEvent::RoomMessage</span>(<span class="ident">e</span>)) <span class="op">=</span>
+            <span class="ident">decrypted</span>.<span class="ident">deserialize</span>().<span class="ident">unwrap</span>()
+        {
             <span class="macro">assert_matches!</span>(<span class="ident">e</span>.<span class="ident">content</span>.<span class="ident">relates_to</span>, <span class="prelude-val">Some</span>(<span class="ident">Relation::Replacement</span>(<span class="kw">_</span>)));
         } <span class="kw">else</span> {
             <span class="macro">panic!</span>(<span class="string">&quot;Invalid event type&quot;</span>)
         }
-
-        <span class="prelude-val">Ok</span>(())
     }
 
-    <span class="attribute">#[<span class="ident">tokio::test</span>]</span>
+    <span class="attribute">#[<span class="ident">async_test</span>]</span>
     <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">group_session_export</span>() {
         <span class="kw">let</span> <span class="ident">alice</span> <span class="op">=</span> <span class="ident">ReadOnlyAccount::new</span>(<span class="ident">alice_id</span>(), <span class="ident">alice_device_id</span>());
         <span class="kw">let</span> <span class="ident">room_id</span> <span class="op">=</span> <span class="macro">room_id!</span>(<span class="string">&quot;!test:localhost&quot;</span>);
@@ -624,5 +624,5 @@
     }
 }
 </code></pre></div>
-</section><section id="search" class="content hidden"></section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="matrix_sdk_crypto" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.60.0-nightly (2681f253b 2022-02-01)" ></div>
+</section><section id="search" class="content hidden"></section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="matrix_sdk_crypto" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.60.0-nightly (27f5d830e 2022-02-02)" ></div>
 </body></html>

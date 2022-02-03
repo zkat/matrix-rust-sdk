@@ -35,6 +35,12 @@
 <span id="30">30</span>
 <span id="31">31</span>
 <span id="32">32</span>
+<span id="33">33</span>
+<span id="34">34</span>
+<span id="35">35</span>
+<span id="36">36</span>
+<span id="37">37</span>
+<span id="38">38</span>
 </pre><pre class="rust"><code><span class="attribute">#![<span class="ident">doc</span> <span class="op">=</span> <span class="macro">include_str!</span>(<span class="string">&quot;../README.md&quot;</span>)]</span>
 <span class="attribute">#![<span class="ident">deny</span>(
     <span class="ident">missing_debug_implementations</span>,
@@ -51,6 +57,12 @@
 <span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">deserialized_responses</span>;
 <span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">executor</span>;
 <span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">locks</span>;
+<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">util</span>;
+
+<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">target_arch</span> <span class="op">=</span> <span class="string">&quot;wasm32&quot;</span>)]</span>
+<span class="kw">mod</span> <span class="ident">wasm_helpers</span>;
+<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">target_arch</span> <span class="op">=</span> <span class="string">&quot;wasm32&quot;</span>)]</span>
+<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">wasm_helpers::SafeEncode</span>;
 
 <span class="doccomment">/// Super trait that is used for our store traits, this trait will differ if</span>
 <span class="doccomment">/// it&#39;s used on WASM. WASM targets will not require `Send` and `Sync` to have</span>
@@ -64,9 +76,9 @@
 <span class="doccomment">/// it&#39;s used on WASM. WASM targets will not require `Send` and `Sync` to have</span>
 <span class="doccomment">/// implemented, while other targets will.</span>
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">target_arch</span> <span class="op">=</span> <span class="string">&quot;wasm32&quot;</span>)]</span>
-<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">AsyncTraitDeps</span>: <span class="ident">std::fmt::Debug</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span> {}
+<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">AsyncTraitDeps</span>: <span class="ident">std::fmt::Debug</span> {}
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">target_arch</span> <span class="op">=</span> <span class="string">&quot;wasm32&quot;</span>)]</span>
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">std::fmt::Debug</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span><span class="op">&gt;</span> <span class="ident">AsyncTraitDeps</span> <span class="kw">for</span> <span class="ident">T</span> {}
+<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">std::fmt::Debug</span><span class="op">&gt;</span> <span class="ident">AsyncTraitDeps</span> <span class="kw">for</span> <span class="ident">T</span> {}
 </code></pre></div>
-</section><section id="search" class="content hidden"></section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="matrix_sdk_common" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.60.0-nightly (2681f253b 2022-02-01)" ></div>
+</section><section id="search" class="content hidden"></section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="matrix_sdk_common" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.60.0-nightly (27f5d830e 2022-02-02)" ></div>
 </body></html>

@@ -3684,6 +3684,10 @@
 <span id="3679">3679</span>
 <span id="3680">3680</span>
 <span id="3681">3681</span>
+<span id="3682">3682</span>
+<span id="3683">3683</span>
+<span id="3684">3684</span>
+<span id="3685">3685</span>
 </pre><pre class="rust"><code><span class="comment">// Copyright 2020 Damir Jelić</span>
 <span class="comment">// Copyright 2020 The Matrix.org Foundation C.I.C.</span>
 <span class="comment">//</span>
@@ -3849,9 +3853,9 @@
     <span class="doccomment">/// # Arguments</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// * `homeserver_url` - The homeserver that the client should connect to.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">homeserver_url</span>: <span class="ident">Url</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">homeserver_url</span>: <span class="ident">Url</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">config</span> <span class="op">=</span> <span class="ident">ClientConfig::new</span>();
-        <span class="ident">Client::new_with_config</span>(<span class="ident">homeserver_url</span>, <span class="ident">config</span>)
+        <span class="ident">Client::new_with_config</span>(<span class="ident">homeserver_url</span>, <span class="ident">config</span>).<span class="kw">await</span>
     }
 
     <span class="doccomment">/// Create a new [`Client`] for the given homeserver and use the given</span>
@@ -3862,7 +3866,7 @@
     <span class="doccomment">/// * `homeserver_url` - The homeserver that the client should connect to.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// * `config` - Configuration for the client.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new_with_config</span>(<span class="ident">homeserver_url</span>: <span class="ident">Url</span>, <span class="ident">config</span>: <span class="ident">ClientConfig</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">new_with_config</span>(<span class="ident">homeserver_url</span>: <span class="ident">Url</span>, <span class="ident">config</span>: <span class="ident">ClientConfig</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">homeserver</span> <span class="op">=</span> <span class="ident">Arc::new</span>(<span class="ident">RwLock::new</span>(<span class="ident">homeserver_url</span>));
 
         <span class="kw">let</span> <span class="ident">client</span> <span class="op">=</span> <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">client</span>) <span class="op">=</span> <span class="ident">config</span>.<span class="ident">client</span> {
@@ -3871,7 +3875,7 @@
             <span class="ident">Arc::new</span>(<span class="ident">client_with_config</span>(<span class="kw-2">&amp;</span><span class="ident">config</span>)<span class="question-mark">?</span>)
         };
 
-        <span class="kw">let</span> <span class="ident">base_client</span> <span class="op">=</span> <span class="ident">BaseClient::new_with_config</span>(<span class="ident">config</span>.<span class="ident">base_config</span>)<span class="question-mark">?</span>;
+        <span class="kw">let</span> <span class="ident">base_client</span> <span class="op">=</span> <span class="ident">BaseClient::new_with_config</span>(<span class="ident">config</span>.<span class="ident">base_config</span>).<span class="kw">await</span><span class="question-mark">?</span>;
         <span class="kw">let</span> <span class="ident">session</span> <span class="op">=</span> <span class="ident">base_client</span>.<span class="ident">session</span>().<span class="ident">clone</span>();
 
         <span class="kw">let</span> <span class="ident">http_client</span> <span class="op">=</span>
@@ -3952,7 +3956,7 @@
         <span class="ident">config</span>: <span class="ident">ClientConfig</span>,
     ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">homeserver</span> <span class="op">=</span> <span class="ident">Client::homeserver_from_user_id</span>(<span class="ident">user_id</span>)<span class="question-mark">?</span>;
-        <span class="kw">let</span> <span class="ident">client</span> <span class="op">=</span> <span class="ident">Client::new_with_config</span>(<span class="ident">homeserver</span>, <span class="ident">config</span>)<span class="question-mark">?</span>;
+        <span class="kw">let</span> <span class="ident">client</span> <span class="op">=</span> <span class="ident">Client::new_with_config</span>(<span class="ident">homeserver</span>, <span class="ident">config</span>).<span class="kw">await</span><span class="question-mark">?</span>;
 
         <span class="kw">let</span> <span class="ident">well_known</span> <span class="op">=</span> <span class="ident">client</span>.<span class="ident">discover_homeserver</span>().<span class="kw">await</span><span class="question-mark">?</span>;
         <span class="kw">let</span> <span class="ident">well_known</span> <span class="op">=</span> <span class="ident">Url::parse</span>(<span class="ident">well_known</span>.<span class="ident">homeserver</span>.<span class="ident">base_url</span>.<span class="ident">as_ref</span>())<span class="question-mark">?</span>;
@@ -4018,7 +4022,7 @@
     <span class="doccomment">/// use url::Url;</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// let homeserver = Url::parse(&quot;http://example.com&quot;)?;</span>
-    <span class="doccomment">/// let client = Client::new(homeserver)?;</span>
+    <span class="doccomment">/// let client = Client::new(homeserver).await?;</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// // Check that it is a valid homeserver.</span>
     <span class="doccomment">/// client.get_supported_versions().await?;</span>
@@ -4094,7 +4098,7 @@
     <span class="doccomment">/// # let homeserver = Url::parse(&quot;http://example.com&quot;).unwrap();</span>
     <span class="doccomment">/// # block_on(async {</span>
     <span class="doccomment">/// let user = &quot;example&quot;;</span>
-    <span class="doccomment">/// let client = Client::new(homeserver).unwrap();</span>
+    <span class="doccomment">/// let client = Client::new(homeserver).await.unwrap();</span>
     <span class="doccomment">/// client.login(user, &quot;password&quot;, None, None).await.unwrap();</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// if let Some(name) = client.display_name().await.unwrap() {</span>
@@ -4119,7 +4123,7 @@
     <span class="doccomment">/// # let homeserver = Url::parse(&quot;http://example.com&quot;).unwrap();</span>
     <span class="doccomment">/// # block_on(async {</span>
     <span class="doccomment">/// let user = &quot;example&quot;;</span>
-    <span class="doccomment">/// let client = Client::new(homeserver).unwrap();</span>
+    <span class="doccomment">/// let client = Client::new(homeserver).await.unwrap();</span>
     <span class="doccomment">/// client.login(user, &quot;password&quot;, None, None).await.unwrap();</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// client.set_display_name(Some(&quot;Alice&quot;)).await.expect(&quot;Failed setting display name&quot;);</span>
@@ -4142,7 +4146,7 @@
     <span class="doccomment">/// # let homeserver = Url::parse(&quot;http://example.com&quot;).unwrap();</span>
     <span class="doccomment">/// # block_on(async {</span>
     <span class="doccomment">/// # let user = &quot;example&quot;;</span>
-    <span class="doccomment">/// let client = Client::new(homeserver).unwrap();</span>
+    <span class="doccomment">/// let client = Client::new(homeserver).await.unwrap();</span>
     <span class="doccomment">/// client.login(user, &quot;password&quot;, None, None).await.unwrap();</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// if let Some(url) = client.avatar_url().await.unwrap() {</span>
@@ -4180,7 +4184,7 @@
     <span class="doccomment">/// # let homeserver = Url::parse(&quot;http://example.com&quot;).unwrap();</span>
     <span class="doccomment">/// # block_on(async {</span>
     <span class="doccomment">/// # let user = &quot;example&quot;;</span>
-    <span class="doccomment">/// let client = Client::new(homeserver).unwrap();</span>
+    <span class="doccomment">/// let client = Client::new(homeserver).await.unwrap();</span>
     <span class="doccomment">/// client.login(user, &quot;password&quot;, None, None).await.unwrap();</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// if let Some(avatar) = client.avatar(MediaFormat::File).await.unwrap() {</span>
@@ -4228,7 +4232,7 @@
     <span class="doccomment">/// # use url::Url;</span>
     <span class="doccomment">/// # block_on(async {</span>
     <span class="doccomment">/// # let homeserver = Url::parse(&quot;http://localhost:8080&quot;).unwrap();</span>
-    <span class="doccomment">/// # let client = Client::new(homeserver).unwrap();</span>
+    <span class="doccomment">/// # let client = Client::new(homeserver).await.unwrap();</span>
     <span class="doccomment">/// let path = Path::new(&quot;/home/example/selfie.jpg&quot;);</span>
     <span class="doccomment">/// let mut image = File::open(&amp;path).unwrap();</span>
     <span class="doccomment">///</span>
@@ -4268,7 +4272,6 @@
     <span class="doccomment">/// # use futures::executor::block_on;</span>
     <span class="doccomment">/// # use url::Url;</span>
     <span class="doccomment">/// # let homeserver = Url::parse(&quot;http://localhost:8080&quot;).unwrap();</span>
-    <span class="doccomment">/// # let client = Client::new(homeserver).unwrap();</span>
     <span class="doccomment">/// use matrix_sdk::{</span>
     <span class="doccomment">///     deserialized_responses::EncryptionInfo,</span>
     <span class="doccomment">///     room::Room,</span>
@@ -4285,6 +4288,7 @@
     <span class="doccomment">/// use serde::{Deserialize, Serialize};</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// # block_on(async {</span>
+    <span class="doccomment">/// # let client = Client::new(homeserver).await.unwrap();</span>
     <span class="doccomment">/// client</span>
     <span class="doccomment">///     .register_event_handler(</span>
     <span class="doccomment">///         |ev: SyncRoomMessageEvent, room: Room, client: Client| async move {</span>
@@ -4397,8 +4401,8 @@
     <span class="doccomment">/// # struct SomeType;</span>
     <span class="doccomment">/// # fn obtain_gui_handle() -&gt; SomeType { SomeType }</span>
     <span class="doccomment">/// # let homeserver = url::Url::parse(&quot;http://localhost:8080&quot;).unwrap();</span>
-    <span class="doccomment">/// # let client = matrix_sdk::Client::new(homeserver).unwrap();</span>
     <span class="doccomment">/// # block_on(async {</span>
+    <span class="doccomment">/// # let client = matrix_sdk::Client::new(homeserver).await.unwrap();</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// // Handle used to send messages to the UI part of the app</span>
     <span class="doccomment">/// let my_gui_handle: SomeType = obtain_gui_handle();</span>
@@ -4592,7 +4596,7 @@
     <span class="doccomment">/// # block_on(async {</span>
     <span class="doccomment">/// use matrix_sdk::Client;</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// let client = Client::new(homeserver)?;</span>
+    <span class="doccomment">/// let client = Client::new(homeserver).await?;</span>
     <span class="doccomment">/// let user = &quot;example&quot;;</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// let response = client</span>
@@ -4688,7 +4692,7 @@
     <span class="doccomment">/// # use url::Url;</span>
     <span class="doccomment">/// # let homeserver = Url::parse(&quot;https://example.com&quot;).unwrap();</span>
     <span class="doccomment">/// # block_on(async {</span>
-    <span class="doccomment">/// let client = Client::new(homeserver).unwrap();</span>
+    <span class="doccomment">/// let client = Client::new(homeserver).await.unwrap();</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// let response = client</span>
     <span class="doccomment">///     .login_with_sso(</span>
@@ -4871,7 +4875,7 @@
     <span class="doccomment">/// # let redirect_url = &quot;http://localhost:1234&quot;;</span>
     <span class="doccomment">/// # let login_token = &quot;token&quot;;</span>
     <span class="doccomment">/// # block_on(async {</span>
-    <span class="doccomment">/// let client = Client::new(homeserver).unwrap();</span>
+    <span class="doccomment">/// let client = Client::new(homeserver).await.unwrap();</span>
     <span class="doccomment">/// let sso_url = client.get_sso_login_url(redirect_url);</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// // Let the user authenticate at the SSO URL</span>
@@ -4954,7 +4958,7 @@
     <span class="doccomment">/// # block_on(async {</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// let homeserver = Url::parse(&quot;http://example.com&quot;)?;</span>
-    <span class="doccomment">/// let client = Client::new(homeserver)?;</span>
+    <span class="doccomment">/// let client = Client::new(homeserver).await?;</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// let session = Session {</span>
     <span class="doccomment">///     access_token: &quot;My-Token&quot;.to_owned(),</span>
@@ -4976,7 +4980,7 @@
     <span class="doccomment">/// # block_on(async {</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// let homeserver = Url::parse(&quot;http://example.com&quot;)?;</span>
-    <span class="doccomment">/// let client = Client::new(homeserver)?;</span>
+    <span class="doccomment">/// let client = Client::new(homeserver).await?;</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// let session: Session = client</span>
     <span class="doccomment">///     .login(&quot;example&quot;, &quot;my-password&quot;, None, None)</span>
@@ -5025,7 +5029,7 @@
     <span class="doccomment">///         uiaa::FallbackAcknowledgement::new(&quot;foobar&quot;),</span>
     <span class="doccomment">///     )),</span>
     <span class="doccomment">/// });</span>
-    <span class="doccomment">/// let client = Client::new(homeserver).unwrap();</span>
+    <span class="doccomment">/// let client = Client::new(homeserver).await.unwrap();</span>
     <span class="doccomment">/// client.register(request).await;</span>
     <span class="doccomment">/// # })</span>
     <span class="doccomment">/// ```</span>
@@ -5074,9 +5078,9 @@
     <span class="doccomment">/// # };</span>
     <span class="doccomment">/// # use futures::executor::block_on;</span>
     <span class="doccomment">/// # use url::Url;</span>
-    <span class="doccomment">/// # let homeserver = Url::parse(&quot;http://example.com&quot;).unwrap();</span>
-    <span class="doccomment">/// # let client = Client::new(homeserver).unwrap();</span>
     <span class="doccomment">/// # block_on(async {</span>
+    <span class="doccomment">/// # let homeserver = Url::parse(&quot;http://example.com&quot;).unwrap();</span>
+    <span class="doccomment">/// # let client = Client::new(homeserver).await.unwrap();</span>
     <span class="doccomment">/// let mut filter = FilterDefinition::default();</span>
     <span class="doccomment">/// let mut room_filter = RoomFilter::default();</span>
     <span class="doccomment">/// let mut event_filter = RoomEventFilter::default();</span>
@@ -5172,10 +5176,10 @@
     <span class="doccomment">/// # let limit = Some(10);</span>
     <span class="doccomment">/// # let since = Some(&quot;since token&quot;);</span>
     <span class="doccomment">/// # let server = Some(&quot;servername.com&quot;.try_into().unwrap());</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// let mut client = Client::new(homeserver).unwrap();</span>
     <span class="doccomment">/// # use futures::executor::block_on;</span>
     <span class="doccomment">/// # block_on(async {</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// let mut client = Client::new(homeserver).await.unwrap();</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// client.public_rooms(limit, since, server).await;</span>
     <span class="doccomment">/// # });</span>
@@ -5215,11 +5219,11 @@
     <span class="doccomment">/// # };</span>
     <span class="doccomment">/// # use url::Url;</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// # let homeserver = Url::parse(&quot;http://example.com&quot;).unwrap();</span>
-    <span class="doccomment">/// let request = CreateRoomRequest::new();</span>
-    <span class="doccomment">/// let client = Client::new(homeserver).unwrap();</span>
     <span class="doccomment">/// # use futures::executor::block_on;</span>
     <span class="doccomment">/// # block_on(async {</span>
+    <span class="doccomment">/// # let homeserver = Url::parse(&quot;http://example.com&quot;).unwrap();</span>
+    <span class="doccomment">/// let request = CreateRoomRequest::new();</span>
+    <span class="doccomment">/// let client = Client::new(homeserver).await.unwrap();</span>
     <span class="doccomment">/// assert!(client.create_room(request).await.is_ok());</span>
     <span class="doccomment">/// # });</span>
     <span class="doccomment">/// ```</span>
@@ -5253,7 +5257,7 @@
     <span class="doccomment">///         assign,</span>
     <span class="doccomment">///     }</span>
     <span class="doccomment">/// };</span>
-    <span class="doccomment">/// # let mut client = Client::new(homeserver)?;</span>
+    <span class="doccomment">/// # let mut client = Client::new(homeserver).await?;</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// let generic_search_term = Some(&quot;rust&quot;);</span>
     <span class="doccomment">/// let filter = assign!(Filter::new(), { generic_search_term });</span>
@@ -5294,7 +5298,7 @@
     <span class="doccomment">/// # use mime;</span>
     <span class="doccomment">/// # block_on(async {</span>
     <span class="doccomment">/// # let homeserver = Url::parse(&quot;http://localhost:8080&quot;)?;</span>
-    <span class="doccomment">/// # let mut client = Client::new(homeserver)?;</span>
+    <span class="doccomment">/// # let mut client = Client::new(homeserver).await?;</span>
     <span class="doccomment">/// let path = PathBuf::from(&quot;/home/example/my-cat.jpg&quot;);</span>
     <span class="doccomment">/// let mut image = File::open(path)?;</span>
     <span class="doccomment">///</span>
@@ -5350,7 +5354,7 @@
     <span class="doccomment">/// # use std::convert::TryFrom;</span>
     <span class="doccomment">/// # block_on(async {</span>
     <span class="doccomment">/// # let homeserver = Url::parse(&quot;http://localhost:8080&quot;)?;</span>
-    <span class="doccomment">/// # let mut client = Client::new(homeserver)?;</span>
+    <span class="doccomment">/// # let mut client = Client::new(homeserver).await?;</span>
     <span class="doccomment">/// use matrix_sdk::ruma::{api::client::r0::profile, user_id};</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// // First construct the request you want to make</span>
@@ -5389,7 +5393,7 @@
     <span class="doccomment">/// # use std::convert::TryFrom;</span>
     <span class="doccomment">/// # block_on(async {</span>
     <span class="doccomment">/// # let homeserver = Url::parse(&quot;http://localhost:8080&quot;)?;</span>
-    <span class="doccomment">/// # let mut client = Client::new(homeserver)?;</span>
+    <span class="doccomment">/// # let mut client = Client::new(homeserver).await?;</span>
     <span class="doccomment">/// let response = client.devices().await?;</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// for device in response.devices {</span>
@@ -5437,7 +5441,7 @@
     <span class="doccomment">/// # use std::{collections::BTreeMap, convert::TryFrom};</span>
     <span class="doccomment">/// # block_on(async {</span>
     <span class="doccomment">/// # let homeserver = Url::parse(&quot;http://localhost:8080&quot;)?;</span>
-    <span class="doccomment">/// # let mut client = Client::new(homeserver)?;</span>
+    <span class="doccomment">/// # let mut client = Client::new(homeserver).await?;</span>
     <span class="doccomment">/// let devices = &amp;[device_id!(&quot;DEVICEID&quot;).to_owned()];</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// if let Err(e) = client.delete_devices(devices, None).await {</span>
@@ -5526,7 +5530,7 @@
     <span class="doccomment">///     ruma::events::room::message::SyncRoomMessageEvent,</span>
     <span class="doccomment">/// };</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// let client = Client::new(homeserver)?;</span>
+    <span class="doccomment">/// let client = Client::new(homeserver).await?;</span>
     <span class="doccomment">/// client.login(&amp;username, &amp;password, None, None).await?;</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// // Sync once so we receive the client state and old messages.</span>
@@ -5631,7 +5635,7 @@
     <span class="doccomment">///     ruma::events::room::message::SyncRoomMessageEvent,</span>
     <span class="doccomment">/// };</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// let client = Client::new(homeserver)?;</span>
+    <span class="doccomment">/// let client = Client::new(homeserver).await?;</span>
     <span class="doccomment">/// client.login(&amp;username, &amp;password, None, None).await?;</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// // Register our handler so we start responding once we receive a new</span>
@@ -5679,7 +5683,7 @@
     <span class="doccomment">/// # use futures::executor::block_on;</span>
     <span class="doccomment">/// # block_on(async {</span>
     <span class="doccomment">/// # let homeserver = Url::parse(&quot;http://localhost:8080&quot;).unwrap();</span>
-    <span class="doccomment">/// # let mut client = Client::new(homeserver).unwrap();</span>
+    <span class="doccomment">/// # let mut client = Client::new(homeserver).await.unwrap();</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// use tokio::sync::mpsc::channel;</span>
     <span class="doccomment">///</span>
@@ -5757,7 +5761,7 @@
     <span class="doccomment">/// use futures::StreamExt;</span>
     <span class="doccomment">/// use matrix_sdk::{Client, config::SyncSettings};</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// let client = Client::new(homeserver)?;</span>
+    <span class="doccomment">/// let client = Client::new(homeserver).await?;</span>
     <span class="doccomment">/// client.login(&amp;username, &amp;password, None, None).await?;</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// let mut sync_stream = Box::pin(client.sync_stream(SyncSettings::default()).await);</span>
@@ -6046,9 +6050,13 @@
         })
     }
 }
-
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
+<span class="comment">// mockito (the http mocking library) is not supported for wasm32</span>
+<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">test</span>, <span class="ident">not</span>(<span class="ident">target_arch</span> <span class="op">=</span> <span class="string">&quot;wasm32&quot;</span>)))]</span>
 <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">mod</span> <span class="ident">test</span> {
+    <span class="kw">use</span> <span class="ident">matrix_sdk_test::async_test</span>;
+    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">target_arch</span> <span class="op">=</span> <span class="string">&quot;wasm32&quot;</span>)]</span>
+    <span class="macro">wasm_bindgen_test::wasm_bindgen_test_configure!</span>(<span class="ident">run_in_browser</span>);
+
     <span class="kw">use</span> <span class="ident">std</span>::{
         <span class="ident">collections::BTreeMap</span>,
         <span class="ident">convert</span>::{<span class="ident">TryFrom</span>, <span class="ident">TryInto</span>},
@@ -6106,17 +6114,17 @@
         };
         <span class="kw">let</span> <span class="ident">homeserver</span> <span class="op">=</span> <span class="ident">url::Url::parse</span>(<span class="kw-2">&amp;</span><span class="ident">mockito::server_url</span>()).<span class="ident">unwrap</span>();
         <span class="kw">let</span> <span class="ident">config</span> <span class="op">=</span> <span class="ident">ClientConfig::new</span>().<span class="ident">request_config</span>(<span class="ident">RequestConfig::new</span>().<span class="ident">disable_retry</span>());
-        <span class="kw">let</span> <span class="ident">client</span> <span class="op">=</span> <span class="ident">Client::new_with_config</span>(<span class="ident">homeserver</span>, <span class="ident">config</span>).<span class="ident">unwrap</span>();
+        <span class="kw">let</span> <span class="ident">client</span> <span class="op">=</span> <span class="ident">Client::new_with_config</span>(<span class="ident">homeserver</span>, <span class="ident">config</span>).<span class="kw">await</span>.<span class="ident">unwrap</span>();
         <span class="ident">client</span>.<span class="ident">restore_login</span>(<span class="ident">session</span>).<span class="kw">await</span>.<span class="ident">unwrap</span>();
 
         <span class="ident">client</span>
     }
 
-    <span class="attribute">#[<span class="ident">tokio::test</span>]</span>
+    <span class="attribute">#[<span class="ident">async_test</span>]</span>
     <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">set_homeserver</span>() {
         <span class="kw">let</span> <span class="ident">homeserver</span> <span class="op">=</span> <span class="ident">Url::from_str</span>(<span class="string">&quot;http://example.com/&quot;</span>).<span class="ident">unwrap</span>();
 
-        <span class="kw">let</span> <span class="ident">client</span> <span class="op">=</span> <span class="ident">Client::new</span>(<span class="ident">homeserver</span>).<span class="ident">unwrap</span>();
+        <span class="kw">let</span> <span class="ident">client</span> <span class="op">=</span> <span class="ident">Client::new</span>(<span class="ident">homeserver</span>).<span class="kw">await</span>.<span class="ident">unwrap</span>();
 
         <span class="kw">let</span> <span class="ident">homeserver</span> <span class="op">=</span> <span class="ident">Url::from_str</span>(<span class="kw-2">&amp;</span><span class="ident">mockito::server_url</span>()).<span class="ident">unwrap</span>();
 
@@ -6125,7 +6133,7 @@
         <span class="macro">assert_eq!</span>(<span class="ident">client</span>.<span class="ident">homeserver</span>().<span class="kw">await</span>, <span class="ident">homeserver</span>);
     }
 
-    <span class="attribute">#[<span class="ident">tokio::test</span>]</span>
+    <span class="attribute">#[<span class="ident">async_test</span>]</span>
     <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">successful_discovery</span>() {
         <span class="kw">let</span> <span class="ident">server_url</span> <span class="op">=</span> <span class="ident">mockito::server_url</span>();
         <span class="kw">let</span> <span class="ident">domain</span> <span class="op">=</span> <span class="ident">server_url</span>.<span class="ident">strip_prefix</span>(<span class="string">&quot;http://&quot;</span>).<span class="ident">unwrap</span>();
@@ -6147,7 +6155,7 @@
         <span class="macro">assert_eq!</span>(<span class="ident">client</span>.<span class="ident">homeserver</span>().<span class="kw">await</span>, <span class="ident">Url::parse</span>(<span class="ident">server_url</span>.<span class="ident">as_ref</span>()).<span class="ident">unwrap</span>());
     }
 
-    <span class="attribute">#[<span class="ident">tokio::test</span>]</span>
+    <span class="attribute">#[<span class="ident">async_test</span>]</span>
     <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">discovery_broken_server</span>() {
         <span class="kw">let</span> <span class="ident">server_url</span> <span class="op">=</span> <span class="ident">mockito::server_url</span>();
         <span class="kw">let</span> <span class="ident">domain</span> <span class="op">=</span> <span class="ident">server_url</span>.<span class="ident">strip_prefix</span>(<span class="string">&quot;http://&quot;</span>).<span class="ident">unwrap</span>();
@@ -6167,11 +6175,11 @@
         );
     }
 
-    <span class="attribute">#[<span class="ident">tokio::test</span>]</span>
+    <span class="attribute">#[<span class="ident">async_test</span>]</span>
     <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">login</span>() {
         <span class="kw">let</span> <span class="ident">homeserver</span> <span class="op">=</span> <span class="ident">Url::from_str</span>(<span class="kw-2">&amp;</span><span class="ident">mockito::server_url</span>()).<span class="ident">unwrap</span>();
 
-        <span class="kw">let</span> <span class="ident">client</span> <span class="op">=</span> <span class="ident">Client::new</span>(<span class="ident">homeserver</span>.<span class="ident">clone</span>()).<span class="ident">unwrap</span>();
+        <span class="kw">let</span> <span class="ident">client</span> <span class="op">=</span> <span class="ident">Client::new</span>(<span class="ident">homeserver</span>.<span class="ident">clone</span>()).<span class="kw">await</span>.<span class="ident">unwrap</span>();
 
         <span class="kw">let</span> <span class="ident">_m_types</span> <span class="op">=</span> <span class="ident">mock</span>(<span class="string">&quot;GET&quot;</span>, <span class="string">&quot;/_matrix/client/r0/login&quot;</span>)
             .<span class="ident">with_status</span>(<span class="number">200</span>)
@@ -6200,12 +6208,12 @@
         <span class="macro">assert_eq!</span>(<span class="ident">client</span>.<span class="ident">homeserver</span>().<span class="kw">await</span>, <span class="ident">homeserver</span>);
     }
 
-    <span class="attribute">#[<span class="ident">tokio::test</span>]</span>
+    <span class="attribute">#[<span class="ident">async_test</span>]</span>
     <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">login_with_discovery</span>() {
         <span class="kw">let</span> <span class="ident">homeserver</span> <span class="op">=</span> <span class="ident">Url::from_str</span>(<span class="kw-2">&amp;</span><span class="ident">mockito::server_url</span>()).<span class="ident">unwrap</span>();
         <span class="kw">let</span> <span class="ident">config</span> <span class="op">=</span> <span class="ident">ClientConfig::new</span>().<span class="ident">use_discovery_response</span>();
 
-        <span class="kw">let</span> <span class="ident">client</span> <span class="op">=</span> <span class="ident">Client::new_with_config</span>(<span class="ident">homeserver</span>, <span class="ident">config</span>).<span class="ident">unwrap</span>();
+        <span class="kw">let</span> <span class="ident">client</span> <span class="op">=</span> <span class="ident">Client::new_with_config</span>(<span class="ident">homeserver</span>, <span class="ident">config</span>).<span class="kw">await</span>.<span class="ident">unwrap</span>();
 
         <span class="kw">let</span> <span class="ident">_m_login</span> <span class="op">=</span> <span class="ident">mock</span>(<span class="string">&quot;POST&quot;</span>, <span class="string">&quot;/_matrix/client/r0/login&quot;</span>)
             .<span class="ident">with_status</span>(<span class="number">200</span>)
@@ -6220,12 +6228,12 @@
         <span class="macro">assert_eq!</span>(<span class="ident">client</span>.<span class="ident">homeserver</span>().<span class="kw">await</span>.<span class="ident">as_str</span>(), <span class="string">&quot;https://example.org/&quot;</span>);
     }
 
-    <span class="attribute">#[<span class="ident">tokio::test</span>]</span>
+    <span class="attribute">#[<span class="ident">async_test</span>]</span>
     <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">login_no_discovery</span>() {
         <span class="kw">let</span> <span class="ident">homeserver</span> <span class="op">=</span> <span class="ident">Url::from_str</span>(<span class="kw-2">&amp;</span><span class="ident">mockito::server_url</span>()).<span class="ident">unwrap</span>();
         <span class="kw">let</span> <span class="ident">config</span> <span class="op">=</span> <span class="ident">ClientConfig::new</span>().<span class="ident">use_discovery_response</span>();
 
-        <span class="kw">let</span> <span class="ident">client</span> <span class="op">=</span> <span class="ident">Client::new_with_config</span>(<span class="ident">homeserver</span>.<span class="ident">clone</span>(), <span class="ident">config</span>).<span class="ident">unwrap</span>();
+        <span class="kw">let</span> <span class="ident">client</span> <span class="op">=</span> <span class="ident">Client::new_with_config</span>(<span class="ident">homeserver</span>.<span class="ident">clone</span>(), <span class="ident">config</span>).<span class="kw">await</span>.<span class="ident">unwrap</span>();
 
         <span class="kw">let</span> <span class="ident">_m_login</span> <span class="op">=</span> <span class="ident">mock</span>(<span class="string">&quot;POST&quot;</span>, <span class="string">&quot;/_matrix/client/r0/login&quot;</span>)
             .<span class="ident">with_status</span>(<span class="number">200</span>)
@@ -6241,7 +6249,7 @@
     }
 
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;sso_login&quot;</span>)]</span>
-    <span class="attribute">#[<span class="ident">tokio::test</span>]</span>
+    <span class="attribute">#[<span class="ident">async_test</span>]</span>
     <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">login_with_sso</span>() {
         <span class="kw">let</span> <span class="ident">_m_login</span> <span class="op">=</span> <span class="ident">mock</span>(<span class="string">&quot;POST&quot;</span>, <span class="string">&quot;/_matrix/client/r0/login&quot;</span>)
             .<span class="ident">with_status</span>(<span class="number">200</span>)
@@ -6249,7 +6257,7 @@
             .<span class="ident">create</span>();
 
         <span class="kw">let</span> <span class="ident">homeserver</span> <span class="op">=</span> <span class="ident">Url::from_str</span>(<span class="kw-2">&amp;</span><span class="ident">mockito::server_url</span>()).<span class="ident">unwrap</span>();
-        <span class="kw">let</span> <span class="ident">client</span> <span class="op">=</span> <span class="ident">Client::new</span>(<span class="ident">homeserver</span>).<span class="ident">unwrap</span>();
+        <span class="kw">let</span> <span class="ident">client</span> <span class="op">=</span> <span class="ident">Client::new</span>(<span class="ident">homeserver</span>).<span class="kw">await</span>.<span class="ident">unwrap</span>();
 
         <span class="ident">client</span>
             .<span class="ident">login_with_sso</span>(
@@ -6278,11 +6286,11 @@
         <span class="macro">assert!</span>(<span class="ident">logged_in</span>, <span class="string">&quot;Client should be logged in&quot;</span>);
     }
 
-    <span class="attribute">#[<span class="ident">tokio::test</span>]</span>
+    <span class="attribute">#[<span class="ident">async_test</span>]</span>
     <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">login_with_sso_token</span>() {
         <span class="kw">let</span> <span class="ident">homeserver</span> <span class="op">=</span> <span class="ident">Url::from_str</span>(<span class="kw-2">&amp;</span><span class="ident">mockito::server_url</span>()).<span class="ident">unwrap</span>();
 
-        <span class="kw">let</span> <span class="ident">client</span> <span class="op">=</span> <span class="ident">Client::new</span>(<span class="ident">homeserver</span>).<span class="ident">unwrap</span>();
+        <span class="kw">let</span> <span class="ident">client</span> <span class="op">=</span> <span class="ident">Client::new</span>(<span class="ident">homeserver</span>).<span class="kw">await</span>.<span class="ident">unwrap</span>();
 
         <span class="kw">let</span> <span class="ident">_m</span> <span class="op">=</span> <span class="ident">mock</span>(<span class="string">&quot;GET&quot;</span>, <span class="string">&quot;/_matrix/client/r0/login&quot;</span>)
             .<span class="ident">with_status</span>(<span class="number">200</span>)
@@ -6312,7 +6320,7 @@
         <span class="macro">assert!</span>(<span class="ident">logged_in</span>, <span class="string">&quot;Client should be logged in&quot;</span>);
     }
 
-    <span class="attribute">#[<span class="ident">tokio::test</span>]</span>
+    <span class="attribute">#[<span class="ident">async_test</span>]</span>
     <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">devices</span>() {
         <span class="kw">let</span> <span class="ident">client</span> <span class="op">=</span> <span class="ident">logged_in_client</span>().<span class="kw">await</span>;
 
@@ -6324,7 +6332,7 @@
         <span class="macro">assert!</span>(<span class="ident">client</span>.<span class="ident">devices</span>().<span class="kw">await</span>.<span class="ident">is_ok</span>());
     }
 
-    <span class="attribute">#[<span class="ident">tokio::test</span>]</span>
+    <span class="attribute">#[<span class="ident">async_test</span>]</span>
     <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">test_join_leave_room</span>() {
         <span class="kw">let</span> <span class="ident">homeserver</span> <span class="op">=</span> <span class="ident">Url::from_str</span>(<span class="kw-2">&amp;</span><span class="ident">mockito::server_url</span>()).<span class="ident">unwrap</span>();
         <span class="kw">let</span> <span class="ident">room_id</span> <span class="op">=</span> <span class="macro">room_id!</span>(<span class="string">&quot;!SVkFJHzfwvuaIEawgC:localhost&quot;</span>);
@@ -6353,7 +6361,7 @@
         <span class="kw">let</span> <span class="ident">config</span> <span class="op">=</span> <span class="ident">ClientConfig::default</span>()
             .<span class="ident">store_path</span>(<span class="ident">path</span>)
             .<span class="ident">request_config</span>(<span class="ident">RequestConfig::new</span>().<span class="ident">disable_retry</span>());
-        <span class="kw">let</span> <span class="ident">joined_client</span> <span class="op">=</span> <span class="ident">Client::new_with_config</span>(<span class="ident">homeserver</span>, <span class="ident">config</span>).<span class="ident">unwrap</span>();
+        <span class="kw">let</span> <span class="ident">joined_client</span> <span class="op">=</span> <span class="ident">Client::new_with_config</span>(<span class="ident">homeserver</span>, <span class="ident">config</span>).<span class="kw">await</span>.<span class="ident">unwrap</span>();
         <span class="ident">joined_client</span>.<span class="ident">restore_login</span>(<span class="ident">session</span>).<span class="kw">await</span>.<span class="ident">unwrap</span>();
 
         <span class="comment">// joined room reloaded from state store</span>
@@ -6375,7 +6383,7 @@
         <span class="macro">assert!</span>(<span class="ident">room</span>.<span class="ident">is_some</span>());
     }
 
-    <span class="attribute">#[<span class="ident">tokio::test</span>]</span>
+    <span class="attribute">#[<span class="ident">async_test</span>]</span>
     <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">account_data</span>() {
         <span class="kw">let</span> <span class="ident">client</span> <span class="op">=</span> <span class="ident">logged_in_client</span>().<span class="kw">await</span>;
 
@@ -6393,7 +6401,7 @@
         <span class="comment">// assert_eq!(1, ignored_users.len())</span>
     }
 
-    <span class="attribute">#[<span class="ident">tokio::test</span>]</span>
+    <span class="attribute">#[<span class="ident">async_test</span>]</span>
     <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">room_creation</span>() {
         <span class="kw">let</span> <span class="ident">client</span> <span class="op">=</span> <span class="ident">logged_in_client</span>().<span class="kw">await</span>;
 
@@ -6411,11 +6419,11 @@
         <span class="macro">assert!</span>(<span class="ident">room</span>.<span class="ident">is_some</span>());
     }
 
-    <span class="attribute">#[<span class="ident">tokio::test</span>]</span>
+    <span class="attribute">#[<span class="ident">async_test</span>]</span>
     <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">login_error</span>() {
         <span class="kw">let</span> <span class="ident">homeserver</span> <span class="op">=</span> <span class="ident">Url::from_str</span>(<span class="kw-2">&amp;</span><span class="ident">mockito::server_url</span>()).<span class="ident">unwrap</span>();
         <span class="kw">let</span> <span class="ident">config</span> <span class="op">=</span> <span class="ident">ClientConfig::default</span>().<span class="ident">request_config</span>(<span class="ident">RequestConfig::new</span>().<span class="ident">disable_retry</span>());
-        <span class="kw">let</span> <span class="ident">client</span> <span class="op">=</span> <span class="ident">Client::new_with_config</span>(<span class="ident">homeserver</span>, <span class="ident">config</span>).<span class="ident">unwrap</span>();
+        <span class="kw">let</span> <span class="ident">client</span> <span class="op">=</span> <span class="ident">Client::new_with_config</span>(<span class="ident">homeserver</span>, <span class="ident">config</span>).<span class="kw">await</span>.<span class="ident">unwrap</span>();
 
         <span class="kw">let</span> <span class="ident">_m</span> <span class="op">=</span> <span class="ident">mock</span>(<span class="string">&quot;POST&quot;</span>, <span class="string">&quot;/_matrix/client/r0/login&quot;</span>)
             .<span class="ident">with_status</span>(<span class="number">403</span>)
@@ -6441,10 +6449,10 @@
         }
     }
 
-    <span class="attribute">#[<span class="ident">tokio::test</span>]</span>
+    <span class="attribute">#[<span class="ident">async_test</span>]</span>
     <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">register_error</span>() {
         <span class="kw">let</span> <span class="ident">homeserver</span> <span class="op">=</span> <span class="ident">Url::from_str</span>(<span class="kw-2">&amp;</span><span class="ident">mockito::server_url</span>()).<span class="ident">unwrap</span>();
-        <span class="kw">let</span> <span class="ident">client</span> <span class="op">=</span> <span class="ident">Client::new</span>(<span class="ident">homeserver</span>).<span class="ident">unwrap</span>();
+        <span class="kw">let</span> <span class="ident">client</span> <span class="op">=</span> <span class="ident">Client::new</span>(<span class="ident">homeserver</span>).<span class="kw">await</span>.<span class="ident">unwrap</span>();
 
         <span class="kw">let</span> <span class="ident">_m</span> <span class="op">=</span> <span class="ident">mock</span>(<span class="string">&quot;POST&quot;</span>, <span class="ident">Matcher::Regex</span>(<span class="string">r&quot;^/_matrix/client/r0/register\?.*$&quot;</span>.<span class="ident">to_string</span>()))
             .<span class="ident">with_status</span>(<span class="number">403</span>)
@@ -6479,7 +6487,7 @@
         }
     }
 
-    <span class="attribute">#[<span class="ident">tokio::test</span>]</span>
+    <span class="attribute">#[<span class="ident">async_test</span>]</span>
     <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">join_room_by_id</span>() {
         <span class="kw">let</span> <span class="ident">client</span> <span class="op">=</span> <span class="ident">logged_in_client</span>().<span class="kw">await</span>;
 
@@ -6499,7 +6507,7 @@
         );
     }
 
-    <span class="attribute">#[<span class="ident">tokio::test</span>]</span>
+    <span class="attribute">#[<span class="ident">async_test</span>]</span>
     <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">join_room_by_id_or_alias</span>() {
         <span class="kw">let</span> <span class="ident">client</span> <span class="op">=</span> <span class="ident">logged_in_client</span>().<span class="kw">await</span>;
 
@@ -6523,7 +6531,7 @@
         );
     }
 
-    <span class="attribute">#[<span class="ident">tokio::test</span>]</span>
+    <span class="attribute">#[<span class="ident">async_test</span>]</span>
     <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">invite_user_by_id</span>() {
         <span class="kw">let</span> <span class="ident">client</span> <span class="op">=</span> <span class="ident">logged_in_client</span>().<span class="kw">await</span>;
 
@@ -6549,7 +6557,7 @@
         <span class="ident">room</span>.<span class="ident">invite_user_by_id</span>(<span class="ident">user</span>).<span class="kw">await</span>.<span class="ident">unwrap</span>();
     }
 
-    <span class="attribute">#[<span class="ident">tokio::test</span>]</span>
+    <span class="attribute">#[<span class="ident">async_test</span>]</span>
     <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">invite_user_by_3pid</span>() {
         <span class="kw">let</span> <span class="ident">client</span> <span class="op">=</span> <span class="ident">logged_in_client</span>().<span class="kw">await</span>;
 
@@ -6585,10 +6593,10 @@
         .<span class="ident">unwrap</span>();
     }
 
-    <span class="attribute">#[<span class="ident">tokio::test</span>]</span>
+    <span class="attribute">#[<span class="ident">async_test</span>]</span>
     <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">room_search_all</span>() {
         <span class="kw">let</span> <span class="ident">homeserver</span> <span class="op">=</span> <span class="ident">Url::from_str</span>(<span class="kw-2">&amp;</span><span class="ident">mockito::server_url</span>()).<span class="ident">unwrap</span>();
-        <span class="kw">let</span> <span class="ident">client</span> <span class="op">=</span> <span class="ident">Client::new</span>(<span class="ident">homeserver</span>).<span class="ident">unwrap</span>();
+        <span class="kw">let</span> <span class="ident">client</span> <span class="op">=</span> <span class="ident">Client::new</span>(<span class="ident">homeserver</span>).<span class="kw">await</span>.<span class="ident">unwrap</span>();
 
         <span class="kw">let</span> <span class="ident">_m</span> <span class="op">=</span> <span class="ident">mock</span>(<span class="string">&quot;GET&quot;</span>, <span class="ident">Matcher::Regex</span>(<span class="string">r&quot;^/_matrix/client/r0/publicRooms&quot;</span>.<span class="ident">to_string</span>()))
             .<span class="ident">with_status</span>(<span class="number">200</span>)
@@ -6600,7 +6608,7 @@
         <span class="macro">assert_eq!</span>(<span class="ident">chunk</span>.<span class="ident">len</span>(), <span class="number">1</span>);
     }
 
-    <span class="attribute">#[<span class="ident">tokio::test</span>]</span>
+    <span class="attribute">#[<span class="ident">async_test</span>]</span>
     <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">room_search_filtered</span>() {
         <span class="kw">let</span> <span class="ident">client</span> <span class="op">=</span> <span class="ident">logged_in_client</span>().<span class="kw">await</span>;
 
@@ -6619,7 +6627,7 @@
         <span class="macro">assert_eq!</span>(<span class="ident">chunk</span>.<span class="ident">len</span>(), <span class="number">1</span>);
     }
 
-    <span class="attribute">#[<span class="ident">tokio::test</span>]</span>
+    <span class="attribute">#[<span class="ident">async_test</span>]</span>
     <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">leave_room</span>() {
         <span class="kw">let</span> <span class="ident">client</span> <span class="op">=</span> <span class="ident">logged_in_client</span>().<span class="kw">await</span>;
 
@@ -6645,7 +6653,7 @@
         <span class="ident">room</span>.<span class="ident">leave</span>().<span class="kw">await</span>.<span class="ident">unwrap</span>();
     }
 
-    <span class="attribute">#[<span class="ident">tokio::test</span>]</span>
+    <span class="attribute">#[<span class="ident">async_test</span>]</span>
     <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">ban_user</span>() {
         <span class="kw">let</span> <span class="ident">client</span> <span class="op">=</span> <span class="ident">logged_in_client</span>().<span class="kw">await</span>;
 
@@ -6672,7 +6680,7 @@
         <span class="ident">room</span>.<span class="ident">ban_user</span>(<span class="ident">user</span>, <span class="prelude-val">None</span>).<span class="kw">await</span>.<span class="ident">unwrap</span>();
     }
 
-    <span class="attribute">#[<span class="ident">tokio::test</span>]</span>
+    <span class="attribute">#[<span class="ident">async_test</span>]</span>
     <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">kick_user</span>() {
         <span class="kw">let</span> <span class="ident">client</span> <span class="op">=</span> <span class="ident">logged_in_client</span>().<span class="kw">await</span>;
 
@@ -6699,7 +6707,7 @@
         <span class="ident">room</span>.<span class="ident">kick_user</span>(<span class="ident">user</span>, <span class="prelude-val">None</span>).<span class="kw">await</span>.<span class="ident">unwrap</span>();
     }
 
-    <span class="attribute">#[<span class="ident">tokio::test</span>]</span>
+    <span class="attribute">#[<span class="ident">async_test</span>]</span>
     <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">forget_room</span>() {
         <span class="kw">let</span> <span class="ident">client</span> <span class="op">=</span> <span class="ident">logged_in_client</span>().<span class="kw">await</span>;
 
@@ -6725,7 +6733,7 @@
         <span class="ident">room</span>.<span class="ident">forget</span>().<span class="kw">await</span>.<span class="ident">unwrap</span>();
     }
 
-    <span class="attribute">#[<span class="ident">tokio::test</span>]</span>
+    <span class="attribute">#[<span class="ident">async_test</span>]</span>
     <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">read_receipt</span>() {
         <span class="kw">let</span> <span class="ident">client</span> <span class="op">=</span> <span class="ident">logged_in_client</span>().<span class="kw">await</span>;
 
@@ -6752,7 +6760,7 @@
         <span class="ident">room</span>.<span class="ident">read_receipt</span>(<span class="ident">event_id</span>).<span class="kw">await</span>.<span class="ident">unwrap</span>();
     }
 
-    <span class="attribute">#[<span class="ident">tokio::test</span>]</span>
+    <span class="attribute">#[<span class="ident">async_test</span>]</span>
     <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">read_marker</span>() {
         <span class="kw">let</span> <span class="ident">client</span> <span class="op">=</span> <span class="ident">logged_in_client</span>().<span class="kw">await</span>;
 
@@ -6780,7 +6788,7 @@
         <span class="ident">room</span>.<span class="ident">read_marker</span>(<span class="ident">event_id</span>, <span class="prelude-val">None</span>).<span class="kw">await</span>.<span class="ident">unwrap</span>();
     }
 
-    <span class="attribute">#[<span class="ident">tokio::test</span>]</span>
+    <span class="attribute">#[<span class="ident">async_test</span>]</span>
     <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">typing_notice</span>() {
         <span class="kw">let</span> <span class="ident">client</span> <span class="op">=</span> <span class="ident">logged_in_client</span>().<span class="kw">await</span>;
 
@@ -6806,7 +6814,7 @@
         <span class="ident">room</span>.<span class="ident">typing_notice</span>(<span class="bool-val">true</span>).<span class="kw">await</span>.<span class="ident">unwrap</span>();
     }
 
-    <span class="attribute">#[<span class="ident">tokio::test</span>]</span>
+    <span class="attribute">#[<span class="ident">async_test</span>]</span>
     <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">room_state_event_send</span>() {
         <span class="kw">use</span> <span class="ident">ruma::events::room::member</span>::{<span class="ident">MembershipState</span>, <span class="ident">RoomMemberEventContent</span>};
 
@@ -6840,7 +6848,7 @@
         <span class="macro">assert_eq!</span>(<span class="macro">event_id!</span>(<span class="string">&quot;$h29iv0s8:example.com&quot;</span>), <span class="ident">response</span>.<span class="ident">event_id</span>);
     }
 
-    <span class="attribute">#[<span class="ident">tokio::test</span>]</span>
+    <span class="attribute">#[<span class="ident">async_test</span>]</span>
     <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">room_message_send</span>() {
         <span class="kw">let</span> <span class="ident">client</span> <span class="op">=</span> <span class="ident">logged_in_client</span>().<span class="kw">await</span>;
 
@@ -6869,7 +6877,7 @@
         <span class="macro">assert_eq!</span>(<span class="macro">event_id!</span>(<span class="string">&quot;$h29iv0s8:example.com&quot;</span>), <span class="ident">response</span>.<span class="ident">event_id</span>)
     }
 
-    <span class="attribute">#[<span class="ident">tokio::test</span>]</span>
+    <span class="attribute">#[<span class="ident">async_test</span>]</span>
     <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">room_attachment_send</span>() {
         <span class="kw">let</span> <span class="ident">client</span> <span class="op">=</span> <span class="ident">logged_in_client</span>().<span class="kw">await</span>;
 
@@ -6910,7 +6918,7 @@
         <span class="macro">assert_eq!</span>(<span class="macro">event_id!</span>(<span class="string">&quot;$h29iv0s8:example.com&quot;</span>), <span class="ident">response</span>.<span class="ident">event_id</span>)
     }
 
-    <span class="attribute">#[<span class="ident">tokio::test</span>]</span>
+    <span class="attribute">#[<span class="ident">async_test</span>]</span>
     <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">room_redact</span>() {
         <span class="kw">let</span> <span class="ident">client</span> <span class="op">=</span> <span class="ident">logged_in_client</span>().<span class="kw">await</span>;
 
@@ -6942,7 +6950,7 @@
         <span class="macro">assert_eq!</span>(<span class="macro">event_id!</span>(<span class="string">&quot;$h29iv0s8:example.com&quot;</span>), <span class="ident">response</span>.<span class="ident">event_id</span>)
     }
 
-    <span class="attribute">#[<span class="ident">tokio::test</span>]</span>
+    <span class="attribute">#[<span class="ident">async_test</span>]</span>
     <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">user_presence</span>() {
         <span class="kw">let</span> <span class="ident">client</span> <span class="op">=</span> <span class="ident">logged_in_client</span>().<span class="kw">await</span>;
 
@@ -6969,7 +6977,7 @@
         <span class="comment">// assert!(room.power_levels.is_some())</span>
     }
 
-    <span class="attribute">#[<span class="ident">tokio::test</span>]</span>
+    <span class="attribute">#[<span class="ident">async_test</span>]</span>
     <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">calculate_room_names_from_summary</span>() {
         <span class="kw">let</span> <span class="ident">client</span> <span class="op">=</span> <span class="ident">logged_in_client</span>().<span class="kw">await</span>;
 
@@ -6986,7 +6994,7 @@
         <span class="macro">assert_eq!</span>(<span class="string">&quot;example2&quot;</span>, <span class="ident">room</span>.<span class="ident">display_name</span>().<span class="kw">await</span>.<span class="ident">unwrap</span>());
     }
 
-    <span class="attribute">#[<span class="ident">tokio::test</span>]</span>
+    <span class="attribute">#[<span class="ident">async_test</span>]</span>
     <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">invited_rooms</span>() {
         <span class="kw">let</span> <span class="ident">client</span> <span class="op">=</span> <span class="ident">logged_in_client</span>().<span class="kw">await</span>;
 
@@ -7005,7 +7013,7 @@
         <span class="macro">assert!</span>(<span class="ident">client</span>.<span class="ident">get_invited_room</span>(<span class="macro">room_id!</span>(<span class="string">&quot;!696r7674:example.com&quot;</span>)).<span class="ident">is_some</span>());
     }
 
-    <span class="attribute">#[<span class="ident">tokio::test</span>]</span>
+    <span class="attribute">#[<span class="ident">async_test</span>]</span>
     <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">left_rooms</span>() {
         <span class="kw">let</span> <span class="ident">client</span> <span class="op">=</span> <span class="ident">logged_in_client</span>().<span class="kw">await</span>;
 
@@ -7024,7 +7032,7 @@
         <span class="macro">assert!</span>(<span class="ident">client</span>.<span class="ident">get_left_room</span>(<span class="macro">room_id!</span>(<span class="string">&quot;!SVkFJHzfwvuaIEawgC:localhost&quot;</span>)).<span class="ident">is_some</span>())
     }
 
-    <span class="attribute">#[<span class="ident">tokio::test</span>]</span>
+    <span class="attribute">#[<span class="ident">async_test</span>]</span>
     <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">sync</span>() {
         <span class="kw">let</span> <span class="ident">client</span> <span class="op">=</span> <span class="ident">logged_in_client</span>().<span class="kw">await</span>;
 
@@ -7043,7 +7051,7 @@
         <span class="macro">assert!</span>(<span class="ident">client</span>.<span class="ident">sync_token</span>().<span class="kw">await</span>.<span class="ident">is_some</span>());
     }
 
-    <span class="attribute">#[<span class="ident">tokio::test</span>]</span>
+    <span class="attribute">#[<span class="ident">async_test</span>]</span>
     <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">room_names</span>() {
         <span class="kw">let</span> <span class="ident">client</span> <span class="op">=</span> <span class="ident">logged_in_client</span>().<span class="kw">await</span>;
 
@@ -7076,10 +7084,10 @@
         <span class="macro">assert_eq!</span>(<span class="string">&quot;My Room Name&quot;</span>.<span class="ident">to_string</span>(), <span class="ident">invited_room</span>.<span class="ident">display_name</span>().<span class="kw">await</span>.<span class="ident">unwrap</span>());
     }
 
-    <span class="attribute">#[<span class="ident">tokio::test</span>]</span>
+    <span class="attribute">#[<span class="ident">async_test</span>]</span>
     <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">delete_devices</span>() {
         <span class="kw">let</span> <span class="ident">homeserver</span> <span class="op">=</span> <span class="ident">Url::from_str</span>(<span class="kw-2">&amp;</span><span class="ident">mockito::server_url</span>()).<span class="ident">unwrap</span>();
-        <span class="kw">let</span> <span class="ident">client</span> <span class="op">=</span> <span class="ident">Client::new</span>(<span class="ident">homeserver</span>).<span class="ident">unwrap</span>();
+        <span class="kw">let</span> <span class="ident">client</span> <span class="op">=</span> <span class="ident">Client::new</span>(<span class="ident">homeserver</span>).<span class="kw">await</span>.<span class="ident">unwrap</span>();
 
         <span class="kw">let</span> <span class="ident">_m</span> <span class="op">=</span> <span class="ident">mock</span>(<span class="string">&quot;POST&quot;</span>, <span class="string">&quot;/_matrix/client/r0/delete_devices&quot;</span>)
             .<span class="ident">with_status</span>(<span class="number">401</span>)
@@ -7129,12 +7137,12 @@
         }
     }
 
-    <span class="attribute">#[<span class="ident">tokio::test</span>]</span>
+    <span class="attribute">#[<span class="ident">async_test</span>]</span>
     <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">retry_limit_http_requests</span>() {
         <span class="kw">let</span> <span class="ident">homeserver</span> <span class="op">=</span> <span class="ident">Url::from_str</span>(<span class="kw-2">&amp;</span><span class="ident">mockito::server_url</span>()).<span class="ident">unwrap</span>();
         <span class="kw">let</span> <span class="ident">config</span> <span class="op">=</span> <span class="ident">ClientConfig::default</span>().<span class="ident">request_config</span>(<span class="ident">RequestConfig::new</span>().<span class="ident">retry_limit</span>(<span class="number">3</span>));
         <span class="macro">assert!</span>(<span class="ident">config</span>.<span class="ident">request_config</span>.<span class="ident">retry_limit</span>.<span class="ident">unwrap</span>() <span class="op">==</span> <span class="number">3</span>);
-        <span class="kw">let</span> <span class="ident">client</span> <span class="op">=</span> <span class="ident">Client::new_with_config</span>(<span class="ident">homeserver</span>, <span class="ident">config</span>).<span class="ident">unwrap</span>();
+        <span class="kw">let</span> <span class="ident">client</span> <span class="op">=</span> <span class="ident">Client::new_with_config</span>(<span class="ident">homeserver</span>, <span class="ident">config</span>).<span class="kw">await</span>.<span class="ident">unwrap</span>();
 
         <span class="kw">let</span> <span class="ident">m</span> <span class="op">=</span> <span class="ident">mock</span>(<span class="string">&quot;POST&quot;</span>, <span class="string">&quot;/_matrix/client/r0/login&quot;</span>).<span class="ident">with_status</span>(<span class="number">501</span>).<span class="ident">expect</span>(<span class="number">3</span>).<span class="ident">create</span>();
 
@@ -7145,7 +7153,7 @@
         }
     }
 
-    <span class="attribute">#[<span class="ident">tokio::test</span>]</span>
+    <span class="attribute">#[<span class="ident">async_test</span>]</span>
     <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">retry_timeout_http_requests</span>() {
         <span class="kw">let</span> <span class="ident">homeserver</span> <span class="op">=</span> <span class="ident">Url::from_str</span>(<span class="kw-2">&amp;</span><span class="ident">mockito::server_url</span>()).<span class="ident">unwrap</span>();
         <span class="comment">// Keep this timeout small so that the test doesn&#39;t take long</span>
@@ -7153,7 +7161,7 @@
         <span class="kw">let</span> <span class="ident">config</span> <span class="op">=</span> <span class="ident">ClientConfig::default</span>()
             .<span class="ident">request_config</span>(<span class="ident">RequestConfig::new</span>().<span class="ident">retry_timeout</span>(<span class="ident">retry_timeout</span>));
         <span class="macro">assert!</span>(<span class="ident">config</span>.<span class="ident">request_config</span>.<span class="ident">retry_timeout</span>.<span class="ident">unwrap</span>() <span class="op">==</span> <span class="ident">retry_timeout</span>);
-        <span class="kw">let</span> <span class="ident">client</span> <span class="op">=</span> <span class="ident">Client::new_with_config</span>(<span class="ident">homeserver</span>, <span class="ident">config</span>).<span class="ident">unwrap</span>();
+        <span class="kw">let</span> <span class="ident">client</span> <span class="op">=</span> <span class="ident">Client::new_with_config</span>(<span class="ident">homeserver</span>, <span class="ident">config</span>).<span class="kw">await</span>.<span class="ident">unwrap</span>();
 
         <span class="kw">let</span> <span class="ident">m</span> <span class="op">=</span>
             <span class="ident">mock</span>(<span class="string">&quot;POST&quot;</span>, <span class="string">&quot;/_matrix/client/r0/login&quot;</span>).<span class="ident">with_status</span>(<span class="number">501</span>).<span class="ident">expect_at_least</span>(<span class="number">2</span>).<span class="ident">create</span>();
@@ -7165,12 +7173,12 @@
         }
     }
 
-    <span class="attribute">#[<span class="ident">tokio::test</span>]</span>
+    <span class="attribute">#[<span class="ident">async_test</span>]</span>
     <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">no_retry_http_requests</span>() {
         <span class="kw">let</span> <span class="ident">homeserver</span> <span class="op">=</span> <span class="ident">Url::from_str</span>(<span class="kw-2">&amp;</span><span class="ident">mockito::server_url</span>()).<span class="ident">unwrap</span>();
         <span class="kw">let</span> <span class="ident">config</span> <span class="op">=</span> <span class="ident">ClientConfig::default</span>().<span class="ident">request_config</span>(<span class="ident">RequestConfig::new</span>().<span class="ident">disable_retry</span>());
         <span class="macro">assert!</span>(<span class="ident">config</span>.<span class="ident">request_config</span>.<span class="ident">retry_limit</span>.<span class="ident">unwrap</span>() <span class="op">==</span> <span class="number">0</span>);
-        <span class="kw">let</span> <span class="ident">client</span> <span class="op">=</span> <span class="ident">Client::new_with_config</span>(<span class="ident">homeserver</span>, <span class="ident">config</span>).<span class="ident">unwrap</span>();
+        <span class="kw">let</span> <span class="ident">client</span> <span class="op">=</span> <span class="ident">Client::new_with_config</span>(<span class="ident">homeserver</span>, <span class="ident">config</span>).<span class="kw">await</span>.<span class="ident">unwrap</span>();
 
         <span class="kw">let</span> <span class="ident">m</span> <span class="op">=</span> <span class="ident">mock</span>(<span class="string">&quot;POST&quot;</span>, <span class="string">&quot;/_matrix/client/r0/login&quot;</span>).<span class="ident">with_status</span>(<span class="number">501</span>).<span class="ident">create</span>();
 
@@ -7181,7 +7189,7 @@
         }
     }
 
-    <span class="attribute">#[<span class="ident">tokio::test</span>]</span>
+    <span class="attribute">#[<span class="ident">async_test</span>]</span>
     <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">get_media_content</span>() {
         <span class="kw">let</span> <span class="ident">client</span> <span class="op">=</span> <span class="ident">logged_in_client</span>().<span class="kw">await</span>;
 
@@ -7205,7 +7213,7 @@
         <span class="ident">m</span>.<span class="ident">assert</span>();
     }
 
-    <span class="attribute">#[<span class="ident">tokio::test</span>]</span>
+    <span class="attribute">#[<span class="ident">async_test</span>]</span>
     <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">get_media_file</span>() {
         <span class="kw">let</span> <span class="ident">client</span> <span class="op">=</span> <span class="ident">logged_in_client</span>().<span class="kw">await</span>;
 
@@ -7251,7 +7259,7 @@
         <span class="ident">m</span>.<span class="ident">assert</span>();
     }
 
-    <span class="attribute">#[<span class="ident">tokio::test</span>]</span>
+    <span class="attribute">#[<span class="ident">async_test</span>]</span>
     <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">whoami</span>() {
         <span class="kw">let</span> <span class="ident">client</span> <span class="op">=</span> <span class="ident">logged_in_client</span>().<span class="kw">await</span>;
 
@@ -7266,7 +7274,7 @@
         <span class="macro">assert_eq!</span>(<span class="ident">client</span>.<span class="ident">whoami</span>().<span class="kw">await</span>.<span class="ident">unwrap</span>().<span class="ident">user_id</span>, <span class="ident">user_id</span>);
     }
 
-    <span class="attribute">#[<span class="ident">tokio::test</span>]</span>
+    <span class="attribute">#[<span class="ident">async_test</span>]</span>
     <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">test_state_event_getting</span>() {
         <span class="kw">let</span> <span class="ident">homeserver</span> <span class="op">=</span> <span class="ident">Url::from_str</span>(<span class="kw-2">&amp;</span><span class="ident">mockito::server_url</span>()).<span class="ident">unwrap</span>();
         <span class="kw">let</span> <span class="ident">room_id</span> <span class="op">=</span> <span class="macro">room_id!</span>(<span class="string">&quot;!SVkFJHzfwvuaIEawgC:localhost&quot;</span>);
@@ -7338,7 +7346,7 @@
             .<span class="ident">create</span>();
 
         <span class="kw">let</span> <span class="ident">config</span> <span class="op">=</span> <span class="ident">ClientConfig::default</span>().<span class="ident">request_config</span>(<span class="ident">RequestConfig::new</span>().<span class="ident">retry_limit</span>(<span class="number">3</span>));
-        <span class="kw">let</span> <span class="ident">client</span> <span class="op">=</span> <span class="ident">Client::new_with_config</span>(<span class="ident">homeserver</span>.<span class="ident">clone</span>(), <span class="ident">config</span>).<span class="ident">unwrap</span>();
+        <span class="kw">let</span> <span class="ident">client</span> <span class="op">=</span> <span class="ident">Client::new_with_config</span>(<span class="ident">homeserver</span>.<span class="ident">clone</span>(), <span class="ident">config</span>).<span class="kw">await</span>.<span class="ident">unwrap</span>();
         <span class="ident">client</span>.<span class="ident">restore_login</span>(<span class="ident">session</span>.<span class="ident">clone</span>()).<span class="kw">await</span>.<span class="ident">unwrap</span>();
 
         <span class="kw">let</span> <span class="ident">room</span> <span class="op">=</span> <span class="ident">client</span>.<span class="ident">get_joined_room</span>(<span class="ident">room_id</span>);
@@ -7366,5 +7374,5 @@
     }
 }
 </code></pre></div>
-</section><section id="search" class="content hidden"></section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="matrix_sdk" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.60.0-nightly (2681f253b 2022-02-01)" ></div>
+</section><section id="search" class="content hidden"></section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="matrix_sdk" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.60.0-nightly (27f5d830e 2022-02-02)" ></div>
 </body></html>
