@@ -3774,15 +3774,15 @@
     ) -&gt; <span class="ident">StoreResult</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">ExportedRoomKey</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">exported</span> <span class="op">=</span> <span class="ident">Vec::new</span>();
 
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">sessions</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">InboundGroupSession</span><span class="op">&gt;</span> <span class="op">=</span> <span class="self">self</span>
+        <span class="kw">let</span> <span class="ident">sessions</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">InboundGroupSession</span><span class="op">&gt;</span> <span class="op">=</span> <span class="self">self</span>
             .<span class="ident">store</span>
             .<span class="ident">get_inbound_group_sessions</span>()
             .<span class="kw">await</span><span class="question-mark">?</span>
-            .<span class="ident">drain</span>(..)
+            .<span class="ident">into_iter</span>()
             .<span class="ident">filter</span>(<span class="op">|</span><span class="ident">s</span><span class="op">|</span> <span class="ident">predicate</span>(<span class="ident">s</span>))
             .<span class="ident">collect</span>();
 
-        <span class="kw">for</span> <span class="ident">session</span> <span class="kw">in</span> <span class="ident">sessions</span>.<span class="ident">drain</span>(..) {
+        <span class="kw">for</span> <span class="ident">session</span> <span class="kw">in</span> <span class="ident">sessions</span> {
             <span class="kw">let</span> <span class="ident">export</span> <span class="op">=</span> <span class="ident">session</span>.<span class="ident">export</span>().<span class="kw">await</span>;
             <span class="ident">exported</span>.<span class="ident">push</span>(<span class="ident">export</span>);
         }
