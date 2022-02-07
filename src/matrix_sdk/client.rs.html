@@ -3688,6 +3688,8 @@
 <span id="3683">3683</span>
 <span id="3684">3684</span>
 <span id="3685">3685</span>
+<span id="3686">3686</span>
+<span id="3687">3687</span>
 </pre><pre class="rust"><code><span class="comment">// Copyright 2020 Damir Jelić</span>
 <span class="comment">// Copyright 2020 The Matrix.org Foundation C.I.C.</span>
 <span class="comment">//</span>
@@ -4479,7 +4481,7 @@
     <span class="doccomment">/// Returns the invited rooms this client knows about.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">invited_rooms</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">room::Invited</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">store</span>()
-            .<span class="ident">get_rooms</span>()
+            .<span class="ident">get_stripped_rooms</span>()
             .<span class="ident">into_iter</span>()
             .<span class="ident">filter_map</span>(<span class="op">|</span><span class="ident">room</span><span class="op">|</span> <span class="ident">room::Invited::new</span>(<span class="self">self</span>.<span class="ident">clone</span>(), <span class="ident">room</span>))
             .<span class="ident">collect</span>()
@@ -7066,6 +7068,7 @@
 
         <span class="kw">let</span> <span class="ident">_response</span> <span class="op">=</span> <span class="ident">client</span>.<span class="ident">sync_once</span>(<span class="ident">sync_settings</span>).<span class="kw">await</span>.<span class="ident">unwrap</span>();
 
+        <span class="macro">assert_eq!</span>(<span class="ident">client</span>.<span class="ident">rooms</span>().<span class="ident">len</span>(), <span class="number">1</span>);
         <span class="kw">let</span> <span class="ident">room</span> <span class="op">=</span> <span class="ident">client</span>.<span class="ident">get_joined_room</span>(<span class="macro">room_id!</span>(<span class="string">&quot;!SVkFJHzfwvuaIEawgC:localhost&quot;</span>)).<span class="ident">unwrap</span>();
 
         <span class="macro">assert_eq!</span>(<span class="string">&quot;tutorial&quot;</span>.<span class="ident">to_string</span>(), <span class="ident">room</span>.<span class="ident">display_name</span>().<span class="kw">await</span>.<span class="ident">unwrap</span>());
@@ -7079,6 +7082,7 @@
 
         <span class="kw">let</span> <span class="ident">_response</span> <span class="op">=</span> <span class="ident">client</span>.<span class="ident">sync_once</span>(<span class="ident">SyncSettings::new</span>()).<span class="kw">await</span>.<span class="ident">unwrap</span>();
 
+        <span class="macro">assert_eq!</span>(<span class="ident">client</span>.<span class="ident">rooms</span>().<span class="ident">len</span>(), <span class="number">1</span>);
         <span class="kw">let</span> <span class="ident">invited_room</span> <span class="op">=</span> <span class="ident">client</span>.<span class="ident">get_invited_room</span>(<span class="macro">room_id!</span>(<span class="string">&quot;!696r7674:example.com&quot;</span>)).<span class="ident">unwrap</span>();
 
         <span class="macro">assert_eq!</span>(<span class="string">&quot;My Room Name&quot;</span>.<span class="ident">to_string</span>(), <span class="ident">invited_room</span>.<span class="ident">display_name</span>().<span class="kw">await</span>.<span class="ident">unwrap</span>());
@@ -7374,5 +7378,5 @@
     }
 }
 </code></pre></div>
-</section><section id="search" class="content hidden"></section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="matrix_sdk" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.60.0-nightly (27f5d830e 2022-02-02)" ></div>
+</section><section id="search" class="content hidden"></section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="matrix_sdk" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.60.0-nightly (f624427f8 2022-02-06)" ></div>
 </body></html>
