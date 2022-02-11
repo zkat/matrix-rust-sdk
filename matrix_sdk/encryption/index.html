@@ -10,7 +10,7 @@ types related to end-to-end encryption, describes a bit how E2EE works in
 the matrix-sdk, and how to set your <a href="../struct.Client.html" title="Client"><code>Client</code></a> up to support E2EE.</p>
 <p>Jump to the <a href="#client-setup">Client Setup</a> section if you don’t care how E2EE
 works under the hood.</p>
-<h2 id="end-to-end-encryption" class="section-header"><a href="#end-to-end-encryption">End-to-end encryption</a></h2>
+<h2 id="end-to-end-encryption"><a href="#end-to-end-encryption">End-to-end encryption</a></h2>
 <p>While all messages in Matrix land are transferred to the server in an
 encrypted manner, rooms can be marked as end-to-end encrypted. If a room is
 marked as end-to-end encrypted, using a <code>m.room.encrypted</code> state event, all
@@ -27,7 +27,7 @@ get sent to such a room.</p>
      ┌───────┐                │              │                ┌───────┐
      │ Alice │≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡►│─────────────►│≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡►│  Bob  │
      └───────┘   encrypted    │   encrypted  │   encrypted    └───────┘
-                              └──────────────┘</code></pre></div><h3 id="encrypting-for-each-end" class="section-header"><a href="#encrypting-for-each-end">Encrypting for each end</a></h3>
+                              └──────────────┘</code></pre></div><h3 id="encrypting-for-each-end"><a href="#encrypting-for-each-end">Encrypting for each end</a></h3>
 <p>We already mentioned that a message in a end-to-end encrypted world needs to
 be encrypted for each individual member, though that isn’t completely
 correct. A message needs to be encrypted for each individual <em>end</em>. An <em>end</em>
@@ -39,7 +39,7 @@ individual room member.</p>
 <p>Since rooms might grow quite big, encrypting each message for every
 <a href="identities/struct.Device.html" title="Device"><code>Device</code></a> becomes quickly unsustainable. Because of that room keys have
 been introduced.</p>
-<h3 id="room-keys" class="section-header"><a href="#room-keys">Room keys</a></h3>
+<h3 id="room-keys"><a href="#room-keys">Room keys</a></h3>
 <p>Room keys remove the need to encrypt each message for each <em>end</em>.
 Instead a room key needs to be shared with each <em>end</em>, after that a message
 can be encrypted in a single, O(1), step.</p>
@@ -51,7 +51,7 @@ session, which is shared with each <em>end</em>.</p>
             │       Encryption       │      Decryption       │
             ├────────────────────────┼───────────────────────┤
             │ Outbound group session │ Inbound group session │
-            └────────────────────────┴───────────────────────┘</code></pre></div><h4 id="lifetime-of-a-room-key" class="section-header"><a href="#lifetime-of-a-room-key">Lifetime of a room key</a></h4>
+            └────────────────────────┴───────────────────────┘</code></pre></div><h4 id="lifetime-of-a-room-key"><a href="#lifetime-of-a-room-key">Lifetime of a room key</a></h4>
 <ol>
 <li>Create a room key</li>
 <li>Share the room key with each participant</li>
@@ -61,13 +61,13 @@ session, which is shared with each <em>end</em>.</p>
 <p>The <code>m.room.encryption</code> state event of the room decides how long a room key
 should be used. By default this is for 100 messages or for 1 week, whichever
 comes first.</p>
-<h4 id="decrypting-the-room-history" class="section-header"><a href="#decrypting-the-room-history">Decrypting the room history</a></h4>
+<h4 id="decrypting-the-room-history"><a href="#decrypting-the-room-history">Decrypting the room history</a></h4>
 <p>Since room keys get relatively often rotated, each room key will need to be
 stored, otherwise we won’t be able to decrypt historical messages. The SDK
 stores all room keys locally in a encrypted manner.</p>
 <p>Besides storing them as part of the SDK store, users can export room keys
 using the <a href="../struct.Client.html#method.export_keys" title="Client::export_keys"><code>Client::export_keys</code></a> method.</p>
-<h2 id="verification" class="section-header"><a href="#verification">Verification</a></h2>
+<h2 id="verification"><a href="#verification">Verification</a></h2>
 <p>One important aspect of end-to-end encryption is to check that the <em>end</em> you
 are communicating with is indeed the person you expect. This checking is
 done in Matrix via interactive verification. While interactively verifying,
@@ -119,7 +119,7 @@ module.</p>
 <a href="verification/index.html" title="verification"><code>verification</code></a> module, also check out the documentation for the
 <a href="identities/struct.Device.html#method.verified" title="Device::verified()"><code>Device::verified()</code></a> method, which explains in more detail what it means
 for a <a href="identities/struct.Device.html" title="Device"><code>Device</code></a> to be verified.</p>
-<h2 id="client-setup" class="section-header"><a href="#client-setup">Client setup</a></h2>
+<h2 id="client-setup"><a href="#client-setup">Client setup</a></h2>
 <p>The matrix-sdk aims to provide encryption support transparently. If
 encryption is enabled and correctly set up, events that need to be encrypted
 will be encrypted automatically. Events will also be decrypted
@@ -131,7 +131,7 @@ to work.</p>
 <li>Make sure the <code>encryption</code> feature is enabled.</li>
 <li>Configure a store path with the <a href="../config/struct.ClientConfig.html#method.store_path"><code>ClientConfig::store_path</code></a> method.</li>
 </ol>
-<h3 id="restoring-a-client" class="section-header"><a href="#restoring-a-client">Restoring a client</a></h3>
+<h3 id="restoring-a-client"><a href="#restoring-a-client">Restoring a client</a></h3>
 <p>Restoring a Client is relatively easy, still some things need to be kept in
 mind before doing so.</p>
 <p>There are two ways one might wish to restore a <a href="../struct.Client.html" title="Client"><code>Client</code></a>:</p>
@@ -145,7 +145,7 @@ can be found in the <a href="https://spec.matrix.org/unstable/client-server-api/
 <p>After we log in the client will upload the end-to-end encryption related
 <a href="https://spec.matrix.org/unstable/client-server-api/#device-keys">device keys</a> to the server. Those device keys cannot be replaced once they
 have been uploaded and tied to a device ID.</p>
-<h4 id="using-an-access-token" class="section-header"><a href="#using-an-access-token">Using an access token</a></h4>
+<h4 id="using-an-access-token"><a href="#using-an-access-token">Using an access token</a></h4>
 <ol>
 <li>Log in with the password using <a href="../struct.Client.html#method.login" title="Client::login()"><code>Client::login()</code></a> setting the
 <code>device_id</code> argument to <code>None</code>.</li>
@@ -156,7 +156,7 @@ have been uploaded and tied to a device ID.</p>
 lives on a server. If you’re skipping step one of this method, remember that
 you <strong>can’t</strong> use an access token that already has some device keys tied to
 the device ID.</p>
-<h4 id="using-a-password" class="section-header"><a href="#using-a-password">Using a password.</a></h4>
+<h4 id="using-a-password"><a href="#using-a-password">Using a password.</a></h4>
 <ol>
 <li>Log in using <a href="../struct.Client.html#method.login" title="Client::login()"><code>Client::login()</code></a> setting the <code>device_id</code> argument to <code>None</code>.</li>
 <li>Store the <code>device_id</code> that was returned in the login response from the
@@ -169,7 +169,7 @@ won’t create a new device.</li>
 <p><strong>Note</strong> that the default store supports only a single device, logging in
 with a different device id (either <code>None</code> or a device ID of another client)
 is <strong>not</strong> supported using the default store.</p>
-<h3 id="common-pitfalls" class="section-header"><a href="#common-pitfalls">Common pitfalls</a></h3><div><table><thead><tr><th>Failure</th><th>Cause</th><th>Fix</th></tr></thead><tbody>
+<h3 id="common-pitfalls"><a href="#common-pitfalls">Common pitfalls</a></h3><div><table><thead><tr><th>Failure</th><th>Cause</th><th>Fix</th></tr></thead><tbody>
 <tr><td>No messages get encrypted nor decrypted</td><td>The <code>encryption</code> feature is disabled</td><td><a href="https://doc.rust-lang.org/cargo/reference/specifying-dependencies.html#choosing-features">Enable the feature in your <code>Cargo.toml</code> file</a></td></tr>
 <tr><td>Messages that were decryptable aren’t after a restart</td><td>Storage isn’t setup to be persistent</td><td>Setup storage with <a href="../config/struct.ClientConfig.html#method.store_path"><code>ClientConfig::store_path</code></a></td></tr>
 <tr><td>Messages are encrypted but can’t be decrypted</td><td>The access token that the client is using is tied to another device</td><td>Clear storage to create a new device, read the <a href="#restoring-a-client">Restoring a Client</a> section</td></tr>
@@ -184,5 +184,5 @@ file.</p>
 </div></div><div class="item-row"><div class="item-left module-item"><a class="struct" href="struct.RoomKeyImportResult.html" title="matrix_sdk::encryption::RoomKeyImportResult struct">RoomKeyImportResult</a></div><div class="item-right docblock-short"><p>Return type for the room key importing.</p>
 </div></div></div><h2 id="enums" class="small-section-header"><a href="#enums">Enums</a></h2>
 <div class="item-table"><div class="item-row"><div class="item-left module-item"><a class="enum" href="enum.LocalTrust.html" title="matrix_sdk::encryption::LocalTrust enum">LocalTrust</a></div><div class="item-right docblock-short"><p>The local trust state of a device.</p>
-</div></div></div></section><section id="search" class="content hidden"></section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="matrix_sdk" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.60.0-nightly (f624427f8 2022-02-06)" ></div>
+</div></div></div></section><section id="search" class="content hidden"></section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="matrix_sdk" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.60.0-nightly (e646f3d2a 2022-02-10)" ></div>
 </body></html>
