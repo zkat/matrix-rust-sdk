@@ -1031,7 +1031,6 @@
 <span id="1026">1026</span>
 <span id="1027">1027</span>
 <span id="1028">1028</span>
-<span id="1029">1029</span>
 </pre><pre class="rust"><code><span class="comment">// Copyright 2021 The Matrix.org Foundation C.I.C.</span>
 <span class="comment">// Copyright 2021 Damir Jelić</span>
 <span class="comment">//</span>
@@ -1401,14 +1400,14 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// ```no_run</span>
     <span class="doccomment">/// # use std::convert::TryFrom;</span>
-    <span class="doccomment">/// # use matrix_sdk::{Client, ruma::{device_id, UserId}};</span>
+    <span class="doccomment">/// # use matrix_sdk::{Client, ruma::{device_id, user_id}};</span>
     <span class="doccomment">/// # use url::Url;</span>
     <span class="doccomment">/// # use futures::executor::block_on;</span>
     <span class="doccomment">/// # block_on(async {</span>
-    <span class="doccomment">/// # let alice = Box::&lt;UserId&gt;::try_from(&quot;@alice:example.org&quot;)?;</span>
+    <span class="doccomment">/// # let alice = user_id!(&quot;@alice:example.org&quot;);</span>
     <span class="doccomment">/// # let homeserver = Url::parse(&quot;http://example.com&quot;)?;</span>
     <span class="doccomment">/// # let client = Client::new(homeserver).await?;</span>
-    <span class="doccomment">/// if let Some(device) = client.get_device(&amp;alice, device_id!(&quot;DEVICEID&quot;)).await? {</span>
+    <span class="doccomment">/// if let Some(device) = client.get_device(alice, device_id!(&quot;DEVICEID&quot;)).await? {</span>
     <span class="doccomment">///     println!(&quot;{:?}&quot;, device.verified());</span>
     <span class="doccomment">///</span>
     <span class="doccomment">///     if !device.verified() {</span>
@@ -1441,14 +1440,14 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// ```no_run</span>
     <span class="doccomment">/// # use std::convert::TryFrom;</span>
-    <span class="doccomment">/// # use matrix_sdk::{Client, ruma::UserId};</span>
+    <span class="doccomment">/// # use matrix_sdk::{Client, ruma::user_id};</span>
     <span class="doccomment">/// # use url::Url;</span>
     <span class="doccomment">/// # use futures::executor::block_on;</span>
     <span class="doccomment">/// # block_on(async {</span>
-    <span class="doccomment">/// # let alice = Box::&lt;UserId&gt;::try_from(&quot;@alice:example.org&quot;)?;</span>
+    <span class="doccomment">/// # let alice = user_id!(&quot;@alice:example.org&quot;);</span>
     <span class="doccomment">/// # let homeserver = Url::parse(&quot;http://example.com&quot;)?;</span>
     <span class="doccomment">/// # let client = Client::new(homeserver).await?;</span>
-    <span class="doccomment">/// let devices = client.get_user_devices(&amp;alice).await?;</span>
+    <span class="doccomment">/// let devices = client.get_user_devices(alice).await?;</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// for device in devices.devices() {</span>
     <span class="doccomment">///     println!(&quot;{:?}&quot;, device);</span>
@@ -1480,14 +1479,14 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// ```no_run</span>
     <span class="doccomment">/// # use std::convert::TryFrom;</span>
-    <span class="doccomment">/// # use matrix_sdk::{Client, ruma::UserId};</span>
+    <span class="doccomment">/// # use matrix_sdk::{Client, ruma::user_id};</span>
     <span class="doccomment">/// # use url::Url;</span>
     <span class="doccomment">/// # use futures::executor::block_on;</span>
     <span class="doccomment">/// # block_on(async {</span>
-    <span class="doccomment">/// # let alice = Box::&lt;UserId&gt;::try_from(&quot;@alice:example.org&quot;)?;</span>
+    <span class="doccomment">/// # let alice = user_id!(&quot;@alice:example.org&quot;);</span>
     <span class="doccomment">/// # let homeserver = Url::parse(&quot;http://example.com&quot;)?;</span>
     <span class="doccomment">/// # let client = Client::new(homeserver).await?;</span>
-    <span class="doccomment">/// let user = client.get_user_identity(&amp;alice).await?;</span>
+    <span class="doccomment">/// let user = client.get_user_identity(alice).await?;</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// if let Some(user) = user {</span>
     <span class="doccomment">///     println!(&quot;{:?}&quot;, user.verified());</span>
@@ -1533,14 +1532,13 @@
     <span class="doccomment">/// ```no_run</span>
     <span class="doccomment">/// # use std::{convert::TryFrom, collections::BTreeMap};</span>
     <span class="doccomment">/// # use matrix_sdk::{</span>
-    <span class="doccomment">/// #     ruma::{api::client::r0::uiaa, assign, UserId},</span>
+    <span class="doccomment">/// #     ruma::{api::client::r0::uiaa, assign},</span>
     <span class="doccomment">/// #     Client,</span>
     <span class="doccomment">/// # };</span>
     <span class="doccomment">/// # use url::Url;</span>
     <span class="doccomment">/// # use futures::executor::block_on;</span>
     <span class="doccomment">/// # use serde_json::json;</span>
     <span class="doccomment">/// # block_on(async {</span>
-    <span class="doccomment">/// # let user_id = Box::&lt;UserId&gt;::try_from(&quot;@alice:example.org&quot;)?;</span>
     <span class="doccomment">/// # let homeserver = Url::parse(&quot;http://example.com&quot;)?;</span>
     <span class="doccomment">/// # let client = Client::new(homeserver).await?;</span>
     <span class="doccomment">/// if let Err(e) = client.bootstrap_cross_signing(None).await {</span>

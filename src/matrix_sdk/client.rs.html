@@ -3684,12 +3684,6 @@
 <span id="3679">3679</span>
 <span id="3680">3680</span>
 <span id="3681">3681</span>
-<span id="3682">3682</span>
-<span id="3683">3683</span>
-<span id="3684">3684</span>
-<span id="3685">3685</span>
-<span id="3686">3686</span>
-<span id="3687">3687</span>
 </pre><pre class="rust"><code><span class="comment">// Copyright 2020 Damir Jelić</span>
 <span class="comment">// Copyright 2020 The Matrix.org Foundation C.I.C.</span>
 <span class="comment">//</span>
@@ -3923,7 +3917,7 @@
     <span class="doccomment">/// use matrix_sdk::{Client, ruma::UserId};</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// // First let&#39;s try to construct an user id, presumably from user input.</span>
-    <span class="doccomment">/// let alice = Box::&lt;UserId&gt;::try_from(&quot;@alice:example.org&quot;)?;</span>
+    <span class="doccomment">/// let alice = UserId::parse(&quot;@alice:example.org&quot;)?;</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// // Now let&#39;s try to discover the homeserver and create a client object.</span>
     <span class="doccomment">/// let client = Client::new_from_user_id(&amp;alice).await?;</span>
@@ -6059,13 +6053,7 @@
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">target_arch</span> <span class="op">=</span> <span class="string">&quot;wasm32&quot;</span>)]</span>
     <span class="macro">wasm_bindgen_test::wasm_bindgen_test_configure!</span>(<span class="ident">run_in_browser</span>);
 
-    <span class="kw">use</span> <span class="ident">std</span>::{
-        <span class="ident">collections::BTreeMap</span>,
-        <span class="ident">convert</span>::{<span class="ident">TryFrom</span>, <span class="ident">TryInto</span>},
-        <span class="ident">io::Cursor</span>,
-        <span class="ident">str::FromStr</span>,
-        <span class="ident">time::Duration</span>,
-    };
+    <span class="kw">use</span> <span class="ident">std</span>::{<span class="ident">collections::BTreeMap</span>, <span class="ident">convert::TryInto</span>, <span class="ident">io::Cursor</span>, <span class="ident">str::FromStr</span>, <span class="ident">time::Duration</span>};
 
     <span class="kw">use</span> <span class="ident">matrix_sdk_base::media</span>::{<span class="ident">MediaFormat</span>, <span class="ident">MediaRequest</span>, <span class="ident">MediaThumbnailSize</span>, <span class="ident">MediaType</span>};
     <span class="kw">use</span> <span class="ident">matrix_sdk_test</span>::{<span class="ident">test_json</span>, <span class="ident">EventBuilder</span>, <span class="ident">EventsJson</span>};
@@ -6139,7 +6127,7 @@
     <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">successful_discovery</span>() {
         <span class="kw">let</span> <span class="ident">server_url</span> <span class="op">=</span> <span class="ident">mockito::server_url</span>();
         <span class="kw">let</span> <span class="ident">domain</span> <span class="op">=</span> <span class="ident">server_url</span>.<span class="ident">strip_prefix</span>(<span class="string">&quot;http://&quot;</span>).<span class="ident">unwrap</span>();
-        <span class="kw">let</span> <span class="ident">alice</span> <span class="op">=</span> <span class="ident">Box</span>::<span class="op">&lt;</span><span class="ident">UserId</span><span class="op">&gt;</span><span class="ident">::try_from</span>(<span class="string">&quot;@alice:&quot;</span>.<span class="ident">to_string</span>() <span class="op">+</span> <span class="ident">domain</span>).<span class="ident">unwrap</span>();
+        <span class="kw">let</span> <span class="ident">alice</span> <span class="op">=</span> <span class="ident">UserId::parse</span>(<span class="string">&quot;@alice:&quot;</span>.<span class="ident">to_string</span>() <span class="op">+</span> <span class="ident">domain</span>).<span class="ident">unwrap</span>();
 
         <span class="kw">let</span> <span class="ident">_m_well_known</span> <span class="op">=</span> <span class="ident">mock</span>(<span class="string">&quot;GET&quot;</span>, <span class="string">&quot;/.well-known/matrix/client&quot;</span>)
             .<span class="ident">with_status</span>(<span class="number">200</span>)
@@ -6161,7 +6149,7 @@
     <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">discovery_broken_server</span>() {
         <span class="kw">let</span> <span class="ident">server_url</span> <span class="op">=</span> <span class="ident">mockito::server_url</span>();
         <span class="kw">let</span> <span class="ident">domain</span> <span class="op">=</span> <span class="ident">server_url</span>.<span class="ident">strip_prefix</span>(<span class="string">&quot;http://&quot;</span>).<span class="ident">unwrap</span>();
-        <span class="kw">let</span> <span class="ident">alice</span> <span class="op">=</span> <span class="ident">Box</span>::<span class="op">&lt;</span><span class="ident">UserId</span><span class="op">&gt;</span><span class="ident">::try_from</span>(<span class="string">&quot;@alice:&quot;</span>.<span class="ident">to_string</span>() <span class="op">+</span> <span class="ident">domain</span>).<span class="ident">unwrap</span>();
+        <span class="kw">let</span> <span class="ident">alice</span> <span class="op">=</span> <span class="ident">UserId::parse</span>(<span class="string">&quot;@alice:&quot;</span>.<span class="ident">to_string</span>() <span class="op">+</span> <span class="ident">domain</span>).<span class="ident">unwrap</span>();
 
         <span class="kw">let</span> <span class="ident">_m</span> <span class="op">=</span> <span class="ident">mock</span>(<span class="string">&quot;GET&quot;</span>, <span class="string">&quot;/.well-known/matrix/client&quot;</span>)
             .<span class="ident">with_status</span>(<span class="number">200</span>)
