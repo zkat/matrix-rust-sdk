@@ -1031,6 +1031,86 @@
 <span id="1026">1026</span>
 <span id="1027">1027</span>
 <span id="1028">1028</span>
+<span id="1029">1029</span>
+<span id="1030">1030</span>
+<span id="1031">1031</span>
+<span id="1032">1032</span>
+<span id="1033">1033</span>
+<span id="1034">1034</span>
+<span id="1035">1035</span>
+<span id="1036">1036</span>
+<span id="1037">1037</span>
+<span id="1038">1038</span>
+<span id="1039">1039</span>
+<span id="1040">1040</span>
+<span id="1041">1041</span>
+<span id="1042">1042</span>
+<span id="1043">1043</span>
+<span id="1044">1044</span>
+<span id="1045">1045</span>
+<span id="1046">1046</span>
+<span id="1047">1047</span>
+<span id="1048">1048</span>
+<span id="1049">1049</span>
+<span id="1050">1050</span>
+<span id="1051">1051</span>
+<span id="1052">1052</span>
+<span id="1053">1053</span>
+<span id="1054">1054</span>
+<span id="1055">1055</span>
+<span id="1056">1056</span>
+<span id="1057">1057</span>
+<span id="1058">1058</span>
+<span id="1059">1059</span>
+<span id="1060">1060</span>
+<span id="1061">1061</span>
+<span id="1062">1062</span>
+<span id="1063">1063</span>
+<span id="1064">1064</span>
+<span id="1065">1065</span>
+<span id="1066">1066</span>
+<span id="1067">1067</span>
+<span id="1068">1068</span>
+<span id="1069">1069</span>
+<span id="1070">1070</span>
+<span id="1071">1071</span>
+<span id="1072">1072</span>
+<span id="1073">1073</span>
+<span id="1074">1074</span>
+<span id="1075">1075</span>
+<span id="1076">1076</span>
+<span id="1077">1077</span>
+<span id="1078">1078</span>
+<span id="1079">1079</span>
+<span id="1080">1080</span>
+<span id="1081">1081</span>
+<span id="1082">1082</span>
+<span id="1083">1083</span>
+<span id="1084">1084</span>
+<span id="1085">1085</span>
+<span id="1086">1086</span>
+<span id="1087">1087</span>
+<span id="1088">1088</span>
+<span id="1089">1089</span>
+<span id="1090">1090</span>
+<span id="1091">1091</span>
+<span id="1092">1092</span>
+<span id="1093">1093</span>
+<span id="1094">1094</span>
+<span id="1095">1095</span>
+<span id="1096">1096</span>
+<span id="1097">1097</span>
+<span id="1098">1098</span>
+<span id="1099">1099</span>
+<span id="1100">1100</span>
+<span id="1101">1101</span>
+<span id="1102">1102</span>
+<span id="1103">1103</span>
+<span id="1104">1104</span>
+<span id="1105">1105</span>
+<span id="1106">1106</span>
+<span id="1107">1107</span>
+<span id="1108">1108</span>
 </pre><pre class="rust"><code><span class="comment">// Copyright 2021 The Matrix.org Foundation C.I.C.</span>
 <span class="comment">// Copyright 2021 Damir Jelić</span>
 <span class="comment">//</span>
@@ -1316,6 +1396,7 @@
 <span class="kw">use</span> <span class="ident">tracing</span>::{<span class="ident">debug</span>, <span class="ident">instrument</span>, <span class="ident">trace</span>, <span class="ident">warn</span>};
 
 <span class="kw">use</span> <span class="kw">crate</span>::{
+    <span class="ident">attachment</span>::{<span class="ident">AttachmentInfo</span>, <span class="ident">Thumbnail</span>},
     <span class="ident">encryption</span>::{
         <span class="ident">identities</span>::{<span class="ident">Device</span>, <span class="ident">UserDevices</span>},
         <span class="ident">verification</span>::{<span class="ident">SasVerification</span>, <span class="ident">Verification</span>, <span class="ident">VerificationRequest</span>},
@@ -1762,14 +1843,45 @@
     }
 
     <span class="doccomment">/// Encrypt and upload the file to be read from `reader` and construct an</span>
-    <span class="doccomment">/// attachment message with `body` and the specified `content_type`.</span>
+    <span class="doccomment">/// attachment message with `body`, `content_type`, `info` and `thumbnail`.</span>
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;encryption&quot;</span>)]</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">prepare_encrypted_attachment_message</span><span class="op">&lt;</span><span class="ident">R</span>: <span class="ident">Read</span><span class="op">&gt;</span>(
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">prepare_encrypted_attachment_message</span><span class="op">&lt;</span><span class="ident">R</span>: <span class="ident">Read</span>, <span class="ident">T</span>: <span class="ident">Read</span><span class="op">&gt;</span>(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         <span class="ident">body</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>,
         <span class="ident">content_type</span>: <span class="kw-2">&amp;</span><span class="ident">mime::Mime</span>,
         <span class="ident">reader</span>: <span class="kw-2">&amp;mut</span> <span class="ident">R</span>,
+        <span class="ident">info</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">AttachmentInfo</span><span class="op">&gt;</span>,
+        <span class="ident">thumbnail</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Thumbnail</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span>,
     ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">ruma::events::room::message::MessageType</span><span class="op">&gt;</span> {
+        <span class="kw">let</span> (<span class="ident">thumbnail_file</span>, <span class="ident">thumbnail_info</span>) <span class="op">=</span>
+            <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">thumbnail</span>) <span class="op">=</span> <span class="ident">thumbnail</span> {
+                <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">reader</span> <span class="op">=</span> <span class="ident">matrix_sdk_base::crypto::AttachmentEncryptor::new</span>(<span class="ident">thumbnail</span>.<span class="ident">reader</span>);
+
+                <span class="kw">let</span> <span class="ident">response</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">upload</span>(<span class="ident">thumbnail</span>.<span class="ident">content_type</span>, <span class="kw-2">&amp;mut</span> <span class="ident">reader</span>).<span class="kw">await</span><span class="question-mark">?</span>;
+
+                <span class="kw">let</span> <span class="ident">file</span>: <span class="ident">ruma::events::room::EncryptedFile</span> <span class="op">=</span> {
+                    <span class="kw">let</span> <span class="ident">keys</span> <span class="op">=</span> <span class="ident">reader</span>.<span class="ident">finish</span>();
+                    <span class="ident">ruma::events::room::EncryptedFileInit</span> {
+                        <span class="ident">url</span>: <span class="ident">response</span>.<span class="ident">content_uri</span>,
+                        <span class="ident">key</span>: <span class="ident">keys</span>.<span class="ident">web_key</span>,
+                        <span class="ident">iv</span>: <span class="ident">keys</span>.<span class="ident">iv</span>,
+                        <span class="ident">hashes</span>: <span class="ident">keys</span>.<span class="ident">hashes</span>,
+                        <span class="ident">v</span>: <span class="ident">keys</span>.<span class="ident">version</span>,
+                    }
+                    .<span class="ident">into</span>()
+                };
+
+                <span class="kw">use</span> <span class="ident">ruma::events::room::ThumbnailInfo</span>;
+                <span class="kw">let</span> <span class="ident">thumbnail_info</span> <span class="op">=</span> <span class="macro">assign!</span>(
+                    <span class="ident">thumbnail</span>.<span class="ident">info</span>.<span class="ident">as_ref</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">info</span><span class="op">|</span> <span class="ident">ThumbnailInfo::from</span>(<span class="ident">info</span>.<span class="ident">clone</span>())).<span class="ident">unwrap_or_default</span>(),
+                    { <span class="ident">mimetype</span>: <span class="prelude-val">Some</span>(<span class="ident">thumbnail</span>.<span class="ident">content_type</span>.<span class="ident">as_ref</span>().<span class="ident">to_owned</span>()) }
+                );
+
+                (<span class="prelude-val">Some</span>(<span class="ident">Box::new</span>(<span class="ident">file</span>)), <span class="prelude-val">Some</span>(<span class="ident">Box::new</span>(<span class="ident">thumbnail_info</span>)))
+            } <span class="kw">else</span> {
+                (<span class="prelude-val">None</span>, <span class="prelude-val">None</span>)
+            };
+
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">reader</span> <span class="op">=</span> <span class="ident">matrix_sdk_base::crypto::AttachmentEncryptor::new</span>(<span class="ident">reader</span>);
 
         <span class="kw">let</span> <span class="ident">response</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">upload</span>(<span class="ident">content_type</span>, <span class="kw-2">&amp;mut</span> <span class="ident">reader</span>).<span class="kw">await</span><span class="question-mark">?</span>;
@@ -1786,18 +1898,66 @@
             .<span class="ident">into</span>()
         };
 
-        <span class="kw">use</span> <span class="ident">ruma::events::room::message</span>;
+        <span class="kw">use</span> <span class="ident">ruma::events::room</span>::{<span class="self">self</span>, <span class="ident">message</span>};
         <span class="prelude-val">Ok</span>(<span class="kw">match</span> <span class="ident">content_type</span>.<span class="ident">type_</span>() {
             <span class="ident">mime::IMAGE</span> =&gt; {
-                <span class="ident">message::MessageType::Image</span>(<span class="ident">message::ImageMessageEventContent::encrypted</span>(<span class="ident">body</span>.<span class="ident">to_owned</span>(), <span class="ident">file</span>))
+                <span class="kw">let</span> <span class="ident">info</span> <span class="op">=</span> <span class="macro">assign!</span>(
+                    <span class="ident">info</span>.<span class="ident">map</span>(<span class="ident">room::ImageInfo::from</span>).<span class="ident">unwrap_or_default</span>(),
+                    {
+                        <span class="ident">mimetype</span>: <span class="prelude-val">Some</span>(<span class="ident">content_type</span>.<span class="ident">as_ref</span>().<span class="ident">to_owned</span>()),
+                        <span class="ident">thumbnail_file</span>,
+                        <span class="ident">thumbnail_info</span>
+                    }
+                );
+                <span class="kw">let</span> <span class="ident">content</span> <span class="op">=</span> <span class="macro">assign!</span>(
+                    <span class="ident">message::ImageMessageEventContent::encrypted</span>(<span class="ident">body</span>.<span class="ident">to_owned</span>(), <span class="ident">file</span>),
+                    { <span class="ident">info</span>: <span class="prelude-val">Some</span>(<span class="ident">Box::new</span>(<span class="ident">info</span>)) }
+                );
+                <span class="ident">message::MessageType::Image</span>(<span class="ident">content</span>)
             }
             <span class="ident">mime::AUDIO</span> =&gt; {
-                <span class="ident">message::MessageType::Audio</span>(<span class="ident">message::AudioMessageEventContent::encrypted</span>(<span class="ident">body</span>.<span class="ident">to_owned</span>(), <span class="ident">file</span>))
+                <span class="kw">let</span> <span class="ident">info</span> <span class="op">=</span> <span class="macro">assign!</span>(
+                    <span class="ident">info</span>.<span class="ident">map</span>(<span class="ident">message::AudioInfo::from</span>).<span class="ident">unwrap_or_default</span>(),
+                    {
+                        <span class="ident">mimetype</span>: <span class="prelude-val">Some</span>(<span class="ident">content_type</span>.<span class="ident">as_ref</span>().<span class="ident">to_owned</span>()),
+                    }
+                );
+                <span class="kw">let</span> <span class="ident">content</span> <span class="op">=</span> <span class="macro">assign!</span>(
+                    <span class="ident">message::AudioMessageEventContent::encrypted</span>(<span class="ident">body</span>.<span class="ident">to_owned</span>(), <span class="ident">file</span>),
+                    { <span class="ident">info</span>: <span class="prelude-val">Some</span>(<span class="ident">Box::new</span>(<span class="ident">info</span>)) }
+                );
+                <span class="ident">message::MessageType::Audio</span>(<span class="ident">content</span>)
             }
             <span class="ident">mime::VIDEO</span> =&gt; {
-                <span class="ident">message::MessageType::Video</span>(<span class="ident">message::VideoMessageEventContent::encrypted</span>(<span class="ident">body</span>.<span class="ident">to_owned</span>(), <span class="ident">file</span>))
+                <span class="kw">let</span> <span class="ident">info</span> <span class="op">=</span> <span class="macro">assign!</span>(
+                    <span class="ident">info</span>.<span class="ident">map</span>(<span class="ident">message::VideoInfo::from</span>).<span class="ident">unwrap_or_default</span>(),
+                    {
+                        <span class="ident">mimetype</span>: <span class="prelude-val">Some</span>(<span class="ident">content_type</span>.<span class="ident">as_ref</span>().<span class="ident">to_owned</span>()),
+                        <span class="ident">thumbnail_file</span>,
+                        <span class="ident">thumbnail_info</span>
+                    }
+                );
+                <span class="kw">let</span> <span class="ident">content</span> <span class="op">=</span> <span class="macro">assign!</span>(
+                    <span class="ident">message::VideoMessageEventContent::encrypted</span>(<span class="ident">body</span>.<span class="ident">to_owned</span>(), <span class="ident">file</span>),
+                    { <span class="ident">info</span>: <span class="prelude-val">Some</span>(<span class="ident">Box::new</span>(<span class="ident">info</span>)) }
+                );
+                <span class="ident">message::MessageType::Video</span>(<span class="ident">content</span>)
             }
-            <span class="kw">_</span> =&gt; <span class="ident">message::MessageType::File</span>(<span class="ident">message::FileMessageEventContent::encrypted</span>(<span class="ident">body</span>.<span class="ident">to_owned</span>(), <span class="ident">file</span>)),
+            <span class="kw">_</span> =&gt; {
+                <span class="kw">let</span> <span class="ident">info</span> <span class="op">=</span> <span class="macro">assign!</span>(
+                    <span class="ident">info</span>.<span class="ident">map</span>(<span class="ident">message::FileInfo::from</span>).<span class="ident">unwrap_or_default</span>(),
+                    {
+                        <span class="ident">mimetype</span>: <span class="prelude-val">Some</span>(<span class="ident">content_type</span>.<span class="ident">as_ref</span>().<span class="ident">to_owned</span>()),
+                        <span class="ident">thumbnail_file</span>,
+                        <span class="ident">thumbnail_info</span>
+                    }
+                );
+                <span class="kw">let</span> <span class="ident">content</span> <span class="op">=</span> <span class="macro">assign!</span>(
+                    <span class="ident">message::FileMessageEventContent::encrypted</span>(<span class="ident">body</span>.<span class="ident">to_owned</span>(), <span class="ident">file</span>),
+                    { <span class="ident">info</span>: <span class="prelude-val">Some</span>(<span class="ident">Box::new</span>(<span class="ident">info</span>)) }
+                );
+                <span class="ident">message::MessageType::File</span>(<span class="ident">content</span>)
+            }
         })
     }
 
@@ -2060,5 +2220,5 @@
     }
 }
 </code></pre></div>
-</section><section id="search" class="content hidden"></section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="matrix_sdk" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.60.0-nightly (c5c610aad 2022-02-14)" ></div>
+</section><section id="search" class="content hidden"></section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="matrix_sdk" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.60.0-nightly (09cb29c64 2022-02-15)" ></div>
 </body></html>
