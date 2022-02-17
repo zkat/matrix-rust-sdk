@@ -212,6 +212,27 @@
 <span id="207">207</span>
 <span id="208">208</span>
 <span id="209">209</span>
+<span id="210">210</span>
+<span id="211">211</span>
+<span id="212">212</span>
+<span id="213">213</span>
+<span id="214">214</span>
+<span id="215">215</span>
+<span id="216">216</span>
+<span id="217">217</span>
+<span id="218">218</span>
+<span id="219">219</span>
+<span id="220">220</span>
+<span id="221">221</span>
+<span id="222">222</span>
+<span id="223">223</span>
+<span id="224">224</span>
+<span id="225">225</span>
+<span id="226">226</span>
+<span id="227">227</span>
+<span id="228">228</span>
+<span id="229">229</span>
+<span id="230">230</span>
 </pre><pre class="rust"><code><span class="comment">// Copyright 2021 The Matrix.org Foundation C.I.C.</span>
 <span class="comment">//</span>
 <span class="comment">// Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);</span>
@@ -233,7 +254,7 @@
     <span class="ident">sync::Arc</span>,
 };
 
-<span class="kw">use</span> <span class="ident">http</span>::{<span class="ident">header::InvalidHeaderValue</span>, <span class="ident">HeaderValue</span>};
+<span class="kw">use</span> <span class="ident">http::header::InvalidHeaderValue</span>;
 <span class="kw">use</span> <span class="ident">matrix_sdk_base::BaseClientConfig</span>;
 
 <span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">config::RequestConfig</span>, <span class="ident">HttpSend</span>, <span class="prelude-ty">Result</span>};
@@ -254,11 +275,32 @@
 <span class="doccomment">///     .disable_ssl_verification();</span>
 <span class="doccomment">/// # matrix_sdk::Result::&lt;()&gt;::Ok(())</span>
 <span class="doccomment">/// ```</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// # Example for using a custom client</span>
+<span class="doccomment">/// Note: setting a custom client will ignore `user_agent`, `proxy`, and</span>
+<span class="doccomment">/// `disable_ssl_verification` - you&#39;d need to set these yourself if you</span>
+<span class="doccomment">/// want them.</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// ```</span>
+<span class="doccomment">/// use matrix_sdk::config::ClientConfig;</span>
+<span class="doccomment">/// use reqwest::ClientBuilder;</span>
+<span class="doccomment">/// use std::sync::Arc;</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// // setting up a custom builder</span>
+<span class="doccomment">/// let builder = ClientBuilder::new()</span>
+<span class="doccomment">///     .https_only(true)</span>
+<span class="doccomment">///     .no_proxy()</span>
+<span class="doccomment">///     .user_agent(&quot;MyApp/v3.0&quot;);</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// let client_config = ClientConfig::new()</span>
+<span class="doccomment">///     .client(Arc::new(builder.build()?));</span>
+<span class="doccomment">/// # matrix_sdk::Result::&lt;()&gt;::Ok(())</span>
+<span class="doccomment">/// ```</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Default</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">ClientConfig</span> {
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">target_arch</span> <span class="op">=</span> <span class="string">&quot;wasm32&quot;</span>))]</span>
     <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">proxy</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">reqwest::Proxy</span><span class="op">&gt;</span>,
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">user_agent</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">HeaderValue</span><span class="op">&gt;</span>,
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">user_agent</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
     <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">disable_ssl_verification</span>: <span class="ident">bool</span>,
     <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">base_config</span>: <span class="ident">BaseClientConfig</span>,
     <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">request_config</span>: <span class="ident">RequestConfig</span>,
@@ -322,7 +364,7 @@
 
     <span class="doccomment">/// Set a custom HTTP user agent for the client.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">user_agent</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">user_agent</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">InvalidHeaderValue</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">user_agent</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">HeaderValue::from_str</span>(<span class="ident">user_agent</span>)<span class="question-mark">?</span>);
+        <span class="self">self</span>.<span class="ident">user_agent</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">user_agent</span>.<span class="ident">to_owned</span>());
         <span class="prelude-val">Ok</span>(<span class="self">self</span>)
     }
 
@@ -422,5 +464,5 @@
     }
 }
 </code></pre></div>
-</section><section id="search" class="content hidden"></section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="matrix_sdk" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.60.0-nightly (09cb29c64 2022-02-15)" ></div>
+</section><section id="search" class="content hidden"></section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="matrix_sdk" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.60.0-nightly (75d9a0ae2 2022-02-16)" ></div>
 </body></html>
