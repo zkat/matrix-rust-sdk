@@ -652,6 +652,30 @@
 <span id="647">647</span>
 <span id="648">648</span>
 <span id="649">649</span>
+<span id="650">650</span>
+<span id="651">651</span>
+<span id="652">652</span>
+<span id="653">653</span>
+<span id="654">654</span>
+<span id="655">655</span>
+<span id="656">656</span>
+<span id="657">657</span>
+<span id="658">658</span>
+<span id="659">659</span>
+<span id="660">660</span>
+<span id="661">661</span>
+<span id="662">662</span>
+<span id="663">663</span>
+<span id="664">664</span>
+<span id="665">665</span>
+<span id="666">666</span>
+<span id="667">667</span>
+<span id="668">668</span>
+<span id="669">669</span>
+<span id="670">670</span>
+<span id="671">671</span>
+<span id="672">672</span>
+<span id="673">673</span>
 </pre><pre class="rust"><code><span class="comment">// Copyright 2021 The Matrix.org Foundation C.I.C.</span>
 <span class="comment">//</span>
 <span class="comment">// Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);</span>
@@ -671,6 +695,7 @@
 <span class="kw">use</span> <span class="ident">std</span>::{
     <span class="ident">collections</span>::{<span class="ident">BTreeMap</span>, <span class="ident">BTreeSet</span>},
     <span class="ident">ops::Deref</span>,
+    <span class="ident">pin::Pin</span>,
     <span class="ident">sync::Arc</span>,
 };
 
@@ -694,6 +719,8 @@
     <span class="ident">EventId</span>, <span class="ident">MxcUri</span>, <span class="ident">RoomId</span>, <span class="ident">UserId</span>,
 };
 
+<span class="kw">pub</span> <span class="kw">type</span> <span class="ident">BoxStream</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">Pin</span><span class="op">&lt;</span><span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">futures_util::Stream</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">T</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident">Send</span><span class="op">&gt;</span><span class="op">&gt;</span>;
+
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">any</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;sled_state_store&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;indexeddb_state_store&quot;</span>))]</span>
 <span class="kw">mod</span> <span class="ident">store_key</span>;
 
@@ -704,7 +731,7 @@
 <span class="kw">mod</span> <span class="ident">indexeddb_store</span>;
 
 <span class="kw">use</span> <span class="kw">crate</span>::{
-    <span class="ident">deserialized_responses</span>::{<span class="ident">MemberEvent</span>, <span class="ident">StrippedMemberEvent</span>},
+    <span class="ident">deserialized_responses</span>::{<span class="ident">MemberEvent</span>, <span class="ident">StrippedMemberEvent</span>, <span class="ident">SyncRoomEvent</span>, <span class="ident">TimelineSlice</span>},
     <span class="ident">media::MediaRequest</span>,
     <span class="ident">rooms</span>::{<span class="ident">RoomInfo</span>, <span class="ident">RoomType</span>},
     <span class="ident">Room</span>, <span class="ident">Session</span>,
@@ -1008,6 +1035,19 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// * `room_id` - The `RoomId` of the room to delete.</span>
     <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">remove_room</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">room_id</span>: <span class="kw-2">&amp;</span><span class="ident">RoomId</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span>;
+
+    <span class="doccomment">/// Get a stream of the stored timeline</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// # Arguments</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// * `room_id` - The `RoomId` of the room to delete.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// Returns a stream of events and a token that can be used to request</span>
+    <span class="doccomment">/// previous events.</span>
+    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">room_timeline</span>(
+        <span class="kw-2">&amp;</span><span class="self">self</span>,
+        <span class="ident">room_id</span>: <span class="kw-2">&amp;</span><span class="ident">RoomId</span>,
+    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span>(<span class="ident">BoxStream</span><span class="op">&lt;</span><span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">SyncRoomEvent</span><span class="op">&gt;</span><span class="op">&gt;</span>, <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>)<span class="op">&gt;</span><span class="op">&gt;</span>;
 }
 
 <span class="doccomment">/// A state store wrapper for the SDK.</span>
@@ -1216,6 +1256,8 @@
     <span class="kw">pub</span> <span class="ident">ambiguity_maps</span>: <span class="ident">BTreeMap</span><span class="op">&lt;</span><span class="ident">Box</span><span class="op">&lt;</span><span class="ident">RoomId</span><span class="op">&gt;</span>, <span class="ident">BTreeMap</span><span class="op">&lt;</span><span class="ident">String</span>, <span class="ident">BTreeSet</span><span class="op">&lt;</span><span class="ident">Box</span><span class="op">&lt;</span><span class="ident">UserId</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span>,
     <span class="doccomment">/// A map of `RoomId` to a vector of `Notification`s</span>
     <span class="kw">pub</span> <span class="ident">notifications</span>: <span class="ident">BTreeMap</span><span class="op">&lt;</span><span class="ident">Box</span><span class="op">&lt;</span><span class="ident">RoomId</span><span class="op">&gt;</span>, <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Notification</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// A mapping of `RoomId` to a `TimelineSlice`</span>
+    <span class="kw">pub</span> <span class="ident">timeline</span>: <span class="ident">BTreeMap</span><span class="op">&lt;</span><span class="ident">Box</span><span class="op">&lt;</span><span class="ident">RoomId</span><span class="op">&gt;</span>, <span class="ident">TimelineSlice</span><span class="op">&gt;</span>,
 }
 
 <span class="kw">impl</span> <span class="ident">StateChanges</span> {
@@ -1299,6 +1341,12 @@
     <span class="doccomment">/// `Receipts`.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">add_receipts</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">room_id</span>: <span class="kw-2">&amp;</span><span class="ident">RoomId</span>, <span class="ident">event</span>: <span class="ident">ReceiptEventContent</span>) {
         <span class="self">self</span>.<span class="ident">receipts</span>.<span class="ident">insert</span>(<span class="ident">room_id</span>.<span class="ident">to_owned</span>(), <span class="ident">event</span>);
+    }
+
+    <span class="doccomment">/// Update the `StateChanges` struct with the given room with a new</span>
+    <span class="doccomment">/// `TimelineSlice`.</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">add_timeline</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">room_id</span>: <span class="kw-2">&amp;</span><span class="ident">RoomId</span>, <span class="ident">timeline</span>: <span class="ident">TimelineSlice</span>) {
+        <span class="self">self</span>.<span class="ident">timeline</span>.<span class="ident">insert</span>(<span class="ident">room_id</span>.<span class="ident">to_owned</span>(), <span class="ident">timeline</span>);
     }
 }
 </code></pre></div>

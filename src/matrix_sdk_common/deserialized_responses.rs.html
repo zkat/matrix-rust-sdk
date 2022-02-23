@@ -403,6 +403,46 @@
 <span id="398">398</span>
 <span id="399">399</span>
 <span id="400">400</span>
+<span id="401">401</span>
+<span id="402">402</span>
+<span id="403">403</span>
+<span id="404">404</span>
+<span id="405">405</span>
+<span id="406">406</span>
+<span id="407">407</span>
+<span id="408">408</span>
+<span id="409">409</span>
+<span id="410">410</span>
+<span id="411">411</span>
+<span id="412">412</span>
+<span id="413">413</span>
+<span id="414">414</span>
+<span id="415">415</span>
+<span id="416">416</span>
+<span id="417">417</span>
+<span id="418">418</span>
+<span id="419">419</span>
+<span id="420">420</span>
+<span id="421">421</span>
+<span id="422">422</span>
+<span id="423">423</span>
+<span id="424">424</span>
+<span id="425">425</span>
+<span id="426">426</span>
+<span id="427">427</span>
+<span id="428">428</span>
+<span id="429">429</span>
+<span id="430">430</span>
+<span id="431">431</span>
+<span id="432">432</span>
+<span id="433">433</span>
+<span id="434">434</span>
+<span id="435">435</span>
+<span id="436">436</span>
+<span id="437">437</span>
+<span id="438">438</span>
+<span id="439">439</span>
+<span id="440">440</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">std</span>::{<span class="ident">collections::BTreeMap</span>, <span class="ident">convert::TryFrom</span>};
 
 <span class="kw">use</span> <span class="ident">ruma</span>::{
@@ -500,6 +540,13 @@
     <span class="doccomment">/// The encryption info about the event. Will be `None` if the event was not</span>
     <span class="doccomment">/// encrypted.</span>
     <span class="kw">pub</span> <span class="ident">encryption_info</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">EncryptionInfo</span><span class="op">&gt;</span>,
+}
+
+<span class="kw">impl</span> <span class="ident">SyncRoomEvent</span> {
+    <span class="doccomment">/// Get the event id of this `SyncRoomEvent` if the event has any valid id.</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">event_id</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Box</span><span class="op">&lt;</span><span class="ident">EventId</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+        <span class="self">self</span>.<span class="ident">event</span>.<span class="ident">get_field</span>::<span class="op">&lt;</span><span class="ident">Box</span><span class="op">&lt;</span><span class="ident">EventId</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="string">&quot;event_id&quot;</span>).<span class="ident">ok</span>().<span class="ident">flatten</span>()
+    }
 }
 
 <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">Raw</span><span class="op">&lt;</span><span class="ident">AnySyncRoomEvent</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">SyncRoomEvent</span> {
@@ -657,6 +704,39 @@
 <span class="kw">impl</span> <span class="ident">Timeline</span> {
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">limited</span>: <span class="ident">bool</span>, <span class="ident">prev_batch</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
         <span class="self">Self</span> { <span class="ident">limited</span>, <span class="ident">prev_batch</span>, ..<span class="ident">Default::default</span>() }
+    }
+}
+
+<span class="doccomment">/// A slice of the timeline in the room.</span>
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Default</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>)]</span>
+<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">TimelineSlice</span> {
+    <span class="doccomment">/// The `next_batch` or `from` token used to obtain this slice</span>
+    <span class="kw">pub</span> <span class="ident">start</span>: <span class="ident">String</span>,
+
+    <span class="doccomment">/// The `prev_batch` or `to` token used to obtain this slice</span>
+    <span class="doccomment">/// If `None` this `TimelineSlice` is the beginning of the room</span>
+    <span class="kw">pub</span> <span class="ident">end</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
+
+    <span class="doccomment">/// Whether the number of events returned for this slice was limited</span>
+    <span class="doccomment">/// by a `limit`-filter when requesting</span>
+    <span class="kw">pub</span> <span class="ident">limited</span>: <span class="ident">bool</span>,
+
+    <span class="doccomment">/// A list of events.</span>
+    <span class="kw">pub</span> <span class="ident">events</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">SyncRoomEvent</span><span class="op">&gt;</span>,
+
+    <span class="doccomment">/// Whether this is a timeline slice obtained from a `SyncResponse`</span>
+    <span class="kw">pub</span> <span class="ident">sync</span>: <span class="ident">bool</span>,
+}
+
+<span class="kw">impl</span> <span class="ident">TimelineSlice</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(
+        <span class="ident">events</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">SyncRoomEvent</span><span class="op">&gt;</span>,
+        <span class="ident">start</span>: <span class="ident">String</span>,
+        <span class="ident">end</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
+        <span class="ident">limited</span>: <span class="ident">bool</span>,
+        <span class="ident">sync</span>: <span class="ident">bool</span>,
+    ) -&gt; <span class="self">Self</span> {
+        <span class="self">Self</span> { <span class="ident">start</span>, <span class="ident">end</span>, <span class="ident">events</span>, <span class="ident">limited</span>, <span class="ident">sync</span> }
     }
 }
 
