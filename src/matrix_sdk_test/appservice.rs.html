@@ -73,7 +73,7 @@
 <span id="68">68</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">std::convert::TryFrom</span>;
 
-<span class="kw">use</span> <span class="ident">ruma</span>::{<span class="ident">events::AnyRoomEvent</span>, <span class="ident">room_id</span>};
+<span class="kw">use</span> <span class="ident">ruma</span>::{<span class="ident">events::AnyRoomEvent</span>, <span class="ident">room_id</span>, <span class="ident">serde::Raw</span>};
 <span class="kw">use</span> <span class="ident">serde_json::Value</span>;
 
 <span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">test_json</span>, <span class="ident">EventsJson</span>};
@@ -98,7 +98,7 @@
 <span class="doccomment">/// Usage is similar to [`super::EventBuilder`]</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Default</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">TransactionBuilder</span> {
-    <span class="ident">events</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">AnyRoomEvent</span><span class="op">&gt;</span>,
+    <span class="ident">events</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Raw</span><span class="op">&lt;</span><span class="ident">AnyRoomEvent</span><span class="op">&gt;</span><span class="op">&gt;</span>,
 }
 
 <span class="kw">impl</span> <span class="ident">TransactionBuilder</span> {
@@ -117,7 +117,7 @@
 
         <span class="kw">let</span> <span class="ident">val</span> <span class="op">=</span> <span class="ident">value_with_room_id</span>(<span class="ident">val</span>);
 
-        <span class="kw">let</span> <span class="ident">event</span> <span class="op">=</span> <span class="ident">serde_json::from_value</span>::<span class="op">&lt;</span><span class="ident">AnyRoomEvent</span><span class="op">&gt;</span>(<span class="ident">val</span>).<span class="ident">unwrap</span>();
+        <span class="kw">let</span> <span class="ident">event</span> <span class="op">=</span> <span class="ident">serde_json::from_value</span>(<span class="ident">val</span>).<span class="ident">unwrap</span>();
 
         <span class="self">self</span>.<span class="ident">events</span>.<span class="ident">push</span>(<span class="ident">event</span>);
         <span class="self">self</span>
