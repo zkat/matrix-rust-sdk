@@ -3984,6 +3984,105 @@
 <span id="3979">3979</span>
 <span id="3980">3980</span>
 <span id="3981">3981</span>
+<span id="3982">3982</span>
+<span id="3983">3983</span>
+<span id="3984">3984</span>
+<span id="3985">3985</span>
+<span id="3986">3986</span>
+<span id="3987">3987</span>
+<span id="3988">3988</span>
+<span id="3989">3989</span>
+<span id="3990">3990</span>
+<span id="3991">3991</span>
+<span id="3992">3992</span>
+<span id="3993">3993</span>
+<span id="3994">3994</span>
+<span id="3995">3995</span>
+<span id="3996">3996</span>
+<span id="3997">3997</span>
+<span id="3998">3998</span>
+<span id="3999">3999</span>
+<span id="4000">4000</span>
+<span id="4001">4001</span>
+<span id="4002">4002</span>
+<span id="4003">4003</span>
+<span id="4004">4004</span>
+<span id="4005">4005</span>
+<span id="4006">4006</span>
+<span id="4007">4007</span>
+<span id="4008">4008</span>
+<span id="4009">4009</span>
+<span id="4010">4010</span>
+<span id="4011">4011</span>
+<span id="4012">4012</span>
+<span id="4013">4013</span>
+<span id="4014">4014</span>
+<span id="4015">4015</span>
+<span id="4016">4016</span>
+<span id="4017">4017</span>
+<span id="4018">4018</span>
+<span id="4019">4019</span>
+<span id="4020">4020</span>
+<span id="4021">4021</span>
+<span id="4022">4022</span>
+<span id="4023">4023</span>
+<span id="4024">4024</span>
+<span id="4025">4025</span>
+<span id="4026">4026</span>
+<span id="4027">4027</span>
+<span id="4028">4028</span>
+<span id="4029">4029</span>
+<span id="4030">4030</span>
+<span id="4031">4031</span>
+<span id="4032">4032</span>
+<span id="4033">4033</span>
+<span id="4034">4034</span>
+<span id="4035">4035</span>
+<span id="4036">4036</span>
+<span id="4037">4037</span>
+<span id="4038">4038</span>
+<span id="4039">4039</span>
+<span id="4040">4040</span>
+<span id="4041">4041</span>
+<span id="4042">4042</span>
+<span id="4043">4043</span>
+<span id="4044">4044</span>
+<span id="4045">4045</span>
+<span id="4046">4046</span>
+<span id="4047">4047</span>
+<span id="4048">4048</span>
+<span id="4049">4049</span>
+<span id="4050">4050</span>
+<span id="4051">4051</span>
+<span id="4052">4052</span>
+<span id="4053">4053</span>
+<span id="4054">4054</span>
+<span id="4055">4055</span>
+<span id="4056">4056</span>
+<span id="4057">4057</span>
+<span id="4058">4058</span>
+<span id="4059">4059</span>
+<span id="4060">4060</span>
+<span id="4061">4061</span>
+<span id="4062">4062</span>
+<span id="4063">4063</span>
+<span id="4064">4064</span>
+<span id="4065">4065</span>
+<span id="4066">4066</span>
+<span id="4067">4067</span>
+<span id="4068">4068</span>
+<span id="4069">4069</span>
+<span id="4070">4070</span>
+<span id="4071">4071</span>
+<span id="4072">4072</span>
+<span id="4073">4073</span>
+<span id="4074">4074</span>
+<span id="4075">4075</span>
+<span id="4076">4076</span>
+<span id="4077">4077</span>
+<span id="4078">4078</span>
+<span id="4079">4079</span>
+<span id="4080">4080</span>
 </pre><pre class="rust"><code><span class="comment">// Copyright 2020 Damir Jelić</span>
 <span class="comment">// Copyright 2020 The Matrix.org Foundation C.I.C.</span>
 <span class="comment">//</span>
@@ -7824,8 +7923,13 @@
         <span class="macro">matches::assert_matches!</span>(<span class="ident">encryption_event</span>, <span class="ident">AnySyncStateEvent::RoomEncryption</span>(<span class="kw">_</span>));
     }
 
-    <span class="attribute">#[<span class="ident">async_test</span>]</span>
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">room_timeline</span>() {
+    <span class="comment">// FIXME: removing timelines during reading the stream currently leaves to an</span>
+    <span class="comment">// inconsistent undefined state. This tests shows that, but because</span>
+    <span class="comment">// different implementations deal with problem in different,</span>
+    <span class="comment">// inconsistent manners, isn&#39;t activated.</span>
+    <span class="comment">//#[async_test]</span>
+    <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">dead_code</span>)]</span>
+    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">room_timeline_with_remove</span>() {
         <span class="kw">let</span> <span class="ident">client</span> <span class="op">=</span> <span class="ident">logged_in_client</span>().<span class="kw">await</span>;
         <span class="kw">let</span> <span class="ident">sync_settings</span> <span class="op">=</span> <span class="ident">SyncSettings::new</span>().<span class="ident">timeout</span>(<span class="ident">Duration::from_millis</span>(<span class="number">3000</span>));
 
@@ -7841,6 +7945,8 @@
         <span class="kw">let</span> <span class="ident">room</span> <span class="op">=</span> <span class="ident">client</span>.<span class="ident">get_joined_room</span>(<span class="macro">room_id!</span>(<span class="string">&quot;!SVkFJHzfwvuaIEawgC:localhost&quot;</span>)).<span class="ident">unwrap</span>();
         <span class="kw">let</span> (<span class="ident">forward_stream</span>, <span class="ident">backward_stream</span>) <span class="op">=</span> <span class="ident">room</span>.<span class="ident">timeline</span>().<span class="kw">await</span>.<span class="ident">unwrap</span>();
 
+        <span class="comment">// these two syncs lead to the store removing its existing timeline</span>
+        <span class="comment">// and replace them with new ones</span>
         <span class="kw">let</span> <span class="ident">sync_2</span> <span class="op">=</span> <span class="ident">mock</span>(
             <span class="string">&quot;GET&quot;</span>,
             <span class="ident">Matcher::Regex</span>(
@@ -7899,7 +8005,7 @@
         <span class="kw">let</span> <span class="kw">_</span> <span class="op">=</span> <span class="ident">client</span>.<span class="ident">sync_once</span>(<span class="ident">sync_settings</span>).<span class="kw">await</span>.<span class="ident">unwrap</span>();
         <span class="ident">sync_3</span>.<span class="ident">assert</span>();
 
-        <span class="kw">let</span> <span class="ident">expected_events</span> <span class="op">=</span> <span class="macro">vec!</span>[
+        <span class="kw">let</span> <span class="ident">expected_forward_events</span> <span class="op">=</span> <span class="macro">vec!</span>[
             <span class="string">&quot;$152037280074GZeOm:localhost&quot;</span>,
             <span class="string">&quot;$editevid:localhost&quot;</span>,
             <span class="string">&quot;$151957878228ssqrJ:localhost&quot;</span>,
@@ -7915,28 +8021,17 @@
         ];
 
         <span class="kw">use</span> <span class="ident">futures_util::StreamExt</span>;
-        <span class="kw">let</span> <span class="ident">forward_events</span> <span class="op">=</span>
-            <span class="ident">forward_stream</span>.<span class="ident">take</span>(<span class="ident">expected_events</span>.<span class="ident">len</span>()).<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">SyncRoomEvent</span><span class="op">&gt;</span><span class="op">&gt;</span>().<span class="kw">await</span>;
+        <span class="kw">let</span> <span class="ident">forward_events</span> <span class="op">=</span> <span class="ident">forward_stream</span>
+            .<span class="ident">take</span>(<span class="ident">expected_forward_events</span>.<span class="ident">len</span>())
+            .<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">SyncRoomEvent</span><span class="op">&gt;</span><span class="op">&gt;</span>()
+            .<span class="kw">await</span>;
 
-        <span class="macro">assert!</span>(<span class="ident">forward_events</span>.<span class="ident">into_iter</span>().<span class="ident">zip</span>(<span class="ident">expected_events</span>.<span class="ident">iter</span>()).<span class="ident">all</span>(<span class="op">|</span>(<span class="ident">a</span>, <span class="ident">b</span>)<span class="op">|</span> <span class="kw-2">&amp;</span><span class="ident">a</span>
-            .<span class="ident">event_id</span>()
-            .<span class="ident">unwrap</span>()
-            .<span class="ident">as_str</span>()
-            <span class="op">==</span> <span class="ident">b</span>));
+        <span class="kw">for</span> (<span class="ident">r</span>, <span class="ident">e</span>) <span class="kw">in</span> <span class="ident">forward_events</span>.<span class="ident">into_iter</span>().<span class="ident">zip</span>(<span class="ident">expected_forward_events</span>.<span class="ident">iter</span>()) {
+            <span class="macro">assert_eq!</span>(<span class="kw-2">&amp;</span><span class="ident">r</span>.<span class="ident">event_id</span>().<span class="ident">unwrap</span>().<span class="ident">as_str</span>(), <span class="ident">e</span>);
+        }
 
-        <span class="kw">let</span> <span class="ident">expected_events</span> <span class="op">=</span> <span class="macro">vec!</span>[
-            <span class="string">&quot;$152037280074GZeOm2:localhost&quot;</span>,
-            <span class="string">&quot;$editevid2:localhost&quot;</span>,
-            <span class="string">&quot;$151957878228ssqrJ2:localhost&quot;</span>,
-            <span class="string">&quot;$15275046980maRLj2:localhost&quot;</span>,
-            <span class="string">&quot;$15275047031IXQRi2:localhost&quot;</span>,
-            <span class="string">&quot;$098237280074GZeOm2:localhost&quot;</span>,
+        <span class="kw">let</span> <span class="ident">expected_backwards_events</span> <span class="op">=</span> <span class="macro">vec!</span>[
             <span class="string">&quot;$152037280074GZeOm:localhost&quot;</span>,
-            <span class="string">&quot;$editevid:localhost&quot;</span>,
-            <span class="string">&quot;$151957878228ssqrJ:localhost&quot;</span>,
-            <span class="string">&quot;$15275046980maRLj:localhost&quot;</span>,
-            <span class="string">&quot;$15275047031IXQRi:localhost&quot;</span>,
-            <span class="string">&quot;$098237280074GZeOm:localhost&quot;</span>,
             <span class="string">&quot;$1444812213350496Caaaf:example.com&quot;</span>,
             <span class="string">&quot;$1444812213350496Cbbbf:example.com&quot;</span>,
             <span class="string">&quot;$1444812213350496Ccccf:example.com&quot;</span>,
@@ -7945,26 +8040,129 @@
             <span class="string">&quot;$1444812213350496Cccck:example.com&quot;</span>,
         ];
 
-        <span class="kw">let</span> <span class="ident">join_handle</span> <span class="op">=</span> <span class="ident">tokio::spawn</span>(<span class="kw">async</span> <span class="kw">move</span> {
-            <span class="kw">let</span> <span class="ident">backward_events</span> <span class="op">=</span> <span class="ident">backward_stream</span>
-                .<span class="ident">take</span>(<span class="ident">expected_events</span>.<span class="ident">len</span>())
-                .<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident">SyncRoomEvent</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span>()
-                .<span class="kw">await</span>;
+        <span class="kw">let</span> <span class="ident">backward_events</span> <span class="op">=</span> <span class="ident">backward_stream</span>
+            .<span class="ident">take</span>(<span class="ident">expected_backwards_events</span>.<span class="ident">len</span>())
+            .<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident">SyncRoomEvent</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span>()
+            .<span class="kw">await</span>;
 
-            <span class="macro">assert!</span>(<span class="ident">backward_events</span>.<span class="ident">into_iter</span>().<span class="ident">zip</span>(<span class="ident">expected_events</span>.<span class="ident">iter</span>()).<span class="ident">all</span>(<span class="op">|</span>(<span class="ident">a</span>, <span class="ident">b</span>)<span class="op">|</span> <span class="kw-2">&amp;</span><span class="ident">a</span>
-                .<span class="ident">unwrap</span>()
-                .<span class="ident">event_id</span>()
-                .<span class="ident">unwrap</span>()
-                .<span class="ident">as_str</span>()
-                <span class="op">==</span> <span class="ident">b</span>));
-        });
+        <span class="kw">for</span> (<span class="ident">r</span>, <span class="ident">e</span>) <span class="kw">in</span> <span class="ident">backward_events</span>.<span class="ident">into_iter</span>().<span class="ident">zip</span>(<span class="ident">expected_backwards_events</span>.<span class="ident">iter</span>()) {
+            <span class="macro">assert_eq!</span>(<span class="kw-2">&amp;</span><span class="ident">r</span>.<span class="ident">unwrap</span>().<span class="ident">event_id</span>().<span class="ident">unwrap</span>().<span class="ident">as_str</span>(), <span class="ident">e</span>);
+        }
 
-        <span class="ident">join_handle</span>.<span class="kw">await</span>.<span class="ident">unwrap</span>();
+        <span class="ident">mocked_messages</span>.<span class="ident">assert</span>();
+        <span class="ident">mocked_messages_2</span>.<span class="ident">assert</span>();
+    }
+    <span class="attribute">#[<span class="ident">async_test</span>]</span>
+    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">room_timeline</span>() {
+        <span class="kw">let</span> <span class="ident">client</span> <span class="op">=</span> <span class="ident">logged_in_client</span>().<span class="kw">await</span>;
+        <span class="kw">let</span> <span class="ident">sync_settings</span> <span class="op">=</span> <span class="ident">SyncSettings::new</span>().<span class="ident">timeout</span>(<span class="ident">Duration::from_millis</span>(<span class="number">3000</span>));
+
+        <span class="kw">let</span> <span class="ident">sync</span> <span class="op">=</span> <span class="ident">mock</span>(<span class="string">&quot;GET&quot;</span>, <span class="ident">Matcher::Regex</span>(<span class="string">r&quot;^/_matrix/client/r0/sync\?.*$&quot;</span>.<span class="ident">to_string</span>()))
+            .<span class="ident">with_status</span>(<span class="number">200</span>)
+            .<span class="ident">with_body</span>(<span class="ident">test_json::MORE_SYNC</span>.<span class="ident">to_string</span>())
+            .<span class="ident">match_header</span>(<span class="string">&quot;authorization&quot;</span>, <span class="string">&quot;Bearer 1234&quot;</span>)
+            .<span class="ident">create</span>();
+
+        <span class="kw">let</span> <span class="kw">_</span> <span class="op">=</span> <span class="ident">client</span>.<span class="ident">sync_once</span>(<span class="ident">sync_settings</span>).<span class="kw">await</span>.<span class="ident">unwrap</span>();
+        <span class="ident">sync</span>.<span class="ident">assert</span>();
+        <span class="ident">drop</span>(<span class="ident">sync</span>);
+        <span class="kw">let</span> <span class="ident">room</span> <span class="op">=</span> <span class="ident">client</span>.<span class="ident">get_joined_room</span>(<span class="macro">room_id!</span>(<span class="string">&quot;!SVkFJHzfwvuaIEawgC:localhost&quot;</span>)).<span class="ident">unwrap</span>();
+        <span class="kw">let</span> (<span class="ident">forward_stream</span>, <span class="ident">backward_stream</span>) <span class="op">=</span> <span class="ident">room</span>.<span class="ident">timeline</span>().<span class="kw">await</span>.<span class="ident">unwrap</span>();
+
+        <span class="kw">let</span> <span class="ident">sync_2</span> <span class="op">=</span> <span class="ident">mock</span>(
+            <span class="string">&quot;GET&quot;</span>,
+            <span class="ident">Matcher::Regex</span>(
+                <span class="string">r&quot;^/_matrix/client/r0/sync\?.*since=s526_47314_0_7_1_1_1_11444_2.*&quot;</span>.<span class="ident">to_string</span>(),
+            ),
+        )
+        .<span class="ident">with_status</span>(<span class="number">200</span>)
+        .<span class="ident">with_body</span>(<span class="ident">test_json::MORE_SYNC_2</span>.<span class="ident">to_string</span>())
+        .<span class="ident">match_header</span>(<span class="string">&quot;authorization&quot;</span>, <span class="string">&quot;Bearer 1234&quot;</span>)
+        .<span class="ident">create</span>();
+
+        <span class="kw">let</span> <span class="ident">mocked_messages</span> <span class="op">=</span> <span class="ident">mock</span>(
+            <span class="string">&quot;GET&quot;</span>,
+            <span class="ident">Matcher::Regex</span>(
+                <span class="string">r&quot;^/_matrix/client/r0/rooms/.*/messages.*from=t392-516_47314_0_7_1_1_1_11444_1.*&quot;</span>
+                    .<span class="ident">to_string</span>(),
+            ),
+        )
+        .<span class="ident">with_status</span>(<span class="number">200</span>)
+        .<span class="ident">with_body</span>(<span class="ident">test_json::SYNC_ROOM_MESSAGES_BATCH_1</span>.<span class="ident">to_string</span>())
+        .<span class="ident">match_header</span>(<span class="string">&quot;authorization&quot;</span>, <span class="string">&quot;Bearer 1234&quot;</span>)
+        .<span class="ident">create</span>();
+
+        <span class="kw">let</span> <span class="ident">mocked_messages_2</span> <span class="op">=</span> <span class="ident">mock</span>(
+            <span class="string">&quot;GET&quot;</span>,
+            <span class="ident">Matcher::Regex</span>(
+                <span class="string">r&quot;^/_matrix/client/r0/rooms/.*/messages.*from=t47409-4357353_219380_26003_2269.*&quot;</span>
+                    .<span class="ident">to_string</span>(),
+            ),
+        )
+        .<span class="ident">with_status</span>(<span class="number">200</span>)
+        .<span class="ident">with_body</span>(<span class="ident">test_json::SYNC_ROOM_MESSAGES_BATCH_2</span>.<span class="ident">to_string</span>())
+        .<span class="ident">match_header</span>(<span class="string">&quot;authorization&quot;</span>, <span class="string">&quot;Bearer 1234&quot;</span>)
+        .<span class="ident">create</span>();
+
+        <span class="macro">assert_eq!</span>(<span class="ident">client</span>.<span class="ident">sync_token</span>().<span class="kw">await</span>, <span class="prelude-val">Some</span>(<span class="string">&quot;s526_47314_0_7_1_1_1_11444_2&quot;</span>.<span class="ident">to_string</span>()));
+        <span class="kw">let</span> <span class="ident">sync_settings</span> <span class="op">=</span> <span class="ident">SyncSettings::new</span>()
+            .<span class="ident">timeout</span>(<span class="ident">Duration::from_millis</span>(<span class="number">3000</span>))
+            .<span class="ident">token</span>(<span class="string">&quot;s526_47314_0_7_1_1_1_11444_2&quot;</span>);
+        <span class="kw">let</span> <span class="kw">_</span> <span class="op">=</span> <span class="ident">client</span>.<span class="ident">sync_once</span>(<span class="ident">sync_settings</span>).<span class="kw">await</span>.<span class="ident">unwrap</span>();
+        <span class="ident">sync_2</span>.<span class="ident">assert</span>();
+
+        <span class="kw">let</span> <span class="ident">expected_forward_events</span> <span class="op">=</span> <span class="macro">vec!</span>[
+            <span class="string">&quot;$152037280074GZeOm2:localhost&quot;</span>,
+            <span class="string">&quot;$editevid2:localhost&quot;</span>,
+            <span class="string">&quot;$151957878228ssqrJ2:localhost&quot;</span>,
+            <span class="string">&quot;$15275046980maRLj2:localhost&quot;</span>,
+            <span class="string">&quot;$15275047031IXQRi2:localhost&quot;</span>,
+            <span class="string">&quot;$098237280074GZeOm2:localhost&quot;</span>,
+        ];
+
+        <span class="kw">use</span> <span class="ident">futures_util::StreamExt</span>;
+        <span class="kw">let</span> <span class="ident">forward_events</span> <span class="op">=</span> <span class="ident">forward_stream</span>
+            .<span class="ident">take</span>(<span class="ident">expected_forward_events</span>.<span class="ident">len</span>())
+            .<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">SyncRoomEvent</span><span class="op">&gt;</span><span class="op">&gt;</span>()
+            .<span class="kw">await</span>;
+
+        <span class="kw">for</span> (<span class="ident">r</span>, <span class="ident">e</span>) <span class="kw">in</span> <span class="ident">forward_events</span>.<span class="ident">into_iter</span>().<span class="ident">zip</span>(<span class="ident">expected_forward_events</span>.<span class="ident">iter</span>()) {
+            <span class="macro">assert_eq!</span>(<span class="kw-2">&amp;</span><span class="ident">r</span>.<span class="ident">event_id</span>().<span class="ident">unwrap</span>().<span class="ident">as_str</span>(), <span class="ident">e</span>);
+        }
+
+        <span class="kw">let</span> <span class="ident">expected_backwards_events</span> <span class="op">=</span> <span class="macro">vec!</span>[
+            <span class="string">&quot;$152037280074GZeOm:localhost&quot;</span>,
+            <span class="string">&quot;$editevid:localhost&quot;</span>,
+            <span class="string">&quot;$151957878228ssqrJ:localhost&quot;</span>,
+            <span class="string">&quot;$15275046980maRLj:localhost&quot;</span>,
+            <span class="string">&quot;$15275047031IXQRi:localhost&quot;</span>,
+            <span class="string">&quot;$098237280074GZeOm:localhost&quot;</span>,
+            <span class="comment">// ^^^ These come from the first sync before we asked for the timeline and thus</span>
+            <span class="comment">//     where cached</span>
+            <span class="comment">//</span>
+            <span class="comment">// While the following are fetched over the network transparently to us after,</span>
+            <span class="comment">// when scrolling back in time:</span>
+            <span class="string">&quot;$1444812213350496Caaaf:example.com&quot;</span>,
+            <span class="string">&quot;$1444812213350496Cbbbf:example.com&quot;</span>,
+            <span class="string">&quot;$1444812213350496Ccccf:example.com&quot;</span>,
+            <span class="string">&quot;$1444812213350496Caaak:example.com&quot;</span>,
+            <span class="string">&quot;$1444812213350496Cbbbk:example.com&quot;</span>,
+            <span class="string">&quot;$1444812213350496Cccck:example.com&quot;</span>,
+        ];
+
+        <span class="kw">let</span> <span class="ident">backward_events</span> <span class="op">=</span> <span class="ident">backward_stream</span>
+            .<span class="ident">take</span>(<span class="ident">expected_backwards_events</span>.<span class="ident">len</span>())
+            .<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident">SyncRoomEvent</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span>()
+            .<span class="kw">await</span>;
+
+        <span class="kw">for</span> (<span class="ident">r</span>, <span class="ident">e</span>) <span class="kw">in</span> <span class="ident">backward_events</span>.<span class="ident">into_iter</span>().<span class="ident">zip</span>(<span class="ident">expected_backwards_events</span>.<span class="ident">iter</span>()) {
+            <span class="macro">assert_eq!</span>(<span class="kw-2">&amp;</span><span class="ident">r</span>.<span class="ident">unwrap</span>().<span class="ident">event_id</span>().<span class="ident">unwrap</span>().<span class="ident">as_str</span>(), <span class="ident">e</span>);
+        }
 
         <span class="ident">mocked_messages</span>.<span class="ident">assert</span>();
         <span class="ident">mocked_messages_2</span>.<span class="ident">assert</span>();
     }
 }
 </code></pre></div>
-</section><section id="search" class="content hidden"></section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="matrix_sdk" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.61.0-nightly (6a7055661 2022-02-27)" ></div>
+</section><section id="search" class="content hidden"></section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="matrix_sdk" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.61.0-nightly (f0c4da499 2022-03-01)" ></div>
 </body></html>
