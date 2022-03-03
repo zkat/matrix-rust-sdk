@@ -1111,6 +1111,10 @@
 <span id="1106">1106</span>
 <span id="1107">1107</span>
 <span id="1108">1108</span>
+<span id="1109">1109</span>
+<span id="1110">1110</span>
+<span id="1111">1111</span>
+<span id="1112">1112</span>
 </pre><pre class="rust"><code><span class="comment">// Copyright 2021 The Matrix.org Foundation C.I.C.</span>
 <span class="comment">// Copyright 2021 Damir Jelić</span>
 <span class="comment">//</span>
@@ -1379,11 +1383,11 @@
 };
 <span class="kw">use</span> <span class="ident">matrix_sdk_common::instant::Duration</span>;
 <span class="kw">use</span> <span class="ident">ruma</span>::{
-    <span class="ident">api::client::r0</span>::{
-        <span class="ident">backup::add_backup_keys::Response</span> <span class="kw">as</span> <span class="ident">KeysBackupResponse</span>,
-        <span class="ident">keys</span>::{<span class="ident">get_keys</span>, <span class="ident">upload_keys</span>, <span class="ident">upload_signing_keys::Request</span> <span class="kw">as</span> <span class="ident">UploadSigningKeysRequest</span>},
+    <span class="ident">api::client</span>::{
+        <span class="ident">backup::add_backup_keys::v3::Response</span> <span class="kw">as</span> <span class="ident">KeysBackupResponse</span>,
+        <span class="ident">keys</span>::{<span class="ident">get_keys</span>, <span class="ident">upload_keys</span>, <span class="ident">upload_signing_keys::v3::Request</span> <span class="kw">as</span> <span class="ident">UploadSigningKeysRequest</span>},
         <span class="ident">message::send_message_event</span>,
-        <span class="ident">to_device::send_event_to_device</span>::{
+        <span class="ident">to_device::send_event_to_device::v3</span>::{
             <span class="ident">Request</span> <span class="kw">as</span> <span class="ident">RumaToDeviceRequest</span>, <span class="ident">Response</span> <span class="kw">as</span> <span class="ident">ToDeviceResponse</span>,
         },
         <span class="ident">uiaa::AuthData</span>,
@@ -1613,7 +1617,7 @@
     <span class="doccomment">/// ```no_run</span>
     <span class="doccomment">/// # use std::{convert::TryFrom, collections::BTreeMap};</span>
     <span class="doccomment">/// # use matrix_sdk::{</span>
-    <span class="doccomment">/// #     ruma::{api::client::r0::uiaa, assign},</span>
+    <span class="doccomment">/// #     ruma::{api::client::uiaa, assign},</span>
     <span class="doccomment">/// #     Client,</span>
     <span class="doccomment">/// # };</span>
     <span class="doccomment">/// # use url::Url;</span>
@@ -1625,8 +1629,12 @@
     <span class="doccomment">/// if let Err(e) = client.bootstrap_cross_signing(None).await {</span>
     <span class="doccomment">///     if let Some(response) = e.uiaa_response() {</span>
     <span class="doccomment">///         let auth_data = uiaa::AuthData::Password(assign!(</span>
-    <span class="doccomment">///             uiaa::Password::new(uiaa::UserIdentifier::MatrixId(&quot;example&quot;), &quot;wordpass&quot;),</span>
-    <span class="doccomment">///             { session: response.session.as_deref() }</span>
+    <span class="doccomment">///             uiaa::Password::new(</span>
+    <span class="doccomment">///                 uiaa::UserIdentifier::UserIdOrLocalpart(&quot;example&quot;),</span>
+    <span class="doccomment">///                 &quot;wordpass&quot;,</span>
+    <span class="doccomment">///             ), {</span>
+    <span class="doccomment">///                 session: response.session.as_deref(),</span>
+    <span class="doccomment">///             }</span>
     <span class="doccomment">///         ));</span>
     <span class="doccomment">///</span>
     <span class="doccomment">///         client</span>
@@ -1800,10 +1808,10 @@
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;encryption&quot;</span>)]</span>
     <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">decrypt_room_event</span>(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
-        <span class="ident">event</span>: <span class="kw-2">&amp;</span><span class="ident">AnyRoomEvent</span>,
+        <span class="ident">event</span>: <span class="ident">Raw</span><span class="op">&lt;</span><span class="ident">AnyRoomEvent</span><span class="op">&gt;</span>,
     ) -&gt; <span class="ident">RoomEvent</span> {
         <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">machine</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">olm_machine</span>().<span class="kw">await</span> {
-            <span class="kw">if</span> <span class="kw">let</span> <span class="ident">AnyRoomEvent::Message</span>(<span class="ident">event</span>) <span class="op">=</span> <span class="ident">event</span> {
+            <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Ok</span>(<span class="ident">AnyRoomEvent::Message</span>(<span class="ident">event</span>)) <span class="op">=</span> <span class="ident">event</span>.<span class="ident">deserialize</span>() {
                 <span class="kw">if</span> <span class="kw">let</span> <span class="ident">AnyMessageEvent::RoomEncrypted</span>(<span class="kw">_</span>) <span class="op">=</span> <span class="ident">event</span> {
                     <span class="kw">let</span> <span class="ident">room_id</span> <span class="op">=</span> <span class="ident">event</span>.<span class="ident">room_id</span>();
                     <span class="comment">// Turn the AnyMessageEvent into a AnySyncMessageEvent</span>
@@ -1819,7 +1827,7 @@
         }
 
         <span class="comment">// Fallback to still-encrypted room event</span>
-        <span class="ident">RoomEvent</span> { <span class="ident">event</span>: <span class="ident">Raw::new</span>(<span class="ident">event</span>).<span class="ident">expect</span>(<span class="string">&quot;AnyRoomEvent serialization should not fail&quot;</span>), <span class="ident">encryption_info</span>: <span class="prelude-val">None</span> }
+        <span class="ident">RoomEvent</span> { <span class="ident">event</span>, <span class="ident">encryption_info</span>: <span class="prelude-val">None</span> }
     }
 
     <span class="doccomment">/// Query the server for users device keys.</span>
@@ -1833,8 +1841,8 @@
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         <span class="ident">request_id</span>: <span class="kw-2">&amp;</span><span class="ident">TransactionId</span>,
         <span class="ident">device_keys</span>: <span class="ident">BTreeMap</span><span class="op">&lt;</span><span class="ident">Box</span><span class="op">&lt;</span><span class="ident">UserId</span><span class="op">&gt;</span>, <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Box</span><span class="op">&lt;</span><span class="ident">DeviceId</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">get_keys::Response</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">request</span> <span class="op">=</span> <span class="macro">assign!</span>(<span class="ident">get_keys::Request::new</span>(), { <span class="ident">device_keys</span> });
+    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">get_keys::v3::Response</span><span class="op">&gt;</span> {
+        <span class="kw">let</span> <span class="ident">request</span> <span class="op">=</span> <span class="macro">assign!</span>(<span class="ident">get_keys::v3::Request::new</span>(), { <span class="ident">device_keys</span> });
 
         <span class="kw">let</span> <span class="ident">response</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">send</span>(<span class="ident">request</span>, <span class="prelude-val">None</span>).<span class="kw">await</span><span class="question-mark">?</span>;
         <span class="self">self</span>.<span class="ident">mark_request_as_sent</span>(<span class="ident">request_id</span>, <span class="kw-2">&amp;</span><span class="ident">response</span>).<span class="kw">await</span><span class="question-mark">?</span>;
@@ -1965,12 +1973,12 @@
     <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">send_account_data</span>(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         <span class="ident">content</span>: <span class="ident">ruma::events::AnyGlobalAccountDataEventContent</span>,
-    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">ruma::api::client::r0::config::set_global_account_data::Response</span><span class="op">&gt;</span> {
+    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">ruma::api::client::config::set_global_account_data::v3::Response</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">own_user</span> <span class="op">=</span>
             <span class="self">self</span>.<span class="ident">user_id</span>().<span class="kw">await</span>.<span class="ident">ok_or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">Error::from</span>(<span class="ident">HttpError::AuthenticationRequired</span>))<span class="question-mark">?</span>;
         <span class="kw">let</span> <span class="ident">data</span> <span class="op">=</span> <span class="ident">serde_json::value::to_raw_value</span>(<span class="kw-2">&amp;</span><span class="ident">content</span>)<span class="question-mark">?</span>;
 
-        <span class="kw">let</span> <span class="ident">request</span> <span class="op">=</span> <span class="ident">ruma::api::client::r0::config::set_global_account_data::Request::new</span>(
+        <span class="kw">let</span> <span class="ident">request</span> <span class="op">=</span> <span class="ident">ruma::api::client::config::set_global_account_data::v3::Request::new</span>(
             <span class="kw-2">&amp;</span><span class="ident">data</span>,
             <span class="ident">ruma::events::EventContent::event_type</span>(<span class="kw-2">&amp;</span><span class="ident">content</span>),
             <span class="kw-2">&amp;</span><span class="ident">own_user</span>,
@@ -1982,7 +1990,7 @@
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;encryption&quot;</span>)]</span>
     <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">create_dm_room</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">user_id</span>: <span class="ident">Box</span><span class="op">&lt;</span><span class="ident">UserId</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">room::Joined</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="kw">use</span> <span class="ident">ruma</span>::{
-            <span class="ident">api::client::r0::room::create_room::RoomPreset</span>,
+            <span class="ident">api::client::room::create_room::v3::RoomPreset</span>,
             <span class="ident">events::AnyGlobalAccountDataEventContent</span>,
         };
 
@@ -1993,7 +2001,7 @@
         <span class="kw">let</span> <span class="ident">invite</span> <span class="op">=</span> <span class="kw-2">&amp;</span>[<span class="ident">user_id</span>.<span class="ident">clone</span>()];
 
         <span class="kw">let</span> <span class="ident">request</span> <span class="op">=</span> <span class="macro">assign!</span>(
-            <span class="ident">ruma::api::client::r0::room::create_room::Request::new</span>(),
+            <span class="ident">ruma::api::client::room::create_room::v3::Request::new</span>(),
             {
                 <span class="ident">invite</span>,
                 <span class="ident">is_direct</span>: <span class="bool-val">true</span>,
@@ -2073,8 +2081,8 @@
     <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">keys_upload</span>(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         <span class="ident">request_id</span>: <span class="kw-2">&amp;</span><span class="ident">TransactionId</span>,
-        <span class="ident">request</span>: <span class="kw-2">&amp;</span><span class="ident">upload_keys::Request</span>,
-    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">upload_keys::Response</span><span class="op">&gt;</span> {
+        <span class="ident">request</span>: <span class="kw-2">&amp;</span><span class="ident">upload_keys::v3::Request</span>,
+    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">upload_keys::v3::Response</span><span class="op">&gt;</span> {
         <span class="macro">debug!</span>(
             <span class="ident">device_keys</span> <span class="op">=</span> <span class="ident">request</span>.<span class="ident">device_keys</span>.<span class="ident">is_some</span>(),
             <span class="ident">one_time_key_count</span> <span class="op">=</span> <span class="ident">request</span>.<span class="ident">one_time_keys</span>.<span class="ident">len</span>(),
@@ -2091,7 +2099,7 @@
     <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">room_send_helper</span>(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         <span class="ident">request</span>: <span class="kw-2">&amp;</span><span class="ident">RoomMessageRequest</span>,
-    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">send_message_event::Response</span><span class="op">&gt;</span> {
+    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">send_message_event::v3::Response</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">content</span> <span class="op">=</span> <span class="ident">request</span>.<span class="ident">content</span>.<span class="ident">clone</span>();
         <span class="kw">let</span> <span class="ident">txn_id</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">request</span>.<span class="ident">txn_id</span>;
         <span class="kw">let</span> <span class="ident">room_id</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">request</span>.<span class="ident">room_id</span>;
@@ -2185,7 +2193,7 @@
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         <span class="ident">request</span>: <span class="kw-2">&amp;</span><span class="ident">matrix_sdk_base::crypto::KeysBackupRequest</span>,
     ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">KeysBackupResponse</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">request</span> <span class="op">=</span> <span class="ident">ruma::api::client::r0::backup::add_backup_keys::Request::new</span>(
+        <span class="kw">let</span> <span class="ident">request</span> <span class="op">=</span> <span class="ident">ruma::api::client::backup::add_backup_keys::v3::Request::new</span>(
             <span class="kw-2">&amp;</span><span class="ident">request</span>.<span class="ident">version</span>,
             <span class="ident">request</span>.<span class="ident">rooms</span>.<span class="ident">to_owned</span>(),
         );
@@ -2220,5 +2228,5 @@
     }
 }
 </code></pre></div>
-</section><section id="search" class="content hidden"></section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="matrix_sdk" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.61.0-nightly (f0c4da499 2022-03-01)" ></div>
+</section><section id="search" class="content hidden"></section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="matrix_sdk" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.61.0-nightly (8769f4ef2 2022-03-02)" ></div>
 </body></html>
