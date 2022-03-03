@@ -1,0 +1,1 @@
+initSidebarItems({"fn":[["get_device","Generate default ReadOnlyDevice for tests"],["get_other_identity","Generate default other identify for tests"],["get_own_identity","Generate default own identity for tests"]]});

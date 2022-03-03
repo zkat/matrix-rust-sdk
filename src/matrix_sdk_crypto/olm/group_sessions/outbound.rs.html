@@ -631,7 +631,6 @@
 <span id="626">626</span>
 <span id="627">627</span>
 <span id="628">628</span>
-<span id="629">629</span>
 </pre><pre class="rust"><code><span class="comment">// Copyright 2020 The Matrix.org Foundation C.I.C.</span>
 <span class="comment">//</span>
 <span class="comment">// Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);</span>
@@ -661,12 +660,11 @@
 <span class="kw">use</span> <span class="ident">matrix_sdk_common</span>::{<span class="ident">instant::Instant</span>, <span class="ident">locks::Mutex</span>};
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">olm_rs</span>::{
     <span class="ident">account::IdentityKeys</span>,
+    <span class="ident">outbound_group_session::OlmOutboundGroupSession</span>,
     <span class="ident">session</span>::{<span class="ident">OlmMessage</span>, <span class="ident">PreKeyMessage</span>},
     <span class="ident">utility::OlmUtility</span>,
 };
-<span class="kw">use</span> <span class="ident">olm_rs</span>::{
-    <span class="ident">errors::OlmGroupSessionError</span>, <span class="ident">outbound_group_session::OlmOutboundGroupSession</span>, <span class="ident">PicklingMode</span>,
-};
+<span class="kw">use</span> <span class="ident">olm_rs</span>::{<span class="ident">errors::OlmGroupSessionError</span>, <span class="ident">PicklingMode</span>};
 <span class="kw">use</span> <span class="ident">ruma</span>::{
     <span class="ident">events</span>::{
         <span class="ident">room</span>::{
@@ -695,7 +693,7 @@
 <span class="kw">const</span> <span class="ident">ROTATION_MESSAGES</span>: <span class="ident">u64</span> <span class="op">=</span> <span class="number">100</span>;
 
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>, <span class="ident">Copy</span>, <span class="ident">PartialEq</span>, <span class="ident">Eq</span>)]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">ShareState</span> {
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">enum</span> <span class="ident">ShareState</span> {
     <span class="ident">NotShared</span>,
     <span class="ident">SharedButChangedSenderKey</span>,
     <span class="ident">Shared</span>(<span class="ident">u32</span>),

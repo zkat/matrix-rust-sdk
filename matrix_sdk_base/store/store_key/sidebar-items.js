@@ -1,0 +1,1 @@
+initSidebarItems({"enum":[["Error","Local State Error for Store Keys"]],"struct":[["EncryptedEvent","Holding the  data of the encrypted event"],["EncryptedStoreKey","An encrypted version of our store key, this can be safely stored in a database."],["StoreKey","A store key that can be used to encrypt entries in the store."]]});

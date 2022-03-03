@@ -786,6 +786,10 @@
 <span id="781">781</span>
 <span id="782">782</span>
 <span id="783">783</span>
+<span id="784">784</span>
+<span id="785">785</span>
+<span id="786">786</span>
+<span id="787">787</span>
 </pre><pre class="rust"><code><span class="comment">// Copyright 2020 The Matrix.org Foundation C.I.C.</span>
 <span class="comment">//</span>
 <span class="comment">// Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);</span>
@@ -1315,8 +1319,9 @@
 
     <span class="doccomment">/// Create a new cross signing identity without signing the device that</span>
     <span class="doccomment">/// created it.</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">user_id</span>: <span class="ident">Box</span><span class="op">&lt;</span><span class="ident">UserId</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
+    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">any</span>(<span class="ident">test</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;testing&quot;</span>))]</span>
+    <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">dead_code</span>)]</span>
+    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">user_id</span>: <span class="ident">Box</span><span class="op">&lt;</span><span class="ident">UserId</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
         <span class="kw">let</span> <span class="ident">master</span> <span class="op">=</span> <span class="ident">Signing::new</span>();
 
         <span class="kw">let</span> <span class="ident">public_key</span> <span class="op">=</span> <span class="ident">master</span>.<span class="ident">cross_signing_key</span>(<span class="ident">user_id</span>.<span class="ident">clone</span>(), <span class="ident">KeyUsage::Master</span>);
@@ -1325,8 +1330,11 @@
         <span class="ident"><span class="self">Self</span>::new_helper</span>(<span class="kw-2">&amp;</span><span class="ident">user_id</span>, <span class="ident">master</span>).<span class="kw">await</span>
     }
 
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">reset</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) {
+    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">any</span>(<span class="ident">test</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;testing&quot;</span>))]</span>
+    <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">dead_code</span>)]</span>
+    <span class="doccomment">/// Testing helper to reset this CrossSigning with a fresh one using the</span>
+    <span class="doccomment">/// local ideniy</span>
+    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">reset</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) {
         <span class="kw">let</span> <span class="ident">new</span> <span class="op">=</span> <span class="ident"><span class="self">Self</span>::new</span>(<span class="self">self</span>.<span class="ident">user_id</span>().<span class="ident">to_owned</span>()).<span class="kw">await</span>;
         <span class="kw-2">*</span><span class="self">self</span> <span class="op">=</span> <span class="ident">new</span>
     }

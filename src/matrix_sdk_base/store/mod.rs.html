@@ -610,77 +610,6 @@
 <span id="605">605</span>
 <span id="606">606</span>
 <span id="607">607</span>
-<span id="608">608</span>
-<span id="609">609</span>
-<span id="610">610</span>
-<span id="611">611</span>
-<span id="612">612</span>
-<span id="613">613</span>
-<span id="614">614</span>
-<span id="615">615</span>
-<span id="616">616</span>
-<span id="617">617</span>
-<span id="618">618</span>
-<span id="619">619</span>
-<span id="620">620</span>
-<span id="621">621</span>
-<span id="622">622</span>
-<span id="623">623</span>
-<span id="624">624</span>
-<span id="625">625</span>
-<span id="626">626</span>
-<span id="627">627</span>
-<span id="628">628</span>
-<span id="629">629</span>
-<span id="630">630</span>
-<span id="631">631</span>
-<span id="632">632</span>
-<span id="633">633</span>
-<span id="634">634</span>
-<span id="635">635</span>
-<span id="636">636</span>
-<span id="637">637</span>
-<span id="638">638</span>
-<span id="639">639</span>
-<span id="640">640</span>
-<span id="641">641</span>
-<span id="642">642</span>
-<span id="643">643</span>
-<span id="644">644</span>
-<span id="645">645</span>
-<span id="646">646</span>
-<span id="647">647</span>
-<span id="648">648</span>
-<span id="649">649</span>
-<span id="650">650</span>
-<span id="651">651</span>
-<span id="652">652</span>
-<span id="653">653</span>
-<span id="654">654</span>
-<span id="655">655</span>
-<span id="656">656</span>
-<span id="657">657</span>
-<span id="658">658</span>
-<span id="659">659</span>
-<span id="660">660</span>
-<span id="661">661</span>
-<span id="662">662</span>
-<span id="663">663</span>
-<span id="664">664</span>
-<span id="665">665</span>
-<span id="666">666</span>
-<span id="667">667</span>
-<span id="668">668</span>
-<span id="669">669</span>
-<span id="670">670</span>
-<span id="671">671</span>
-<span id="672">672</span>
-<span id="673">673</span>
-<span id="674">674</span>
-<span id="675">675</span>
-<span id="676">676</span>
-<span id="677">677</span>
-<span id="678">678</span>
 </pre><pre class="rust"><code><span class="comment">// Copyright 2021 The Matrix.org Foundation C.I.C.</span>
 <span class="comment">//</span>
 <span class="comment">// Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);</span>
@@ -695,8 +624,14 @@
 <span class="comment">// See the License for the specific language governing permissions and</span>
 <span class="comment">// limitations under the License.</span>
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;sled_state_store&quot;</span>)]</span>
-<span class="kw">use</span> <span class="ident">std::path::Path</span>;
+<span class="doccomment">//! The state store holds the overall state for rooms, users and their</span>
+<span class="doccomment">//! profiles and their timelines. It is an overall cache for faster access</span>
+<span class="doccomment">//! and convenience- accessible through `Store`.</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! Implementing the `StateStore` trait, you can plug any storage backend</span>
+<span class="doccomment">//! into the store for the actual storage. By default this brings an in-memory</span>
+<span class="doccomment">//! store.</span>
+
 <span class="kw">use</span> <span class="ident">std</span>::{
     <span class="ident">collections</span>::{<span class="ident">BTreeMap</span>, <span class="ident">BTreeSet</span>},
     <span class="ident">ops::Deref</span>,
@@ -704,7 +639,7 @@
     <span class="ident">sync::Arc</span>,
 };
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
+<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">any</span>(<span class="ident">test</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;testing&quot;</span>))]</span>
 <span class="attribute">#[<span class="ident">macro_use</span>]</span>
 <span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">integration_tests</span>;
 
@@ -724,16 +659,11 @@
     <span class="ident">EventId</span>, <span class="ident">MxcUri</span>, <span class="ident">RoomId</span>, <span class="ident">UserId</span>,
 };
 
+<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;store_key&quot;</span>)]</span>
+<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">store_key</span>;
+
+<span class="doccomment">/// BoxStream of owned Types</span>
 <span class="kw">pub</span> <span class="kw">type</span> <span class="ident">BoxStream</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">Pin</span><span class="op">&lt;</span><span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">futures_util::Stream</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">T</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident">Send</span><span class="op">&gt;</span><span class="op">&gt;</span>;
-
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">any</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;sled_state_store&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;indexeddb_state_store&quot;</span>))]</span>
-<span class="kw">mod</span> <span class="ident">store_key</span>;
-
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;sled_state_store&quot;</span>)]</span>
-<span class="kw">use</span> <span class="ident">sled::Db</span>;
-
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;indexeddb_state_store&quot;</span>)]</span>
-<span class="kw">mod</span> <span class="ident">indexeddb_store</span>;
 
 <span class="kw">use</span> <span class="kw">crate</span>::{
     <span class="ident">deserialized_responses</span>::{<span class="ident">MemberEvent</span>, <span class="ident">StrippedMemberEvent</span>, <span class="ident">SyncRoomEvent</span>, <span class="ident">TimelineSlice</span>},
@@ -744,34 +674,15 @@
 
 <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">mod</span> <span class="ident">ambiguity_map</span>;
 <span class="kw">mod</span> <span class="ident">memory_store</span>;
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;sled_state_store&quot;</span>)]</span>
-<span class="kw">mod</span> <span class="ident">sled_store</span>;
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;indexeddb_state_store&quot;</span>)]</span>
-<span class="kw">use</span> <span class="ident"><span class="self">self</span>::indexeddb_store::IndexeddbStore</span>;
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">any</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;sled_state_store&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;indexeddb_state_store&quot;</span>)))]</span>
-<span class="kw">use</span> <span class="ident"><span class="self">self</span>::memory_store::MemoryStore</span>;
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;sled_state_store&quot;</span>)]</span>
-<span class="kw">use</span> <span class="ident"><span class="self">self</span>::sled_store::SledStore</span>;
+<span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="self">self</span>::memory_store::MemoryStore</span>;
 
 <span class="doccomment">/// State store specific error type.</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">thiserror::Error</span>)]</span>
 <span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">StoreError</span> {
-    <span class="doccomment">/// An error happened in the underlying sled database.</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;sled_state_store&quot;</span>)]</span>
     <span class="attribute">#[<span class="ident">error</span>(<span class="ident">transparent</span>)]</span>
-    <span class="ident">Sled</span>(<span class="attribute">#[<span class="ident">from</span>]</span> <span class="ident">sled::Error</span>),
-    <span class="doccomment">/// An error happened in the underlying Indexed Database.</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;indexeddb_state_store&quot;</span>)]</span>
-    <span class="attribute">#[<span class="ident">error</span>(<span class="string">&quot;IndexDB error: {name} ({code}): {message}&quot;</span>)]</span>
-    <span class="ident">Indexeddb</span> {
-        <span class="doccomment">/// DomException code</span>
-        <span class="ident">code</span>: <span class="ident">u16</span>,
-        <span class="doccomment">/// Specific name of the DomException</span>
-        <span class="ident">name</span>: <span class="ident">String</span>,
-        <span class="doccomment">/// Message given to the DomException</span>
-        <span class="ident">message</span>: <span class="ident">String</span>,
-    },
+    <span class="doccomment">/// An error happened in the underlying database backend.</span>
+    <span class="ident">Backend</span>(<span class="attribute">#[<span class="ident">from</span>]</span> <span class="ident">anyhow::Error</span>),
     <span class="doccomment">/// An error happened while serializing or deserializing some data.</span>
     <span class="attribute">#[<span class="ident">error</span>(<span class="ident">transparent</span>)]</span>
     <span class="ident">Json</span>(<span class="attribute">#[<span class="ident">from</span>]</span> <span class="ident">serde_json::Error</span>),
@@ -792,24 +703,12 @@
     <span class="doccomment">/// The store failed to encode or decode some data.</span>
     <span class="attribute">#[<span class="ident">error</span>(<span class="string">&quot;Error encoding or decoding data from the store: {0}&quot;</span>)]</span>
     <span class="ident">Codec</span>(<span class="ident">String</span>),
-    <span class="doccomment">/// An error happened while running a tokio task.</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;sled_state_store&quot;</span>)]</span>
-    <span class="attribute">#[<span class="ident">error</span>(<span class="ident">transparent</span>)]</span>
-    <span class="ident">Task</span>(<span class="attribute">#[<span class="ident">from</span>]</span> <span class="ident">tokio::task::JoinError</span>),
     <span class="doccomment">/// Redacting an event in the store has failed.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// This should never happen.</span>
     <span class="attribute">#[<span class="ident">error</span>(<span class="string">&quot;Redaction failed: {0}&quot;</span>)]</span>
     <span class="ident">Redaction</span>(<span class="attribute">#[<span class="ident">source</span>]</span> <span class="ident">ruma::signatures::Error</span>),
 }
-
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;indexeddb_state_store&quot;</span>)]</span>
-<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">indexed_db_futures::web_sys::DomException</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">StoreError</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">frm</span>: <span class="ident">indexed_db_futures::web_sys::DomException</span>) -&gt; <span class="ident">StoreError</span> {
-        <span class="ident">StoreError::Indexeddb</span> { <span class="ident">name</span>: <span class="ident">frm</span>.<span class="ident">name</span>(), <span class="ident">message</span>: <span class="ident">frm</span>.<span class="ident">message</span>(), <span class="ident">code</span>: <span class="ident">frm</span>.<span class="ident">code</span>() }
-    }
-}
-
 <span class="doccomment">/// A `StateStore` specific result type.</span>
 <span class="kw">pub</span> <span class="kw">type</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">E</span> <span class="op">=</span> <span class="ident">StoreError</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">std::result::Result</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">E</span><span class="op">&gt;</span>;
 
@@ -1073,57 +972,9 @@
     <span class="ident">stripped_rooms</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">DashMap</span><span class="op">&lt;</span><span class="ident">Box</span><span class="op">&lt;</span><span class="ident">RoomId</span><span class="op">&gt;</span>, <span class="ident">Room</span><span class="op">&gt;</span><span class="op">&gt;</span>,
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;sled_state_store&quot;</span>)]</span>
 <span class="kw">impl</span> <span class="ident">Store</span> {
-    <span class="doccomment">/// Open the default Sled store.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Arguments</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// * `path` - The path where the store should reside in.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// * `passphrase` - A passphrase that should be used to encrypt the state</span>
-    <span class="doccomment">/// store.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">open_default</span>(<span class="ident">path</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">Path</span><span class="op">&gt;</span>, <span class="ident">passphrase</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(<span class="self">Self</span>, <span class="ident">Db</span>)<span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">inner</span> <span class="op">=</span> <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">passphrase</span>) <span class="op">=</span> <span class="ident">passphrase</span> {
-            <span class="ident">SledStore::open_with_passphrase</span>(<span class="ident">path</span>, <span class="ident">passphrase</span>)<span class="question-mark">?</span>
-        } <span class="kw">else</span> {
-            <span class="ident">SledStore::open_with_path</span>(<span class="ident">path</span>)<span class="question-mark">?</span>
-        };
-
-        <span class="prelude-val">Ok</span>((<span class="ident"><span class="self">Self</span>::new</span>(<span class="ident">Box::new</span>(<span class="ident">inner</span>.<span class="ident">clone</span>())), <span class="ident">inner</span>.<span class="ident">inner</span>))
-    }
-
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">open_temporary</span>() -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(<span class="self">Self</span>, <span class="ident">Db</span>)<span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">inner</span> <span class="op">=</span> <span class="ident">SledStore::open</span>()<span class="question-mark">?</span>;
-
-        <span class="prelude-val">Ok</span>((<span class="ident"><span class="self">Self</span>::new</span>(<span class="ident">Box::new</span>(<span class="ident">inner</span>.<span class="ident">clone</span>())), <span class="ident">inner</span>.<span class="ident">inner</span>))
-    }
-}
-
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;indexeddb_state_store&quot;</span>)]</span>
-<span class="kw">impl</span> <span class="ident">Store</span> {
-    <span class="doccomment">/// Open the default IndexedDB store.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Arguments</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// * `name` - The name of the store should reside in.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// * `passphrase` - A passphrase that should be used to encrypt the state</span>
-    <span class="doccomment">/// store.</span>
-    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">open_default</span>(<span class="ident">name</span>: <span class="ident">String</span>, <span class="ident">passphrase</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">inner</span> <span class="op">=</span> <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">passphrase</span>) <span class="op">=</span> <span class="ident">passphrase</span> {
-            <span class="ident">IndexeddbStore::open_with_passphrase</span>(<span class="ident">name</span>, <span class="ident">passphrase</span>).<span class="kw">await</span><span class="question-mark">?</span>
-        } <span class="kw">else</span> {
-            <span class="ident">IndexeddbStore::open_with_name</span>(<span class="ident">name</span>).<span class="kw">await</span><span class="question-mark">?</span>
-        };
-
-        <span class="prelude-val">Ok</span>(<span class="ident"><span class="self">Self</span>::new</span>(<span class="ident">Box::new</span>(<span class="ident">inner</span>)))
-    }
-}
-
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">any</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;sled_state_store&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;indexeddb_state_store&quot;</span>)))]</span>
-<span class="kw">impl</span> <span class="ident">Store</span> {
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">open_memory_store</span>() -&gt; <span class="self">Self</span> {
+    <span class="doccomment">/// Create a new Store with the default `MemoryStore`</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">open_memory_store</span>() -&gt; <span class="self">Self</span> {
         <span class="kw">let</span> <span class="ident">inner</span> <span class="op">=</span> <span class="ident">Box::new</span>(<span class="ident">MemoryStore::new</span>());
 
         <span class="ident"><span class="self">Self</span>::new</span>(<span class="ident">inner</span>)
@@ -1131,7 +982,8 @@
 }
 
 <span class="kw">impl</span> <span class="ident">Store</span> {
-    <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">inner</span>: <span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">StateStore</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
+    <span class="doccomment">/// Create a new store, wrappning the given `StateStore`</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">inner</span>: <span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">StateStore</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
         <span class="self">Self</span> {
             <span class="ident">inner</span>: <span class="ident">inner</span>.<span class="ident">into</span>(),
             <span class="ident">session</span>: <span class="ident">Default::default</span>(),
@@ -1141,7 +993,9 @@
         }
     }
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">restore_session</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">session</span>: <span class="ident">Session</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+    <span class="doccomment">/// Restore the access to the Store from the given `Session`, overwrites any</span>
+    <span class="doccomment">/// previously existing access to the Store.</span>
+    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">restore_session</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">session</span>: <span class="ident">Session</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="kw">for</span> <span class="ident">info</span> <span class="kw">in</span> <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">get_room_infos</span>().<span class="kw">await</span><span class="question-mark">?</span> {
             <span class="kw">let</span> <span class="ident">room</span> <span class="op">=</span> <span class="ident">Room::restore</span>(<span class="kw-2">&amp;</span><span class="ident">session</span>.<span class="ident">user_id</span>, <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">clone</span>(), <span class="ident">info</span>);
             <span class="self">self</span>.<span class="ident">rooms</span>.<span class="ident">insert</span>(<span class="ident">room</span>.<span class="ident">room_id</span>().<span class="ident">to_owned</span>(), <span class="ident">room</span>);
@@ -1187,7 +1041,9 @@
         <span class="self">self</span>.<span class="ident">stripped_rooms</span>.<span class="ident">get</span>(<span class="ident">room_id</span>).<span class="ident">map</span>(<span class="op">|</span><span class="ident">r</span><span class="op">|</span> <span class="ident">r</span>.<span class="ident">clone</span>())
     }
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">get_or_create_stripped_room</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">room_id</span>: <span class="kw-2">&amp;</span><span class="ident">RoomId</span>) -&gt; <span class="ident">Room</span> {
+    <span class="doccomment">/// Lookup the stripped Room for the given RoomId, or create one, if it</span>
+    <span class="doccomment">/// didn&#39;t exist yet in the store</span>
+    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">get_or_create_stripped_room</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">room_id</span>: <span class="kw-2">&amp;</span><span class="ident">RoomId</span>) -&gt; <span class="ident">Room</span> {
         <span class="kw">let</span> <span class="ident">session</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">session</span>.<span class="ident">read</span>().<span class="kw">await</span>;
         <span class="kw">let</span> <span class="ident">user_id</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">session</span>.<span class="ident">as_ref</span>().<span class="ident">expect</span>(<span class="string">&quot;Creating room while not being logged in&quot;</span>).<span class="ident">user_id</span>;
 
@@ -1197,7 +1053,9 @@
             .<span class="ident">clone</span>()
     }
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">get_or_create_room</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">room_id</span>: <span class="kw-2">&amp;</span><span class="ident">RoomId</span>, <span class="ident">room_type</span>: <span class="ident">RoomType</span>) -&gt; <span class="ident">Room</span> {
+    <span class="doccomment">/// Lookup the Room for the given RoomId, or create one, if it didn&#39;t exist</span>
+    <span class="doccomment">/// yet in the store</span>
+    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">get_or_create_room</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">room_id</span>: <span class="kw-2">&amp;</span><span class="ident">RoomId</span>, <span class="ident">room_type</span>: <span class="ident">RoomType</span>) -&gt; <span class="ident">Room</span> {
         <span class="kw">if</span> <span class="ident">room_type</span> <span class="op">==</span> <span class="ident">RoomType::Invited</span> {
             <span class="kw">return</span> <span class="self">self</span>.<span class="ident">get_or_create_stripped_room</span>(<span class="ident">room_id</span>).<span class="kw">await</span>;
         }

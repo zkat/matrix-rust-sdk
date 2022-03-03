@@ -280,6 +280,15 @@
 <span id="275">275</span>
 <span id="276">276</span>
 <span id="277">277</span>
+<span id="278">278</span>
+<span id="279">279</span>
+<span id="280">280</span>
+<span id="281">281</span>
+<span id="282">282</span>
+<span id="283">283</span>
+<span id="284">284</span>
+<span id="285">285</span>
+<span id="286">286</span>
 </pre><pre class="rust"><code><span class="comment">// Copyright 2020 The Matrix.org Foundation C.I.C.</span>
 <span class="comment">//</span>
 <span class="comment">// Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);</span>
@@ -325,15 +334,24 @@
 <span class="doccomment">/// `Account`s</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Session</span> {
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">user_id</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">UserId</span><span class="op">&gt;</span>,
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">device_id</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">DeviceId</span><span class="op">&gt;</span>,
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">our_identity_keys</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">IdentityKeys</span><span class="op">&gt;</span>,
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">inner</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">Mutex</span><span class="op">&lt;</span><span class="ident">OlmSession</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">session_id</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">str</span><span class="op">&gt;</span>,
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">sender_key</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">str</span><span class="op">&gt;</span>,
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">created_using_fallback_key</span>: <span class="ident">bool</span>,
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">creation_time</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">Instant</span><span class="op">&gt;</span>,
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">last_use_time</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">Instant</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// The `UserId` associated with this session</span>
+    <span class="kw">pub</span> <span class="ident">user_id</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">UserId</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// The specific `DeviceId` associated with this session</span>
+    <span class="kw">pub</span> <span class="ident">device_id</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">DeviceId</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// The `IdentityKeys` associated with this session</span>
+    <span class="kw">pub</span> <span class="ident">our_identity_keys</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">IdentityKeys</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// The OlmSession</span>
+    <span class="kw">pub</span> <span class="ident">inner</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">Mutex</span><span class="op">&lt;</span><span class="ident">OlmSession</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// Our sessionId</span>
+    <span class="kw">pub</span> <span class="ident">session_id</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">str</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// The Key of the sender</span>
+    <span class="kw">pub</span> <span class="ident">sender_key</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">str</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// Has this been created using the fallback key</span>
+    <span class="kw">pub</span> <span class="ident">created_using_fallback_key</span>: <span class="ident">bool</span>,
+    <span class="doccomment">/// When the session was created</span>
+    <span class="kw">pub</span> <span class="ident">creation_time</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">Instant</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// When the session was last used</span>
+    <span class="kw">pub</span> <span class="ident">last_use_time</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">Instant</span><span class="op">&gt;</span>,
 }
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">tarpaulin_include</span>))]</span>

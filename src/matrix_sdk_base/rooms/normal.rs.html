@@ -686,6 +686,20 @@
 <span id="681">681</span>
 <span id="682">682</span>
 <span id="683">683</span>
+<span id="684">684</span>
+<span id="685">685</span>
+<span id="686">686</span>
+<span id="687">687</span>
+<span id="688">688</span>
+<span id="689">689</span>
+<span id="690">690</span>
+<span id="691">691</span>
+<span id="692">692</span>
+<span id="693">693</span>
+<span id="694">694</span>
+<span id="695">695</span>
+<span id="696">696</span>
+<span id="697">697</span>
 </pre><pre class="rust"><code><span class="comment">// Copyright 2020 The Matrix.org Foundation C.I.C.</span>
 <span class="comment">//</span>
 <span class="comment">// Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);</span>
@@ -1063,11 +1077,13 @@
         <span class="prelude-val">Ok</span>(<span class="ident">inner</span>.<span class="ident">base_info</span>.<span class="ident">calculate_room_name</span>(<span class="ident">joined</span>, <span class="ident">invited</span>, <span class="ident">members</span>))
     }
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">clone_info</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">RoomInfo</span> {
+    <span class="doccomment">/// Clone the inner RoomInfo</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">clone_info</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">RoomInfo</span> {
         (<span class="kw-2">*</span><span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">read</span>().<span class="ident">unwrap</span>()).<span class="ident">clone</span>()
     }
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">update_summary</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">summary</span>: <span class="ident">RoomInfo</span>) {
+    <span class="doccomment">/// Update the summary with given RoomInfo</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">update_summary</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">summary</span>: <span class="ident">RoomInfo</span>) {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">inner</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">write</span>().<span class="ident">unwrap</span>();
         <span class="kw-2">*</span><span class="ident">inner</span> <span class="op">=</span> <span class="ident">summary</span>;
     }
@@ -1299,23 +1315,30 @@
 }
 
 <span class="kw">impl</span> <span class="ident">RoomInfo</span> {
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">mark_as_joined</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) {
+    <span class="doccomment">/// Mark this Room as joined</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">mark_as_joined</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) {
         <span class="self">self</span>.<span class="ident">room_type</span> <span class="op">=</span> <span class="ident">RoomType::Joined</span>;
     }
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">mark_as_left</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) {
+    <span class="doccomment">/// Mark this Room as left</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">mark_as_left</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) {
         <span class="self">self</span>.<span class="ident">room_type</span> <span class="op">=</span> <span class="ident">RoomType::Left</span>;
     }
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">mark_members_synced</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) {
+    <span class="doccomment">/// Mark this Room as having all the members synced</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">mark_members_synced</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) {
         <span class="self">self</span>.<span class="ident">members_synced</span> <span class="op">=</span> <span class="bool-val">true</span>;
     }
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">mark_members_missing</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) {
+    <span class="doccomment">/// Mark this Room still missing member information</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">mark_members_missing</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) {
         <span class="self">self</span>.<span class="ident">members_synced</span> <span class="op">=</span> <span class="bool-val">false</span>;
     }
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">set_prev_batch</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">prev_batch</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span>) -&gt; <span class="ident">bool</span> {
+    <span class="doccomment">/// Set the `prev_batch`-token.</span>
+    <span class="doccomment">/// Returns whether the token has differed and thus has been upgraded:</span>
+    <span class="doccomment">/// `false` means no update was applied as the were the same</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_prev_batch</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">prev_batch</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span>) -&gt; <span class="ident">bool</span> {
         <span class="kw">if</span> <span class="self">self</span>.<span class="ident">last_prev_batch</span>.<span class="ident">as_deref</span>() <span class="op">!</span><span class="op">=</span> <span class="ident">prev_batch</span> {
             <span class="self">self</span>.<span class="ident">last_prev_batch</span> <span class="op">=</span> <span class="ident">prev_batch</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">p</span><span class="op">|</span> <span class="ident">p</span>.<span class="ident">to_string</span>());
             <span class="bool-val">true</span>
@@ -1324,22 +1347,27 @@
         }
     }
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">is_encrypted</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
+    <span class="doccomment">/// Whether this is an encrypted Room</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_encrypted</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
         <span class="self">self</span>.<span class="ident">base_info</span>.<span class="ident">encryption</span>.<span class="ident">is_some</span>()
     }
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">handle_state_event</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">event</span>: <span class="kw-2">&amp;</span><span class="ident">AnyStateEventContent</span>) -&gt; <span class="ident">bool</span> {
+    <span class="doccomment">/// handle the given State event.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// Returns true if the event modified the info, false otherwise.</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">handle_state_event</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">event</span>: <span class="kw-2">&amp;</span><span class="ident">AnyStateEventContent</span>) -&gt; <span class="ident">bool</span> {
         <span class="self">self</span>.<span class="ident">base_info</span>.<span class="ident">handle_state_event</span>(<span class="ident">event</span>)
     }
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">update_notification_count</span>(
-        <span class="kw-2">&amp;mut</span> <span class="self">self</span>,
-        <span class="ident">notification_counts</span>: <span class="ident">UnreadNotificationsCount</span>,
-    ) {
+    <span class="doccomment">/// Update the notifications count</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">update_notification_count</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">notification_counts</span>: <span class="ident">UnreadNotificationsCount</span>) {
         <span class="self">self</span>.<span class="ident">notification_counts</span> <span class="op">=</span> <span class="ident">notification_counts</span>;
     }
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">update_summary</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">summary</span>: <span class="kw-2">&amp;</span><span class="ident">RumaSummary</span>) -&gt; <span class="ident">bool</span> {
+    <span class="doccomment">/// Update the RoomSummary</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// Returns true if the Summary modified the info, false otherwise.</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">update_summary</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">summary</span>: <span class="kw-2">&amp;</span><span class="ident">RumaSummary</span>) -&gt; <span class="ident">bool</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">changed</span> <span class="op">=</span> <span class="bool-val">false</span>;
 
         <span class="kw">if</span> <span class="op">!</span><span class="ident">summary</span>.<span class="ident">is_empty</span>() {

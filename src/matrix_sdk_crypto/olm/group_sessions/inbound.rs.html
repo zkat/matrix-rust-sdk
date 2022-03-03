@@ -479,6 +479,14 @@
 <span id="474">474</span>
 <span id="475">475</span>
 <span id="476">476</span>
+<span id="477">477</span>
+<span id="478">478</span>
+<span id="479">479</span>
+<span id="480">480</span>
+<span id="481">481</span>
+<span id="482">482</span>
+<span id="483">483</span>
+<span id="484">484</span>
 </pre><pre class="rust"><code><span class="comment">// Copyright 2020 The Matrix.org Foundation C.I.C.</span>
 <span class="comment">//</span>
 <span class="comment">// Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);</span>
@@ -492,6 +500,8 @@
 <span class="comment">// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.</span>
 <span class="comment">// See the License for the specific language governing permissions and</span>
 <span class="comment">// limitations under the License.</span>
+
+<span class="attribute">#![<span class="ident">warn</span>(<span class="ident">missing_docs</span>)]</span>
 
 <span class="kw">use</span> <span class="ident">std</span>::{
     <span class="ident">collections::BTreeMap</span>,
@@ -543,11 +553,15 @@
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">InboundGroupSession</span> {
     <span class="ident">inner</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">Mutex</span><span class="op">&lt;</span><span class="ident">OlmInboundGroupSession</span><span class="op">&gt;</span><span class="op">&gt;</span>,
     <span class="ident">history_visibility</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">HistoryVisibility</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">session_id</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">str</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// The SessionId associated to this GroupSession</span>
+    <span class="kw">pub</span> <span class="ident">session_id</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">str</span><span class="op">&gt;</span>,
     <span class="ident">first_known_index</span>: <span class="ident">u32</span>,
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">sender_key</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">str</span><span class="op">&gt;</span>,
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">signing_keys</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">BTreeMap</span><span class="op">&lt;</span><span class="ident">DeviceKeyAlgorithm</span>, <span class="ident">String</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">room_id</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">RoomId</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// The sender_key associated to this GroupSession</span>
+    <span class="kw">pub</span> <span class="ident">sender_key</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">str</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// Map of DeviceKeyAlgorithm to the public ed25519 key of the account</span>
+    <span class="kw">pub</span> <span class="ident">signing_keys</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">BTreeMap</span><span class="op">&lt;</span><span class="ident">DeviceKeyAlgorithm</span>, <span class="ident">String</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// The Room this GroupSession belongs to</span>
+    <span class="kw">pub</span> <span class="ident">room_id</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">RoomId</span><span class="op">&gt;</span>,
     <span class="ident">forwarding_chains</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span><span class="op">&gt;</span>,
     <span class="ident">imported</span>: <span class="ident">bool</span>,
     <span class="ident">backed_up</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">AtomicBool</span><span class="op">&gt;</span>,
@@ -570,7 +584,7 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// * `session_key` - The private session key that is used to decrypt</span>
     <span class="doccomment">/// messages.</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">new</span>(
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(
         <span class="ident">sender_key</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>,
         <span class="ident">signing_key</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>,
         <span class="ident">room_id</span>: <span class="kw-2">&amp;</span><span class="ident">RoomId</span>,
@@ -640,7 +654,7 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// * `content` - A forwarded room key content that contains the session key</span>
     <span class="doccomment">/// to create the `InboundGroupSession`.</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">from_forwarded_key</span>(
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">from_forwarded_key</span>(
         <span class="ident">sender_key</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>,
         <span class="ident">content</span>: <span class="kw-2">&amp;mut</span> <span class="ident">ToDeviceForwardedRoomKeyEventContent</span>,
     ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">OlmGroupSessionError</span><span class="op">&gt;</span> {
@@ -709,13 +723,15 @@
     }
 
     <span class="doccomment">/// Reset the backup state of the inbound group session.</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">reset_backup_state</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">reset_backup_state</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) {
         <span class="self">self</span>.<span class="ident">backed_up</span>.<span class="ident">store</span>(<span class="bool-val">false</span>, <span class="ident">SeqCst</span>)
     }
 
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
+    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">any</span>(<span class="ident">test</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;testing&quot;</span>))]</span>
     <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">dead_code</span>)]</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">mark_as_backed_up</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) {
+    <span class="doccomment">/// For testing, allow to manually mark this GroupSession to have been</span>
+    <span class="doccomment">/// backed up</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">mark_as_backed_up</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) {
         <span class="self">self</span>.<span class="ident">backed_up</span>.<span class="ident">store</span>(<span class="bool-val">true</span>, <span class="ident">SeqCst</span>)
     }
 
@@ -808,7 +824,7 @@
     <span class="doccomment">/// # Arguments</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// * `message` - The message that should be decrypted.</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">decrypt_helper</span>(
+    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">decrypt_helper</span>(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         <span class="ident">message</span>: <span class="ident">String</span>,
     ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(<span class="ident">String</span>, <span class="ident">u32</span>), <span class="ident">OlmGroupSessionError</span><span class="op">&gt;</span> {
@@ -816,7 +832,7 @@
     }
 
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;backups_v1&quot;</span>)]</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">to_backup</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">BackedUpRoomKey</span> {
+    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">to_backup</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">BackedUpRoomKey</span> {
         <span class="self">self</span>.<span class="ident">export</span>().<span class="kw">await</span>.<span class="ident">into</span>()
     }
 
@@ -825,7 +841,7 @@
     <span class="doccomment">/// # Arguments</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// * `event` - The event that should be decrypted.</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">decrypt</span>(
+    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">decrypt</span>(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         <span class="ident">event</span>: <span class="kw-2">&amp;</span><span class="ident">SyncRoomEncryptedEvent</span>,
     ) -&gt; <span class="ident">MegolmResult</span><span class="op">&lt;</span>(<span class="ident">Raw</span><span class="op">&lt;</span><span class="ident">AnyRoomEvent</span><span class="op">&gt;</span>, <span class="ident">u32</span>)<span class="op">&gt;</span> {

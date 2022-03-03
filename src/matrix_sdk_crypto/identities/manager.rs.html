@@ -815,6 +815,14 @@
 <span id="810">810</span>
 <span id="811">811</span>
 <span id="812">812</span>
+<span id="813">813</span>
+<span id="814">814</span>
+<span id="815">815</span>
+<span id="816">816</span>
+<span id="817">817</span>
+<span id="818">818</span>
+<span id="819">819</span>
+<span id="820">820</span>
 </pre><pre class="rust"><code><span class="comment">// Copyright 2020 The Matrix.org Foundation C.I.C.</span>
 <span class="comment">//</span>
 <span class="comment">// Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);</span>
@@ -1354,12 +1362,12 @@
     }
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">mod</span> <span class="ident">test</span> {
+<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">any</span>(<span class="ident">test</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;testing&quot;</span>))]</span>
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">mod</span> <span class="ident">testing</span> {
+    <span class="attribute">#![<span class="ident">allow</span>(<span class="ident">dead_code</span>)]</span>
     <span class="kw">use</span> <span class="ident">std::sync::Arc</span>;
 
     <span class="kw">use</span> <span class="ident">matrix_sdk_common::locks::Mutex</span>;
-    <span class="kw">use</span> <span class="ident">matrix_sdk_test::async_test</span>;
     <span class="kw">use</span> <span class="ident">ruma</span>::{
         <span class="ident">api</span>::{<span class="ident">client::keys::get_keys::v3::Response</span> <span class="kw">as</span> <span class="ident">KeyQueryResponse</span>, <span class="ident">IncomingResponse</span>},
         <span class="ident">device_id</span>, <span class="ident">user_id</span>, <span class="ident">DeviceId</span>, <span class="ident">UserId</span>,
@@ -1368,25 +1376,25 @@
 
     <span class="kw">use</span> <span class="kw">crate</span>::{
         <span class="ident">identities::IdentityManager</span>,
-        <span class="ident">machine::test::response_from_file</span>,
+        <span class="ident">machine::testing::response_from_file</span>,
         <span class="ident">olm</span>::{<span class="ident">PrivateCrossSigningIdentity</span>, <span class="ident">ReadOnlyAccount</span>},
         <span class="ident">store</span>::{<span class="ident">CryptoStore</span>, <span class="ident">MemoryStore</span>, <span class="ident">Store</span>},
         <span class="ident">verification::VerificationMachine</span>,
     };
 
-    <span class="kw">fn</span> <span class="ident">user_id</span>() -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">UserId</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">user_id</span>() -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">UserId</span> {
         <span class="macro">user_id!</span>(<span class="string">&quot;@example:localhost&quot;</span>)
     }
 
-    <span class="kw">fn</span> <span class="ident">other_user_id</span>() -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">UserId</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">other_user_id</span>() -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">UserId</span> {
         <span class="macro">user_id!</span>(<span class="string">&quot;@example2:localhost&quot;</span>)
     }
 
-    <span class="kw">fn</span> <span class="ident">device_id</span>() -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">DeviceId</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">device_id</span>() -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">DeviceId</span> {
         <span class="macro">device_id!</span>(<span class="string">&quot;WSKKLTJZCL&quot;</span>)
     }
 
-    <span class="kw">fn</span> <span class="ident">manager</span>() -&gt; <span class="ident">IdentityManager</span> {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">manager</span>() -&gt; <span class="ident">IdentityManager</span> {
         <span class="kw">let</span> <span class="ident">identity</span> <span class="op">=</span>
             <span class="ident">Arc::new</span>(<span class="ident">Mutex::new</span>(<span class="ident">PrivateCrossSigningIdentity::empty</span>(<span class="ident">user_id</span>().<span class="ident">to_owned</span>())));
         <span class="kw">let</span> <span class="ident">user_id</span> <span class="op">=</span> <span class="ident">Arc::from</span>(<span class="ident">user_id</span>());
@@ -1398,7 +1406,7 @@
         <span class="ident">IdentityManager::new</span>(<span class="ident">user_id</span>, <span class="ident">device_id</span>().<span class="ident">into</span>(), <span class="ident">store</span>)
     }
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">other_key_query</span>() -&gt; <span class="ident">KeyQueryResponse</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">other_key_query</span>() -&gt; <span class="ident">KeyQueryResponse</span> {
         <span class="kw">let</span> <span class="ident">data</span> <span class="op">=</span> <span class="ident">response_from_file</span>(<span class="kw-2">&amp;</span><span class="macro">json!</span>({
             <span class="string">&quot;device_keys&quot;</span>: {
                 <span class="string">&quot;@example2:localhost&quot;</span>: {
@@ -1457,7 +1465,7 @@
             .<span class="ident">expect</span>(<span class="string">&quot;Can&#39;t parse the keys upload response&quot;</span>)
     }
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">own_key_query</span>() -&gt; <span class="ident">KeyQueryResponse</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">own_key_query</span>() -&gt; <span class="ident">KeyQueryResponse</span> {
         <span class="kw">let</span> <span class="ident">data</span> <span class="op">=</span> <span class="ident">response_from_file</span>(<span class="kw-2">&amp;</span><span class="macro">json!</span>({
           <span class="string">&quot;device_keys&quot;</span>: {
             <span class="string">&quot;@example:localhost&quot;</span>: {
@@ -1557,6 +1565,14 @@
         <span class="ident">KeyQueryResponse::try_from_http_response</span>(<span class="ident">data</span>)
             .<span class="ident">expect</span>(<span class="string">&quot;Can&#39;t parse the keys upload response&quot;</span>)
     }
+}
+
+<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">mod</span> <span class="ident">test</span> {
+    <span class="kw">use</span> <span class="ident">matrix_sdk_test::async_test</span>;
+    <span class="kw">use</span> <span class="ident">ruma::device_id</span>;
+
+    <span class="kw">use</span> <span class="ident"><span class="kw">super</span>::testing</span>::{<span class="ident">manager</span>, <span class="ident">other_key_query</span>, <span class="ident">other_user_id</span>};
 
     <span class="attribute">#[<span class="ident">async_test</span>]</span>
     <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">test_manager_creation</span>() {

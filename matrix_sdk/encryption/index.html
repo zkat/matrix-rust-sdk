@@ -129,7 +129,8 @@ unverified devices, verifying devices is <strong>not</strong> necessary for encr
 to work.</p>
 <ol>
 <li>Make sure the <code>encryption</code> feature is enabled.</li>
-<li>Configure a store path with the <a href="../config/struct.ClientConfig.html#method.store_path"><code>ClientConfig::store_path</code></a> method.</li>
+<li>Ensure you have a persistent storage backend, either by activating the
+<code>sled_state_store</code>-feature or providing one via [<code>ClientConfig.state_store</code>]</li>
 </ol>
 <h3 id="restoring-a-client"><a href="#restoring-a-client">Restoring a client</a></h3>
 <p>Restoring a Client is relatively easy, still some things need to be kept in
@@ -171,7 +172,7 @@ with a different device id (either <code>None</code> or a device ID of another c
 is <strong>not</strong> supported using the default store.</p>
 <h3 id="common-pitfalls"><a href="#common-pitfalls">Common pitfalls</a></h3><div><table><thead><tr><th>Failure</th><th>Cause</th><th>Fix</th></tr></thead><tbody>
 <tr><td>No messages get encrypted nor decrypted</td><td>The <code>encryption</code> feature is disabled</td><td><a href="https://doc.rust-lang.org/cargo/reference/specifying-dependencies.html#choosing-features">Enable the feature in your <code>Cargo.toml</code> file</a></td></tr>
-<tr><td>Messages that were decryptable aren’t after a restart</td><td>Storage isn’t setup to be persistent</td><td>Setup storage with <a href="../config/struct.ClientConfig.html#method.store_path"><code>ClientConfig::store_path</code></a></td></tr>
+<tr><td>Messages that were decryptable aren’t after a restart</td><td>Storage isn’t setup to be persistent</td><td>Ensure you’ve activated the persistent storage backend feature, e.g. <code>sled_state_store</code></td></tr>
 <tr><td>Messages are encrypted but can’t be decrypted</td><td>The access token that the client is using is tied to another device</td><td>Clear storage to create a new device, read the <a href="#restoring-a-client">Restoring a Client</a> section</td></tr>
 <tr><td>Messages don’t get encrypted but get decrypted</td><td>The <code>m.room.encryption</code> event is missing</td><td>Make sure encryption is <a href="../room/struct.Joined.html#method.enable_encryption">enabled</a> for the room and the event isn’t <a href="../config/struct.SyncSettings.html#method.filter">filtered</a> out, otherwise it might be a deserialization bug</td></tr>
 </tbody></table>

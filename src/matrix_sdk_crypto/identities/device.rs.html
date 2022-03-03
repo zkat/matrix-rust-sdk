@@ -698,6 +698,23 @@
 <span id="693">693</span>
 <span id="694">694</span>
 <span id="695">695</span>
+<span id="696">696</span>
+<span id="697">697</span>
+<span id="698">698</span>
+<span id="699">699</span>
+<span id="700">700</span>
+<span id="701">701</span>
+<span id="702">702</span>
+<span id="703">703</span>
+<span id="704">704</span>
+<span id="705">705</span>
+<span id="706">706</span>
+<span id="707">707</span>
+<span id="708">708</span>
+<span id="709">709</span>
+<span id="710">710</span>
+<span id="711">711</span>
+<span id="712">712</span>
 </pre><pre class="rust"><code><span class="comment">// Copyright 2020 The Matrix.org Foundation C.I.C.</span>
 <span class="comment">//</span>
 <span class="comment">// Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);</span>
@@ -747,7 +764,7 @@
     <span class="ident">verification::VerificationMachine</span>,
     <span class="ident">OutgoingVerificationRequest</span>, <span class="ident">Sas</span>, <span class="ident">ToDeviceRequest</span>, <span class="ident">VerificationRequest</span>,
 };
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
+<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">any</span>(<span class="ident">test</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;testing&quot;</span>))]</span>
 <span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">OlmMachine</span>, <span class="ident">ReadOnlyAccount</span>};
 
 <span class="doccomment">/// A read-only version of a `Device`.</span>
@@ -1074,8 +1091,7 @@
     <span class="doccomment">/// Create a new Device, this constructor skips signature verification of</span>
     <span class="doccomment">/// the keys, `TryFrom` should be used for completely new devices we</span>
     <span class="doccomment">/// receive.</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;sled_cryptostore&quot;</span>)]</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">device_keys</span>: <span class="ident">DeviceKeys</span>, <span class="ident">trust_state</span>: <span class="ident">LocalTrust</span>) -&gt; <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">device_keys</span>: <span class="ident">DeviceKeys</span>, <span class="ident">trust_state</span>: <span class="ident">LocalTrust</span>) -&gt; <span class="self">Self</span> {
         <span class="self">Self</span> {
             <span class="ident">inner</span>: <span class="ident">device_keys</span>.<span class="ident">into</span>(),
             <span class="ident">trust_state</span>: <span class="ident">Arc::new</span>(<span class="ident">Atomic::new</span>(<span class="ident">trust_state</span>)),
@@ -1272,12 +1288,20 @@
         <span class="self">self</span>.<span class="ident">deleted</span>.<span class="ident">store</span>(<span class="bool-val">true</span>, <span class="ident">Ordering::Relaxed</span>);
     }
 
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
+    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">any</span>(<span class="ident">test</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;testing&quot;</span>))]</span>
+    <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">dead_code</span>)]</span>
+    <span class="doccomment">/// Generate the Device from the reference of an OlmMachine.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// TESTING FACILITY ONLY, DO NOT USE OUTSIDE OF TESTS</span>
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">from_machine</span>(<span class="ident">machine</span>: <span class="kw-2">&amp;</span><span class="ident">OlmMachine</span>) -&gt; <span class="ident">ReadOnlyDevice</span> {
         <span class="ident">ReadOnlyDevice::from_account</span>(<span class="ident">machine</span>.<span class="ident">account</span>()).<span class="kw">await</span>
     }
 
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
+    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">any</span>(<span class="ident">test</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;testing&quot;</span>))]</span>
+    <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">dead_code</span>)]</span>
+    <span class="doccomment">/// Generate the Device from the reference of an Account.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// TESTING FACILITY ONLY, DO NOT USE OUTSIDE OF TESTS</span>
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">from_account</span>(<span class="ident">account</span>: <span class="kw-2">&amp;</span><span class="ident">ReadOnlyAccount</span>) -&gt; <span class="ident">ReadOnlyDevice</span> {
         <span class="kw">let</span> <span class="ident">device_keys</span> <span class="op">=</span> <span class="ident">account</span>.<span class="ident">device_keys</span>().<span class="kw">await</span>;
         <span class="ident">ReadOnlyDevice::try_from</span>(<span class="kw-2">&amp;</span><span class="ident">device_keys</span>).<span class="ident">unwrap</span>()
@@ -1305,16 +1329,17 @@
     }
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">mod</span> <span class="ident">test</span> {
-    <span class="kw">use</span> <span class="ident">std::convert::TryFrom</span>;
-
-    <span class="kw">use</span> <span class="ident">ruma</span>::{<span class="ident">encryption::DeviceKeys</span>, <span class="ident">user_id</span>, <span class="ident">DeviceKeyAlgorithm</span>};
+<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">any</span>(<span class="ident">test</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;testing&quot;</span>))]</span>
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">mod</span> <span class="ident">testing</span> {
+    <span class="doccomment">//! Testing Facilities for Device Management</span>
+    <span class="attribute">#![<span class="ident">allow</span>(<span class="ident">dead_code</span>)]</span>
+    <span class="kw">use</span> <span class="ident">ruma::encryption::DeviceKeys</span>;
     <span class="kw">use</span> <span class="ident">serde_json::json</span>;
 
-    <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::identities</span>::{<span class="ident">LocalTrust</span>, <span class="ident">ReadOnlyDevice</span>};
+    <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::identities::ReadOnlyDevice</span>;
 
-    <span class="kw">fn</span> <span class="ident">device_keys</span>() -&gt; <span class="ident">DeviceKeys</span> {
+    <span class="doccomment">/// Generate default DeviceKeys for tests</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">device_keys</span>() -&gt; <span class="ident">DeviceKeys</span> {
         <span class="kw">let</span> <span class="ident">device_keys</span> <span class="op">=</span> <span class="macro">json!</span>({
           <span class="string">&quot;algorithms&quot;</span>: <span class="macro">vec!</span>[
               <span class="string">&quot;m.olm.v1.curve25519-aes-sha2&quot;</span>,
@@ -1339,10 +1364,19 @@
         <span class="ident">serde_json::from_value</span>(<span class="ident">device_keys</span>).<span class="ident">unwrap</span>()
     }
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">get_device</span>() -&gt; <span class="ident">ReadOnlyDevice</span> {
+    <span class="doccomment">/// Generate default ReadOnlyDevice for tests</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_device</span>() -&gt; <span class="ident">ReadOnlyDevice</span> {
         <span class="kw">let</span> <span class="ident">device_keys</span> <span class="op">=</span> <span class="ident">device_keys</span>();
         <span class="ident">ReadOnlyDevice::try_from</span>(<span class="kw-2">&amp;</span><span class="ident">device_keys</span>).<span class="ident">unwrap</span>()
     }
+}
+
+<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">mod</span> <span class="ident">test</span> {
+    <span class="kw">use</span> <span class="ident">ruma</span>::{<span class="ident">user_id</span>, <span class="ident">DeviceKeyAlgorithm</span>};
+
+    <span class="kw">use</span> <span class="ident"><span class="kw">super</span>::testing</span>::{<span class="ident">device_keys</span>, <span class="ident">get_device</span>};
+    <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::identities::LocalTrust</span>;
 
     <span class="attribute">#[<span class="ident">test</span>]</span>
     <span class="kw">fn</span> <span class="ident">create_a_device</span>() {

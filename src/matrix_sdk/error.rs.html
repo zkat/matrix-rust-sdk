@@ -284,6 +284,14 @@
 <span id="279">279</span>
 <span id="280">280</span>
 <span id="281">281</span>
+<span id="282">282</span>
+<span id="283">283</span>
+<span id="284">284</span>
+<span id="285">285</span>
+<span id="286">286</span>
+<span id="287">287</span>
+<span id="288">288</span>
+<span id="289">289</span>
 </pre><pre class="rust"><code><span class="comment">// Copyright 2020 The Matrix.org Foundation C.I.C.</span>
 <span class="comment">//</span>
 <span class="comment">// Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);</span>
@@ -394,6 +402,12 @@
     <span class="doccomment">/// client.</span>
     <span class="attribute">#[<span class="ident">error</span>(<span class="string">&quot;the queried endpoint requires authentication but was called before logging in&quot;</span>)]</span>
     <span class="ident">AuthenticationRequired</span>,
+
+    <span class="doccomment">/// Attempting to restore a session after the olm-machine has already been</span>
+    <span class="doccomment">/// set up fails</span>
+    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;encryption&quot;</span>)]</span>
+    <span class="attribute">#[<span class="ident">error</span>(<span class="string">&quot;The olm machine has already been initialized&quot;</span>)]</span>
+    <span class="ident">BadCryptoStoreState</span>,
 
     <span class="doccomment">/// An error de/serializing type for the `StateStore`</span>
     <span class="attribute">#[<span class="ident">error</span>(<span class="ident">transparent</span>)]</span>
@@ -535,6 +549,8 @@
             <span class="ident">SdkBaseError::IoError</span>(<span class="ident">e</span>) =&gt; <span class="ident"><span class="self">Self</span>::Io</span>(<span class="ident">e</span>),
             <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;encryption&quot;</span>)]</span>
             <span class="ident">SdkBaseError::CryptoStore</span>(<span class="ident">e</span>) =&gt; <span class="ident"><span class="self">Self</span>::CryptoStoreError</span>(<span class="ident">e</span>),
+            <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;encryption&quot;</span>)]</span>
+            <span class="ident">SdkBaseError::BadCryptoStoreState</span> =&gt; <span class="ident"><span class="self">Self</span>::BadCryptoStoreState</span>,
             <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;encryption&quot;</span>)]</span>
             <span class="ident">SdkBaseError::OlmError</span>(<span class="ident">e</span>) =&gt; <span class="ident"><span class="self">Self</span>::OlmError</span>(<span class="ident">e</span>),
             <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;encryption&quot;</span>)]</span>
