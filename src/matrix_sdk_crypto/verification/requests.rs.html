@@ -1876,7 +1876,7 @@
         <span class="ident">store</span>: <span class="ident">VerificationStore</span>,
         <span class="ident">sender</span>: <span class="kw-2">&amp;</span><span class="ident">UserId</span>,
         <span class="ident">flow_id</span>: <span class="ident">FlowId</span>,
-        <span class="ident">content</span>: <span class="kw-2">&amp;</span><span class="ident">RequestContent</span>,
+        <span class="ident">content</span>: <span class="kw-2">&amp;</span><span class="ident">RequestContent</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>,
     ) -&gt; <span class="self">Self</span> {
         <span class="kw">let</span> <span class="ident">account</span> <span class="op">=</span> <span class="ident">store</span>.<span class="ident">account</span>.<span class="ident">clone</span>();
 
@@ -2066,7 +2066,7 @@
         }
     }
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">receive_ready</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">sender</span>: <span class="kw-2">&amp;</span><span class="ident">UserId</span>, <span class="ident">content</span>: <span class="kw-2">&amp;</span><span class="ident">ReadyContent</span>) {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">receive_ready</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">sender</span>: <span class="kw-2">&amp;</span><span class="ident">UserId</span>, <span class="ident">content</span>: <span class="kw-2">&amp;</span><span class="ident">ReadyContent</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">inner</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">lock</span>().<span class="ident">unwrap</span>();
 
         <span class="kw">match</span> <span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="ident">inner</span> {
@@ -2223,7 +2223,7 @@
         }
     }
 
-    <span class="kw">fn</span> <span class="ident">receive_done</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">content</span>: <span class="kw-2">&amp;</span><span class="ident">DoneContent</span>) {
+    <span class="kw">fn</span> <span class="ident">receive_done</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">content</span>: <span class="kw-2">&amp;</span><span class="ident">DoneContent</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) {
         <span class="kw-2">*</span><span class="self">self</span> <span class="op">=</span> <span class="ident">InnerRequest::Done</span>(<span class="kw">match</span> <span class="self">self</span> {
             <span class="ident">InnerRequest::Ready</span>(<span class="ident">s</span>) =&gt; <span class="ident">s</span>.<span class="ident">clone</span>().<span class="ident">into_done</span>(<span class="ident">content</span>),
             <span class="ident">InnerRequest::Passive</span>(<span class="ident">s</span>) =&gt; <span class="ident">s</span>.<span class="ident">clone</span>().<span class="ident">into_done</span>(<span class="ident">content</span>),
@@ -2292,7 +2292,7 @@
 }
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">S</span>: <span class="ident">Clone</span><span class="op">&gt;</span> <span class="ident">RequestState</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">into_done</span>(<span class="self">self</span>, <span class="kw">_</span>: <span class="kw-2">&amp;</span><span class="ident">DoneContent</span>) -&gt; <span class="ident">RequestState</span><span class="op">&lt;</span><span class="ident">Done</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">into_done</span>(<span class="self">self</span>, <span class="kw">_</span>: <span class="kw-2">&amp;</span><span class="ident">DoneContent</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">RequestState</span><span class="op">&lt;</span><span class="ident">Done</span><span class="op">&gt;</span> {
         <span class="ident">RequestState</span>::<span class="op">&lt;</span><span class="ident">Done</span><span class="op">&gt;</span> {
             <span class="ident">private_cross_signing_identity</span>: <span class="self">self</span>.<span class="ident">private_cross_signing_identity</span>,
             <span class="ident">verification_cache</span>: <span class="self">self</span>.<span class="ident">verification_cache</span>,
@@ -2340,7 +2340,7 @@
         }
     }
 
-    <span class="kw">fn</span> <span class="ident">into_ready</span>(<span class="self">self</span>, <span class="ident">_sender</span>: <span class="kw-2">&amp;</span><span class="ident">UserId</span>, <span class="ident">content</span>: <span class="kw-2">&amp;</span><span class="ident">ReadyContent</span>) -&gt; <span class="ident">RequestState</span><span class="op">&lt;</span><span class="ident">Ready</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">into_ready</span>(<span class="self">self</span>, <span class="ident">_sender</span>: <span class="kw-2">&amp;</span><span class="ident">UserId</span>, <span class="ident">content</span>: <span class="kw-2">&amp;</span><span class="ident">ReadyContent</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">RequestState</span><span class="op">&lt;</span><span class="ident">Ready</span><span class="op">&gt;</span> {
         <span class="comment">// TODO check the flow id, and that the methods match what we suggested.</span>
         <span class="ident">RequestState</span> {
             <span class="ident">flow_id</span>: <span class="self">self</span>.<span class="ident">flow_id</span>,
@@ -2379,7 +2379,7 @@
         <span class="ident">store</span>: <span class="ident">VerificationStore</span>,
         <span class="ident">sender</span>: <span class="kw-2">&amp;</span><span class="ident">UserId</span>,
         <span class="ident">flow_id</span>: <span class="kw-2">&amp;</span><span class="ident">FlowId</span>,
-        <span class="ident">content</span>: <span class="kw-2">&amp;</span><span class="ident">RequestContent</span>,
+        <span class="ident">content</span>: <span class="kw-2">&amp;</span><span class="ident">RequestContent</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>,
     ) -&gt; <span class="ident">RequestState</span><span class="op">&lt;</span><span class="ident">Requested</span><span class="op">&gt;</span> {
         <span class="comment">// TODO only create this if we support the methods</span>
         <span class="ident">RequestState</span> {
@@ -2395,7 +2395,7 @@
         }
     }
 
-    <span class="kw">fn</span> <span class="ident">into_passive</span>(<span class="self">self</span>, <span class="ident">content</span>: <span class="kw-2">&amp;</span><span class="ident">ReadyContent</span>) -&gt; <span class="ident">RequestState</span><span class="op">&lt;</span><span class="ident">Passive</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">into_passive</span>(<span class="self">self</span>, <span class="ident">content</span>: <span class="kw-2">&amp;</span><span class="ident">ReadyContent</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">RequestState</span><span class="op">&lt;</span><span class="ident">Passive</span><span class="op">&gt;</span> {
         <span class="ident">RequestState</span> {
             <span class="ident">flow_id</span>: <span class="self">self</span>.<span class="ident">flow_id</span>,
             <span class="ident">verification_cache</span>: <span class="self">self</span>.<span class="ident">verification_cache</span>,

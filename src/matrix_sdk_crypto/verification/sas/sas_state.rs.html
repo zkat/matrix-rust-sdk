@@ -1953,7 +1953,7 @@
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">into_accepted</span>(
         <span class="self">self</span>,
         <span class="ident">sender</span>: <span class="kw-2">&amp;</span><span class="ident">UserId</span>,
-        <span class="ident">content</span>: <span class="kw-2">&amp;</span><span class="ident">AcceptContent</span>,
+        <span class="ident">content</span>: <span class="kw-2">&amp;</span><span class="ident">AcceptContent</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>,
     ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">SasState</span><span class="op">&lt;</span><span class="ident">Accepted</span><span class="op">&gt;</span>, <span class="ident">SasState</span><span class="op">&lt;</span><span class="ident">Cancelled</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">check_event</span>(<span class="ident">sender</span>, <span class="ident">content</span>.<span class="ident">flow_id</span>()).<span class="ident">map_err</span>(<span class="op">|</span><span class="ident">c</span><span class="op">|</span> <span class="self">self</span>.<span class="ident">clone</span>().<span class="ident">cancel</span>(<span class="bool-val">true</span>, <span class="ident">c</span>))<span class="question-mark">?</span>;
 
@@ -2002,7 +2002,7 @@
         <span class="ident">own_identity</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ReadOnlyOwnUserIdentity</span><span class="op">&gt;</span>,
         <span class="ident">other_identity</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ReadOnlyUserIdentities</span><span class="op">&gt;</span>,
         <span class="ident">flow_id</span>: <span class="ident">FlowId</span>,
-        <span class="ident">content</span>: <span class="kw-2">&amp;</span><span class="ident">StartContent</span>,
+        <span class="ident">content</span>: <span class="kw-2">&amp;</span><span class="ident">StartContent</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>,
         <span class="ident">started_from_request</span>: <span class="ident">bool</span>,
     ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">SasState</span><span class="op">&lt;</span><span class="ident">Started</span><span class="op">&gt;</span>, <span class="ident">SasState</span><span class="op">&lt;</span><span class="ident">Cancelled</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">flow_id</span> <span class="op">=</span> <span class="ident">Arc::new</span>(<span class="ident">flow_id</span>);
@@ -2121,7 +2121,7 @@
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">into_accepted</span>(
         <span class="self">self</span>,
         <span class="ident">sender</span>: <span class="kw-2">&amp;</span><span class="ident">UserId</span>,
-        <span class="ident">content</span>: <span class="kw-2">&amp;</span><span class="ident">AcceptContent</span>,
+        <span class="ident">content</span>: <span class="kw-2">&amp;</span><span class="ident">AcceptContent</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>,
     ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">SasState</span><span class="op">&lt;</span><span class="ident">Accepted</span><span class="op">&gt;</span>, <span class="ident">SasState</span><span class="op">&lt;</span><span class="ident">Cancelled</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">check_event</span>(<span class="ident">sender</span>, <span class="ident">content</span>.<span class="ident">flow_id</span>()).<span class="ident">map_err</span>(<span class="op">|</span><span class="ident">c</span><span class="op">|</span> <span class="self">self</span>.<span class="ident">clone</span>().<span class="ident">cancel</span>(<span class="bool-val">true</span>, <span class="ident">c</span>))<span class="question-mark">?</span>;
 
@@ -2205,7 +2205,7 @@
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">into_key_received</span>(
         <span class="self">self</span>,
         <span class="ident">sender</span>: <span class="kw-2">&amp;</span><span class="ident">UserId</span>,
-        <span class="ident">content</span>: <span class="kw-2">&amp;</span><span class="ident">KeyContent</span>,
+        <span class="ident">content</span>: <span class="kw-2">&amp;</span><span class="ident">KeyContent</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>,
     ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">SasState</span><span class="op">&lt;</span><span class="ident">KeyReceived</span><span class="op">&gt;</span>, <span class="ident">SasState</span><span class="op">&lt;</span><span class="ident">Cancelled</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">check_event</span>(<span class="ident">sender</span>, <span class="ident">content</span>.<span class="ident">flow_id</span>()).<span class="ident">map_err</span>(<span class="op">|</span><span class="ident">c</span><span class="op">|</span> <span class="self">self</span>.<span class="ident">clone</span>().<span class="ident">cancel</span>(<span class="bool-val">true</span>, <span class="ident">c</span>))<span class="question-mark">?</span>;
 
@@ -2245,7 +2245,7 @@
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">into_key_received</span>(
         <span class="self">self</span>,
         <span class="ident">sender</span>: <span class="kw-2">&amp;</span><span class="ident">UserId</span>,
-        <span class="ident">content</span>: <span class="kw-2">&amp;</span><span class="ident">KeyContent</span>,
+        <span class="ident">content</span>: <span class="kw-2">&amp;</span><span class="ident">KeyContent</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>,
     ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">SasState</span><span class="op">&lt;</span><span class="ident">KeyReceived</span><span class="op">&gt;</span>, <span class="ident">SasState</span><span class="op">&lt;</span><span class="ident">Cancelled</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">check_event</span>(<span class="ident">sender</span>, <span class="ident">content</span>.<span class="ident">flow_id</span>()).<span class="ident">map_err</span>(<span class="op">|</span><span class="ident">c</span><span class="op">|</span> <span class="self">self</span>.<span class="ident">clone</span>().<span class="ident">cancel</span>(<span class="bool-val">true</span>, <span class="ident">c</span>))<span class="question-mark">?</span>;
 
@@ -2386,7 +2386,7 @@
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">into_mac_received</span>(
         <span class="self">self</span>,
         <span class="ident">sender</span>: <span class="kw-2">&amp;</span><span class="ident">UserId</span>,
-        <span class="ident">content</span>: <span class="kw-2">&amp;</span><span class="ident">MacContent</span>,
+        <span class="ident">content</span>: <span class="kw-2">&amp;</span><span class="ident">MacContent</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>,
     ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">SasState</span><span class="op">&lt;</span><span class="ident">MacReceived</span><span class="op">&gt;</span>, <span class="ident">SasState</span><span class="op">&lt;</span><span class="ident">Cancelled</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">check_event</span>(<span class="ident">sender</span>, <span class="ident">content</span>.<span class="ident">flow_id</span>()).<span class="ident">map_err</span>(<span class="op">|</span><span class="ident">c</span><span class="op">|</span> <span class="self">self</span>.<span class="ident">clone</span>().<span class="ident">cancel</span>(<span class="bool-val">true</span>, <span class="ident">c</span>))<span class="question-mark">?</span>;
 
@@ -2446,7 +2446,7 @@
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">into_done</span>(
         <span class="self">self</span>,
         <span class="ident">sender</span>: <span class="kw-2">&amp;</span><span class="ident">UserId</span>,
-        <span class="ident">content</span>: <span class="kw-2">&amp;</span><span class="ident">MacContent</span>,
+        <span class="ident">content</span>: <span class="kw-2">&amp;</span><span class="ident">MacContent</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>,
     ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">SasState</span><span class="op">&lt;</span><span class="ident">Done</span><span class="op">&gt;</span>, <span class="ident">SasState</span><span class="op">&lt;</span><span class="ident">Cancelled</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">check_event</span>(<span class="ident">sender</span>, <span class="ident">content</span>.<span class="ident">flow_id</span>()).<span class="ident">map_err</span>(<span class="op">|</span><span class="ident">c</span><span class="op">|</span> <span class="self">self</span>.<span class="ident">clone</span>().<span class="ident">cancel</span>(<span class="bool-val">true</span>, <span class="ident">c</span>))<span class="question-mark">?</span>;
 
@@ -2486,7 +2486,7 @@
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">into_waiting_for_done</span>(
         <span class="self">self</span>,
         <span class="ident">sender</span>: <span class="kw-2">&amp;</span><span class="ident">UserId</span>,
-        <span class="ident">content</span>: <span class="kw-2">&amp;</span><span class="ident">MacContent</span>,
+        <span class="ident">content</span>: <span class="kw-2">&amp;</span><span class="ident">MacContent</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>,
     ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">SasState</span><span class="op">&lt;</span><span class="ident">WaitingForDone</span><span class="op">&gt;</span>, <span class="ident">SasState</span><span class="op">&lt;</span><span class="ident">Cancelled</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">check_event</span>(<span class="ident">sender</span>, <span class="ident">content</span>.<span class="ident">flow_id</span>()).<span class="ident">map_err</span>(<span class="op">|</span><span class="ident">c</span><span class="op">|</span> <span class="self">self</span>.<span class="ident">clone</span>().<span class="ident">cancel</span>(<span class="bool-val">true</span>, <span class="ident">c</span>))<span class="question-mark">?</span>;
 
@@ -2641,7 +2641,7 @@
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">into_done</span>(
         <span class="self">self</span>,
         <span class="ident">sender</span>: <span class="kw-2">&amp;</span><span class="ident">UserId</span>,
-        <span class="ident">content</span>: <span class="kw-2">&amp;</span><span class="ident">DoneContent</span>,
+        <span class="ident">content</span>: <span class="kw-2">&amp;</span><span class="ident">DoneContent</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>,
     ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">SasState</span><span class="op">&lt;</span><span class="ident">Done</span><span class="op">&gt;</span>, <span class="ident">SasState</span><span class="op">&lt;</span><span class="ident">Cancelled</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">check_event</span>(<span class="ident">sender</span>, <span class="ident">content</span>.<span class="ident">flow_id</span>()).<span class="ident">map_err</span>(<span class="op">|</span><span class="ident">c</span><span class="op">|</span> <span class="self">self</span>.<span class="ident">clone</span>().<span class="ident">cancel</span>(<span class="bool-val">true</span>, <span class="ident">c</span>))<span class="question-mark">?</span>;
 

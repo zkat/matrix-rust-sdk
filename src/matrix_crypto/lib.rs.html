@@ -167,6 +167,12 @@
 <span id="162">162</span>
 <span id="163">163</span>
 <span id="164">164</span>
+<span id="165">165</span>
+<span id="166">166</span>
+<span id="167">167</span>
+<span id="168">168</span>
+<span id="169">169</span>
+<span id="170">170</span>
 </pre><pre class="rust"><code><span class="attribute">#![<span class="ident">deny</span>(
     <span class="ident">dead_code</span>,
     <span class="ident">missing_docs</span>,
@@ -278,7 +284,7 @@
     <span class="kw">pub</span> <span class="ident">backup_version</span>: <span class="ident">String</span>,
 }
 
-<span class="kw">impl</span> <span class="ident">std::convert::TryFrom</span><span class="op">&lt;</span><span class="ident">matrix_sdk_crypto::store::BackupKeys</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">BackupKeys</span> {
+<span class="kw">impl</span> <span class="ident">TryFrom</span><span class="op">&lt;</span><span class="ident">matrix_sdk_crypto::store::BackupKeys</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">BackupKeys</span> {
     <span class="kw">type</span> <span class="ident">Error</span> <span class="op">=</span> ();
 
     <span class="kw">fn</span> <span class="ident">try_from</span>(<span class="ident">keys</span>: <span class="ident">matrix_sdk_crypto::store::BackupKeys</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident"><span class="self">Self</span>::Error</span><span class="op">&gt;</span> {
@@ -330,7 +336,13 @@
         .<span class="ident">map_err</span>(<span class="op">|</span><span class="ident">e</span><span class="op">|</span> <span class="ident">CryptoStoreError::InvalidUserId</span>(<span class="ident">user_id</span>.<span class="ident">to_owned</span>(), <span class="ident">e</span>))
 }
 
-<span class="macro">include!</span>(<span class="macro">concat!</span>(<span class="macro">env!</span>(<span class="string">&quot;OUT_DIR&quot;</span>), <span class="string">&quot;/olm.uniffi.rs&quot;</span>));
+<span class="attribute">#[<span class="ident">allow</span>(<span class="ident">warnings</span>)]</span>
+<span class="kw">mod</span> <span class="ident">generated</span> {
+    <span class="kw">use</span> <span class="kw">super</span>::<span class="kw-2">*</span>;
+    <span class="macro">include!</span>(<span class="macro">concat!</span>(<span class="macro">env!</span>(<span class="string">&quot;OUT_DIR&quot;</span>), <span class="string">&quot;/olm.uniffi.rs&quot;</span>));
+}
+
+<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">generated</span>::<span class="kw-2">*</span>;
 </code></pre></div>
 </section><section id="search" class="content hidden"></section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="matrix_crypto" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.61.0-nightly (10913c000 2022-03-03)" ></div>
 </body></html>
