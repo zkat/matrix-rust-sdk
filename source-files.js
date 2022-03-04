@@ -1,4 +1,5 @@
 var N = null;var sourcesIndex = {};
+sourcesIndex["matrix_crypto"] = {"name":"","files":["backup_recovery_key.rs","device.rs","error.rs","lib.rs","logger.rs","machine.rs","responses.rs","users.rs","verification.rs"]};
 sourcesIndex["matrix_qrcode"] = {"name":"","files":["error.rs","lib.rs","types.rs","utils.rs"]};
 sourcesIndex["matrix_sdk"] = {"name":"","dirs":[{"name":"config","files":["client.rs","mod.rs","request.rs","sync.rs"]},{"name":"encryption","dirs":[{"name":"identities","files":["devices.rs","mod.rs","users.rs"]},{"name":"verification","files":["mod.rs","qrcode.rs","requests.rs","sas.rs"]}],"files":["mod.rs"]},{"name":"room","files":["common.rs","invited.rs","joined.rs","left.rs","mod.rs"]}],"files":["account.rs","attachment.rs","client.rs","error.rs","event_handler.rs","http_client.rs","lib.rs","room_member.rs","sync.rs"]};
 sourcesIndex["matrix_sdk_appservice"] = {"name":"","dirs":[{"name":"webserver","files":["mod.rs","warp.rs"]}],"files":["error.rs","event_handler.rs","lib.rs"]};
