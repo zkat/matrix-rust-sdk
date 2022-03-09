@@ -616,17 +616,6 @@
 <span id="611">611</span>
 <span id="612">612</span>
 <span id="613">613</span>
-<span id="614">614</span>
-<span id="615">615</span>
-<span id="616">616</span>
-<span id="617">617</span>
-<span id="618">618</span>
-<span id="619">619</span>
-<span id="620">620</span>
-<span id="621">621</span>
-<span id="622">622</span>
-<span id="623">623</span>
-<span id="624">624</span>
 </pre><pre class="rust"><code><span class="comment">// Copyright 2021 Famedly GmbH</span>
 <span class="comment">//</span>
 <span class="comment">// Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);</span>
@@ -700,9 +689,6 @@
 <span class="doccomment">//! [Application Service]: https://matrix.org/docs/spec/application_service/r0.1.2</span>
 <span class="doccomment">//! [matrix-org/matrix-rust-sdk#228]: https://github.com/matrix-org/matrix-rust-sdk/issues/228</span>
 <span class="doccomment">//! [examples directory]: https://github.com/matrix-org/matrix-rust-sdk/tree/main/crates/matrix-sdk-appservice/examples</span>
-
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">any</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;warp&quot;</span>)))]</span>
-<span class="macro">compile_error!</span>(<span class="string">&quot;one webserver feature must be enabled. available ones: `warp`&quot;</span>);
 
 <span class="kw">use</span> <span class="ident">std</span>::{
     <span class="ident">convert</span>::{<span class="ident">TryFrom</span>, <span class="ident">TryInto</span>},
@@ -1162,10 +1148,8 @@
     <span class="doccomment">/// functionality.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// [application-service-specific routes]: https://spec.matrix.org/unstable/application-service-api/#legacy-routes</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;warp&quot;</span>)]</span>
-    <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;warp&quot;</span>)))]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">warp_filter</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">warp::filters::BoxedFilter</span><span class="op">&lt;</span>(<span class="kw">impl</span> <span class="ident">warp::Reply</span>,)<span class="op">&gt;</span> {
-        <span class="ident">webserver::warp::warp_filter</span>(<span class="self">self</span>.<span class="ident">clone</span>())
+        <span class="ident">webserver::warp_filter</span>(<span class="self">self</span>.<span class="ident">clone</span>())
     }
 
     <span class="doccomment">/// Convenience method that runs an http server depending on the selected</span>
@@ -1178,14 +1162,8 @@
         <span class="kw">let</span> <span class="ident">port</span> <span class="op">=</span> <span class="ident">port</span>.<span class="ident">into</span>();
         <span class="macro">info!</span>(<span class="string">&quot;Starting AppService on {}:{}&quot;</span>, <span class="kw-2">&amp;</span><span class="ident">host</span>, <span class="kw-2">&amp;</span><span class="ident">port</span>);
 
-        <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;warp&quot;</span>)]</span>
-        {
-            <span class="ident">webserver::warp::run_server</span>(<span class="self">self</span>.<span class="ident">clone</span>(), <span class="ident">host</span>, <span class="ident">port</span>).<span class="kw">await</span><span class="question-mark">?</span>;
-            <span class="prelude-val">Ok</span>(())
-        }
-
-        <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">any</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;warp&quot;</span>,)))]</span>
-        <span class="macro">unreachable!</span>()
+        <span class="ident">webserver::run_server</span>(<span class="self">self</span>.<span class="ident">clone</span>(), <span class="ident">host</span>, <span class="ident">port</span>).<span class="kw">await</span><span class="question-mark">?</span>;
+        <span class="prelude-val">Ok</span>(())
     }
 }
 

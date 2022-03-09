@@ -1,1 +1,1 @@
-initSidebarItems({"enum":[["CiCommand",""],["FeatureSet",""]],"fn":[["check_clippy",""],["check_docs",""],["check_style",""],["check_typos",""],["run_feature_tests",""],["run_tests",""],["workspace_root",""]],"struct":[["CiArgs",""]]});
+initSidebarItems({"enum":[["CiCommand",""],["FeatureSet",""]],"fn":[["check_clippy",""],["check_docs",""],["check_style",""],["check_typos",""],["run_appservice_tests",""],["run_feature_tests",""],["run_tests",""],["workspace_root",""]],"struct":[["CiArgs",""]]});
