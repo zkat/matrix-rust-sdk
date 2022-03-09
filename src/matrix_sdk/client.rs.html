@@ -4619,7 +4619,7 @@
     <span class="doccomment">/// }).await;</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// // Adding your custom data to the handler can be done as well</span>
-    <span class="doccomment">/// let data = &quot;MyCustomIdentifier&quot;.to_string();</span>
+    <span class="doccomment">/// let data = &quot;MyCustomIdentifier&quot;.to_owned();</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// client.register_event_handler({</span>
     <span class="doccomment">///     let data = data.clone();</span>
@@ -6520,7 +6520,7 @@
     <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">successful_discovery</span>() {
         <span class="kw">let</span> <span class="ident">server_url</span> <span class="op">=</span> <span class="ident">mockito::server_url</span>();
         <span class="kw">let</span> <span class="ident">domain</span> <span class="op">=</span> <span class="ident">server_url</span>.<span class="ident">strip_prefix</span>(<span class="string">&quot;http://&quot;</span>).<span class="ident">unwrap</span>();
-        <span class="kw">let</span> <span class="ident">alice</span> <span class="op">=</span> <span class="ident">UserId::parse</span>(<span class="string">&quot;@alice:&quot;</span>.<span class="ident">to_string</span>() <span class="op">+</span> <span class="ident">domain</span>).<span class="ident">unwrap</span>();
+        <span class="kw">let</span> <span class="ident">alice</span> <span class="op">=</span> <span class="ident">UserId::parse</span>(<span class="string">&quot;@alice:&quot;</span>.<span class="ident">to_owned</span>() <span class="op">+</span> <span class="ident">domain</span>).<span class="ident">unwrap</span>();
 
         <span class="kw">let</span> <span class="ident">_m_well_known</span> <span class="op">=</span> <span class="ident">mock</span>(<span class="string">&quot;GET&quot;</span>, <span class="string">&quot;/.well-known/matrix/client&quot;</span>)
             .<span class="ident">with_status</span>(<span class="number">200</span>)
@@ -6542,7 +6542,7 @@
     <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">discovery_broken_server</span>() {
         <span class="kw">let</span> <span class="ident">server_url</span> <span class="op">=</span> <span class="ident">mockito::server_url</span>();
         <span class="kw">let</span> <span class="ident">domain</span> <span class="op">=</span> <span class="ident">server_url</span>.<span class="ident">strip_prefix</span>(<span class="string">&quot;http://&quot;</span>).<span class="ident">unwrap</span>();
-        <span class="kw">let</span> <span class="ident">alice</span> <span class="op">=</span> <span class="ident">UserId::parse</span>(<span class="string">&quot;@alice:&quot;</span>.<span class="ident">to_string</span>() <span class="op">+</span> <span class="ident">domain</span>).<span class="ident">unwrap</span>();
+        <span class="kw">let</span> <span class="ident">alice</span> <span class="op">=</span> <span class="ident">UserId::parse</span>(<span class="string">&quot;@alice:&quot;</span>.<span class="ident">to_owned</span>() <span class="op">+</span> <span class="ident">domain</span>).<span class="ident">unwrap</span>();
 
         <span class="kw">let</span> <span class="ident">_m</span> <span class="op">=</span> <span class="ident">mock</span>(<span class="string">&quot;GET&quot;</span>, <span class="string">&quot;/.well-known/matrix/client&quot;</span>)
             .<span class="ident">with_status</span>(<span class="number">200</span>)
@@ -6642,8 +6642,8 @@
         <span class="kw">let</span> <span class="ident">homeserver</span> <span class="op">=</span> <span class="ident">Url::from_str</span>(<span class="kw-2">&amp;</span><span class="ident">mockito::server_url</span>()).<span class="ident">unwrap</span>();
         <span class="kw">let</span> <span class="ident">client</span> <span class="op">=</span> <span class="ident">Client::new</span>(<span class="ident">homeserver</span>).<span class="kw">await</span>.<span class="ident">unwrap</span>();
         <span class="kw">let</span> <span class="ident">idp</span> <span class="op">=</span> <span class="ident"><span class="kw">crate</span>::client::get_login_types::v3::IdentityProvider::new</span>(
-            <span class="string">&quot;some-id&quot;</span>.<span class="ident">to_string</span>(),
-            <span class="string">&quot;idp-name&quot;</span>.<span class="ident">to_string</span>(),
+            <span class="string">&quot;some-id&quot;</span>.<span class="ident">to_owned</span>(),
+            <span class="string">&quot;idp-name&quot;</span>.<span class="ident">to_owned</span>(),
         );
         <span class="ident">client</span>
             .<span class="ident">login_with_sso</span>(
@@ -6724,7 +6724,7 @@
         <span class="kw">let</span> <span class="ident">homeserver</span> <span class="op">=</span> <span class="ident">Url::from_str</span>(<span class="kw-2">&amp;</span><span class="ident">mockito::server_url</span>()).<span class="ident">unwrap</span>();
         <span class="kw">let</span> <span class="ident">room_id</span> <span class="op">=</span> <span class="macro">room_id!</span>(<span class="string">&quot;!SVkFJHzfwvuaIEawgC:localhost&quot;</span>);
 
-        <span class="kw">let</span> <span class="ident">_m</span> <span class="op">=</span> <span class="ident">mock</span>(<span class="string">&quot;GET&quot;</span>, <span class="ident">Matcher::Regex</span>(<span class="string">r&quot;^/_matrix/client/r0/sync\?.*$&quot;</span>.<span class="ident">to_string</span>()))
+        <span class="kw">let</span> <span class="ident">_m</span> <span class="op">=</span> <span class="ident">mock</span>(<span class="string">&quot;GET&quot;</span>, <span class="ident">Matcher::Regex</span>(<span class="string">r&quot;^/_matrix/client/r0/sync\?.*$&quot;</span>.<span class="ident">to_owned</span>()))
             .<span class="ident">with_status</span>(<span class="number">200</span>)
             .<span class="ident">with_body</span>(<span class="ident">test_json::SYNC</span>.<span class="ident">to_string</span>())
             .<span class="ident">create</span>();
@@ -6757,7 +6757,7 @@
         <span class="kw">let</span> <span class="ident">room</span> <span class="op">=</span> <span class="ident">joined_client</span>.<span class="ident">get_joined_room</span>(<span class="ident">room_id</span>);
         <span class="macro">assert!</span>(<span class="ident">room</span>.<span class="ident">is_some</span>());
 
-        <span class="kw">let</span> <span class="ident">_m</span> <span class="op">=</span> <span class="ident">mock</span>(<span class="string">&quot;GET&quot;</span>, <span class="ident">Matcher::Regex</span>(<span class="string">r&quot;^/_matrix/client/r0/sync\?.*$&quot;</span>.<span class="ident">to_string</span>()))
+        <span class="kw">let</span> <span class="ident">_m</span> <span class="op">=</span> <span class="ident">mock</span>(<span class="string">&quot;GET&quot;</span>, <span class="ident">Matcher::Regex</span>(<span class="string">r&quot;^/_matrix/client/r0/sync\?.*$&quot;</span>.<span class="ident">to_owned</span>()))
             .<span class="ident">with_status</span>(<span class="number">200</span>)
             .<span class="ident">with_body</span>(<span class="ident">test_json::LEAVE_SYNC_EVENT</span>.<span class="ident">to_string</span>())
             .<span class="ident">create</span>();
@@ -6775,7 +6775,7 @@
     <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">account_data</span>() {
         <span class="kw">let</span> <span class="ident">client</span> <span class="op">=</span> <span class="ident">logged_in_client</span>().<span class="kw">await</span>;
 
-        <span class="kw">let</span> <span class="ident">_m</span> <span class="op">=</span> <span class="ident">mock</span>(<span class="string">&quot;GET&quot;</span>, <span class="ident">Matcher::Regex</span>(<span class="string">r&quot;^/_matrix/client/r0/sync\?.*$&quot;</span>.<span class="ident">to_string</span>()))
+        <span class="kw">let</span> <span class="ident">_m</span> <span class="op">=</span> <span class="ident">mock</span>(<span class="string">&quot;GET&quot;</span>, <span class="ident">Matcher::Regex</span>(<span class="string">r&quot;^/_matrix/client/r0/sync\?.*$&quot;</span>.<span class="ident">to_owned</span>()))
             .<span class="ident">with_status</span>(<span class="number">200</span>)
             .<span class="ident">with_body</span>(<span class="ident">test_json::SYNC</span>.<span class="ident">to_string</span>())
             .<span class="ident">match_header</span>(<span class="string">&quot;authorization&quot;</span>, <span class="string">&quot;Bearer 1234&quot;</span>)
@@ -6827,7 +6827,7 @@
                 } <span class="kw">else</span> {
                     <span class="macro">panic!</span>(<span class="string">&quot;found the wrong `ErrorKind` {:?}, expected `Forbidden&quot;</span>, <span class="ident">kind</span>);
                 }
-                <span class="macro">assert_eq!</span>(<span class="ident">message</span>, <span class="string">&quot;Invalid password&quot;</span>.<span class="ident">to_string</span>());
+                <span class="macro">assert_eq!</span>(<span class="ident">message</span>, <span class="string">&quot;Invalid password&quot;</span>.<span class="ident">to_owned</span>());
                 <span class="macro">assert_eq!</span>(<span class="ident">status_code</span>, <span class="ident">http::StatusCode::from_u16</span>(<span class="number">403</span>).<span class="ident">unwrap</span>());
             } <span class="kw">else</span> {
                 <span class="macro">panic!</span>(<span class="string">&quot;found the wrong `Error` type {:?}, expected `Error::RumaResponse&quot;</span>, <span class="ident">err</span>);
@@ -6842,7 +6842,7 @@
         <span class="kw">let</span> <span class="ident">homeserver</span> <span class="op">=</span> <span class="ident">Url::from_str</span>(<span class="kw-2">&amp;</span><span class="ident">mockito::server_url</span>()).<span class="ident">unwrap</span>();
         <span class="kw">let</span> <span class="ident">client</span> <span class="op">=</span> <span class="ident">Client::new</span>(<span class="ident">homeserver</span>).<span class="kw">await</span>.<span class="ident">unwrap</span>();
 
-        <span class="kw">let</span> <span class="ident">_m</span> <span class="op">=</span> <span class="ident">mock</span>(<span class="string">&quot;POST&quot;</span>, <span class="ident">Matcher::Regex</span>(<span class="string">r&quot;^/_matrix/client/r0/register\?.*$&quot;</span>.<span class="ident">to_string</span>()))
+        <span class="kw">let</span> <span class="ident">_m</span> <span class="op">=</span> <span class="ident">mock</span>(<span class="string">&quot;POST&quot;</span>, <span class="ident">Matcher::Regex</span>(<span class="string">r&quot;^/_matrix/client/r0/register\?.*$&quot;</span>.<span class="ident">to_owned</span>()))
             .<span class="ident">with_status</span>(<span class="number">403</span>)
             .<span class="ident">with_body</span>(<span class="ident">test_json::REGISTRATION_RESPONSE_ERR</span>.<span class="ident">to_string</span>())
             .<span class="ident">create</span>();
@@ -6865,7 +6865,7 @@
                 } <span class="kw">else</span> {
                     <span class="macro">panic!</span>(<span class="string">&quot;found the wrong `ErrorKind` {:?}, expected `Forbidden&quot;</span>, <span class="ident">kind</span>);
                 }
-                <span class="macro">assert_eq!</span>(<span class="ident">message</span>, <span class="string">&quot;Invalid password&quot;</span>.<span class="ident">to_string</span>());
+                <span class="macro">assert_eq!</span>(<span class="ident">message</span>, <span class="string">&quot;Invalid password&quot;</span>.<span class="ident">to_owned</span>());
                 <span class="macro">assert_eq!</span>(<span class="ident">status_code</span>, <span class="ident">http::StatusCode::from_u16</span>(<span class="number">403</span>).<span class="ident">unwrap</span>());
             } <span class="kw">else</span> {
                 <span class="macro">panic!</span>(<span class="string">&quot;found the wrong `Error` type {:#?}, expected `UiaaResponse`&quot;</span>, <span class="ident">err</span>);
@@ -6879,7 +6879,7 @@
     <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">join_room_by_id</span>() {
         <span class="kw">let</span> <span class="ident">client</span> <span class="op">=</span> <span class="ident">logged_in_client</span>().<span class="kw">await</span>;
 
-        <span class="kw">let</span> <span class="ident">_m</span> <span class="op">=</span> <span class="ident">mock</span>(<span class="string">&quot;POST&quot;</span>, <span class="ident">Matcher::Regex</span>(<span class="string">r&quot;^/_matrix/client/r0/rooms/.*/join&quot;</span>.<span class="ident">to_string</span>()))
+        <span class="kw">let</span> <span class="ident">_m</span> <span class="op">=</span> <span class="ident">mock</span>(<span class="string">&quot;POST&quot;</span>, <span class="ident">Matcher::Regex</span>(<span class="string">r&quot;^/_matrix/client/r0/rooms/.*/join&quot;</span>.<span class="ident">to_owned</span>()))
             .<span class="ident">with_status</span>(<span class="number">200</span>)
             .<span class="ident">with_body</span>(<span class="ident">test_json::ROOM_ID</span>.<span class="ident">to_string</span>())
             .<span class="ident">match_header</span>(<span class="string">&quot;authorization&quot;</span>, <span class="string">&quot;Bearer 1234&quot;</span>)
@@ -6899,7 +6899,7 @@
     <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">join_room_by_id_or_alias</span>() {
         <span class="kw">let</span> <span class="ident">client</span> <span class="op">=</span> <span class="ident">logged_in_client</span>().<span class="kw">await</span>;
 
-        <span class="kw">let</span> <span class="ident">_m</span> <span class="op">=</span> <span class="ident">mock</span>(<span class="string">&quot;POST&quot;</span>, <span class="ident">Matcher::Regex</span>(<span class="string">r&quot;^/_matrix/client/r0/join/&quot;</span>.<span class="ident">to_string</span>()))
+        <span class="kw">let</span> <span class="ident">_m</span> <span class="op">=</span> <span class="ident">mock</span>(<span class="string">&quot;POST&quot;</span>, <span class="ident">Matcher::Regex</span>(<span class="string">r&quot;^/_matrix/client/r0/join/&quot;</span>.<span class="ident">to_owned</span>()))
             .<span class="ident">with_status</span>(<span class="number">200</span>)
             .<span class="ident">with_body</span>(<span class="ident">test_json::ROOM_ID</span>.<span class="ident">to_string</span>())
             .<span class="ident">match_header</span>(<span class="string">&quot;authorization&quot;</span>, <span class="string">&quot;Bearer 1234&quot;</span>)
@@ -6923,13 +6923,13 @@
     <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">invite_user_by_id</span>() {
         <span class="kw">let</span> <span class="ident">client</span> <span class="op">=</span> <span class="ident">logged_in_client</span>().<span class="kw">await</span>;
 
-        <span class="kw">let</span> <span class="ident">_m</span> <span class="op">=</span> <span class="ident">mock</span>(<span class="string">&quot;POST&quot;</span>, <span class="ident">Matcher::Regex</span>(<span class="string">r&quot;^/_matrix/client/r0/rooms/.*/invite&quot;</span>.<span class="ident">to_string</span>()))
+        <span class="kw">let</span> <span class="ident">_m</span> <span class="op">=</span> <span class="ident">mock</span>(<span class="string">&quot;POST&quot;</span>, <span class="ident">Matcher::Regex</span>(<span class="string">r&quot;^/_matrix/client/r0/rooms/.*/invite&quot;</span>.<span class="ident">to_owned</span>()))
             .<span class="ident">with_status</span>(<span class="number">200</span>)
             .<span class="ident">with_body</span>(<span class="ident">test_json::LOGOUT</span>.<span class="ident">to_string</span>())
             .<span class="ident">match_header</span>(<span class="string">&quot;authorization&quot;</span>, <span class="string">&quot;Bearer 1234&quot;</span>)
             .<span class="ident">create</span>();
 
-        <span class="kw">let</span> <span class="ident">_m</span> <span class="op">=</span> <span class="ident">mock</span>(<span class="string">&quot;GET&quot;</span>, <span class="ident">Matcher::Regex</span>(<span class="string">r&quot;^/_matrix/client/r0/sync\?.*$&quot;</span>.<span class="ident">to_string</span>()))
+        <span class="kw">let</span> <span class="ident">_m</span> <span class="op">=</span> <span class="ident">mock</span>(<span class="string">&quot;GET&quot;</span>, <span class="ident">Matcher::Regex</span>(<span class="string">r&quot;^/_matrix/client/r0/sync\?.*$&quot;</span>.<span class="ident">to_owned</span>()))
             .<span class="ident">with_status</span>(<span class="number">200</span>)
             .<span class="ident">match_header</span>(<span class="string">&quot;authorization&quot;</span>, <span class="string">&quot;Bearer 1234&quot;</span>)
             .<span class="ident">with_body</span>(<span class="ident">test_json::SYNC</span>.<span class="ident">to_string</span>())
@@ -6949,14 +6949,14 @@
     <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">invite_user_by_3pid</span>() {
         <span class="kw">let</span> <span class="ident">client</span> <span class="op">=</span> <span class="ident">logged_in_client</span>().<span class="kw">await</span>;
 
-        <span class="kw">let</span> <span class="ident">_m</span> <span class="op">=</span> <span class="ident">mock</span>(<span class="string">&quot;POST&quot;</span>, <span class="ident">Matcher::Regex</span>(<span class="string">r&quot;^/_matrix/client/r0/rooms/.*/invite&quot;</span>.<span class="ident">to_string</span>()))
+        <span class="kw">let</span> <span class="ident">_m</span> <span class="op">=</span> <span class="ident">mock</span>(<span class="string">&quot;POST&quot;</span>, <span class="ident">Matcher::Regex</span>(<span class="string">r&quot;^/_matrix/client/r0/rooms/.*/invite&quot;</span>.<span class="ident">to_owned</span>()))
             .<span class="ident">with_status</span>(<span class="number">200</span>)
             <span class="comment">// empty JSON object</span>
             .<span class="ident">with_body</span>(<span class="ident">test_json::LOGOUT</span>.<span class="ident">to_string</span>())
             .<span class="ident">match_header</span>(<span class="string">&quot;authorization&quot;</span>, <span class="string">&quot;Bearer 1234&quot;</span>)
             .<span class="ident">create</span>();
 
-        <span class="kw">let</span> <span class="ident">_m</span> <span class="op">=</span> <span class="ident">mock</span>(<span class="string">&quot;GET&quot;</span>, <span class="ident">Matcher::Regex</span>(<span class="string">r&quot;^/_matrix/client/r0/sync\?.*$&quot;</span>.<span class="ident">to_string</span>()))
+        <span class="kw">let</span> <span class="ident">_m</span> <span class="op">=</span> <span class="ident">mock</span>(<span class="string">&quot;GET&quot;</span>, <span class="ident">Matcher::Regex</span>(<span class="string">r&quot;^/_matrix/client/r0/sync\?.*$&quot;</span>.<span class="ident">to_owned</span>()))
             .<span class="ident">with_status</span>(<span class="number">200</span>)
             .<span class="ident">match_header</span>(<span class="string">&quot;authorization&quot;</span>, <span class="string">&quot;Bearer 1234&quot;</span>)
             .<span class="ident">with_body</span>(<span class="ident">test_json::SYNC</span>.<span class="ident">to_string</span>())
@@ -6986,7 +6986,7 @@
         <span class="kw">let</span> <span class="ident">homeserver</span> <span class="op">=</span> <span class="ident">Url::from_str</span>(<span class="kw-2">&amp;</span><span class="ident">mockito::server_url</span>()).<span class="ident">unwrap</span>();
         <span class="kw">let</span> <span class="ident">client</span> <span class="op">=</span> <span class="ident">Client::new</span>(<span class="ident">homeserver</span>).<span class="kw">await</span>.<span class="ident">unwrap</span>();
 
-        <span class="kw">let</span> <span class="ident">_m</span> <span class="op">=</span> <span class="ident">mock</span>(<span class="string">&quot;GET&quot;</span>, <span class="ident">Matcher::Regex</span>(<span class="string">r&quot;^/_matrix/client/r0/publicRooms&quot;</span>.<span class="ident">to_string</span>()))
+        <span class="kw">let</span> <span class="ident">_m</span> <span class="op">=</span> <span class="ident">mock</span>(<span class="string">&quot;GET&quot;</span>, <span class="ident">Matcher::Regex</span>(<span class="string">r&quot;^/_matrix/client/r0/publicRooms&quot;</span>.<span class="ident">to_owned</span>()))
             .<span class="ident">with_status</span>(<span class="number">200</span>)
             .<span class="ident">with_body</span>(<span class="ident">test_json::PUBLIC_ROOMS</span>.<span class="ident">to_string</span>())
             .<span class="ident">create</span>();
@@ -7000,7 +7000,7 @@
     <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">room_search_filtered</span>() {
         <span class="kw">let</span> <span class="ident">client</span> <span class="op">=</span> <span class="ident">logged_in_client</span>().<span class="kw">await</span>;
 
-        <span class="kw">let</span> <span class="ident">_m</span> <span class="op">=</span> <span class="ident">mock</span>(<span class="string">&quot;POST&quot;</span>, <span class="ident">Matcher::Regex</span>(<span class="string">r&quot;^/_matrix/client/r0/publicRooms&quot;</span>.<span class="ident">to_string</span>()))
+        <span class="kw">let</span> <span class="ident">_m</span> <span class="op">=</span> <span class="ident">mock</span>(<span class="string">&quot;POST&quot;</span>, <span class="ident">Matcher::Regex</span>(<span class="string">r&quot;^/_matrix/client/r0/publicRooms&quot;</span>.<span class="ident">to_owned</span>()))
             .<span class="ident">with_status</span>(<span class="number">200</span>)
             .<span class="ident">with_body</span>(<span class="ident">test_json::PUBLIC_ROOMS</span>.<span class="ident">to_string</span>())
             .<span class="ident">match_header</span>(<span class="string">&quot;authorization&quot;</span>, <span class="string">&quot;Bearer 1234&quot;</span>)
@@ -7019,14 +7019,14 @@
     <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">leave_room</span>() {
         <span class="kw">let</span> <span class="ident">client</span> <span class="op">=</span> <span class="ident">logged_in_client</span>().<span class="kw">await</span>;
 
-        <span class="kw">let</span> <span class="ident">_m</span> <span class="op">=</span> <span class="ident">mock</span>(<span class="string">&quot;POST&quot;</span>, <span class="ident">Matcher::Regex</span>(<span class="string">r&quot;^/_matrix/client/r0/rooms/.*/leave&quot;</span>.<span class="ident">to_string</span>()))
+        <span class="kw">let</span> <span class="ident">_m</span> <span class="op">=</span> <span class="ident">mock</span>(<span class="string">&quot;POST&quot;</span>, <span class="ident">Matcher::Regex</span>(<span class="string">r&quot;^/_matrix/client/r0/rooms/.*/leave&quot;</span>.<span class="ident">to_owned</span>()))
             .<span class="ident">with_status</span>(<span class="number">200</span>)
             <span class="comment">// this is an empty JSON object</span>
             .<span class="ident">with_body</span>(<span class="ident">test_json::LOGOUT</span>.<span class="ident">to_string</span>())
             .<span class="ident">match_header</span>(<span class="string">&quot;authorization&quot;</span>, <span class="string">&quot;Bearer 1234&quot;</span>)
             .<span class="ident">create</span>();
 
-        <span class="kw">let</span> <span class="ident">_m</span> <span class="op">=</span> <span class="ident">mock</span>(<span class="string">&quot;GET&quot;</span>, <span class="ident">Matcher::Regex</span>(<span class="string">r&quot;^/_matrix/client/r0/sync\?.*$&quot;</span>.<span class="ident">to_string</span>()))
+        <span class="kw">let</span> <span class="ident">_m</span> <span class="op">=</span> <span class="ident">mock</span>(<span class="string">&quot;GET&quot;</span>, <span class="ident">Matcher::Regex</span>(<span class="string">r&quot;^/_matrix/client/r0/sync\?.*$&quot;</span>.<span class="ident">to_owned</span>()))
             .<span class="ident">with_status</span>(<span class="number">200</span>)
             .<span class="ident">match_header</span>(<span class="string">&quot;authorization&quot;</span>, <span class="string">&quot;Bearer 1234&quot;</span>)
             .<span class="ident">with_body</span>(<span class="ident">test_json::SYNC</span>.<span class="ident">to_string</span>())
@@ -7045,14 +7045,14 @@
     <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">ban_user</span>() {
         <span class="kw">let</span> <span class="ident">client</span> <span class="op">=</span> <span class="ident">logged_in_client</span>().<span class="kw">await</span>;
 
-        <span class="kw">let</span> <span class="ident">_m</span> <span class="op">=</span> <span class="ident">mock</span>(<span class="string">&quot;POST&quot;</span>, <span class="ident">Matcher::Regex</span>(<span class="string">r&quot;^/_matrix/client/r0/rooms/.*/ban&quot;</span>.<span class="ident">to_string</span>()))
+        <span class="kw">let</span> <span class="ident">_m</span> <span class="op">=</span> <span class="ident">mock</span>(<span class="string">&quot;POST&quot;</span>, <span class="ident">Matcher::Regex</span>(<span class="string">r&quot;^/_matrix/client/r0/rooms/.*/ban&quot;</span>.<span class="ident">to_owned</span>()))
             .<span class="ident">with_status</span>(<span class="number">200</span>)
             <span class="comment">// this is an empty JSON object</span>
             .<span class="ident">with_body</span>(<span class="ident">test_json::LOGOUT</span>.<span class="ident">to_string</span>())
             .<span class="ident">match_header</span>(<span class="string">&quot;authorization&quot;</span>, <span class="string">&quot;Bearer 1234&quot;</span>)
             .<span class="ident">create</span>();
 
-        <span class="kw">let</span> <span class="ident">_m</span> <span class="op">=</span> <span class="ident">mock</span>(<span class="string">&quot;GET&quot;</span>, <span class="ident">Matcher::Regex</span>(<span class="string">r&quot;^/_matrix/client/r0/sync\?.*$&quot;</span>.<span class="ident">to_string</span>()))
+        <span class="kw">let</span> <span class="ident">_m</span> <span class="op">=</span> <span class="ident">mock</span>(<span class="string">&quot;GET&quot;</span>, <span class="ident">Matcher::Regex</span>(<span class="string">r&quot;^/_matrix/client/r0/sync\?.*$&quot;</span>.<span class="ident">to_owned</span>()))
             .<span class="ident">with_status</span>(<span class="number">200</span>)
             .<span class="ident">match_header</span>(<span class="string">&quot;authorization&quot;</span>, <span class="string">&quot;Bearer 1234&quot;</span>)
             .<span class="ident">with_body</span>(<span class="ident">test_json::SYNC</span>.<span class="ident">to_string</span>())
@@ -7072,14 +7072,14 @@
     <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">kick_user</span>() {
         <span class="kw">let</span> <span class="ident">client</span> <span class="op">=</span> <span class="ident">logged_in_client</span>().<span class="kw">await</span>;
 
-        <span class="kw">let</span> <span class="ident">_m</span> <span class="op">=</span> <span class="ident">mock</span>(<span class="string">&quot;POST&quot;</span>, <span class="ident">Matcher::Regex</span>(<span class="string">r&quot;^/_matrix/client/r0/rooms/.*/kick&quot;</span>.<span class="ident">to_string</span>()))
+        <span class="kw">let</span> <span class="ident">_m</span> <span class="op">=</span> <span class="ident">mock</span>(<span class="string">&quot;POST&quot;</span>, <span class="ident">Matcher::Regex</span>(<span class="string">r&quot;^/_matrix/client/r0/rooms/.*/kick&quot;</span>.<span class="ident">to_owned</span>()))
             .<span class="ident">with_status</span>(<span class="number">200</span>)
             <span class="comment">// this is an empty JSON object</span>
             .<span class="ident">with_body</span>(<span class="ident">test_json::LOGOUT</span>.<span class="ident">to_string</span>())
             .<span class="ident">match_header</span>(<span class="string">&quot;authorization&quot;</span>, <span class="string">&quot;Bearer 1234&quot;</span>)
             .<span class="ident">create</span>();
 
-        <span class="kw">let</span> <span class="ident">_m</span> <span class="op">=</span> <span class="ident">mock</span>(<span class="string">&quot;GET&quot;</span>, <span class="ident">Matcher::Regex</span>(<span class="string">r&quot;^/_matrix/client/r0/sync\?.*$&quot;</span>.<span class="ident">to_string</span>()))
+        <span class="kw">let</span> <span class="ident">_m</span> <span class="op">=</span> <span class="ident">mock</span>(<span class="string">&quot;GET&quot;</span>, <span class="ident">Matcher::Regex</span>(<span class="string">r&quot;^/_matrix/client/r0/sync\?.*$&quot;</span>.<span class="ident">to_owned</span>()))
             .<span class="ident">with_status</span>(<span class="number">200</span>)
             .<span class="ident">match_header</span>(<span class="string">&quot;authorization&quot;</span>, <span class="string">&quot;Bearer 1234&quot;</span>)
             .<span class="ident">with_body</span>(<span class="ident">test_json::SYNC</span>.<span class="ident">to_string</span>())
@@ -7099,14 +7099,14 @@
     <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">forget_room</span>() {
         <span class="kw">let</span> <span class="ident">client</span> <span class="op">=</span> <span class="ident">logged_in_client</span>().<span class="kw">await</span>;
 
-        <span class="kw">let</span> <span class="ident">_m</span> <span class="op">=</span> <span class="ident">mock</span>(<span class="string">&quot;POST&quot;</span>, <span class="ident">Matcher::Regex</span>(<span class="string">r&quot;^/_matrix/client/r0/rooms/.*/forget&quot;</span>.<span class="ident">to_string</span>()))
+        <span class="kw">let</span> <span class="ident">_m</span> <span class="op">=</span> <span class="ident">mock</span>(<span class="string">&quot;POST&quot;</span>, <span class="ident">Matcher::Regex</span>(<span class="string">r&quot;^/_matrix/client/r0/rooms/.*/forget&quot;</span>.<span class="ident">to_owned</span>()))
             .<span class="ident">with_status</span>(<span class="number">200</span>)
             <span class="comment">// this is an empty JSON object</span>
             .<span class="ident">with_body</span>(<span class="ident">test_json::LOGOUT</span>.<span class="ident">to_string</span>())
             .<span class="ident">match_header</span>(<span class="string">&quot;authorization&quot;</span>, <span class="string">&quot;Bearer 1234&quot;</span>)
             .<span class="ident">create</span>();
 
-        <span class="kw">let</span> <span class="ident">_m</span> <span class="op">=</span> <span class="ident">mock</span>(<span class="string">&quot;GET&quot;</span>, <span class="ident">Matcher::Regex</span>(<span class="string">r&quot;^/_matrix/client/r0/sync\?.*$&quot;</span>.<span class="ident">to_string</span>()))
+        <span class="kw">let</span> <span class="ident">_m</span> <span class="op">=</span> <span class="ident">mock</span>(<span class="string">&quot;GET&quot;</span>, <span class="ident">Matcher::Regex</span>(<span class="string">r&quot;^/_matrix/client/r0/sync\?.*$&quot;</span>.<span class="ident">to_owned</span>()))
             .<span class="ident">with_status</span>(<span class="number">200</span>)
             .<span class="ident">match_header</span>(<span class="string">&quot;authorization&quot;</span>, <span class="string">&quot;Bearer 1234&quot;</span>)
             .<span class="ident">with_body</span>(<span class="ident">test_json::LEAVE_SYNC</span>.<span class="ident">to_string</span>())
@@ -7125,14 +7125,14 @@
     <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">read_receipt</span>() {
         <span class="kw">let</span> <span class="ident">client</span> <span class="op">=</span> <span class="ident">logged_in_client</span>().<span class="kw">await</span>;
 
-        <span class="kw">let</span> <span class="ident">_m</span> <span class="op">=</span> <span class="ident">mock</span>(<span class="string">&quot;POST&quot;</span>, <span class="ident">Matcher::Regex</span>(<span class="string">r&quot;^/_matrix/client/r0/rooms/.*/receipt&quot;</span>.<span class="ident">to_string</span>()))
+        <span class="kw">let</span> <span class="ident">_m</span> <span class="op">=</span> <span class="ident">mock</span>(<span class="string">&quot;POST&quot;</span>, <span class="ident">Matcher::Regex</span>(<span class="string">r&quot;^/_matrix/client/r0/rooms/.*/receipt&quot;</span>.<span class="ident">to_owned</span>()))
             .<span class="ident">with_status</span>(<span class="number">200</span>)
             <span class="comment">// this is an empty JSON object</span>
             .<span class="ident">with_body</span>(<span class="ident">test_json::LOGOUT</span>.<span class="ident">to_string</span>())
             .<span class="ident">match_header</span>(<span class="string">&quot;authorization&quot;</span>, <span class="string">&quot;Bearer 1234&quot;</span>)
             .<span class="ident">create</span>();
 
-        <span class="kw">let</span> <span class="ident">_m</span> <span class="op">=</span> <span class="ident">mock</span>(<span class="string">&quot;GET&quot;</span>, <span class="ident">Matcher::Regex</span>(<span class="string">r&quot;^/_matrix/client/r0/sync\?.*$&quot;</span>.<span class="ident">to_string</span>()))
+        <span class="kw">let</span> <span class="ident">_m</span> <span class="op">=</span> <span class="ident">mock</span>(<span class="string">&quot;GET&quot;</span>, <span class="ident">Matcher::Regex</span>(<span class="string">r&quot;^/_matrix/client/r0/sync\?.*$&quot;</span>.<span class="ident">to_owned</span>()))
             .<span class="ident">with_status</span>(<span class="number">200</span>)
             .<span class="ident">match_header</span>(<span class="string">&quot;authorization&quot;</span>, <span class="string">&quot;Bearer 1234&quot;</span>)
             .<span class="ident">with_body</span>(<span class="ident">test_json::SYNC</span>.<span class="ident">to_string</span>())
@@ -7153,14 +7153,14 @@
         <span class="kw">let</span> <span class="ident">client</span> <span class="op">=</span> <span class="ident">logged_in_client</span>().<span class="kw">await</span>;
 
         <span class="kw">let</span> <span class="ident">_m</span> <span class="op">=</span>
-            <span class="ident">mock</span>(<span class="string">&quot;POST&quot;</span>, <span class="ident">Matcher::Regex</span>(<span class="string">r&quot;^/_matrix/client/r0/rooms/.*/read_markers&quot;</span>.<span class="ident">to_string</span>()))
+            <span class="ident">mock</span>(<span class="string">&quot;POST&quot;</span>, <span class="ident">Matcher::Regex</span>(<span class="string">r&quot;^/_matrix/client/r0/rooms/.*/read_markers&quot;</span>.<span class="ident">to_owned</span>()))
                 .<span class="ident">with_status</span>(<span class="number">200</span>)
                 <span class="comment">// this is an empty JSON object</span>
                 .<span class="ident">with_body</span>(<span class="ident">test_json::LOGOUT</span>.<span class="ident">to_string</span>())
                 .<span class="ident">match_header</span>(<span class="string">&quot;authorization&quot;</span>, <span class="string">&quot;Bearer 1234&quot;</span>)
                 .<span class="ident">create</span>();
 
-        <span class="kw">let</span> <span class="ident">_m</span> <span class="op">=</span> <span class="ident">mock</span>(<span class="string">&quot;GET&quot;</span>, <span class="ident">Matcher::Regex</span>(<span class="string">r&quot;^/_matrix/client/r0/sync\?.*$&quot;</span>.<span class="ident">to_string</span>()))
+        <span class="kw">let</span> <span class="ident">_m</span> <span class="op">=</span> <span class="ident">mock</span>(<span class="string">&quot;GET&quot;</span>, <span class="ident">Matcher::Regex</span>(<span class="string">r&quot;^/_matrix/client/r0/sync\?.*$&quot;</span>.<span class="ident">to_owned</span>()))
             .<span class="ident">with_status</span>(<span class="number">200</span>)
             .<span class="ident">match_header</span>(<span class="string">&quot;authorization&quot;</span>, <span class="string">&quot;Bearer 1234&quot;</span>)
             .<span class="ident">with_body</span>(<span class="ident">test_json::SYNC</span>.<span class="ident">to_string</span>())
@@ -7180,14 +7180,14 @@
     <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">typing_notice</span>() {
         <span class="kw">let</span> <span class="ident">client</span> <span class="op">=</span> <span class="ident">logged_in_client</span>().<span class="kw">await</span>;
 
-        <span class="kw">let</span> <span class="ident">_m</span> <span class="op">=</span> <span class="ident">mock</span>(<span class="string">&quot;PUT&quot;</span>, <span class="ident">Matcher::Regex</span>(<span class="string">r&quot;^/_matrix/client/r0/rooms/.*/typing&quot;</span>.<span class="ident">to_string</span>()))
+        <span class="kw">let</span> <span class="ident">_m</span> <span class="op">=</span> <span class="ident">mock</span>(<span class="string">&quot;PUT&quot;</span>, <span class="ident">Matcher::Regex</span>(<span class="string">r&quot;^/_matrix/client/r0/rooms/.*/typing&quot;</span>.<span class="ident">to_owned</span>()))
             .<span class="ident">with_status</span>(<span class="number">200</span>)
             <span class="comment">// this is an empty JSON object</span>
             .<span class="ident">with_body</span>(<span class="ident">test_json::LOGOUT</span>.<span class="ident">to_string</span>())
             .<span class="ident">match_header</span>(<span class="string">&quot;authorization&quot;</span>, <span class="string">&quot;Bearer 1234&quot;</span>)
             .<span class="ident">create</span>();
 
-        <span class="kw">let</span> <span class="ident">_m</span> <span class="op">=</span> <span class="ident">mock</span>(<span class="string">&quot;GET&quot;</span>, <span class="ident">Matcher::Regex</span>(<span class="string">r&quot;^/_matrix/client/r0/sync\?.*$&quot;</span>.<span class="ident">to_string</span>()))
+        <span class="kw">let</span> <span class="ident">_m</span> <span class="op">=</span> <span class="ident">mock</span>(<span class="string">&quot;GET&quot;</span>, <span class="ident">Matcher::Regex</span>(<span class="string">r&quot;^/_matrix/client/r0/sync\?.*$&quot;</span>.<span class="ident">to_owned</span>()))
             .<span class="ident">with_status</span>(<span class="number">200</span>)
             .<span class="ident">match_header</span>(<span class="string">&quot;authorization&quot;</span>, <span class="string">&quot;Bearer 1234&quot;</span>)
             .<span class="ident">with_body</span>(<span class="ident">test_json::SYNC</span>.<span class="ident">to_string</span>())
@@ -7208,13 +7208,13 @@
 
         <span class="kw">let</span> <span class="ident">client</span> <span class="op">=</span> <span class="ident">logged_in_client</span>().<span class="kw">await</span>;
 
-        <span class="kw">let</span> <span class="ident">_m</span> <span class="op">=</span> <span class="ident">mock</span>(<span class="string">&quot;PUT&quot;</span>, <span class="ident">Matcher::Regex</span>(<span class="string">r&quot;^/_matrix/client/r0/rooms/.*/state/.*&quot;</span>.<span class="ident">to_string</span>()))
+        <span class="kw">let</span> <span class="ident">_m</span> <span class="op">=</span> <span class="ident">mock</span>(<span class="string">&quot;PUT&quot;</span>, <span class="ident">Matcher::Regex</span>(<span class="string">r&quot;^/_matrix/client/r0/rooms/.*/state/.*&quot;</span>.<span class="ident">to_owned</span>()))
             .<span class="ident">with_status</span>(<span class="number">200</span>)
             .<span class="ident">match_header</span>(<span class="string">&quot;authorization&quot;</span>, <span class="string">&quot;Bearer 1234&quot;</span>)
             .<span class="ident">with_body</span>(<span class="ident">test_json::EVENT_ID</span>.<span class="ident">to_string</span>())
             .<span class="ident">create</span>();
 
-        <span class="kw">let</span> <span class="ident">_m</span> <span class="op">=</span> <span class="ident">mock</span>(<span class="string">&quot;GET&quot;</span>, <span class="ident">Matcher::Regex</span>(<span class="string">r&quot;^/_matrix/client/r0/sync\?.*$&quot;</span>.<span class="ident">to_string</span>()))
+        <span class="kw">let</span> <span class="ident">_m</span> <span class="op">=</span> <span class="ident">mock</span>(<span class="string">&quot;GET&quot;</span>, <span class="ident">Matcher::Regex</span>(<span class="string">r&quot;^/_matrix/client/r0/sync\?.*$&quot;</span>.<span class="ident">to_owned</span>()))
             .<span class="ident">with_status</span>(<span class="number">200</span>)
             .<span class="ident">match_header</span>(<span class="string">&quot;authorization&quot;</span>, <span class="string">&quot;Bearer 1234&quot;</span>)
             .<span class="ident">with_body</span>(<span class="ident">test_json::SYNC</span>.<span class="ident">to_string</span>())
@@ -7240,13 +7240,13 @@
     <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">room_message_send</span>() {
         <span class="kw">let</span> <span class="ident">client</span> <span class="op">=</span> <span class="ident">logged_in_client</span>().<span class="kw">await</span>;
 
-        <span class="kw">let</span> <span class="ident">_m</span> <span class="op">=</span> <span class="ident">mock</span>(<span class="string">&quot;PUT&quot;</span>, <span class="ident">Matcher::Regex</span>(<span class="string">r&quot;^/_matrix/client/r0/rooms/.*/send/&quot;</span>.<span class="ident">to_string</span>()))
+        <span class="kw">let</span> <span class="ident">_m</span> <span class="op">=</span> <span class="ident">mock</span>(<span class="string">&quot;PUT&quot;</span>, <span class="ident">Matcher::Regex</span>(<span class="string">r&quot;^/_matrix/client/r0/rooms/.*/send/&quot;</span>.<span class="ident">to_owned</span>()))
             .<span class="ident">with_status</span>(<span class="number">200</span>)
             .<span class="ident">match_header</span>(<span class="string">&quot;authorization&quot;</span>, <span class="string">&quot;Bearer 1234&quot;</span>)
             .<span class="ident">with_body</span>(<span class="ident">test_json::EVENT_ID</span>.<span class="ident">to_string</span>())
             .<span class="ident">create</span>();
 
-        <span class="kw">let</span> <span class="ident">_m</span> <span class="op">=</span> <span class="ident">mock</span>(<span class="string">&quot;GET&quot;</span>, <span class="ident">Matcher::Regex</span>(<span class="string">r&quot;^/_matrix/client/r0/sync\?.*$&quot;</span>.<span class="ident">to_string</span>()))
+        <span class="kw">let</span> <span class="ident">_m</span> <span class="op">=</span> <span class="ident">mock</span>(<span class="string">&quot;GET&quot;</span>, <span class="ident">Matcher::Regex</span>(<span class="string">r&quot;^/_matrix/client/r0/sync\?.*$&quot;</span>.<span class="ident">to_owned</span>()))
             .<span class="ident">with_status</span>(<span class="number">200</span>)
             .<span class="ident">match_header</span>(<span class="string">&quot;authorization&quot;</span>, <span class="string">&quot;Bearer 1234&quot;</span>)
             .<span class="ident">with_body</span>(<span class="ident">test_json::SYNC</span>.<span class="ident">to_string</span>())
@@ -7269,7 +7269,7 @@
     <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">room_attachment_send</span>() {
         <span class="kw">let</span> <span class="ident">client</span> <span class="op">=</span> <span class="ident">logged_in_client</span>().<span class="kw">await</span>;
 
-        <span class="kw">let</span> <span class="ident">_m</span> <span class="op">=</span> <span class="ident">mock</span>(<span class="string">&quot;PUT&quot;</span>, <span class="ident">Matcher::Regex</span>(<span class="string">r&quot;^/_matrix/client/r0/rooms/.*/send/&quot;</span>.<span class="ident">to_string</span>()))
+        <span class="kw">let</span> <span class="ident">_m</span> <span class="op">=</span> <span class="ident">mock</span>(<span class="string">&quot;PUT&quot;</span>, <span class="ident">Matcher::Regex</span>(<span class="string">r&quot;^/_matrix/client/r0/rooms/.*/send/&quot;</span>.<span class="ident">to_owned</span>()))
             .<span class="ident">with_status</span>(<span class="number">200</span>)
             .<span class="ident">match_header</span>(<span class="string">&quot;authorization&quot;</span>, <span class="string">&quot;Bearer 1234&quot;</span>)
             .<span class="ident">match_body</span>(<span class="ident">Matcher::PartialJson</span>(<span class="macro">json!</span>({
@@ -7280,7 +7280,7 @@
             .<span class="ident">with_body</span>(<span class="ident">test_json::EVENT_ID</span>.<span class="ident">to_string</span>())
             .<span class="ident">create</span>();
 
-        <span class="kw">let</span> <span class="ident">_m</span> <span class="op">=</span> <span class="ident">mock</span>(<span class="string">&quot;POST&quot;</span>, <span class="ident">Matcher::Regex</span>(<span class="string">r&quot;^/_matrix/media/r0/upload&quot;</span>.<span class="ident">to_string</span>()))
+        <span class="kw">let</span> <span class="ident">_m</span> <span class="op">=</span> <span class="ident">mock</span>(<span class="string">&quot;POST&quot;</span>, <span class="ident">Matcher::Regex</span>(<span class="string">r&quot;^/_matrix/media/r0/upload&quot;</span>.<span class="ident">to_owned</span>()))
             .<span class="ident">with_status</span>(<span class="number">200</span>)
             .<span class="ident">match_header</span>(<span class="string">&quot;content-type&quot;</span>, <span class="string">&quot;image/jpeg&quot;</span>)
             .<span class="ident">with_body</span>(
@@ -7291,7 +7291,7 @@
             )
             .<span class="ident">create</span>();
 
-        <span class="kw">let</span> <span class="ident">_m</span> <span class="op">=</span> <span class="ident">mock</span>(<span class="string">&quot;GET&quot;</span>, <span class="ident">Matcher::Regex</span>(<span class="string">r&quot;^/_matrix/client/r0/sync\?.*$&quot;</span>.<span class="ident">to_string</span>()))
+        <span class="kw">let</span> <span class="ident">_m</span> <span class="op">=</span> <span class="ident">mock</span>(<span class="string">&quot;GET&quot;</span>, <span class="ident">Matcher::Regex</span>(<span class="string">r&quot;^/_matrix/client/r0/sync\?.*$&quot;</span>.<span class="ident">to_owned</span>()))
             .<span class="ident">with_status</span>(<span class="number">200</span>)
             .<span class="ident">match_header</span>(<span class="string">&quot;authorization&quot;</span>, <span class="string">&quot;Bearer 1234&quot;</span>)
             .<span class="ident">with_body</span>(<span class="ident">test_json::SYNC</span>.<span class="ident">to_string</span>())
@@ -7317,7 +7317,7 @@
     <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">room_attachment_send_info</span>() {
         <span class="kw">let</span> <span class="ident">client</span> <span class="op">=</span> <span class="ident">logged_in_client</span>().<span class="kw">await</span>;
 
-        <span class="kw">let</span> <span class="ident">_m</span> <span class="op">=</span> <span class="ident">mock</span>(<span class="string">&quot;PUT&quot;</span>, <span class="ident">Matcher::Regex</span>(<span class="string">r&quot;^/_matrix/client/r0/rooms/.*/send/&quot;</span>.<span class="ident">to_string</span>()))
+        <span class="kw">let</span> <span class="ident">_m</span> <span class="op">=</span> <span class="ident">mock</span>(<span class="string">&quot;PUT&quot;</span>, <span class="ident">Matcher::Regex</span>(<span class="string">r&quot;^/_matrix/client/r0/rooms/.*/send/&quot;</span>.<span class="ident">to_owned</span>()))
             .<span class="ident">with_status</span>(<span class="number">200</span>)
             .<span class="ident">match_header</span>(<span class="string">&quot;authorization&quot;</span>, <span class="string">&quot;Bearer 1234&quot;</span>)
             .<span class="ident">match_body</span>(<span class="ident">Matcher::PartialJson</span>(<span class="macro">json!</span>({
@@ -7330,7 +7330,7 @@
             .<span class="ident">with_body</span>(<span class="ident">test_json::EVENT_ID</span>.<span class="ident">to_string</span>())
             .<span class="ident">create</span>();
 
-        <span class="kw">let</span> <span class="ident">upload_mock</span> <span class="op">=</span> <span class="ident">mock</span>(<span class="string">&quot;POST&quot;</span>, <span class="ident">Matcher::Regex</span>(<span class="string">r&quot;^/_matrix/media/r0/upload&quot;</span>.<span class="ident">to_string</span>()))
+        <span class="kw">let</span> <span class="ident">upload_mock</span> <span class="op">=</span> <span class="ident">mock</span>(<span class="string">&quot;POST&quot;</span>, <span class="ident">Matcher::Regex</span>(<span class="string">r&quot;^/_matrix/media/r0/upload&quot;</span>.<span class="ident">to_owned</span>()))
             .<span class="ident">with_status</span>(<span class="number">200</span>)
             .<span class="ident">match_header</span>(<span class="string">&quot;content-type&quot;</span>, <span class="string">&quot;image/jpeg&quot;</span>)
             .<span class="ident">with_body</span>(
@@ -7341,7 +7341,7 @@
             )
             .<span class="ident">create</span>();
 
-        <span class="kw">let</span> <span class="ident">_m</span> <span class="op">=</span> <span class="ident">mock</span>(<span class="string">&quot;GET&quot;</span>, <span class="ident">Matcher::Regex</span>(<span class="string">r&quot;^/_matrix/client/r0/sync\?.*$&quot;</span>.<span class="ident">to_string</span>()))
+        <span class="kw">let</span> <span class="ident">_m</span> <span class="op">=</span> <span class="ident">mock</span>(<span class="string">&quot;GET&quot;</span>, <span class="ident">Matcher::Regex</span>(<span class="string">r&quot;^/_matrix/client/r0/sync\?.*$&quot;</span>.<span class="ident">to_owned</span>()))
             .<span class="ident">with_status</span>(<span class="number">200</span>)
             .<span class="ident">match_header</span>(<span class="string">&quot;authorization&quot;</span>, <span class="string">&quot;Bearer 1234&quot;</span>)
             .<span class="ident">with_body</span>(<span class="ident">test_json::SYNC</span>.<span class="ident">to_string</span>())
@@ -7373,7 +7373,7 @@
     <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">room_attachment_send_wrong_info</span>() {
         <span class="kw">let</span> <span class="ident">client</span> <span class="op">=</span> <span class="ident">logged_in_client</span>().<span class="kw">await</span>;
 
-        <span class="kw">let</span> <span class="ident">_m</span> <span class="op">=</span> <span class="ident">mock</span>(<span class="string">&quot;PUT&quot;</span>, <span class="ident">Matcher::Regex</span>(<span class="string">r&quot;^/_matrix/client/r0/rooms/.*/send/&quot;</span>.<span class="ident">to_string</span>()))
+        <span class="kw">let</span> <span class="ident">_m</span> <span class="op">=</span> <span class="ident">mock</span>(<span class="string">&quot;PUT&quot;</span>, <span class="ident">Matcher::Regex</span>(<span class="string">r&quot;^/_matrix/client/r0/rooms/.*/send/&quot;</span>.<span class="ident">to_owned</span>()))
             .<span class="ident">with_status</span>(<span class="number">200</span>)
             .<span class="ident">match_header</span>(<span class="string">&quot;authorization&quot;</span>, <span class="string">&quot;Bearer 1234&quot;</span>)
             .<span class="ident">match_body</span>(<span class="ident">Matcher::PartialJson</span>(<span class="macro">json!</span>({
@@ -7386,7 +7386,7 @@
             .<span class="ident">with_body</span>(<span class="ident">test_json::EVENT_ID</span>.<span class="ident">to_string</span>())
             .<span class="ident">create</span>();
 
-        <span class="kw">let</span> <span class="ident">_m</span> <span class="op">=</span> <span class="ident">mock</span>(<span class="string">&quot;POST&quot;</span>, <span class="ident">Matcher::Regex</span>(<span class="string">r&quot;^/_matrix/media/r0/upload&quot;</span>.<span class="ident">to_string</span>()))
+        <span class="kw">let</span> <span class="ident">_m</span> <span class="op">=</span> <span class="ident">mock</span>(<span class="string">&quot;POST&quot;</span>, <span class="ident">Matcher::Regex</span>(<span class="string">r&quot;^/_matrix/media/r0/upload&quot;</span>.<span class="ident">to_owned</span>()))
             .<span class="ident">with_status</span>(<span class="number">200</span>)
             .<span class="ident">match_header</span>(<span class="string">&quot;content-type&quot;</span>, <span class="string">&quot;image/jpeg&quot;</span>)
             .<span class="ident">with_body</span>(
@@ -7397,7 +7397,7 @@
             )
             .<span class="ident">create</span>();
 
-        <span class="kw">let</span> <span class="ident">_m</span> <span class="op">=</span> <span class="ident">mock</span>(<span class="string">&quot;GET&quot;</span>, <span class="ident">Matcher::Regex</span>(<span class="string">r&quot;^/_matrix/client/r0/sync\?.*$&quot;</span>.<span class="ident">to_string</span>()))
+        <span class="kw">let</span> <span class="ident">_m</span> <span class="op">=</span> <span class="ident">mock</span>(<span class="string">&quot;GET&quot;</span>, <span class="ident">Matcher::Regex</span>(<span class="string">r&quot;^/_matrix/client/r0/sync\?.*$&quot;</span>.<span class="ident">to_owned</span>()))
             .<span class="ident">with_status</span>(<span class="number">200</span>)
             .<span class="ident">match_header</span>(<span class="string">&quot;authorization&quot;</span>, <span class="string">&quot;Bearer 1234&quot;</span>)
             .<span class="ident">with_body</span>(<span class="ident">test_json::SYNC</span>.<span class="ident">to_string</span>())
@@ -7428,7 +7428,7 @@
     <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">room_attachment_send_info_thumbnail</span>() {
         <span class="kw">let</span> <span class="ident">client</span> <span class="op">=</span> <span class="ident">logged_in_client</span>().<span class="kw">await</span>;
 
-        <span class="kw">let</span> <span class="ident">_m</span> <span class="op">=</span> <span class="ident">mock</span>(<span class="string">&quot;PUT&quot;</span>, <span class="ident">Matcher::Regex</span>(<span class="string">r&quot;^/_matrix/client/r0/rooms/.*/send/&quot;</span>.<span class="ident">to_string</span>()))
+        <span class="kw">let</span> <span class="ident">_m</span> <span class="op">=</span> <span class="ident">mock</span>(<span class="string">&quot;PUT&quot;</span>, <span class="ident">Matcher::Regex</span>(<span class="string">r&quot;^/_matrix/client/r0/rooms/.*/send/&quot;</span>.<span class="ident">to_owned</span>()))
             .<span class="ident">with_status</span>(<span class="number">200</span>)
             .<span class="ident">match_header</span>(<span class="string">&quot;authorization&quot;</span>, <span class="string">&quot;Bearer 1234&quot;</span>)
             .<span class="ident">match_body</span>(<span class="ident">Matcher::PartialJson</span>(<span class="macro">json!</span>({
@@ -7448,7 +7448,7 @@
             .<span class="ident">with_body</span>(<span class="ident">test_json::EVENT_ID</span>.<span class="ident">to_string</span>())
             .<span class="ident">create</span>();
 
-        <span class="kw">let</span> <span class="ident">upload_mock</span> <span class="op">=</span> <span class="ident">mock</span>(<span class="string">&quot;POST&quot;</span>, <span class="ident">Matcher::Regex</span>(<span class="string">r&quot;^/_matrix/media/r0/upload&quot;</span>.<span class="ident">to_string</span>()))
+        <span class="kw">let</span> <span class="ident">upload_mock</span> <span class="op">=</span> <span class="ident">mock</span>(<span class="string">&quot;POST&quot;</span>, <span class="ident">Matcher::Regex</span>(<span class="string">r&quot;^/_matrix/media/r0/upload&quot;</span>.<span class="ident">to_owned</span>()))
             .<span class="ident">with_status</span>(<span class="number">200</span>)
             .<span class="ident">match_header</span>(<span class="string">&quot;content-type&quot;</span>, <span class="string">&quot;image/jpeg&quot;</span>)
             .<span class="ident">with_body</span>(
@@ -7460,7 +7460,7 @@
             .<span class="ident">expect</span>(<span class="number">2</span>)
             .<span class="ident">create</span>();
 
-        <span class="kw">let</span> <span class="ident">_m</span> <span class="op">=</span> <span class="ident">mock</span>(<span class="string">&quot;GET&quot;</span>, <span class="ident">Matcher::Regex</span>(<span class="string">r&quot;^/_matrix/client/r0/sync\?.*$&quot;</span>.<span class="ident">to_string</span>()))
+        <span class="kw">let</span> <span class="ident">_m</span> <span class="op">=</span> <span class="ident">mock</span>(<span class="string">&quot;GET&quot;</span>, <span class="ident">Matcher::Regex</span>(<span class="string">r&quot;^/_matrix/client/r0/sync\?.*$&quot;</span>.<span class="ident">to_owned</span>()))
             .<span class="ident">with_status</span>(<span class="number">200</span>)
             .<span class="ident">match_header</span>(<span class="string">&quot;authorization&quot;</span>, <span class="string">&quot;Bearer 1234&quot;</span>)
             .<span class="ident">with_body</span>(<span class="ident">test_json::SYNC</span>.<span class="ident">to_string</span>())
@@ -7504,13 +7504,13 @@
         <span class="kw">let</span> <span class="ident">client</span> <span class="op">=</span> <span class="ident">logged_in_client</span>().<span class="kw">await</span>;
 
         <span class="kw">let</span> <span class="ident">_m</span> <span class="op">=</span>
-            <span class="ident">mock</span>(<span class="string">&quot;PUT&quot;</span>, <span class="ident">Matcher::Regex</span>(<span class="string">r&quot;^/_matrix/client/r0/rooms/.*/redact/.*?/.*?&quot;</span>.<span class="ident">to_string</span>()))
+            <span class="ident">mock</span>(<span class="string">&quot;PUT&quot;</span>, <span class="ident">Matcher::Regex</span>(<span class="string">r&quot;^/_matrix/client/r0/rooms/.*/redact/.*?/.*?&quot;</span>.<span class="ident">to_owned</span>()))
                 .<span class="ident">with_status</span>(<span class="number">200</span>)
                 .<span class="ident">match_header</span>(<span class="string">&quot;authorization&quot;</span>, <span class="string">&quot;Bearer 1234&quot;</span>)
                 .<span class="ident">with_body</span>(<span class="ident">test_json::EVENT_ID</span>.<span class="ident">to_string</span>())
                 .<span class="ident">create</span>();
 
-        <span class="kw">let</span> <span class="ident">_m</span> <span class="op">=</span> <span class="ident">mock</span>(<span class="string">&quot;GET&quot;</span>, <span class="ident">Matcher::Regex</span>(<span class="string">r&quot;^/_matrix/client/r0/sync\?.*$&quot;</span>.<span class="ident">to_string</span>()))
+        <span class="kw">let</span> <span class="ident">_m</span> <span class="op">=</span> <span class="ident">mock</span>(<span class="string">&quot;GET&quot;</span>, <span class="ident">Matcher::Regex</span>(<span class="string">r&quot;^/_matrix/client/r0/sync\?.*$&quot;</span>.<span class="ident">to_owned</span>()))
             .<span class="ident">with_status</span>(<span class="number">200</span>)
             .<span class="ident">match_header</span>(<span class="string">&quot;authorization&quot;</span>, <span class="string">&quot;Bearer 1234&quot;</span>)
             .<span class="ident">with_body</span>(<span class="ident">test_json::SYNC</span>.<span class="ident">to_string</span>())
@@ -7535,13 +7535,13 @@
     <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">user_presence</span>() {
         <span class="kw">let</span> <span class="ident">client</span> <span class="op">=</span> <span class="ident">logged_in_client</span>().<span class="kw">await</span>;
 
-        <span class="kw">let</span> <span class="ident">_m</span> <span class="op">=</span> <span class="ident">mock</span>(<span class="string">&quot;GET&quot;</span>, <span class="ident">Matcher::Regex</span>(<span class="string">r&quot;^/_matrix/client/r0/sync\?.*$&quot;</span>.<span class="ident">to_string</span>()))
+        <span class="kw">let</span> <span class="ident">_m</span> <span class="op">=</span> <span class="ident">mock</span>(<span class="string">&quot;GET&quot;</span>, <span class="ident">Matcher::Regex</span>(<span class="string">r&quot;^/_matrix/client/r0/sync\?.*$&quot;</span>.<span class="ident">to_owned</span>()))
             .<span class="ident">with_status</span>(<span class="number">200</span>)
             .<span class="ident">match_header</span>(<span class="string">&quot;authorization&quot;</span>, <span class="string">&quot;Bearer 1234&quot;</span>)
             .<span class="ident">with_body</span>(<span class="ident">test_json::SYNC</span>.<span class="ident">to_string</span>())
             .<span class="ident">create</span>();
 
-        <span class="kw">let</span> <span class="ident">_m</span> <span class="op">=</span> <span class="ident">mock</span>(<span class="string">&quot;GET&quot;</span>, <span class="ident">Matcher::Regex</span>(<span class="string">r&quot;^/_matrix/client/r0/rooms/.*/members&quot;</span>.<span class="ident">to_string</span>()))
+        <span class="kw">let</span> <span class="ident">_m</span> <span class="op">=</span> <span class="ident">mock</span>(<span class="string">&quot;GET&quot;</span>, <span class="ident">Matcher::Regex</span>(<span class="string">r&quot;^/_matrix/client/r0/rooms/.*/members&quot;</span>.<span class="ident">to_owned</span>()))
             .<span class="ident">with_status</span>(<span class="number">200</span>)
             .<span class="ident">match_header</span>(<span class="string">&quot;authorization&quot;</span>, <span class="string">&quot;Bearer 1234&quot;</span>)
             .<span class="ident">with_body</span>(<span class="ident">test_json::MEMBERS</span>.<span class="ident">to_string</span>())
@@ -7562,7 +7562,7 @@
     <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">calculate_room_names_from_summary</span>() {
         <span class="kw">let</span> <span class="ident">client</span> <span class="op">=</span> <span class="ident">logged_in_client</span>().<span class="kw">await</span>;
 
-        <span class="kw">let</span> <span class="ident">_m</span> <span class="op">=</span> <span class="ident">mock</span>(<span class="string">&quot;GET&quot;</span>, <span class="ident">Matcher::Regex</span>(<span class="string">r&quot;^/_matrix/client/r0/sync\?.*$&quot;</span>.<span class="ident">to_string</span>()))
+        <span class="kw">let</span> <span class="ident">_m</span> <span class="op">=</span> <span class="ident">mock</span>(<span class="string">&quot;GET&quot;</span>, <span class="ident">Matcher::Regex</span>(<span class="string">r&quot;^/_matrix/client/r0/sync\?.*$&quot;</span>.<span class="ident">to_owned</span>()))
             .<span class="ident">with_status</span>(<span class="number">200</span>)
             .<span class="ident">match_header</span>(<span class="string">&quot;authorization&quot;</span>, <span class="string">&quot;Bearer 1234&quot;</span>)
             .<span class="ident">with_body</span>(<span class="ident">test_json::DEFAULT_SYNC_SUMMARY</span>.<span class="ident">to_string</span>())
@@ -7579,7 +7579,7 @@
     <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">invited_rooms</span>() {
         <span class="kw">let</span> <span class="ident">client</span> <span class="op">=</span> <span class="ident">logged_in_client</span>().<span class="kw">await</span>;
 
-        <span class="kw">let</span> <span class="ident">_m</span> <span class="op">=</span> <span class="ident">mock</span>(<span class="string">&quot;GET&quot;</span>, <span class="ident">Matcher::Regex</span>(<span class="string">r&quot;^/_matrix/client/r0/sync\?.*$&quot;</span>.<span class="ident">to_string</span>()))
+        <span class="kw">let</span> <span class="ident">_m</span> <span class="op">=</span> <span class="ident">mock</span>(<span class="string">&quot;GET&quot;</span>, <span class="ident">Matcher::Regex</span>(<span class="string">r&quot;^/_matrix/client/r0/sync\?.*$&quot;</span>.<span class="ident">to_owned</span>()))
             .<span class="ident">with_status</span>(<span class="number">200</span>)
             .<span class="ident">match_header</span>(<span class="string">&quot;authorization&quot;</span>, <span class="string">&quot;Bearer 1234&quot;</span>)
             .<span class="ident">with_body</span>(<span class="ident">test_json::INVITE_SYNC</span>.<span class="ident">to_string</span>())
@@ -7598,7 +7598,7 @@
     <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">left_rooms</span>() {
         <span class="kw">let</span> <span class="ident">client</span> <span class="op">=</span> <span class="ident">logged_in_client</span>().<span class="kw">await</span>;
 
-        <span class="kw">let</span> <span class="ident">_m</span> <span class="op">=</span> <span class="ident">mock</span>(<span class="string">&quot;GET&quot;</span>, <span class="ident">Matcher::Regex</span>(<span class="string">r&quot;^/_matrix/client/r0/sync\?.*$&quot;</span>.<span class="ident">to_string</span>()))
+        <span class="kw">let</span> <span class="ident">_m</span> <span class="op">=</span> <span class="ident">mock</span>(<span class="string">&quot;GET&quot;</span>, <span class="ident">Matcher::Regex</span>(<span class="string">r&quot;^/_matrix/client/r0/sync\?.*$&quot;</span>.<span class="ident">to_owned</span>()))
             .<span class="ident">with_status</span>(<span class="number">200</span>)
             .<span class="ident">match_header</span>(<span class="string">&quot;authorization&quot;</span>, <span class="string">&quot;Bearer 1234&quot;</span>)
             .<span class="ident">with_body</span>(<span class="ident">test_json::LEAVE_SYNC</span>.<span class="ident">to_string</span>())
@@ -7617,7 +7617,7 @@
     <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">sync</span>() {
         <span class="kw">let</span> <span class="ident">client</span> <span class="op">=</span> <span class="ident">logged_in_client</span>().<span class="kw">await</span>;
 
-        <span class="kw">let</span> <span class="ident">_m</span> <span class="op">=</span> <span class="ident">mock</span>(<span class="string">&quot;GET&quot;</span>, <span class="ident">Matcher::Regex</span>(<span class="string">r&quot;^/_matrix/client/r0/sync\?.*$&quot;</span>.<span class="ident">to_string</span>()))
+        <span class="kw">let</span> <span class="ident">_m</span> <span class="op">=</span> <span class="ident">mock</span>(<span class="string">&quot;GET&quot;</span>, <span class="ident">Matcher::Regex</span>(<span class="string">r&quot;^/_matrix/client/r0/sync\?.*$&quot;</span>.<span class="ident">to_owned</span>()))
             .<span class="ident">with_status</span>(<span class="number">200</span>)
             .<span class="ident">with_body</span>(<span class="ident">test_json::SYNC</span>.<span class="ident">to_string</span>())
             .<span class="ident">match_header</span>(<span class="string">&quot;authorization&quot;</span>, <span class="string">&quot;Bearer 1234&quot;</span>)
@@ -7636,7 +7636,7 @@
     <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">room_names</span>() {
         <span class="kw">let</span> <span class="ident">client</span> <span class="op">=</span> <span class="ident">logged_in_client</span>().<span class="kw">await</span>;
 
-        <span class="kw">let</span> <span class="ident">_m</span> <span class="op">=</span> <span class="ident">mock</span>(<span class="string">&quot;GET&quot;</span>, <span class="ident">Matcher::Regex</span>(<span class="string">r&quot;^/_matrix/client/r0/sync\?.*$&quot;</span>.<span class="ident">to_string</span>()))
+        <span class="kw">let</span> <span class="ident">_m</span> <span class="op">=</span> <span class="ident">mock</span>(<span class="string">&quot;GET&quot;</span>, <span class="ident">Matcher::Regex</span>(<span class="string">r&quot;^/_matrix/client/r0/sync\?.*$&quot;</span>.<span class="ident">to_owned</span>()))
             .<span class="ident">with_status</span>(<span class="number">200</span>)
             .<span class="ident">match_header</span>(<span class="string">&quot;authorization&quot;</span>, <span class="string">&quot;Bearer 1234&quot;</span>)
             .<span class="ident">with_body</span>(<span class="ident">test_json::SYNC</span>.<span class="ident">to_string</span>())
@@ -7650,9 +7650,9 @@
         <span class="macro">assert_eq!</span>(<span class="ident">client</span>.<span class="ident">rooms</span>().<span class="ident">len</span>(), <span class="number">1</span>);
         <span class="kw">let</span> <span class="ident">room</span> <span class="op">=</span> <span class="ident">client</span>.<span class="ident">get_joined_room</span>(<span class="macro">room_id!</span>(<span class="string">&quot;!SVkFJHzfwvuaIEawgC:localhost&quot;</span>)).<span class="ident">unwrap</span>();
 
-        <span class="macro">assert_eq!</span>(<span class="string">&quot;tutorial&quot;</span>.<span class="ident">to_string</span>(), <span class="ident">room</span>.<span class="ident">display_name</span>().<span class="kw">await</span>.<span class="ident">unwrap</span>());
+        <span class="macro">assert_eq!</span>(<span class="string">&quot;tutorial&quot;</span>.<span class="ident">to_owned</span>(), <span class="ident">room</span>.<span class="ident">display_name</span>().<span class="kw">await</span>.<span class="ident">unwrap</span>());
 
-        <span class="kw">let</span> <span class="ident">_m</span> <span class="op">=</span> <span class="ident">mock</span>(<span class="string">&quot;GET&quot;</span>, <span class="ident">Matcher::Regex</span>(<span class="string">r&quot;^/_matrix/client/r0/sync\?.*$&quot;</span>.<span class="ident">to_string</span>()))
+        <span class="kw">let</span> <span class="ident">_m</span> <span class="op">=</span> <span class="ident">mock</span>(<span class="string">&quot;GET&quot;</span>, <span class="ident">Matcher::Regex</span>(<span class="string">r&quot;^/_matrix/client/r0/sync\?.*$&quot;</span>.<span class="ident">to_owned</span>()))
             .<span class="ident">with_status</span>(<span class="number">200</span>)
             .<span class="ident">match_header</span>(<span class="string">&quot;authorization&quot;</span>, <span class="string">&quot;Bearer 1234&quot;</span>)
             .<span class="ident">with_body</span>(<span class="ident">test_json::INVITE_SYNC</span>.<span class="ident">to_string</span>())
@@ -7664,7 +7664,7 @@
         <span class="macro">assert_eq!</span>(<span class="ident">client</span>.<span class="ident">rooms</span>().<span class="ident">len</span>(), <span class="number">1</span>);
         <span class="kw">let</span> <span class="ident">invited_room</span> <span class="op">=</span> <span class="ident">client</span>.<span class="ident">get_invited_room</span>(<span class="macro">room_id!</span>(<span class="string">&quot;!696r7674:example.com&quot;</span>)).<span class="ident">unwrap</span>();
 
-        <span class="macro">assert_eq!</span>(<span class="string">&quot;My Room Name&quot;</span>.<span class="ident">to_string</span>(), <span class="ident">invited_room</span>.<span class="ident">display_name</span>().<span class="kw">await</span>.<span class="ident">unwrap</span>());
+        <span class="macro">assert_eq!</span>(<span class="string">&quot;My Room Name&quot;</span>.<span class="ident">to_owned</span>(), <span class="ident">invited_room</span>.<span class="ident">display_name</span>().<span class="kw">await</span>.<span class="ident">unwrap</span>());
     }
 
     <span class="attribute">#[<span class="ident">async_test</span>]</span>
@@ -7798,7 +7798,7 @@
 
         <span class="kw">let</span> <span class="ident">m</span> <span class="op">=</span> <span class="ident">mock</span>(
             <span class="string">&quot;GET&quot;</span>,
-            <span class="ident">Matcher::Regex</span>(<span class="string">r&quot;^/_matrix/media/r0/download/localhost/textfile\?.*$&quot;</span>.<span class="ident">to_string</span>()),
+            <span class="ident">Matcher::Regex</span>(<span class="string">r&quot;^/_matrix/media/r0/download/localhost/textfile\?.*$&quot;</span>.<span class="ident">to_owned</span>()),
         )
         .<span class="ident">with_status</span>(<span class="number">200</span>)
         .<span class="ident">with_body</span>(<span class="string">&quot;Some very interesting text.&quot;</span>)
@@ -7828,7 +7828,7 @@
 
         <span class="kw">let</span> <span class="ident">m</span> <span class="op">=</span> <span class="ident">mock</span>(
             <span class="string">&quot;GET&quot;</span>,
-            <span class="ident">Matcher::Regex</span>(<span class="string">r&quot;^/_matrix/media/r0/download/example%2Eorg/image\?.*$&quot;</span>.<span class="ident">to_string</span>()),
+            <span class="ident">Matcher::Regex</span>(<span class="string">r&quot;^/_matrix/media/r0/download/example%2Eorg/image\?.*$&quot;</span>.<span class="ident">to_owned</span>()),
         )
         .<span class="ident">with_status</span>(<span class="number">200</span>)
         .<span class="ident">with_body</span>(<span class="string">&quot;binaryjpegdata&quot;</span>)
@@ -7840,7 +7840,7 @@
 
         <span class="kw">let</span> <span class="ident">m</span> <span class="op">=</span> <span class="ident">mock</span>(
             <span class="string">&quot;GET&quot;</span>,
-            <span class="ident">Matcher::Regex</span>(<span class="string">r&quot;^/_matrix/media/r0/thumbnail/example%2Eorg/image\?.*$&quot;</span>.<span class="ident">to_string</span>()),
+            <span class="ident">Matcher::Regex</span>(<span class="string">r&quot;^/_matrix/media/r0/thumbnail/example%2Eorg/image\?.*$&quot;</span>.<span class="ident">to_owned</span>()),
         )
         .<span class="ident">with_status</span>(<span class="number">200</span>)
         .<span class="ident">with_body</span>(<span class="string">&quot;smallerbinaryjpegdata&quot;</span>)
@@ -7938,7 +7938,7 @@
             }
         });
 
-        <span class="kw">let</span> <span class="ident">_m</span> <span class="op">=</span> <span class="ident">mock</span>(<span class="string">&quot;GET&quot;</span>, <span class="ident">Matcher::Regex</span>(<span class="string">r&quot;^/_matrix/client/r0/sync\?.*$&quot;</span>.<span class="ident">to_string</span>()))
+        <span class="kw">let</span> <span class="ident">_m</span> <span class="op">=</span> <span class="ident">mock</span>(<span class="string">&quot;GET&quot;</span>, <span class="ident">Matcher::Regex</span>(<span class="string">r&quot;^/_matrix/client/r0/sync\?.*$&quot;</span>.<span class="ident">to_owned</span>()))
             .<span class="ident">with_status</span>(<span class="number">200</span>)
             .<span class="ident">with_body</span>(<span class="ident">sync</span>.<span class="ident">to_string</span>())
             .<span class="ident">create</span>();
@@ -7981,7 +7981,7 @@
         <span class="kw">let</span> <span class="ident">client</span> <span class="op">=</span> <span class="ident">logged_in_client</span>().<span class="kw">await</span>;
         <span class="kw">let</span> <span class="ident">sync_settings</span> <span class="op">=</span> <span class="ident">SyncSettings::new</span>().<span class="ident">timeout</span>(<span class="ident">Duration::from_millis</span>(<span class="number">3000</span>));
 
-        <span class="kw">let</span> <span class="ident">sync</span> <span class="op">=</span> <span class="ident">mock</span>(<span class="string">&quot;GET&quot;</span>, <span class="ident">Matcher::Regex</span>(<span class="string">r&quot;^/_matrix/client/r0/sync\?.*$&quot;</span>.<span class="ident">to_string</span>()))
+        <span class="kw">let</span> <span class="ident">sync</span> <span class="op">=</span> <span class="ident">mock</span>(<span class="string">&quot;GET&quot;</span>, <span class="ident">Matcher::Regex</span>(<span class="string">r&quot;^/_matrix/client/r0/sync\?.*$&quot;</span>.<span class="ident">to_owned</span>()))
             .<span class="ident">with_status</span>(<span class="number">200</span>)
             .<span class="ident">with_body</span>(<span class="ident">test_json::SYNC</span>.<span class="ident">to_string</span>())
             .<span class="ident">match_header</span>(<span class="string">&quot;authorization&quot;</span>, <span class="string">&quot;Bearer 1234&quot;</span>)
@@ -7998,7 +7998,7 @@
         <span class="kw">let</span> <span class="ident">sync_2</span> <span class="op">=</span> <span class="ident">mock</span>(
             <span class="string">&quot;GET&quot;</span>,
             <span class="ident">Matcher::Regex</span>(
-                <span class="string">r&quot;^/_matrix/client/r0/sync\?.*since=s526_47314_0_7_1_1_1_11444_1.*&quot;</span>.<span class="ident">to_string</span>(),
+                <span class="string">r&quot;^/_matrix/client/r0/sync\?.*since=s526_47314_0_7_1_1_1_11444_1.*&quot;</span>.<span class="ident">to_owned</span>(),
             ),
         )
         .<span class="ident">with_status</span>(<span class="number">200</span>)
@@ -8009,7 +8009,7 @@
         <span class="kw">let</span> <span class="ident">sync_3</span> <span class="op">=</span> <span class="ident">mock</span>(
             <span class="string">&quot;GET&quot;</span>,
             <span class="ident">Matcher::Regex</span>(
-                <span class="string">r&quot;^/_matrix/client/r0/sync\?.*since=s526_47314_0_7_1_1_1_11444_2.*&quot;</span>.<span class="ident">to_string</span>(),
+                <span class="string">r&quot;^/_matrix/client/r0/sync\?.*since=s526_47314_0_7_1_1_1_11444_2.*&quot;</span>.<span class="ident">to_owned</span>(),
             ),
         )
         .<span class="ident">with_status</span>(<span class="number">200</span>)
@@ -8021,7 +8021,7 @@
             <span class="string">&quot;GET&quot;</span>,
             <span class="ident">Matcher::Regex</span>(
                 <span class="string">r&quot;^/_matrix/client/r0/rooms/.*/messages.*from=t392-516_47314_0_7_1_1_1_11444_1.*&quot;</span>
-                    .<span class="ident">to_string</span>(),
+                    .<span class="ident">to_owned</span>(),
             ),
         )
         .<span class="ident">with_status</span>(<span class="number">200</span>)
@@ -8033,7 +8033,7 @@
             <span class="string">&quot;GET&quot;</span>,
             <span class="ident">Matcher::Regex</span>(
                 <span class="string">r&quot;^/_matrix/client/r0/rooms/.*/messages.*from=t47409-4357353_219380_26003_2269.*&quot;</span>
-                    .<span class="ident">to_string</span>(),
+                    .<span class="ident">to_owned</span>(),
             ),
         )
         .<span class="ident">with_status</span>(<span class="number">200</span>)
@@ -8041,7 +8041,7 @@
         .<span class="ident">match_header</span>(<span class="string">&quot;authorization&quot;</span>, <span class="string">&quot;Bearer 1234&quot;</span>)
         .<span class="ident">create</span>();
 
-        <span class="macro">assert_eq!</span>(<span class="ident">client</span>.<span class="ident">sync_token</span>().<span class="kw">await</span>, <span class="prelude-val">Some</span>(<span class="string">&quot;s526_47314_0_7_1_1_1_11444_1&quot;</span>.<span class="ident">to_string</span>()));
+        <span class="macro">assert_eq!</span>(<span class="ident">client</span>.<span class="ident">sync_token</span>().<span class="kw">await</span>, <span class="prelude-val">Some</span>(<span class="string">&quot;s526_47314_0_7_1_1_1_11444_1&quot;</span>.<span class="ident">to_owned</span>()));
         <span class="kw">let</span> <span class="ident">sync_settings</span> <span class="op">=</span> <span class="ident">SyncSettings::new</span>()
             .<span class="ident">timeout</span>(<span class="ident">Duration::from_millis</span>(<span class="number">3000</span>))
             .<span class="ident">token</span>(<span class="string">&quot;s526_47314_0_7_1_1_1_11444_1&quot;</span>);
@@ -8105,7 +8105,7 @@
         <span class="kw">let</span> <span class="ident">client</span> <span class="op">=</span> <span class="ident">logged_in_client</span>().<span class="kw">await</span>;
         <span class="kw">let</span> <span class="ident">sync_settings</span> <span class="op">=</span> <span class="ident">SyncSettings::new</span>().<span class="ident">timeout</span>(<span class="ident">Duration::from_millis</span>(<span class="number">3000</span>));
 
-        <span class="kw">let</span> <span class="ident">sync</span> <span class="op">=</span> <span class="ident">mock</span>(<span class="string">&quot;GET&quot;</span>, <span class="ident">Matcher::Regex</span>(<span class="string">r&quot;^/_matrix/client/r0/sync\?.*$&quot;</span>.<span class="ident">to_string</span>()))
+        <span class="kw">let</span> <span class="ident">sync</span> <span class="op">=</span> <span class="ident">mock</span>(<span class="string">&quot;GET&quot;</span>, <span class="ident">Matcher::Regex</span>(<span class="string">r&quot;^/_matrix/client/r0/sync\?.*$&quot;</span>.<span class="ident">to_owned</span>()))
             .<span class="ident">with_status</span>(<span class="number">200</span>)
             .<span class="ident">with_body</span>(<span class="ident">test_json::MORE_SYNC</span>.<span class="ident">to_string</span>())
             .<span class="ident">match_header</span>(<span class="string">&quot;authorization&quot;</span>, <span class="string">&quot;Bearer 1234&quot;</span>)
@@ -8120,7 +8120,7 @@
         <span class="kw">let</span> <span class="ident">sync_2</span> <span class="op">=</span> <span class="ident">mock</span>(
             <span class="string">&quot;GET&quot;</span>,
             <span class="ident">Matcher::Regex</span>(
-                <span class="string">r&quot;^/_matrix/client/r0/sync\?.*since=s526_47314_0_7_1_1_1_11444_2.*&quot;</span>.<span class="ident">to_string</span>(),
+                <span class="string">r&quot;^/_matrix/client/r0/sync\?.*since=s526_47314_0_7_1_1_1_11444_2.*&quot;</span>.<span class="ident">to_owned</span>(),
             ),
         )
         .<span class="ident">with_status</span>(<span class="number">200</span>)
@@ -8132,7 +8132,7 @@
             <span class="string">&quot;GET&quot;</span>,
             <span class="ident">Matcher::Regex</span>(
                 <span class="string">r&quot;^/_matrix/client/r0/rooms/.*/messages.*from=t392-516_47314_0_7_1_1_1_11444_1.*&quot;</span>
-                    .<span class="ident">to_string</span>(),
+                    .<span class="ident">to_owned</span>(),
             ),
         )
         .<span class="ident">with_status</span>(<span class="number">200</span>)
@@ -8144,7 +8144,7 @@
             <span class="string">&quot;GET&quot;</span>,
             <span class="ident">Matcher::Regex</span>(
                 <span class="string">r&quot;^/_matrix/client/r0/rooms/.*/messages.*from=t47409-4357353_219380_26003_2269.*&quot;</span>
-                    .<span class="ident">to_string</span>(),
+                    .<span class="ident">to_owned</span>(),
             ),
         )
         .<span class="ident">with_status</span>(<span class="number">200</span>)
@@ -8152,7 +8152,7 @@
         .<span class="ident">match_header</span>(<span class="string">&quot;authorization&quot;</span>, <span class="string">&quot;Bearer 1234&quot;</span>)
         .<span class="ident">create</span>();
 
-        <span class="macro">assert_eq!</span>(<span class="ident">client</span>.<span class="ident">sync_token</span>().<span class="kw">await</span>, <span class="prelude-val">Some</span>(<span class="string">&quot;s526_47314_0_7_1_1_1_11444_2&quot;</span>.<span class="ident">to_string</span>()));
+        <span class="macro">assert_eq!</span>(<span class="ident">client</span>.<span class="ident">sync_token</span>().<span class="kw">await</span>, <span class="prelude-val">Some</span>(<span class="string">&quot;s526_47314_0_7_1_1_1_11444_2&quot;</span>.<span class="ident">to_owned</span>()));
         <span class="kw">let</span> <span class="ident">sync_settings</span> <span class="op">=</span> <span class="ident">SyncSettings::new</span>()
             .<span class="ident">timeout</span>(<span class="ident">Duration::from_millis</span>(<span class="number">3000</span>))
             .<span class="ident">token</span>(<span class="string">&quot;s526_47314_0_7_1_1_1_11444_2&quot;</span>);
