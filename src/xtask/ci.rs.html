@@ -220,6 +220,20 @@
 <span id="215">215</span>
 <span id="216">216</span>
 <span id="217">217</span>
+<span id="218">218</span>
+<span id="219">219</span>
+<span id="220">220</span>
+<span id="221">221</span>
+<span id="222">222</span>
+<span id="223">223</span>
+<span id="224">224</span>
+<span id="225">225</span>
+<span id="226">226</span>
+<span id="227">227</span>
+<span id="228">228</span>
+<span id="229">229</span>
+<span id="230">230</span>
+<span id="231">231</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">std</span>::{<span class="ident">collections::BTreeMap</span>, <span class="ident">env</span>, <span class="ident">path::PathBuf</span>};
 
 <span class="kw">use</span> <span class="ident">clap</span>::{<span class="ident">Args</span>, <span class="ident">Subcommand</span>};
@@ -258,6 +272,8 @@
         <span class="attribute">#[<span class="ident">clap</span>(<span class="ident">subcommand</span>)]</span>
         <span class="ident">cmd</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">WasmFeatureSet</span><span class="op">&gt;</span>,
     },
+    <span class="doccomment">/// Run tests for the different crypto crate features</span>
+    <span class="ident">TestCrypto</span>,
 }
 
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Subcommand</span>, <span class="ident">PartialEq</span>, <span class="ident">Eq</span>, <span class="ident">PartialOrd</span>, <span class="ident">Ord</span>)]</span>
@@ -298,6 +314,7 @@
                 <span class="ident">CiCommand::TestFeatures</span> { <span class="ident">cmd</span> } =&gt; <span class="ident">run_feature_tests</span>(<span class="ident">cmd</span>),
                 <span class="ident">CiCommand::TestAppservice</span> =&gt; <span class="ident">run_appservice_tests</span>(),
                 <span class="ident">CiCommand::Wasm</span> { <span class="ident">cmd</span> } =&gt; <span class="ident">run_wasm_checks</span>(<span class="ident">cmd</span>),
+                <span class="ident">CiCommand::TestCrypto</span> =&gt; <span class="ident">run_crypto_tests</span>(),
             },
             <span class="prelude-val">None</span> =&gt; {
                 <span class="ident">check_style</span>()<span class="question-mark">?</span>;
@@ -308,6 +325,7 @@
                 <span class="ident">run_feature_tests</span>(<span class="prelude-val">None</span>)<span class="question-mark">?</span>;
                 <span class="ident">run_appservice_tests</span>()<span class="question-mark">?</span>;
                 <span class="ident">run_wasm_checks</span>(<span class="prelude-val">None</span>)<span class="question-mark">?</span>;
+                <span class="ident">run_crypto_tests</span>()<span class="question-mark">?</span>;
 
                 <span class="prelude-val">Ok</span>(())
             }
@@ -377,6 +395,16 @@
             }
         }
     }
+
+    <span class="prelude-val">Ok</span>(())
+}
+
+<span class="kw">fn</span> <span class="ident">run_crypto_tests</span>() -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+    <span class="macro">cmd!</span>(
+        <span class="string">&quot;rustup run stable cargo clippy -p matrix-sdk-crypto --features=backups_v1 -- -D warnings&quot;</span>
+    )
+    .<span class="ident">run</span>()<span class="question-mark">?</span>;
+    <span class="macro">cmd!</span>(<span class="string">&quot;rustup run stable cargo test -p matrix-sdk-crypto --features=backups_v1&quot;</span>).<span class="ident">run</span>()<span class="question-mark">?</span>;
 
     <span class="prelude-val">Ok</span>(())
 }

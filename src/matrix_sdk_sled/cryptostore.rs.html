@@ -1123,12 +1123,6 @@
 <span id="1118">1118</span>
 <span id="1119">1119</span>
 <span id="1120">1120</span>
-<span id="1121">1121</span>
-<span id="1122">1122</span>
-<span id="1123">1123</span>
-<span id="1124">1124</span>
-<span id="1125">1125</span>
-<span id="1126">1126</span>
 </pre><pre class="rust"><code><span class="comment">// Copyright 2020 The Matrix.org Foundation C.I.C.</span>
 <span class="comment">//</span>
 <span class="comment">// Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);</span>
@@ -1168,7 +1162,7 @@
     },
     <span class="ident">store</span>::{
         <span class="ident">caches::SessionStore</span>, <span class="ident">BackupKeys</span>, <span class="ident">Changes</span>, <span class="ident">CryptoStore</span>, <span class="ident">CryptoStoreError</span>, <span class="ident">IdentityKeys</span>,
-        <span class="ident">PickleKey</span>, <span class="ident">PicklingMode</span>, <span class="prelude-ty">Result</span>, <span class="ident">RoomKeyCounts</span>,
+        <span class="ident">PickleKey</span>, <span class="ident">PicklingMode</span>, <span class="ident">RecoveryKey</span>, <span class="prelude-ty">Result</span>, <span class="ident">RoomKeyCounts</span>,
     },
     <span class="ident">GossipRequest</span>, <span class="ident">LocalTrust</span>, <span class="ident">ReadOnlyAccount</span>, <span class="ident">ReadOnlyDevice</span>, <span class="ident">ReadOnlyUserIdentities</span>, <span class="ident">SecretInfo</span>,
 };
@@ -1649,7 +1643,6 @@
             <span class="prelude-val">None</span>
         };
 
-        <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;backups_v1&quot;</span>)]</span>
         <span class="kw">let</span> <span class="ident">recovery_key_pickle</span> <span class="op">=</span> <span class="ident">changes</span>.<span class="ident">recovery_key</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">r</span><span class="op">|</span> <span class="ident">r</span>.<span class="ident">pickle</span>(<span class="self">self</span>.<span class="ident">get_pickle_key</span>()));
 
         <span class="kw">let</span> <span class="ident">device_changes</span> <span class="op">=</span> <span class="ident">changes</span>.<span class="ident">devices</span>;
@@ -1690,7 +1683,6 @@
         <span class="kw">let</span> <span class="ident">identity_changes</span> <span class="op">=</span> <span class="ident">changes</span>.<span class="ident">identities</span>;
         <span class="kw">let</span> <span class="ident">olm_hashes</span> <span class="op">=</span> <span class="ident">changes</span>.<span class="ident">message_hashes</span>;
         <span class="kw">let</span> <span class="ident">key_requests</span> <span class="op">=</span> <span class="ident">changes</span>.<span class="ident">key_requests</span>;
-        <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;backups_v1&quot;</span>)]</span>
         <span class="kw">let</span> <span class="ident">backup_version</span> <span class="op">=</span> <span class="ident">changes</span>.<span class="ident">backup_version</span>;
 
         <span class="kw">let</span> <span class="ident">ret</span>: <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">TransactionError</span><span class="op">&lt;</span><span class="ident">serde_json::Error</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="op">=</span> (
@@ -1734,7 +1726,6 @@
                         )<span class="question-mark">?</span>;
                     }
 
-                    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;backups_v1&quot;</span>)]</span>
                     <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">r</span>) <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">recovery_key_pickle</span> {
                         <span class="ident">account</span>.<span class="ident">insert</span>(
                             <span class="string">&quot;recovery_key_v1&quot;</span>.<span class="ident">encode</span>(),
@@ -1742,7 +1733,6 @@
                         )<span class="question-mark">?</span>;
                     }
 
-                    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;backups_v1&quot;</span>)]</span>
                     <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">b</span>) <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">backup_version</span> {
                         <span class="ident">account</span>.<span class="ident">insert</span>(
                             <span class="string">&quot;backup_version_v1&quot;</span>.<span class="ident">encode</span>(),
@@ -2202,21 +2192,22 @@
     }
 
     <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">load_backup_keys</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">BackupKeys</span><span class="op">&gt;</span> {
-        <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;backups_v1&quot;</span>)]</span>
         <span class="kw">let</span> <span class="ident">key</span> <span class="op">=</span> {
             <span class="kw">let</span> <span class="ident">backup_version</span> <span class="op">=</span> <span class="self">self</span>
                 .<span class="ident">account</span>
-                .<span class="ident">get</span>(<span class="string">&quot;backup_version_v1&quot;</span>.<span class="ident">encode</span>())<span class="question-mark">?</span>
+                .<span class="ident">get</span>(<span class="string">&quot;backup_version_v1&quot;</span>.<span class="ident">encode</span>())
+                .<span class="ident">map_err</span>(<span class="op">|</span><span class="ident">e</span><span class="op">|</span> <span class="ident">CryptoStoreError::Backend</span>(<span class="macro">anyhow!</span>(<span class="ident">e</span>)))<span class="question-mark">?</span>
                 .<span class="ident">map</span>(<span class="op">|</span><span class="ident">v</span><span class="op">|</span> <span class="ident">serde_json::from_slice</span>(<span class="kw-2">&amp;</span><span class="ident">v</span>))
                 .<span class="ident">transpose</span>()<span class="question-mark">?</span>;
 
             <span class="kw">let</span> <span class="ident">recovery_key</span> <span class="op">=</span> {
                 <span class="self">self</span>.<span class="ident">account</span>
-                    .<span class="ident">get</span>(<span class="string">&quot;recovery_key_v1&quot;</span>.<span class="ident">encode</span>())<span class="question-mark">?</span>
+                    .<span class="ident">get</span>(<span class="string">&quot;recovery_key_v1&quot;</span>.<span class="ident">encode</span>())
+                    .<span class="ident">map_err</span>(<span class="op">|</span><span class="ident">e</span><span class="op">|</span> <span class="ident">CryptoStoreError::Backend</span>(<span class="macro">anyhow!</span>(<span class="ident">e</span>)))<span class="question-mark">?</span>
                     .<span class="ident">map</span>(<span class="op">|</span><span class="ident">p</span><span class="op">|</span> <span class="ident">serde_json::from_slice</span>(<span class="kw-2">&amp;</span><span class="ident">p</span>))
                     .<span class="ident">transpose</span>()<span class="question-mark">?</span>
                     .<span class="ident">map</span>(<span class="op">|</span><span class="ident">p</span><span class="op">|</span> {
-                        <span class="ident"><span class="kw">crate</span>::backups::RecoveryKey::from_pickle</span>(<span class="ident">p</span>, <span class="self">self</span>.<span class="ident">get_pickle_key</span>())
+                        <span class="ident">RecoveryKey::from_pickle</span>(<span class="ident">p</span>, <span class="self">self</span>.<span class="ident">get_pickle_key</span>())
                             .<span class="ident">map_err</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="ident">CryptoStoreError::UnpicklingError</span>)
                     })
                     .<span class="ident">transpose</span>()<span class="question-mark">?</span>
@@ -2224,9 +2215,6 @@
 
             <span class="ident">BackupKeys</span> { <span class="ident">backup_version</span>, <span class="ident">recovery_key</span> }
         };
-
-        <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;backups_v1&quot;</span>))]</span>
-        <span class="kw">let</span> <span class="ident">key</span> <span class="op">=</span> <span class="ident">BackupKeys</span> {};
 
         <span class="prelude-val">Ok</span>(<span class="ident">key</span>)
     }

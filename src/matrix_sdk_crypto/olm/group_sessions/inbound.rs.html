@@ -727,8 +727,6 @@
         <span class="self">self</span>.<span class="ident">backed_up</span>.<span class="ident">store</span>(<span class="bool-val">false</span>, <span class="ident">SeqCst</span>)
     }
 
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">any</span>(<span class="ident">test</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;testing&quot;</span>))]</span>
-    <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">dead_code</span>)]</span>
     <span class="doccomment">/// For testing, allow to manually mark this GroupSession to have been</span>
     <span class="doccomment">/// backed up</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">mark_as_backed_up</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) {
@@ -831,6 +829,8 @@
         <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">lock</span>().<span class="kw">await</span>.<span class="ident">decrypt</span>(<span class="ident">message</span>)
     }
 
+    <span class="doccomment">/// Export the inbound group session into a format that can be uploaded to</span>
+    <span class="doccomment">/// the server as a backup.</span>
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;backups_v1&quot;</span>)]</span>
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">to_backup</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">BackedUpRoomKey</span> {
         <span class="self">self</span>.<span class="ident">export</span>().<span class="kw">await</span>.<span class="ident">into</span>()
