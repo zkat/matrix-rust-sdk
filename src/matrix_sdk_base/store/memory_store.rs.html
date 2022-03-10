@@ -788,6 +788,7 @@
 <span id="783">783</span>
 <span id="784">784</span>
 <span id="785">785</span>
+<span id="786">786</span>
 </pre><pre class="rust"><code><span class="comment">// Copyright 2021 The Matrix.org Foundation C.I.C.</span>
 <span class="comment">//</span>
 <span class="comment">// Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);</span>
@@ -818,7 +819,8 @@
         <span class="ident">receipt::Receipt</span>,
         <span class="ident">room::member</span>::{<span class="ident">MembershipState</span>, <span class="ident">RoomMemberEventContent</span>},
         <span class="ident">AnyGlobalAccountDataEvent</span>, <span class="ident">AnyRoomAccountDataEvent</span>, <span class="ident">AnyStrippedStateEvent</span>,
-        <span class="ident">AnySyncMessageEvent</span>, <span class="ident">AnySyncRoomEvent</span>, <span class="ident">AnySyncStateEvent</span>, <span class="ident">EventType</span>,
+        <span class="ident">AnySyncMessageEvent</span>, <span class="ident">AnySyncRoomEvent</span>, <span class="ident">AnySyncStateEvent</span>, <span class="ident">GlobalAccountDataEventType</span>,
+        <span class="ident">RoomAccountDataEventType</span>, <span class="ident">StateEventType</span>,
     },
     <span class="ident">receipt::ReceiptType</span>,
     <span class="ident">serde::Raw</span>,
@@ -1198,7 +1200,7 @@
     <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">get_state_event</span>(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         <span class="ident">room_id</span>: <span class="kw-2">&amp;</span><span class="ident">RoomId</span>,
-        <span class="ident">event_type</span>: <span class="ident">EventType</span>,
+        <span class="ident">event_type</span>: <span class="ident">StateEventType</span>,
         <span class="ident">state_key</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>,
     ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Raw</span><span class="op">&lt;</span><span class="ident">AnySyncStateEvent</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="prelude-val">Ok</span>(<span class="self">self</span>.<span class="ident">room_state</span>.<span class="ident">get</span>(<span class="ident">room_id</span>).<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">e</span><span class="op">|</span> {
@@ -1209,7 +1211,7 @@
     <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">get_state_events</span>(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         <span class="ident">room_id</span>: <span class="kw-2">&amp;</span><span class="ident">RoomId</span>,
-        <span class="ident">event_type</span>: <span class="ident">EventType</span>,
+        <span class="ident">event_type</span>: <span class="ident">StateEventType</span>,
     ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Raw</span><span class="op">&lt;</span><span class="ident">AnySyncStateEvent</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="prelude-val">Ok</span>(<span class="self">self</span>
             .<span class="ident">room_state</span>
@@ -1267,7 +1269,7 @@
 
     <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">get_account_data_event</span>(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
-        <span class="ident">event_type</span>: <span class="ident">EventType</span>,
+        <span class="ident">event_type</span>: <span class="ident">GlobalAccountDataEventType</span>,
     ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Raw</span><span class="op">&lt;</span><span class="ident">AnyGlobalAccountDataEvent</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="prelude-val">Ok</span>(<span class="self">self</span>.<span class="ident">account_data</span>.<span class="ident">get</span>(<span class="ident">event_type</span>.<span class="ident">as_ref</span>()).<span class="ident">map</span>(<span class="op">|</span><span class="ident">e</span><span class="op">|</span> <span class="ident">e</span>.<span class="ident">clone</span>()))
     }
@@ -1275,7 +1277,7 @@
     <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">get_room_account_data_event</span>(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         <span class="ident">room_id</span>: <span class="kw-2">&amp;</span><span class="ident">RoomId</span>,
-        <span class="ident">event_type</span>: <span class="ident">EventType</span>,
+        <span class="ident">event_type</span>: <span class="ident">RoomAccountDataEventType</span>,
     ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Raw</span><span class="op">&lt;</span><span class="ident">AnyRoomAccountDataEvent</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="prelude-val">Ok</span>(<span class="self">self</span>
             .<span class="ident">room_account_data</span>
@@ -1421,7 +1423,7 @@
     <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">get_state_event</span>(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         <span class="ident">room_id</span>: <span class="kw-2">&amp;</span><span class="ident">RoomId</span>,
-        <span class="ident">event_type</span>: <span class="ident">EventType</span>,
+        <span class="ident">event_type</span>: <span class="ident">StateEventType</span>,
         <span class="ident">state_key</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>,
     ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Raw</span><span class="op">&lt;</span><span class="ident">AnySyncStateEvent</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">get_state_event</span>(<span class="ident">room_id</span>, <span class="ident">event_type</span>, <span class="ident">state_key</span>).<span class="kw">await</span>
@@ -1430,7 +1432,7 @@
     <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">get_state_events</span>(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         <span class="ident">room_id</span>: <span class="kw-2">&amp;</span><span class="ident">RoomId</span>,
-        <span class="ident">event_type</span>: <span class="ident">EventType</span>,
+        <span class="ident">event_type</span>: <span class="ident">StateEventType</span>,
     ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Raw</span><span class="op">&lt;</span><span class="ident">AnySyncStateEvent</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">get_state_events</span>(<span class="ident">room_id</span>, <span class="ident">event_type</span>).<span class="kw">await</span>
     }
@@ -1485,7 +1487,7 @@
 
     <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">get_account_data_event</span>(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
-        <span class="ident">event_type</span>: <span class="ident">EventType</span>,
+        <span class="ident">event_type</span>: <span class="ident">GlobalAccountDataEventType</span>,
     ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Raw</span><span class="op">&lt;</span><span class="ident">AnyGlobalAccountDataEvent</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">get_account_data_event</span>(<span class="ident">event_type</span>).<span class="kw">await</span>
     }
@@ -1493,7 +1495,7 @@
     <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">get_room_account_data_event</span>(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         <span class="ident">room_id</span>: <span class="kw-2">&amp;</span><span class="ident">RoomId</span>,
-        <span class="ident">event_type</span>: <span class="ident">EventType</span>,
+        <span class="ident">event_type</span>: <span class="ident">RoomAccountDataEventType</span>,
     ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Raw</span><span class="op">&lt;</span><span class="ident">AnyRoomAccountDataEvent</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">get_room_account_data_event</span>(<span class="ident">room_id</span>, <span class="ident">event_type</span>).<span class="kw">await</span>
     }

@@ -1465,6 +1465,18 @@
 <span id="1460">1460</span>
 <span id="1461">1461</span>
 <span id="1462">1462</span>
+<span id="1463">1463</span>
+<span id="1464">1464</span>
+<span id="1465">1465</span>
+<span id="1466">1466</span>
+<span id="1467">1467</span>
+<span id="1468">1468</span>
+<span id="1469">1469</span>
+<span id="1470">1470</span>
+<span id="1471">1471</span>
+<span id="1472">1472</span>
+<span id="1473">1473</span>
+<span id="1474">1474</span>
 </pre><pre class="rust"><code><span class="comment">// Copyright 2021 The Matrix.org Foundation C.I.C.</span>
 <span class="comment">//</span>
 <span class="comment">// Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);</span>
@@ -1509,7 +1521,8 @@
             <span class="ident">receipt::Receipt</span>,
             <span class="ident">room::member</span>::{<span class="ident">MembershipState</span>, <span class="ident">RoomMemberEventContent</span>},
             <span class="ident">AnyGlobalAccountDataEvent</span>, <span class="ident">AnyRoomAccountDataEvent</span>, <span class="ident">AnySyncMessageEvent</span>,
-            <span class="ident">AnySyncRoomEvent</span>, <span class="ident">AnySyncStateEvent</span>, <span class="ident">EventType</span>,
+            <span class="ident">AnySyncRoomEvent</span>, <span class="ident">AnySyncStateEvent</span>, <span class="ident">GlobalAccountDataEventType</span>,
+            <span class="ident">RoomAccountDataEventType</span>, <span class="ident">StateEventType</span>,
         },
         <span class="ident">receipt::ReceiptType</span>,
         <span class="ident">serde::Raw</span>,
@@ -1653,11 +1666,23 @@
     }
 }
 
-<span class="kw">impl</span> <span class="ident">EncodeKey</span> <span class="kw">for</span> <span class="ident">EventType</span> {
+<span class="kw">impl</span> <span class="ident">EncodeKey</span> <span class="kw">for</span> <span class="ident">StateEventType</span> {
     <span class="kw">fn</span> <span class="ident">encode</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">as_str</span>().<span class="ident">encode</span>()
     }
 }
+
+<span class="kw">impl</span> <span class="ident">EncodeKey</span> <span class="kw">for</span> <span class="ident">GlobalAccountDataEventType</span> {
+    <span class="kw">fn</span> <span class="ident">encode</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span> {
+        <span class="self">self</span>.<span class="ident">as_str</span>().<span class="ident">encode</span>()
+    }
+}
+
+<span class="comment">/* impl EncodeKey for RoomAccountDataEventType {
+    fn encode(&amp;self) -&gt; Vec&lt;u8&gt; {
+        self.as_str().encode()
+    }
+} */</span>
 
 <span class="kw">impl</span> <span class="ident">EncodeKey</span> <span class="kw">for</span> <span class="ident">EventId</span> {
     <span class="kw">fn</span> <span class="ident">encode</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span> {
@@ -2116,7 +2141,7 @@
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">get_state_event</span>(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         <span class="ident">room_id</span>: <span class="kw-2">&amp;</span><span class="ident">RoomId</span>,
-        <span class="ident">event_type</span>: <span class="ident">EventType</span>,
+        <span class="ident">event_type</span>: <span class="ident">StateEventType</span>,
         <span class="ident">state_key</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>,
     ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Raw</span><span class="op">&lt;</span><span class="ident">AnySyncStateEvent</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">db</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">clone</span>();
@@ -2130,7 +2155,7 @@
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">get_state_events</span>(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         <span class="ident">room_id</span>: <span class="kw-2">&amp;</span><span class="ident">RoomId</span>,
-        <span class="ident">event_type</span>: <span class="ident">EventType</span>,
+        <span class="ident">event_type</span>: <span class="ident">StateEventType</span>,
     ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Raw</span><span class="op">&lt;</span><span class="ident">AnySyncStateEvent</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">db</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">clone</span>();
         <span class="kw">let</span> <span class="ident">key</span> <span class="op">=</span> (<span class="ident">room_id</span>.<span class="ident">as_str</span>(), <span class="ident">event_type</span>.<span class="ident">as_str</span>()).<span class="ident">encode</span>();
@@ -2276,7 +2301,7 @@
 
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">get_account_data_event</span>(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
-        <span class="ident">event_type</span>: <span class="ident">EventType</span>,
+        <span class="ident">event_type</span>: <span class="ident">GlobalAccountDataEventType</span>,
     ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Raw</span><span class="op">&lt;</span><span class="ident">AnyGlobalAccountDataEvent</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">db</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">clone</span>();
         <span class="kw">let</span> <span class="ident">key</span> <span class="op">=</span> <span class="ident">event_type</span>.<span class="ident">encode</span>();
@@ -2289,7 +2314,7 @@
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">get_room_account_data_event</span>(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         <span class="ident">room_id</span>: <span class="kw-2">&amp;</span><span class="ident">RoomId</span>,
-        <span class="ident">event_type</span>: <span class="ident">EventType</span>,
+        <span class="ident">event_type</span>: <span class="ident">RoomAccountDataEventType</span>,
     ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Raw</span><span class="op">&lt;</span><span class="ident">AnyRoomAccountDataEvent</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">db</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">clone</span>();
         <span class="kw">let</span> <span class="ident">key</span> <span class="op">=</span> (<span class="ident">room_id</span>.<span class="ident">as_str</span>(), <span class="ident">event_type</span>.<span class="ident">as_str</span>()).<span class="ident">encode</span>();
@@ -2767,7 +2792,7 @@
     <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">get_state_event</span>(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         <span class="ident">room_id</span>: <span class="kw-2">&amp;</span><span class="ident">RoomId</span>,
-        <span class="ident">event_type</span>: <span class="ident">EventType</span>,
+        <span class="ident">event_type</span>: <span class="ident">StateEventType</span>,
         <span class="ident">state_key</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>,
     ) -&gt; <span class="ident">StoreResult</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Raw</span><span class="op">&lt;</span><span class="ident">AnySyncStateEvent</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">get_state_event</span>(<span class="ident">room_id</span>, <span class="ident">event_type</span>, <span class="ident">state_key</span>).<span class="kw">await</span>.<span class="ident">map_err</span>(<span class="ident">Into::into</span>)
@@ -2776,7 +2801,7 @@
     <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">get_state_events</span>(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         <span class="ident">room_id</span>: <span class="kw-2">&amp;</span><span class="ident">RoomId</span>,
-        <span class="ident">event_type</span>: <span class="ident">EventType</span>,
+        <span class="ident">event_type</span>: <span class="ident">StateEventType</span>,
     ) -&gt; <span class="ident">StoreResult</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Raw</span><span class="op">&lt;</span><span class="ident">AnySyncStateEvent</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">get_state_events</span>(<span class="ident">room_id</span>, <span class="ident">event_type</span>).<span class="kw">await</span>.<span class="ident">map_err</span>(<span class="ident">Into::into</span>)
     }
@@ -2837,7 +2862,7 @@
 
     <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">get_account_data_event</span>(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
-        <span class="ident">event_type</span>: <span class="ident">EventType</span>,
+        <span class="ident">event_type</span>: <span class="ident">GlobalAccountDataEventType</span>,
     ) -&gt; <span class="ident">StoreResult</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Raw</span><span class="op">&lt;</span><span class="ident">AnyGlobalAccountDataEvent</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">get_account_data_event</span>(<span class="ident">event_type</span>).<span class="kw">await</span>.<span class="ident">map_err</span>(<span class="ident">Into::into</span>)
     }
@@ -2845,7 +2870,7 @@
     <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">get_room_account_data_event</span>(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         <span class="ident">room_id</span>: <span class="kw-2">&amp;</span><span class="ident">RoomId</span>,
-        <span class="ident">event_type</span>: <span class="ident">EventType</span>,
+        <span class="ident">event_type</span>: <span class="ident">RoomAccountDataEventType</span>,
     ) -&gt; <span class="ident">StoreResult</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Raw</span><span class="op">&lt;</span><span class="ident">AnyRoomAccountDataEvent</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">get_room_account_data_event</span>(<span class="ident">room_id</span>, <span class="ident">event_type</span>).<span class="kw">await</span>.<span class="ident">map_err</span>(<span class="ident">Into::into</span>)
     }
@@ -2916,7 +2941,6 @@
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
 <span class="kw">mod</span> <span class="ident">test</span> {
-
     <span class="kw">use</span> <span class="ident">matrix_sdk_base::statestore_integration_tests</span>;
 
     <span class="kw">use</span> <span class="kw">super</span>::{<span class="ident">SledStore</span>, <span class="ident">StateStore</span>, <span class="ident">StoreResult</span>};

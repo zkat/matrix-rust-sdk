@@ -453,7 +453,7 @@
         <span class="ident">to_device::send_event_to_device::v3::Response</span> <span class="kw">as</span> <span class="ident">ToDeviceResponse</span>,
     },
     <span class="ident">encryption::CrossSigningKey</span>,
-    <span class="ident">events</span>::{<span class="ident">AnyMessageEventContent</span>, <span class="ident">AnyToDeviceEventContent</span>, <span class="ident">EventContent</span>, <span class="ident">EventType</span>},
+    <span class="ident">events</span>::{<span class="ident">AnyMessageEventContent</span>, <span class="ident">AnyToDeviceEventContent</span>, <span class="ident">EventContent</span>, <span class="ident">ToDeviceEventType</span>},
     <span class="ident">serde::Raw</span>,
     <span class="ident">to_device::DeviceIdOrAllDevices</span>,
     <span class="ident">DeviceId</span>, <span class="ident">RoomId</span>, <span class="ident">TransactionId</span>, <span class="ident">UserId</span>,
@@ -465,7 +465,7 @@
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">ToDeviceRequest</span> {
     <span class="doccomment">/// Type of event being sent to each device.</span>
-    <span class="kw">pub</span> <span class="ident">event_type</span>: <span class="ident">EventType</span>,
+    <span class="kw">pub</span> <span class="ident">event_type</span>: <span class="ident">ToDeviceEventType</span>,
 
     <span class="doccomment">/// A request identifier unique to the access token used to send the</span>
     <span class="doccomment">/// request.</span>
@@ -531,7 +531,7 @@
         <span class="ident">content</span>: <span class="ident">AnyToDeviceEventContent</span>,
         <span class="ident">txn_id</span>: <span class="ident">Box</span><span class="op">&lt;</span><span class="ident">TransactionId</span><span class="op">&gt;</span>,
     ) -&gt; <span class="self">Self</span> {
-        <span class="kw">let</span> <span class="ident">event_type</span> <span class="op">=</span> <span class="ident">EventType::from</span>(<span class="ident">content</span>.<span class="ident">event_type</span>());
+        <span class="kw">let</span> <span class="ident">event_type</span> <span class="op">=</span> <span class="ident">ToDeviceEventType::from</span>(<span class="ident">content</span>.<span class="ident">event_type</span>());
         <span class="kw">let</span> <span class="ident">raw_content</span> <span class="op">=</span> <span class="ident">Raw::new</span>(<span class="kw-2">&amp;</span><span class="ident">content</span>).<span class="ident">expect</span>(<span class="string">&quot;Failed to serialize to-device event&quot;</span>);
 
         <span class="kw">let</span> <span class="ident">user_messages</span> <span class="op">=</span> <span class="ident">iter::once</span>((<span class="ident">recipient_device</span>.<span class="ident">into</span>(), <span class="ident">raw_content</span>)).<span class="ident">collect</span>();

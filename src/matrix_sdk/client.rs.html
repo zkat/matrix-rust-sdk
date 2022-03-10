@@ -6470,7 +6470,7 @@
                 <span class="ident">message</span>::{<span class="ident">ImageMessageEventContent</span>, <span class="ident">RoomMessageEventContent</span>},
                 <span class="ident">ImageInfo</span>,
             },
-            <span class="ident">AnySyncStateEvent</span>, <span class="ident">EventType</span>,
+            <span class="ident">AnySyncStateEvent</span>, <span class="ident">StateEventType</span>,
         },
         <span class="ident">mxc_uri</span>, <span class="ident">room_id</span>, <span class="ident">thirdparty</span>, <span class="ident">uint</span>, <span class="ident">user_id</span>, <span class="ident">TransactionId</span>, <span class="ident">UserId</span>,
     };
@@ -7952,14 +7952,14 @@
 
         <span class="kw">let</span> <span class="ident">room</span> <span class="op">=</span> <span class="ident">client</span>.<span class="ident">get_joined_room</span>(<span class="ident">room_id</span>).<span class="ident">unwrap</span>();
 
-        <span class="kw">let</span> <span class="ident">state_events</span> <span class="op">=</span> <span class="ident">room</span>.<span class="ident">get_state_events</span>(<span class="ident">EventType::RoomEncryption</span>).<span class="kw">await</span>.<span class="ident">unwrap</span>();
+        <span class="kw">let</span> <span class="ident">state_events</span> <span class="op">=</span> <span class="ident">room</span>.<span class="ident">get_state_events</span>(<span class="ident">StateEventType::RoomEncryption</span>).<span class="kw">await</span>.<span class="ident">unwrap</span>();
         <span class="macro">assert_eq!</span>(<span class="ident">state_events</span>.<span class="ident">len</span>(), <span class="number">1</span>);
 
         <span class="kw">let</span> <span class="ident">state_events</span> <span class="op">=</span> <span class="ident">room</span>.<span class="ident">get_state_events</span>(<span class="string">&quot;m.custom.note&quot;</span>.<span class="ident">into</span>()).<span class="kw">await</span>.<span class="ident">unwrap</span>();
         <span class="macro">assert_eq!</span>(<span class="ident">state_events</span>.<span class="ident">len</span>(), <span class="number">2</span>);
 
         <span class="kw">let</span> <span class="ident">encryption_event</span> <span class="op">=</span> <span class="ident">room</span>
-            .<span class="ident">get_state_event</span>(<span class="ident">EventType::RoomEncryption</span>, <span class="string">&quot;&quot;</span>)
+            .<span class="ident">get_state_event</span>(<span class="ident">StateEventType::RoomEncryption</span>, <span class="string">&quot;&quot;</span>)
             .<span class="kw">await</span>
             .<span class="ident">unwrap</span>()
             .<span class="ident">unwrap</span>()
