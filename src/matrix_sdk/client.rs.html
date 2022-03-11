@@ -4266,7 +4266,7 @@
     <span class="doccomment">/// * `homeserver_url` - The homeserver that the client should connect to.</span>
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">homeserver_url</span>: <span class="ident">Url</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">config</span> <span class="op">=</span> <span class="ident">ClientConfig::new</span>();
-        <span class="ident">Client::new_with_config</span>(<span class="ident">homeserver_url</span>, <span class="ident">config</span>).<span class="kw">await</span>
+        <span class="ident">Client::with_config</span>(<span class="ident">homeserver_url</span>, <span class="ident">config</span>).<span class="kw">await</span>
     }
 
     <span class="doccomment">/// Create a new [`Client`] for the given homeserver and use the given</span>
@@ -4277,7 +4277,7 @@
     <span class="doccomment">/// * `homeserver_url` - The homeserver that the client should connect to.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// * `config` - Configuration for the client.</span>
-    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">new_with_config</span>(<span class="ident">homeserver_url</span>: <span class="ident">Url</span>, <span class="ident">config</span>: <span class="ident">ClientConfig</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">with_config</span>(<span class="ident">homeserver_url</span>: <span class="ident">Url</span>, <span class="ident">config</span>: <span class="ident">ClientConfig</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">homeserver</span> <span class="op">=</span> <span class="ident">Arc::new</span>(<span class="ident">RwLock::new</span>(<span class="ident">homeserver_url</span>));
 
         <span class="kw">let</span> <span class="ident">client</span> <span class="op">=</span> <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">client</span>) <span class="op">=</span> <span class="ident">config</span>.<span class="ident">client</span> {
@@ -4286,7 +4286,7 @@
             <span class="ident">Arc::new</span>(<span class="ident">client_with_config</span>(<span class="kw-2">&amp;</span><span class="ident">config</span>)<span class="question-mark">?</span>)
         };
 
-        <span class="kw">let</span> <span class="ident">base_client</span> <span class="op">=</span> <span class="ident">BaseClient::new_with_store_config</span>(<span class="ident">config</span>.<span class="ident">store_config</span>);
+        <span class="kw">let</span> <span class="ident">base_client</span> <span class="op">=</span> <span class="ident">BaseClient::with_store_config</span>(<span class="ident">config</span>.<span class="ident">store_config</span>);
         <span class="kw">let</span> <span class="ident">session</span> <span class="op">=</span> <span class="ident">base_client</span>.<span class="ident">session</span>().<span class="ident">clone</span>();
 
         <span class="kw">let</span> <span class="ident">http_client</span> <span class="op">=</span>
@@ -4367,7 +4367,7 @@
         <span class="ident">config</span>: <span class="ident">ClientConfig</span>,
     ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">homeserver</span> <span class="op">=</span> <span class="ident">Client::homeserver_from_user_id</span>(<span class="ident">user_id</span>)<span class="question-mark">?</span>;
-        <span class="kw">let</span> <span class="ident">client</span> <span class="op">=</span> <span class="ident">Client::new_with_config</span>(<span class="ident">homeserver</span>, <span class="ident">config</span>).<span class="kw">await</span><span class="question-mark">?</span>;
+        <span class="kw">let</span> <span class="ident">client</span> <span class="op">=</span> <span class="ident">Client::with_config</span>(<span class="ident">homeserver</span>, <span class="ident">config</span>).<span class="kw">await</span><span class="question-mark">?</span>;
 
         <span class="kw">let</span> <span class="ident">well_known</span> <span class="op">=</span> <span class="ident">client</span>.<span class="ident">discover_homeserver</span>().<span class="kw">await</span><span class="question-mark">?</span>;
         <span class="kw">let</span> <span class="ident">well_known</span> <span class="op">=</span> <span class="ident">Url::parse</span>(<span class="ident">well_known</span>.<span class="ident">homeserver</span>.<span class="ident">base_url</span>.<span class="ident">as_ref</span>())<span class="question-mark">?</span>;
@@ -6489,7 +6489,7 @@
         };
         <span class="kw">let</span> <span class="ident">homeserver</span> <span class="op">=</span> <span class="ident">url::Url::parse</span>(<span class="kw-2">&amp;</span><span class="ident">mockito::server_url</span>()).<span class="ident">unwrap</span>();
         <span class="kw">let</span> <span class="ident">config</span> <span class="op">=</span> <span class="ident">ClientConfig::new</span>().<span class="ident">request_config</span>(<span class="ident">RequestConfig::new</span>().<span class="ident">disable_retry</span>());
-        <span class="kw">let</span> <span class="ident">client</span> <span class="op">=</span> <span class="ident">Client::new_with_config</span>(<span class="ident">homeserver</span>, <span class="ident">config</span>).<span class="kw">await</span>.<span class="ident">unwrap</span>();
+        <span class="kw">let</span> <span class="ident">client</span> <span class="op">=</span> <span class="ident">Client::with_config</span>(<span class="ident">homeserver</span>, <span class="ident">config</span>).<span class="kw">await</span>.<span class="ident">unwrap</span>();
         <span class="ident">client</span>.<span class="ident">restore_login</span>(<span class="ident">session</span>).<span class="kw">await</span>.<span class="ident">unwrap</span>();
 
         <span class="ident">client</span>
@@ -6588,7 +6588,7 @@
         <span class="kw">let</span> <span class="ident">homeserver</span> <span class="op">=</span> <span class="ident">Url::from_str</span>(<span class="kw-2">&amp;</span><span class="ident">mockito::server_url</span>()).<span class="ident">unwrap</span>();
         <span class="kw">let</span> <span class="ident">config</span> <span class="op">=</span> <span class="ident">ClientConfig::new</span>().<span class="ident">use_discovery_response</span>();
 
-        <span class="kw">let</span> <span class="ident">client</span> <span class="op">=</span> <span class="ident">Client::new_with_config</span>(<span class="ident">homeserver</span>, <span class="ident">config</span>).<span class="kw">await</span>.<span class="ident">unwrap</span>();
+        <span class="kw">let</span> <span class="ident">client</span> <span class="op">=</span> <span class="ident">Client::with_config</span>(<span class="ident">homeserver</span>, <span class="ident">config</span>).<span class="kw">await</span>.<span class="ident">unwrap</span>();
 
         <span class="kw">let</span> <span class="ident">_m_login</span> <span class="op">=</span> <span class="ident">mock</span>(<span class="string">&quot;POST&quot;</span>, <span class="string">&quot;/_matrix/client/r0/login&quot;</span>)
             .<span class="ident">with_status</span>(<span class="number">200</span>)
@@ -6608,7 +6608,7 @@
         <span class="kw">let</span> <span class="ident">homeserver</span> <span class="op">=</span> <span class="ident">Url::from_str</span>(<span class="kw-2">&amp;</span><span class="ident">mockito::server_url</span>()).<span class="ident">unwrap</span>();
         <span class="kw">let</span> <span class="ident">config</span> <span class="op">=</span> <span class="ident">ClientConfig::new</span>().<span class="ident">use_discovery_response</span>();
 
-        <span class="kw">let</span> <span class="ident">client</span> <span class="op">=</span> <span class="ident">Client::new_with_config</span>(<span class="ident">homeserver</span>.<span class="ident">clone</span>(), <span class="ident">config</span>).<span class="kw">await</span>.<span class="ident">unwrap</span>();
+        <span class="kw">let</span> <span class="ident">client</span> <span class="op">=</span> <span class="ident">Client::with_config</span>(<span class="ident">homeserver</span>.<span class="ident">clone</span>(), <span class="ident">config</span>).<span class="kw">await</span>.<span class="ident">unwrap</span>();
 
         <span class="kw">let</span> <span class="ident">_m_login</span> <span class="op">=</span> <span class="ident">mock</span>(<span class="string">&quot;POST&quot;</span>, <span class="string">&quot;/_matrix/client/r0/login&quot;</span>)
             .<span class="ident">with_status</span>(<span class="number">200</span>)
@@ -6737,7 +6737,7 @@
 
         <span class="comment">// test store reloads with correct room state from the state store</span>
         <span class="kw">let</span> <span class="ident">config</span> <span class="op">=</span> <span class="ident">ClientConfig::new</span>().<span class="ident">request_config</span>(<span class="ident">RequestConfig::new</span>().<span class="ident">disable_retry</span>());
-        <span class="kw">let</span> <span class="ident">joined_client</span> <span class="op">=</span> <span class="ident">Client::new_with_config</span>(<span class="ident">homeserver</span>, <span class="ident">config</span>).<span class="kw">await</span>.<span class="ident">unwrap</span>();
+        <span class="kw">let</span> <span class="ident">joined_client</span> <span class="op">=</span> <span class="ident">Client::with_config</span>(<span class="ident">homeserver</span>, <span class="ident">config</span>).<span class="kw">await</span>.<span class="ident">unwrap</span>();
         <span class="ident">joined_client</span>.<span class="ident">restore_login</span>(<span class="ident">session</span>).<span class="kw">await</span>.<span class="ident">unwrap</span>();
 
         <span class="comment">// joined room reloaded from state store</span>
@@ -6799,7 +6799,7 @@
     <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">login_error</span>() {
         <span class="kw">let</span> <span class="ident">homeserver</span> <span class="op">=</span> <span class="ident">Url::from_str</span>(<span class="kw-2">&amp;</span><span class="ident">mockito::server_url</span>()).<span class="ident">unwrap</span>();
         <span class="kw">let</span> <span class="ident">config</span> <span class="op">=</span> <span class="ident">ClientConfig::default</span>().<span class="ident">request_config</span>(<span class="ident">RequestConfig::new</span>().<span class="ident">disable_retry</span>());
-        <span class="kw">let</span> <span class="ident">client</span> <span class="op">=</span> <span class="ident">Client::new_with_config</span>(<span class="ident">homeserver</span>, <span class="ident">config</span>).<span class="kw">await</span>.<span class="ident">unwrap</span>();
+        <span class="kw">let</span> <span class="ident">client</span> <span class="op">=</span> <span class="ident">Client::with_config</span>(<span class="ident">homeserver</span>, <span class="ident">config</span>).<span class="kw">await</span>.<span class="ident">unwrap</span>();
 
         <span class="kw">let</span> <span class="ident">_m</span> <span class="op">=</span> <span class="ident">mock</span>(<span class="string">&quot;POST&quot;</span>, <span class="string">&quot;/_matrix/client/r0/login&quot;</span>)
             .<span class="ident">with_status</span>(<span class="number">403</span>)
@@ -7716,7 +7716,7 @@
         <span class="kw">let</span> <span class="ident">homeserver</span> <span class="op">=</span> <span class="ident">Url::from_str</span>(<span class="kw-2">&amp;</span><span class="ident">mockito::server_url</span>()).<span class="ident">unwrap</span>();
         <span class="kw">let</span> <span class="ident">config</span> <span class="op">=</span> <span class="ident">ClientConfig::default</span>().<span class="ident">request_config</span>(<span class="ident">RequestConfig::new</span>().<span class="ident">retry_limit</span>(<span class="number">3</span>));
         <span class="macro">assert!</span>(<span class="ident">config</span>.<span class="ident">request_config</span>.<span class="ident">retry_limit</span>.<span class="ident">unwrap</span>() <span class="op">==</span> <span class="number">3</span>);
-        <span class="kw">let</span> <span class="ident">client</span> <span class="op">=</span> <span class="ident">Client::new_with_config</span>(<span class="ident">homeserver</span>, <span class="ident">config</span>).<span class="kw">await</span>.<span class="ident">unwrap</span>();
+        <span class="kw">let</span> <span class="ident">client</span> <span class="op">=</span> <span class="ident">Client::with_config</span>(<span class="ident">homeserver</span>, <span class="ident">config</span>).<span class="kw">await</span>.<span class="ident">unwrap</span>();
 
         <span class="kw">let</span> <span class="ident">m</span> <span class="op">=</span> <span class="ident">mock</span>(<span class="string">&quot;POST&quot;</span>, <span class="string">&quot;/_matrix/client/r0/login&quot;</span>).<span class="ident">with_status</span>(<span class="number">501</span>).<span class="ident">expect</span>(<span class="number">3</span>).<span class="ident">create</span>();
 
@@ -7735,7 +7735,7 @@
         <span class="kw">let</span> <span class="ident">config</span> <span class="op">=</span> <span class="ident">ClientConfig::default</span>()
             .<span class="ident">request_config</span>(<span class="ident">RequestConfig::new</span>().<span class="ident">retry_timeout</span>(<span class="ident">retry_timeout</span>));
         <span class="macro">assert!</span>(<span class="ident">config</span>.<span class="ident">request_config</span>.<span class="ident">retry_timeout</span>.<span class="ident">unwrap</span>() <span class="op">==</span> <span class="ident">retry_timeout</span>);
-        <span class="kw">let</span> <span class="ident">client</span> <span class="op">=</span> <span class="ident">Client::new_with_config</span>(<span class="ident">homeserver</span>, <span class="ident">config</span>).<span class="kw">await</span>.<span class="ident">unwrap</span>();
+        <span class="kw">let</span> <span class="ident">client</span> <span class="op">=</span> <span class="ident">Client::with_config</span>(<span class="ident">homeserver</span>, <span class="ident">config</span>).<span class="kw">await</span>.<span class="ident">unwrap</span>();
 
         <span class="kw">let</span> <span class="ident">m</span> <span class="op">=</span>
             <span class="ident">mock</span>(<span class="string">&quot;POST&quot;</span>, <span class="string">&quot;/_matrix/client/r0/login&quot;</span>).<span class="ident">with_status</span>(<span class="number">501</span>).<span class="ident">expect_at_least</span>(<span class="number">2</span>).<span class="ident">create</span>();
@@ -7932,7 +7932,7 @@
             .<span class="ident">create</span>();
 
         <span class="kw">let</span> <span class="ident">config</span> <span class="op">=</span> <span class="ident">ClientConfig::default</span>().<span class="ident">request_config</span>(<span class="ident">RequestConfig::new</span>().<span class="ident">retry_limit</span>(<span class="number">3</span>));
-        <span class="kw">let</span> <span class="ident">client</span> <span class="op">=</span> <span class="ident">Client::new_with_config</span>(<span class="ident">homeserver</span>.<span class="ident">clone</span>(), <span class="ident">config</span>).<span class="kw">await</span>.<span class="ident">unwrap</span>();
+        <span class="kw">let</span> <span class="ident">client</span> <span class="op">=</span> <span class="ident">Client::with_config</span>(<span class="ident">homeserver</span>.<span class="ident">clone</span>(), <span class="ident">config</span>).<span class="kw">await</span>.<span class="ident">unwrap</span>();
         <span class="ident">client</span>.<span class="ident">restore_login</span>(<span class="ident">session</span>.<span class="ident">clone</span>()).<span class="kw">await</span>.<span class="ident">unwrap</span>();
 
         <span class="kw">let</span> <span class="ident">room</span> <span class="op">=</span> <span class="ident">client</span>.<span class="ident">get_joined_room</span>(<span class="ident">room_id</span>);

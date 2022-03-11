@@ -612,10 +612,6 @@
 <span id="607">607</span>
 <span id="608">608</span>
 <span id="609">609</span>
-<span id="610">610</span>
-<span id="611">611</span>
-<span id="612">612</span>
-<span id="613">613</span>
 </pre><pre class="rust"><code><span class="comment">// Copyright 2021 Famedly GmbH</span>
 <span class="comment">//</span>
 <span class="comment">// Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);</span>
@@ -829,7 +825,7 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// Also creates and caches a [`Client`] for the [`MainUser`].</span>
     <span class="doccomment">/// The default [`ClientConfig`] is used, if you want to customize it</span>
-    <span class="doccomment">/// use [`Self::new_with_config()`] instead.</span>
+    <span class="doccomment">/// use [`Self::with_config()`] instead.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// # Arguments</span>
     <span class="doccomment">///</span>
@@ -845,20 +841,16 @@
         <span class="ident">server_name</span>: <span class="kw">impl</span> <span class="ident">TryInto</span><span class="op">&lt;</span><span class="ident">Box</span><span class="op">&lt;</span><span class="ident">ServerName</span><span class="op">&gt;</span>, <span class="ident">Error</span> <span class="op">=</span> <span class="ident">identifiers::Error</span><span class="op">&gt;</span>,
         <span class="ident">registration</span>: <span class="ident">AppServiceRegistration</span>,
     ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">appservice</span> <span class="op">=</span> <span class="ident"><span class="self">Self</span>::new_with_config</span>(
-            <span class="ident">homeserver_url</span>,
-            <span class="ident">server_name</span>,
-            <span class="ident">registration</span>,
-            <span class="ident">ClientConfig::default</span>(),
-        )
-        .<span class="kw">await</span><span class="question-mark">?</span>;
+        <span class="kw">let</span> <span class="ident">appservice</span> <span class="op">=</span>
+            <span class="ident"><span class="self">Self</span>::with_config</span>(<span class="ident">homeserver_url</span>, <span class="ident">server_name</span>, <span class="ident">registration</span>, <span class="ident">ClientConfig::default</span>())
+                .<span class="kw">await</span><span class="question-mark">?</span>;
 
         <span class="prelude-val">Ok</span>(<span class="ident">appservice</span>)
     }
 
     <span class="doccomment">/// Same as [`Self::new()`] but lets you provide a [`ClientConfig`] for the</span>
     <span class="doccomment">/// [`Client`]</span>
-    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">new_with_config</span>(
+    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">with_config</span>(
         <span class="ident">homeserver_url</span>: <span class="kw">impl</span> <span class="ident">TryInto</span><span class="op">&lt;</span><span class="ident">Url</span>, <span class="ident">Error</span> <span class="op">=</span> <span class="ident">url::ParseError</span><span class="op">&gt;</span>,
         <span class="ident">server_name</span>: <span class="kw">impl</span> <span class="ident">TryInto</span><span class="op">&lt;</span><span class="ident">Box</span><span class="op">&lt;</span><span class="ident">ServerName</span><span class="op">&gt;</span>, <span class="ident">Error</span> <span class="op">=</span> <span class="ident">identifiers::Error</span><span class="op">&gt;</span>,
         <span class="ident">registration</span>: <span class="ident">AppServiceRegistration</span>,
@@ -948,7 +940,7 @@
         };
 
         <span class="kw">let</span> <span class="ident">client</span> <span class="op">=</span>
-            <span class="ident">Client::new_with_config</span>(<span class="self">self</span>.<span class="ident">homeserver_url</span>.<span class="ident">clone</span>(), <span class="ident">config</span>.<span class="ident">appservice_mode</span>()).<span class="kw">await</span><span class="question-mark">?</span>;
+            <span class="ident">Client::with_config</span>(<span class="self">self</span>.<span class="ident">homeserver_url</span>.<span class="ident">clone</span>(), <span class="ident">config</span>.<span class="ident">appservice_mode</span>()).<span class="kw">await</span><span class="question-mark">?</span>;
 
         <span class="kw">let</span> <span class="ident">session</span> <span class="op">=</span> <span class="ident">Session</span> {
             <span class="ident">access_token</span>: <span class="self">self</span>.<span class="ident">registration</span>.<span class="ident">as_token</span>.<span class="ident">clone</span>(),

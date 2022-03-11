@@ -240,6 +240,8 @@
 <span id="235">235</span>
 <span id="236">236</span>
 <span id="237">237</span>
+<span id="238">238</span>
+<span id="239">239</span>
 </pre><pre class="rust"><code><span class="comment">// Copyright 2021 The Matrix.org Foundation C.I.C.</span>
 <span class="comment">//</span>
 <span class="comment">// Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);</span>
@@ -363,8 +365,9 @@
     <span class="doccomment">/// # let custom_state_store = Box::new(MemoryStore::new());</span>
     <span class="doccomment">/// use matrix_sdk::{Client, config::{ClientConfig, StoreConfig}};</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// let store_config = StoreConfig::new_with_state_store(custom_state_store);</span>
-    <span class="doccomment">/// let client_config = ClientConfig::with_store_config(store_config)</span>
+    <span class="doccomment">/// let store_config = StoreConfig::new().state_store(custom_state_store);</span>
+    <span class="doccomment">/// let client_config = ClientConfig::new()</span>
+    <span class="doccomment">///     .store_config(store_config)</span>
     <span class="doccomment">///     .use_discovery_response();</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// # Result::&lt;_, matrix_sdk::Error&gt;::Ok(())</span>
@@ -372,8 +375,9 @@
     <span class="doccomment">/// ```</span>
     <span class="doccomment">/// [`make_store_config`]: crate::store::make_store_config</span>
     <span class="doccomment">/// [`store`]: crate::store</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">with_store_config</span>(<span class="ident">store_config</span>: <span class="ident">StoreConfig</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">Self</span> { <span class="ident">store_config</span>, ..<span class="ident">Default::default</span>() }
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">store_config</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">store_config</span>: <span class="ident">StoreConfig</span>) -&gt; <span class="self">Self</span> {
+        <span class="self">self</span>.<span class="ident">store_config</span> <span class="op">=</span> <span class="ident">store_config</span>;
+        <span class="self">self</span>
     }
 
     <span class="doccomment">/// Set the proxy through which all the HTTP requests should go.</span>
