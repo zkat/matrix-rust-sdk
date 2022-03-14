@@ -612,6 +612,8 @@
 <span id="607">607</span>
 <span id="608">608</span>
 <span id="609">609</span>
+<span id="610">610</span>
+<span id="611">611</span>
 </pre><pre class="rust"><code><span class="comment">// Copyright 2021 Famedly GmbH</span>
 <span class="comment">//</span>
 <span class="comment">// Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);</span>
@@ -704,10 +706,9 @@
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">matrix_sdk::ruma</span>;
 <span class="kw">use</span> <span class="ident">matrix_sdk</span>::{
     <span class="ident">bytes::Bytes</span>,
-    <span class="ident">config::ClientConfig</span>,
     <span class="ident">event_handler</span>::{<span class="ident">EventHandler</span>, <span class="ident">EventHandlerResult</span>, <span class="ident">SyncEvent</span>},
     <span class="ident">reqwest::Url</span>,
-    <span class="ident">Client</span>, <span class="ident">Session</span>,
+    <span class="ident">Client</span>, <span class="ident">ClientBuildError</span>, <span class="ident">ClientBuilder</span>, <span class="ident">Session</span>,
 };
 <span class="kw">use</span> <span class="ident">regex::Regex</span>;
 <span class="kw">use</span> <span class="ident">ruma</span>::{
@@ -824,8 +825,8 @@
     <span class="doccomment">/// Create new AppService</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// Also creates and caches a [`Client`] for the [`MainUser`].</span>
-    <span class="doccomment">/// The default [`ClientConfig`] is used, if you want to customize it</span>
-    <span class="doccomment">/// use [`Self::with_config()`] instead.</span>
+    <span class="doccomment">/// A default [`ClientBuilder`] is used, if you want to customize it</span>
+    <span class="doccomment">/// use [`with_client_builder()`][Self::with_client_builder] instead.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// # Arguments</span>
     <span class="doccomment">///</span>
@@ -842,19 +843,19 @@
         <span class="ident">registration</span>: <span class="ident">AppServiceRegistration</span>,
     ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">appservice</span> <span class="op">=</span>
-            <span class="ident"><span class="self">Self</span>::with_config</span>(<span class="ident">homeserver_url</span>, <span class="ident">server_name</span>, <span class="ident">registration</span>, <span class="ident">ClientConfig::default</span>())
+            <span class="ident"><span class="self">Self</span>::with_client_builder</span>(<span class="ident">homeserver_url</span>, <span class="ident">server_name</span>, <span class="ident">registration</span>, <span class="ident">Client::builder</span>())
                 .<span class="kw">await</span><span class="question-mark">?</span>;
 
         <span class="prelude-val">Ok</span>(<span class="ident">appservice</span>)
     }
 
-    <span class="doccomment">/// Same as [`Self::new()`] but lets you provide a [`ClientConfig`] for the</span>
-    <span class="doccomment">/// [`Client`]</span>
-    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">with_config</span>(
+    <span class="doccomment">/// Same as [`new()`][Self::new] but lets you provide a [`ClientBuilder`]</span>
+    <span class="doccomment">/// for the [`Client`]</span>
+    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">with_client_builder</span>(
         <span class="ident">homeserver_url</span>: <span class="kw">impl</span> <span class="ident">TryInto</span><span class="op">&lt;</span><span class="ident">Url</span>, <span class="ident">Error</span> <span class="op">=</span> <span class="ident">url::ParseError</span><span class="op">&gt;</span>,
         <span class="ident">server_name</span>: <span class="kw">impl</span> <span class="ident">TryInto</span><span class="op">&lt;</span><span class="ident">Box</span><span class="op">&lt;</span><span class="ident">ServerName</span><span class="op">&gt;</span>, <span class="ident">Error</span> <span class="op">=</span> <span class="ident">identifiers::Error</span><span class="op">&gt;</span>,
         <span class="ident">registration</span>: <span class="ident">AppServiceRegistration</span>,
-        <span class="ident">client_config</span>: <span class="ident">ClientConfig</span>,
+        <span class="ident">builder</span>: <span class="ident">ClientBuilder</span>,
     ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">homeserver_url</span> <span class="op">=</span> <span class="ident">homeserver_url</span>.<span class="ident">try_into</span>()<span class="question-mark">?</span>;
         <span class="kw">let</span> <span class="ident">server_name</span> <span class="op">=</span> <span class="ident">server_name</span>.<span class="ident">try_into</span>()<span class="question-mark">?</span>;
@@ -867,7 +868,7 @@
             <span class="ident">AppService</span> { <span class="ident">homeserver_url</span>, <span class="ident">server_name</span>, <span class="ident">registration</span>, <span class="ident">clients</span>, <span class="ident">event_handler</span> };
 
         <span class="comment">// we create and cache the [`MainUser`] by default</span>
-        <span class="ident">appservice</span>.<span class="ident">create_and_cache_client</span>(<span class="kw-2">&amp;</span><span class="ident">sender_localpart</span>, <span class="ident">client_config</span>).<span class="kw">await</span><span class="question-mark">?</span>;
+        <span class="ident">appservice</span>.<span class="ident">create_and_cache_client</span>(<span class="kw-2">&amp;</span><span class="ident">sender_localpart</span>, <span class="ident">builder</span>).<span class="kw">await</span><span class="question-mark">?</span>;
 
         <span class="prelude-val">Ok</span>(<span class="ident">appservice</span>)
     }
@@ -880,8 +881,9 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// This method is a singleton that saves the client internally for re-use</span>
     <span class="doccomment">/// based on the `localpart`. The cached [`Client`] can be retrieved either</span>
-    <span class="doccomment">/// by calling this method again or by calling [`Self::get_cached_client()`]</span>
-    <span class="doccomment">/// which is non-async convenience wrapper.</span>
+    <span class="doccomment">/// by calling this method again or by calling</span>
+    <span class="doccomment">/// [`get_cached_client()`][Self::get_cached_client] which is non-async</span>
+    <span class="doccomment">/// convenience wrapper.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// Note that if you want to do actions like joining rooms with a virtual</span>
     <span class="doccomment">/// user it needs to be registered first. `Self::register_virtual_user()`</span>
@@ -895,20 +897,20 @@
     <span class="doccomment">/// [assert the identity]: https://matrix.org/docs/spec/application_service/r0.1.2#identity-assertion</span>
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">virtual_user_client</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">localpart</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">str</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Client</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">client</span> <span class="op">=</span>
-            <span class="self">self</span>.<span class="ident">virtual_user_client_with_config</span>(<span class="ident">localpart</span>, <span class="ident">ClientConfig::default</span>()).<span class="kw">await</span><span class="question-mark">?</span>;
+            <span class="self">self</span>.<span class="ident">virtual_user_client_with_client_builder</span>(<span class="ident">localpart</span>, <span class="ident">Client::builder</span>()).<span class="kw">await</span><span class="question-mark">?</span>;
 
         <span class="prelude-val">Ok</span>(<span class="ident">client</span>)
     }
 
-    <span class="doccomment">/// Same as [`Self::virtual_user_client()`] but with the ability to pass in</span>
-    <span class="doccomment">/// a [`ClientConfig`]</span>
+    <span class="doccomment">/// Same as [`virtual_user_client()`][Self::virtual_user_client] but with</span>
+    <span class="doccomment">/// the ability to pass in a [`ClientBuilder`]</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// Since this method is a singleton follow-up calls with different</span>
-    <span class="doccomment">/// [`ClientConfig`]s will be ignored.</span>
-    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">virtual_user_client_with_config</span>(
+    <span class="doccomment">/// [`ClientBuilder`]s will be ignored.</span>
+    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">virtual_user_client_with_client_builder</span>(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         <span class="ident">localpart</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">str</span><span class="op">&gt;</span>,
-        <span class="ident">config</span>: <span class="ident">ClientConfig</span>,
+        <span class="ident">builder</span>: <span class="ident">ClientBuilder</span>,
     ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Client</span><span class="op">&gt;</span> {
         <span class="comment">// TODO: check if localpart is covered by namespace?</span>
         <span class="kw">let</span> <span class="ident">localpart</span> <span class="op">=</span> <span class="ident">localpart</span>.<span class="ident">as_ref</span>();
@@ -916,7 +918,7 @@
         <span class="kw">let</span> <span class="ident">client</span> <span class="op">=</span> <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">client</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">clients</span>.<span class="ident">get</span>(<span class="ident">localpart</span>) {
             <span class="ident">client</span>.<span class="ident">clone</span>()
         } <span class="kw">else</span> {
-            <span class="self">self</span>.<span class="ident">create_and_cache_client</span>(<span class="ident">localpart</span>, <span class="ident">config</span>).<span class="kw">await</span><span class="question-mark">?</span>
+            <span class="self">self</span>.<span class="ident">create_and_cache_client</span>(<span class="ident">localpart</span>, <span class="ident">builder</span>).<span class="kw">await</span><span class="question-mark">?</span>
         };
 
         <span class="prelude-val">Ok</span>(<span class="ident">client</span>)
@@ -925,22 +927,23 @@
     <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">create_and_cache_client</span>(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         <span class="ident">localpart</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>,
-        <span class="ident">config</span>: <span class="ident">ClientConfig</span>,
+        <span class="kw-2">mut</span> <span class="ident">builder</span>: <span class="ident">ClientBuilder</span>,
     ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Client</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">user_id</span> <span class="op">=</span> <span class="ident">UserId::parse_with_server_name</span>(<span class="ident">localpart</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">server_name</span>)<span class="question-mark">?</span>;
 
         <span class="comment">// The `as_token` in the `Session` maps to the [`MainUser`]</span>
         <span class="comment">// (`sender_localpart`) by default, so we don&#39;t need to assert identity</span>
         <span class="comment">// in that case</span>
-        <span class="kw">let</span> <span class="ident">config</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">localpart</span> <span class="op">!</span><span class="op">=</span> <span class="self">self</span>.<span class="ident">registration</span>.<span class="ident">sender_localpart</span> {
-            <span class="kw">let</span> <span class="ident">request_config</span> <span class="op">=</span> <span class="ident">config</span>.<span class="ident">get_request_config</span>().<span class="ident">assert_identity</span>();
-            <span class="ident">config</span>.<span class="ident">request_config</span>(<span class="ident">request_config</span>)
-        } <span class="kw">else</span> {
-            <span class="ident">config</span>
-        };
+        <span class="kw">if</span> <span class="ident">localpart</span> <span class="op">!</span><span class="op">=</span> <span class="self">self</span>.<span class="ident">registration</span>.<span class="ident">sender_localpart</span> {
+            <span class="ident">builder</span> <span class="op">=</span> <span class="ident">builder</span>.<span class="ident">assert_identity</span>();
+        }
 
-        <span class="kw">let</span> <span class="ident">client</span> <span class="op">=</span>
-            <span class="ident">Client::with_config</span>(<span class="self">self</span>.<span class="ident">homeserver_url</span>.<span class="ident">clone</span>(), <span class="ident">config</span>.<span class="ident">appservice_mode</span>()).<span class="kw">await</span><span class="question-mark">?</span>;
+        <span class="kw">let</span> <span class="ident">client</span> <span class="op">=</span> <span class="ident">builder</span>
+            .<span class="ident">homeserver_url</span>(<span class="self">self</span>.<span class="ident">homeserver_url</span>.<span class="ident">clone</span>())
+            .<span class="ident">appservice_mode</span>()
+            .<span class="ident">build</span>()
+            .<span class="kw">await</span>
+            .<span class="ident">map_err</span>(<span class="ident">ClientBuildError::assert_valid_builder_args</span>)<span class="question-mark">?</span>;
 
         <span class="kw">let</span> <span class="ident">session</span> <span class="op">=</span> <span class="ident">Session</span> {
             <span class="ident">access_token</span>: <span class="self">self</span>.<span class="ident">registration</span>.<span class="ident">as_token</span>.<span class="ident">clone</span>(),
@@ -958,8 +961,9 @@
     <span class="doccomment">/// Get cached [`Client`]</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// Will return the client for the given `localpart` if previously</span>
-    <span class="doccomment">/// constructed with [`Self::virtual_user_client()`] or</span>
-    <span class="doccomment">/// [`Self::virtual_user_client_with_config()`].</span>
+    <span class="doccomment">/// constructed with [`virtual_user_client()`][Self::virtual_user_client] or</span>
+    <span class="doccomment">/// [`virtual_user_client_with_config()`][Self::</span>
+    <span class="doccomment">/// virtual_user_client_with_client_builder].</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// If no `localpart` is given it assumes the [`MainUser`]&#39;s `localpart`. If</span>
     <span class="doccomment">/// no client for `localpart` is found it will return an Error.</span>

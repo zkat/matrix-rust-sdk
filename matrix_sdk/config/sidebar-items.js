@@ -1,1 +1,1 @@
-initSidebarItems({"struct":[["ClientConfig","Configuration for the creation of the `Client`."],["RequestConfig","Configuration for requests the `Client` makes."],["StoreConfig","Configuration for the state store and, when `encryption` is enabled, for the crypto store."],["SyncSettings","Settings for a sync call."]]});
+initSidebarItems({"struct":[["RequestConfig","Configuration for requests the `Client` makes."],["StoreConfig","Configuration for the state store and, when `encryption` is enabled, for the crypto store."],["SyncSettings","Settings for a sync call."]]});

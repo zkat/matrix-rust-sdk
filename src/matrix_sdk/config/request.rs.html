@@ -127,19 +127,6 @@
 <span id="122">122</span>
 <span id="123">123</span>
 <span id="124">124</span>
-<span id="125">125</span>
-<span id="126">126</span>
-<span id="127">127</span>
-<span id="128">128</span>
-<span id="129">129</span>
-<span id="130">130</span>
-<span id="131">131</span>
-<span id="132">132</span>
-<span id="133">133</span>
-<span id="134">134</span>
-<span id="135">135</span>
-<span id="136">136</span>
-<span id="137">137</span>
 </pre><pre class="rust"><code><span class="comment">// Copyright 2021 The Matrix.org Foundation C.I.C.</span>
 <span class="comment">//</span>
 <span class="comment">// Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);</span>
@@ -159,7 +146,7 @@
     <span class="ident">time::Duration</span>,
 };
 
-<span class="kw">const</span> <span class="ident">DEFAULT_REQUEST_TIMEOUT</span>: <span class="ident">Duration</span> <span class="op">=</span> <span class="ident">Duration::from_secs</span>(<span class="number">10</span>);
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::http_client::DEFAULT_REQUEST_TIMEOUT</span>;
 
 <span class="doccomment">/// Configuration for requests the `Client` makes.</span>
 <span class="doccomment">///</span>
@@ -261,19 +248,6 @@
     <span class="attribute">#[<span class="ident">must_use</span>]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">force_auth</span>(<span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="self">Self</span> {
         <span class="self">self</span>.<span class="ident">force_auth</span> <span class="op">=</span> <span class="bool-val">true</span>;
-        <span class="self">self</span>
-    }
-
-    <span class="doccomment">/// All outgoing http requests will have a GET query key-value appended with</span>
-    <span class="doccomment">/// `user_id` being the key and the `user_id` from the `Session` being</span>
-    <span class="doccomment">/// the value. Will error if there&#39;s no `Session`. This is called</span>
-    <span class="doccomment">/// [identity assertion] in the Matrix Application Service Spec</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [identity assertion]: https://spec.matrix.org/unstable/application-service-api/#identity-assertion</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;appservice&quot;</span>)]</span>
-    <span class="attribute">#[<span class="ident">must_use</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">assert_identity</span>(<span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="ident">assert_identity</span> <span class="op">=</span> <span class="bool-val">true</span>;
         <span class="self">self</span>
     }
 }
