@@ -494,6 +494,8 @@
 <span id="489">489</span>
 <span id="490">490</span>
 <span id="491">491</span>
+<span id="492">492</span>
+<span id="493">493</span>
 </pre><pre class="rust"><code><span class="comment">// Copyright 2021 The Matrix.org Foundation C.I.C.</span>
 <span class="comment">//</span>
 <span class="comment">// Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);</span>
@@ -531,8 +533,8 @@
 <span class="doccomment">///</span>
 <span class="doccomment">/// The identity is backed by public [cross signing] keys that users upload. If</span>
 <span class="doccomment">/// our own user doesn&#39;t yet have such an identity, a new one can be created and</span>
-<span class="doccomment">/// uploaded to the server using [`Client::bootstrap_cross_signing()`]. The user</span>
-<span class="doccomment">/// identity can be also reset using the same method.</span>
+<span class="doccomment">/// uploaded to the server using [`Encryption::bootstrap_cross_signing()`]. The</span>
+<span class="doccomment">/// user identity can be also reset using the same method.</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// The user identity consists of three separate `Ed25519` keypairs:</span>
 <span class="doccomment">///</span>
@@ -559,6 +561,7 @@
 <span class="doccomment">/// let us know whom the user verified.</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// [cross signing]: https://spec.matrix.org/unstable/client-server-api/#cross-signing</span>
+<span class="doccomment">/// [`Encryption::bootstrap_cross_signing()`]: crate::encryption::Encryption::bootstrap_cross_signing</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">UserIdentity</span> {
     <span class="ident">inner</span>: <span class="ident">UserIdentities</span>,
@@ -593,7 +596,7 @@
     <span class="doccomment">/// # let homeserver = Url::parse(&quot;http://example.com&quot;).unwrap();</span>
     <span class="doccomment">/// # futures::executor::block_on(async {</span>
     <span class="doccomment">/// # let client = Client::new(homeserver).await.unwrap();</span>
-    <span class="doccomment">/// let user = client.get_user_identity(alice).await?;</span>
+    <span class="doccomment">/// let user = client.encryption().get_user_identity(alice).await?;</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// if let Some(user) = user {</span>
     <span class="doccomment">///     println!(&quot;This user identity belongs to {}&quot;, user.user_id().as_str());</span>
@@ -645,7 +648,7 @@
     <span class="doccomment">/// # let homeserver = Url::parse(&quot;http://example.com&quot;).unwrap();</span>
     <span class="doccomment">/// # futures::executor::block_on(async {</span>
     <span class="doccomment">/// # let client = Client::new(homeserver).await.unwrap();</span>
-    <span class="doccomment">/// let user = client.get_user_identity(alice).await?;</span>
+    <span class="doccomment">/// let user = client.encryption().get_user_identity(alice).await?;</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// if let Some(user) = user {</span>
     <span class="doccomment">///     let verification = user.request_verification().await?;</span>
@@ -704,7 +707,7 @@
     <span class="doccomment">/// # let homeserver = Url::parse(&quot;http://example.com&quot;).unwrap();</span>
     <span class="doccomment">/// # block_on(async {</span>
     <span class="doccomment">/// # let client = Client::new(homeserver).await.unwrap();</span>
-    <span class="doccomment">/// let user = client.get_user_identity(alice).await?;</span>
+    <span class="doccomment">/// let user = client.encryption().get_user_identity(alice).await?;</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// // We don&#39;t want to support showing a QR code, we only support SAS</span>
     <span class="doccomment">/// // verification</span>
@@ -748,7 +751,7 @@
     <span class="doccomment">/// course fail if the private part of the User-signing key isn&#39;t available.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// The availability of the User-signing key can be checked using the</span>
-    <span class="doccomment">/// [`Client::cross_signing_status()`] method.</span>
+    <span class="doccomment">/// [`Encryption::cross_signing_status()`] method.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// ### Manually verifying our own user</span>
     <span class="doccomment">///</span>
@@ -783,13 +786,14 @@
     <span class="doccomment">/// # let homeserver = Url::parse(&quot;http://example.com&quot;).unwrap();</span>
     <span class="doccomment">/// # block_on(async {</span>
     <span class="doccomment">/// # let client = Client::new(homeserver).await.unwrap();</span>
-    <span class="doccomment">/// let user = client.get_user_identity(alice).await?;</span>
+    <span class="doccomment">/// let user = client.encryption().get_user_identity(alice).await?;</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// if let Some(user) = user {</span>
     <span class="doccomment">///     user.verify().await?;</span>
     <span class="doccomment">/// }</span>
     <span class="doccomment">/// # anyhow::Result::&lt;()&gt;::Ok(()) });</span>
     <span class="doccomment">/// ```</span>
+    <span class="doccomment">/// [`Encryption::cross_signing_status()`]: crate::encryption::Encryption::cross_signing_status</span>
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">verify</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">ManualVerifyError</span><span class="op">&gt;</span> {
         <span class="kw">match</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">inner</span> {
             <span class="ident">UserIdentities::Own</span>(<span class="ident">i</span>) =&gt; <span class="ident">i</span>.<span class="ident">verify</span>().<span class="kw">await</span>,
@@ -826,7 +830,7 @@
     <span class="doccomment">/// # let homeserver = Url::parse(&quot;http://example.com&quot;).unwrap();</span>
     <span class="doccomment">/// # block_on(async {</span>
     <span class="doccomment">/// # let client = Client::new(homeserver).await.unwrap();</span>
-    <span class="doccomment">/// let user = client.get_user_identity(alice).await?;</span>
+    <span class="doccomment">/// let user = client.encryption().get_user_identity(alice).await?;</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// if let Some(user) = user {</span>
     <span class="doccomment">///     if user.verified() {</span>
@@ -866,7 +870,7 @@
     <span class="doccomment">/// # let homeserver = Url::parse(&quot;http://example.com&quot;).unwrap();</span>
     <span class="doccomment">/// # block_on(async {</span>
     <span class="doccomment">/// # let client = Client::new(homeserver).await.unwrap();</span>
-    <span class="doccomment">/// let user = client.get_user_identity(alice).await?;</span>
+    <span class="doccomment">/// let user = client.encryption().get_user_identity(alice).await?;</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// if let Some(user) = user {</span>
     <span class="doccomment">///     // Let&#39;s verify the user after we confirm that the master key</span>
@@ -986,5 +990,5 @@
     }
 }
 </code></pre></div>
-</section><section id="search" class="content hidden"></section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="matrix_sdk" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.61.0-nightly (5f4e06771 2022-03-10)" ></div>
+</section><section id="search" class="content hidden"></section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="matrix_sdk" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.61.0-nightly (e95b10ba4 2022-03-13)" ></div>
 </body></html>
