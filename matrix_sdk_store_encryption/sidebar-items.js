@@ -1,0 +1,1 @@
+initSidebarItems({"enum":[["Error","Error type for the `StoreCipher` operations."]],"struct":[["StoreCipher","An encryption key that can be used to encrypt data for key/value stores."]]});

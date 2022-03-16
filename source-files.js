@@ -8,6 +8,7 @@ sourcesIndex["matrix_sdk_common"] = {"name":"","files":["deserialized_responses.
 sourcesIndex["matrix_sdk_crypto"] = {"name":"","dirs":[{"name":"file_encryption","files":["attachments.rs","key_export.rs","mod.rs"]},{"name":"gossiping","files":["machine.rs","mod.rs"]},{"name":"identities","files":["device.rs","manager.rs","mod.rs","user.rs"]},{"name":"olm","dirs":[{"name":"group_sessions","files":["inbound.rs","mod.rs","outbound.rs"]},{"name":"signing","files":["mod.rs","pk_signing.rs"]}],"files":["account.rs","mod.rs","session.rs","utility.rs"]},{"name":"session_manager","files":["group_sessions.rs","mod.rs","sessions.rs"]},{"name":"store","files":["caches.rs","integration_tests.rs","memorystore.rs","mod.rs","pickle_key.rs"]},{"name":"verification","dirs":[{"name":"sas","files":["helpers.rs","inner_sas.rs","mod.rs","sas_state.rs"]}],"files":["cache.rs","event_enums.rs","machine.rs","mod.rs","qrcode.rs","requests.rs"]}],"files":["error.rs","lib.rs","machine.rs","requests.rs","utilities.rs"]};
 sourcesIndex["matrix_sdk_indexeddb"] = {"name":"","files":["lib.rs","safe_encode.rs"]};
 sourcesIndex["matrix_sdk_sled"] = {"name":"","files":["cryptostore.rs","lib.rs","state_store.rs"]};
+sourcesIndex["matrix_sdk_store_encryption"] = {"name":"","files":["lib.rs"]};
 sourcesIndex["matrix_sdk_test"] = {"name":"","dirs":[{"name":"test_json","files":["events.rs","members.rs","mod.rs","sync.rs"]}],"files":["appservice.rs","lib.rs"]};
 sourcesIndex["matrix_sdk_test_macros"] = {"name":"","files":["lib.rs"]};
 sourcesIndex["xtask"] = {"name":"","files":["ci.rs","main.rs"]};
