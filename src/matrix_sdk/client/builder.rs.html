@@ -436,6 +436,16 @@
 <span id="431">431</span>
 <span id="432">432</span>
 <span id="433">433</span>
+<span id="434">434</span>
+<span id="435">435</span>
+<span id="436">436</span>
+<span id="437">437</span>
+<span id="438">438</span>
+<span id="439">439</span>
+<span id="440">440</span>
+<span id="441">441</span>
+<span id="442">442</span>
+<span id="443">443</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">std::sync::Arc</span>;
 
 <span class="kw">use</span> <span class="ident">matrix_sdk_base</span>::{<span class="ident">locks::RwLock</span>, <span class="ident">store::StoreConfig</span>, <span class="ident">BaseClient</span>, <span class="ident">StateStore</span>};
@@ -855,6 +865,16 @@
     <span class="doccomment">/// Error doing an HTTP request.</span>
     <span class="attribute">#[<span class="ident">error</span>(<span class="ident">transparent</span>)]</span>
     <span class="ident">Http</span>(<span class="attribute">#[<span class="ident">from</span>]</span> <span class="ident">HttpError</span>),
+
+    <span class="doccomment">/// Error opening the indexeddb store.</span>
+    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">any</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;indexeddb_state_store&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;indexeddb_cryptostore&quot;</span>))]</span>
+    <span class="attribute">#[<span class="ident">error</span>(<span class="ident">transparent</span>)]</span>
+    <span class="ident">IndexeddbStore</span>(<span class="attribute">#[<span class="ident">from</span>]</span> <span class="ident">matrix_sdk_indexeddb::OpenStoreError</span>),
+
+    <span class="doccomment">/// Error opening the sled store.</span>
+    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">any</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;sled_state_store&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;sled_cryptostore&quot;</span>))]</span>
+    <span class="attribute">#[<span class="ident">error</span>(<span class="ident">transparent</span>)]</span>
+    <span class="ident">SledStore</span>(<span class="attribute">#[<span class="ident">from</span>]</span> <span class="ident">matrix_sdk_sled::OpenStoreError</span>),
 }
 
 <span class="kw">impl</span> <span class="ident">ClientBuildError</span> {
@@ -870,5 +890,5 @@
     }
 }
 </code></pre></div>
-</section><section id="search" class="content hidden"></section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="matrix_sdk" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.61.0-nightly (e95b10ba4 2022-03-13)" ></div>
+</section><section id="search" class="content hidden"></section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="matrix_sdk" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.61.0-nightly (52b34550a 2022-03-15)" ></div>
 </body></html>

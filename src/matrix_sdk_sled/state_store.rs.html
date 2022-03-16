@@ -1488,6 +1488,11 @@
 <span id="1483">1483</span>
 <span id="1484">1484</span>
 <span id="1485">1485</span>
+<span id="1486">1486</span>
+<span id="1487">1487</span>
+<span id="1488">1488</span>
+<span id="1489">1489</span>
+<span id="1490">1490</span>
 </pre><pre class="rust"><code><span class="comment">// Copyright 2021 The Matrix.org Foundation C.I.C.</span>
 <span class="comment">//</span>
 <span class="comment">// Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);</span>
@@ -1549,6 +1554,8 @@
 <span class="kw">use</span> <span class="ident">tokio::task::spawn_blocking</span>;
 <span class="kw">use</span> <span class="ident">tracing</span>::{<span class="ident">info</span>, <span class="ident">warn</span>};
 
+<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;encryption&quot;</span>)]</span>
+<span class="kw">use</span> <span class="ident"><span class="kw">super</span>::OpenStoreError</span>;
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;encryption&quot;</span>)]</span>
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::CryptoStore</span>;
 
@@ -1874,7 +1881,10 @@
     <span class="doccomment">/// Open a `CryptoStore` that uses the same database as this store.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// The given passphrase will be used to encrypt private data.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_crypto_store</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">passphrase</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">CryptoStore</span>, <span class="ident">anyhow::Error</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">open_crypto_store</span>(
+        <span class="kw-2">&amp;</span><span class="self">self</span>,
+        <span class="ident">passphrase</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span>,
+    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">CryptoStore</span>, <span class="ident">OpenStoreError</span><span class="op">&gt;</span> {
         <span class="ident">CryptoStore::open_with_database</span>(<span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">clone</span>(), <span class="ident">passphrase</span>)
     }
 
@@ -2974,5 +2984,5 @@
     <span class="macro">statestore_integration_tests!</span> { <span class="ident">integration</span> }
 }
 </code></pre></div>
-</section><section id="search" class="content hidden"></section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="matrix_sdk_sled" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.61.0-nightly (e95b10ba4 2022-03-13)" ></div>
+</section><section id="search" class="content hidden"></section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="matrix_sdk_sled" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.61.0-nightly (52b34550a 2022-03-15)" ></div>
 </body></html>

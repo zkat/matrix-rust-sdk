@@ -69,8 +69,29 @@
 <span id="64">64</span>
 <span id="65">65</span>
 <span id="66">66</span>
+<span id="67">67</span>
+<span id="68">68</span>
+<span id="69">69</span>
+<span id="70">70</span>
+<span id="71">71</span>
+<span id="72">72</span>
+<span id="73">73</span>
+<span id="74">74</span>
+<span id="75">75</span>
+<span id="76">76</span>
+<span id="77">77</span>
+<span id="78">78</span>
+<span id="79">79</span>
+<span id="80">80</span>
+<span id="81">81</span>
+<span id="82">82</span>
+<span id="83">83</span>
+<span id="84">84</span>
+<span id="85">85</span>
 </pre><pre class="rust"><code><span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">target_arch</span> <span class="op">=</span> <span class="string">&quot;wasm32&quot;</span>)]</span>
-<span class="kw">use</span> <span class="ident">matrix_sdk_base::store::StoreConfig</span>;
+<span class="kw">use</span> <span class="ident">matrix_sdk_base::store</span>::{<span class="ident">StoreConfig</span>, <span class="ident">StoreError</span>};
+<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">target_arch</span> <span class="op">=</span> <span class="string">&quot;wasm32&quot;</span>)]</span>
+<span class="kw">use</span> <span class="ident">thiserror::Error</span>;
 
 <span class="kw">mod</span> <span class="ident">safe_encode</span>;
 
@@ -85,6 +106,9 @@
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;encryption&quot;</span>)]</span>
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">cryptostore::IndexeddbStore</span> <span class="kw">as</span> <span class="ident">CryptoStore</span>;
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">target_arch</span> <span class="op">=</span> <span class="string">&quot;wasm32&quot;</span>)]</span>
+<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;encryption&quot;</span>)]</span>
+<span class="kw">use</span> <span class="ident">cryptostore::IndexeddbStoreError</span>;
+<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">target_arch</span> <span class="op">=</span> <span class="string">&quot;wasm32&quot;</span>)]</span>
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">state_store::IndexeddbStore</span> <span class="kw">as</span> <span class="ident">StateStore</span>;
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">target_arch</span> <span class="op">=</span> <span class="string">&quot;wasm32&quot;</span>)]</span>
@@ -94,7 +118,7 @@
 <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">open_stores_with_name</span>(
     <span class="ident">name</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
     <span class="ident">passphrase</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span>,
-) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(<span class="ident">Box</span><span class="op">&lt;</span><span class="ident">StateStore</span><span class="op">&gt;</span>, <span class="ident">Box</span><span class="op">&lt;</span><span class="ident">CryptoStore</span><span class="op">&gt;</span>), <span class="ident">anyhow::Error</span><span class="op">&gt;</span> {
+) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(<span class="ident">Box</span><span class="op">&lt;</span><span class="ident">StateStore</span><span class="op">&gt;</span>, <span class="ident">Box</span><span class="op">&lt;</span><span class="ident">CryptoStore</span><span class="op">&gt;</span>), <span class="ident">OpenStoreError</span><span class="op">&gt;</span> {
     <span class="kw">let</span> <span class="ident">name</span> <span class="op">=</span> <span class="ident">name</span>.<span class="ident">into</span>();
 
     <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">passphrase</span>) <span class="op">=</span> <span class="ident">passphrase</span> {
@@ -115,7 +139,7 @@
 <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">make_store_config</span>(
     <span class="ident">name</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
     <span class="ident">passphrase</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span>,
-) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">StoreConfig</span>, <span class="ident">anyhow::Error</span><span class="op">&gt;</span> {
+) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">StoreConfig</span>, <span class="ident">OpenStoreError</span><span class="op">&gt;</span> {
     <span class="kw">let</span> <span class="ident">name</span> <span class="op">=</span> <span class="ident">name</span>.<span class="ident">into</span>();
 
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;encryption&quot;</span>)]</span>
@@ -135,6 +159,20 @@
         <span class="prelude-val">Ok</span>(<span class="ident">StoreConfig::new</span>().<span class="ident">state_store</span>(<span class="ident">Box::new</span>(<span class="ident">state_store</span>)))
     }
 }
+
+<span class="doccomment">/// All the errors that can occur when opening an IndexedDB store.</span>
+<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">target_arch</span> <span class="op">=</span> <span class="string">&quot;wasm32&quot;</span>)]</span>
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Error</span>, <span class="ident">Debug</span>)]</span>
+<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">OpenStoreError</span> {
+    <span class="doccomment">/// An error occurred with the state store implementation.</span>
+    <span class="attribute">#[<span class="ident">error</span>(<span class="ident">transparent</span>)]</span>
+    <span class="ident">State</span>(<span class="attribute">#[<span class="ident">from</span>]</span> <span class="ident">StoreError</span>),
+
+    <span class="doccomment">/// An error occurred with the crypto store implementation.</span>
+    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;encryption&quot;</span>)]</span>
+    <span class="attribute">#[<span class="ident">error</span>(<span class="ident">transparent</span>)]</span>
+    <span class="ident">Crypto</span>(<span class="attribute">#[<span class="ident">from</span>]</span> <span class="ident">IndexeddbStoreError</span>),
+}
 </code></pre></div>
-</section><section id="search" class="content hidden"></section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="matrix_sdk_indexeddb" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.61.0-nightly (e95b10ba4 2022-03-13)" ></div>
+</section><section id="search" class="content hidden"></section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="matrix_sdk_indexeddb" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.61.0-nightly (52b34550a 2022-03-15)" ></div>
 </body></html>
