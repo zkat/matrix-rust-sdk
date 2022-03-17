@@ -3984,11 +3984,6 @@
 <span id="3979">3979</span>
 <span id="3980">3980</span>
 <span id="3981">3981</span>
-<span id="3982">3982</span>
-<span id="3983">3983</span>
-<span id="3984">3984</span>
-<span id="3985">3985</span>
-<span id="3986">3986</span>
 </pre><pre class="rust"><code><span class="comment">// Copyright 2020 Damir Jelić</span>
 <span class="comment">// Copyright 2020 The Matrix.org Foundation C.I.C.</span>
 <span class="comment">//</span>
@@ -4688,7 +4683,7 @@
     <span class="doccomment">/// ```</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// [`restore_login`]: #method.restore_login</span>
-    <span class="attribute">#[<span class="ident">instrument</span>(<span class="ident">skip</span>(<span class="ident">user</span>, <span class="ident">password</span>))]</span>
+    <span class="attribute">#[<span class="ident">instrument</span>(<span class="ident">skip</span>(<span class="self">self</span>, <span class="ident">user</span>, <span class="ident">password</span>))]</span>
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">login</span>(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         <span class="ident">user</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">str</span><span class="op">&gt;</span>,
@@ -4976,7 +4971,7 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// [`get_sso_login_url`]: #method.get_sso_login_url</span>
     <span class="doccomment">/// [`restore_login`]: #method.restore_login</span>
-    <span class="attribute">#[<span class="ident">instrument</span>(<span class="ident">skip</span>(<span class="ident">token</span>))]</span>
+    <span class="attribute">#[<span class="ident">instrument</span>(<span class="ident">skip</span>(<span class="self">self</span>, <span class="ident">token</span>))]</span>
     <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">not</span>(<span class="ident">target_arch</span> <span class="op">=</span> <span class="string">&quot;wasm32&quot;</span>), <span class="ident">deny</span>(<span class="ident">clippy::future_not_send</span>))]</span>
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">login_with_token</span>(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
@@ -5119,7 +5114,7 @@
     <span class="doccomment">/// client.register(request).await;</span>
     <span class="doccomment">/// # })</span>
     <span class="doccomment">/// ```</span>
-    <span class="attribute">#[<span class="ident">instrument</span>(<span class="ident">skip</span>(<span class="ident">registration</span>))]</span>
+    <span class="attribute">#[<span class="ident">instrument</span>(<span class="ident">skip_all</span>)]</span>
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">register</span>(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         <span class="ident">registration</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">register::v3::Request</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span><span class="op">&gt;</span>,
@@ -5168,15 +5163,10 @@
     <span class="doccomment">/// # let homeserver = Url::parse(&quot;http://example.com&quot;).unwrap();</span>
     <span class="doccomment">/// # let client = Client::new(homeserver).await.unwrap();</span>
     <span class="doccomment">/// let mut filter = FilterDefinition::default();</span>
-    <span class="doccomment">/// let mut room_filter = RoomFilter::default();</span>
-    <span class="doccomment">/// let mut event_filter = RoomEventFilter::default();</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// // Let&#39;s enable member lazy loading.</span>
-    <span class="doccomment">/// event_filter.lazy_load_options = LazyLoadOptions::Enabled {</span>
-    <span class="doccomment">///     include_redundant_members: false,</span>
-    <span class="doccomment">/// };</span>
-    <span class="doccomment">/// room_filter.state = event_filter;</span>
-    <span class="doccomment">/// filter.room = room_filter;</span>
+    <span class="doccomment">/// filter.room.state.lazy_load_options =</span>
+    <span class="doccomment">///     LazyLoadOptions::Enabled { include_redundant_members: false };</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// let filter_id = client</span>
     <span class="doccomment">///     .get_or_upload_filter(&quot;sync&quot;, filter)</span>
@@ -5657,7 +5647,7 @@
     <span class="doccomment">/// [`get_or_upload_filter()`]: #method.get_or_upload_filter</span>
     <span class="doccomment">/// [long polling]: #long-polling</span>
     <span class="doccomment">/// [filtered]: #filtering-events</span>
-    <span class="attribute">#[<span class="ident">instrument</span>]</span>
+    <span class="attribute">#[<span class="ident">instrument</span>(<span class="ident">skip</span>(<span class="self">self</span>))]</span>
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">sync_once</span>(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         <span class="ident">sync_settings</span>: <span class="ident"><span class="kw">crate</span>::config::SyncSettings</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>,
@@ -5671,7 +5661,7 @@
         <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;encryption&quot;</span>)]</span>
         <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Err</span>(<span class="ident">e</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">send_outgoing_requests</span>().<span class="kw">await</span> {
             <span class="macro">error!</span>(<span class="ident">error</span> <span class="op">=</span><span class="question-mark">?</span> <span class="ident">e</span>, <span class="string">&quot;Error while sending outgoing E2EE requests&quot;</span>);
-        };
+        }
 
         <span class="kw">let</span> <span class="ident">request</span> <span class="op">=</span> <span class="macro">assign!</span>(<span class="ident">sync_events::v3::Request::new</span>(), {
             <span class="ident">filter</span>: <span class="ident">sync_settings</span>.<span class="ident">filter</span>.<span class="ident">as_ref</span>(),
@@ -5692,7 +5682,7 @@
         <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;encryption&quot;</span>)]</span>
         <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Err</span>(<span class="ident">e</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">send_outgoing_requests</span>().<span class="kw">await</span> {
             <span class="macro">error!</span>(<span class="ident">error</span> <span class="op">=</span><span class="question-mark">?</span> <span class="ident">e</span>, <span class="string">&quot;Error while sending outgoing E2EE requests&quot;</span>);
-        };
+        }
 
         <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">sync_beat</span>.<span class="ident">notify</span>(<span class="ident">usize::MAX</span>);
 
@@ -5806,7 +5796,7 @@
     <span class="doccomment">///     .await;</span>
     <span class="doccomment">/// })</span>
     <span class="doccomment">/// ```</span>
-    <span class="attribute">#[<span class="ident">instrument</span>(<span class="ident">skip</span>(<span class="ident">callback</span>))]</span>
+    <span class="attribute">#[<span class="ident">instrument</span>(<span class="ident">skip</span>(<span class="self">self</span>, <span class="ident">callback</span>))]</span>
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">sync_with_callback</span><span class="op">&lt;</span><span class="ident">C</span><span class="op">&gt;</span>(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         <span class="kw-2">mut</span> <span class="ident">sync_settings</span>: <span class="ident"><span class="kw">crate</span>::config::SyncSettings</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>,
@@ -5876,7 +5866,7 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// # Result::&lt;_, matrix_sdk::Error&gt;::Ok(()) });</span>
     <span class="doccomment">/// ```</span>
-    <span class="attribute">#[<span class="ident">instrument</span>]</span>
+    <span class="attribute">#[<span class="ident">instrument</span>(<span class="ident">skip</span>(<span class="self">self</span>))]</span>
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">sync_stream</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(
         <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="self">self</span>,
         <span class="kw-2">mut</span> <span class="ident">sync_settings</span>: <span class="ident"><span class="kw">crate</span>::config::SyncSettings</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>,
@@ -7976,5 +7966,5 @@
     }
 }
 </code></pre></div>
-</section><section id="search" class="content hidden"></section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="matrix_sdk" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.61.0-nightly (52b34550a 2022-03-15)" ></div>
+</section><section id="search" class="content hidden"></section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="matrix_sdk" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.61.0-nightly (461e80780 2022-03-16)" ></div>
 </body></html>
