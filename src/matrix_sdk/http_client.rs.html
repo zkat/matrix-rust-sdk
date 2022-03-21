@@ -368,6 +368,10 @@
 <span id="363">363</span>
 <span id="364">364</span>
 <span id="365">365</span>
+<span id="366">366</span>
+<span id="367">367</span>
+<span id="368">368</span>
+<span id="369">369</span>
 </pre><pre class="rust"><code><span class="comment">// Copyright 2020 The Matrix.org Foundation C.I.C.</span>
 <span class="comment">//</span>
 <span class="comment">// Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);</span>
@@ -382,7 +386,7 @@
 <span class="comment">// See the License for the specific language governing permissions and</span>
 <span class="comment">// limitations under the License.</span>
 
-<span class="kw">use</span> <span class="ident">std</span>::{<span class="ident">convert::TryFrom</span>, <span class="ident">fmt::Debug</span>, <span class="ident">sync::Arc</span>, <span class="ident">time::Duration</span>};
+<span class="kw">use</span> <span class="ident">std</span>::{<span class="ident">any::type_name</span>, <span class="ident">convert::TryFrom</span>, <span class="ident">fmt::Debug</span>, <span class="ident">sync::Arc</span>, <span class="ident">time::Duration</span>};
 
 <span class="kw">use</span> <span class="ident">bytes</span>::{<span class="ident">Bytes</span>, <span class="ident">BytesMut</span>};
 <span class="kw">use</span> <span class="ident">http::Response</span> <span class="kw">as</span> <span class="ident">HttpResponse</span>;
@@ -478,6 +482,10 @@
         <span class="ident">HttpClient</span> { <span class="ident">inner</span>, <span class="ident">homeserver</span>, <span class="ident">session</span>, <span class="ident">request_config</span> }
     }
 
+    <span class="attribute">#[<span class="ident">tracing::instrument</span>(
+        <span class="ident">skip</span>(<span class="self">self</span>, <span class="ident">request</span>, <span class="ident">session</span>),
+        <span class="ident">fields</span>(<span class="ident">request_type</span> <span class="op">=</span> <span class="ident">type_name</span>::<span class="op">&lt;</span><span class="ident">Request</span><span class="op">&gt;</span>())
+    )]</span>
     <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">send_request</span><span class="op">&lt;</span><span class="ident">Request</span>: <span class="ident">OutgoingRequest</span><span class="op">&gt;</span>(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         <span class="ident">request</span>: <span class="ident">Request</span>,
@@ -734,5 +742,5 @@
     }
 }
 </code></pre></div>
-</section><section id="search" class="content hidden"></section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="matrix_sdk" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.61.0-nightly (461e80780 2022-03-16)" ></div>
+</section><section id="search" class="content hidden"></section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="matrix_sdk" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.61.0-nightly (c84f39e6c 2022-03-20)" ></div>
 </body></html>
