@@ -446,12 +446,28 @@
 <span id="441">441</span>
 <span id="442">442</span>
 <span id="443">443</span>
+<span id="444">444</span>
+<span id="445">445</span>
+<span id="446">446</span>
+<span id="447">447</span>
+<span id="448">448</span>
+<span id="449">449</span>
+<span id="450">450</span>
+<span id="451">451</span>
+<span id="452">452</span>
+<span id="453">453</span>
+<span id="454">454</span>
+<span id="455">455</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">std::sync::Arc</span>;
 
 <span class="kw">use</span> <span class="ident">matrix_sdk_base</span>::{<span class="ident">locks::RwLock</span>, <span class="ident">store::StoreConfig</span>, <span class="ident">BaseClient</span>, <span class="ident">StateStore</span>};
 <span class="kw">use</span> <span class="ident">ruma</span>::{
     <span class="ident">api</span>::{
-        <span class="ident">client::discover</span>::{<span class="ident">discover_homeserver</span>, <span class="ident">get_supported_versions</span>},
+        <span class="ident">client</span>::{
+            <span class="ident">discover</span>::{<span class="ident">discover_homeserver</span>, <span class="ident">get_supported_versions</span>},
+            <span class="ident">Error</span>,
+        },
+        <span class="ident">error::FromHttpResponseError</span>,
         <span class="ident">MatrixVersion</span>,
     },
     <span class="ident">ServerName</span>, <span class="ident">UserId</span>,
@@ -760,7 +776,11 @@
                         <span class="prelude-val">None</span>,
                         [<span class="ident">MatrixVersion::V1_0</span>].<span class="ident">into_iter</span>().<span class="ident">collect</span>(),
                     )
-                    .<span class="kw">await</span><span class="question-mark">?</span>;
+                    .<span class="kw">await</span>
+                    .<span class="ident">map_err</span>(<span class="op">|</span><span class="ident">e</span><span class="op">|</span> <span class="kw">match</span> <span class="ident">e</span> {
+                        <span class="ident">HttpError::ClientApi</span>(<span class="ident">err</span>) =&gt; <span class="ident">ClientBuildError::AutoDiscovery</span>(<span class="ident">err</span>),
+                        <span class="ident">err</span> =&gt; <span class="ident">ClientBuildError::Http</span>(<span class="ident">err</span>),
+                    })<span class="question-mark">?</span>;
 
                 <span class="ident">well_known</span>.<span class="ident">homeserver</span>.<span class="ident">base_url</span>
             }
@@ -857,6 +877,10 @@
     <span class="doccomment">/// No homeserver or user ID was configured</span>
     <span class="attribute">#[<span class="ident">error</span>(<span class="string">&quot;no homeserver or user ID was configured&quot;</span>)]</span>
     <span class="ident">MissingHomeserver</span>,
+
+    <span class="doccomment">/// Error looking up the .well-known endpoint on auto-discovery</span>
+    <span class="attribute">#[<span class="ident">error</span>(<span class="string">&quot;Error looking up the .well-known endpoint on auto-discovery&quot;</span>)]</span>
+    <span class="ident">AutoDiscovery</span>(<span class="ident">FromHttpResponseError</span><span class="op">&lt;</span><span class="ident">Error</span><span class="op">&gt;</span>),
 
     <span class="doccomment">/// An error encountered when trying to parse the homeserver url.</span>
     <span class="attribute">#[<span class="ident">error</span>(<span class="ident">transparent</span>)]</span>
