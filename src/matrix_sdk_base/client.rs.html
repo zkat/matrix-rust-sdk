@@ -1275,6 +1275,75 @@
 <span id="1270">1270</span>
 <span id="1271">1271</span>
 <span id="1272">1272</span>
+<span id="1273">1273</span>
+<span id="1274">1274</span>
+<span id="1275">1275</span>
+<span id="1276">1276</span>
+<span id="1277">1277</span>
+<span id="1278">1278</span>
+<span id="1279">1279</span>
+<span id="1280">1280</span>
+<span id="1281">1281</span>
+<span id="1282">1282</span>
+<span id="1283">1283</span>
+<span id="1284">1284</span>
+<span id="1285">1285</span>
+<span id="1286">1286</span>
+<span id="1287">1287</span>
+<span id="1288">1288</span>
+<span id="1289">1289</span>
+<span id="1290">1290</span>
+<span id="1291">1291</span>
+<span id="1292">1292</span>
+<span id="1293">1293</span>
+<span id="1294">1294</span>
+<span id="1295">1295</span>
+<span id="1296">1296</span>
+<span id="1297">1297</span>
+<span id="1298">1298</span>
+<span id="1299">1299</span>
+<span id="1300">1300</span>
+<span id="1301">1301</span>
+<span id="1302">1302</span>
+<span id="1303">1303</span>
+<span id="1304">1304</span>
+<span id="1305">1305</span>
+<span id="1306">1306</span>
+<span id="1307">1307</span>
+<span id="1308">1308</span>
+<span id="1309">1309</span>
+<span id="1310">1310</span>
+<span id="1311">1311</span>
+<span id="1312">1312</span>
+<span id="1313">1313</span>
+<span id="1314">1314</span>
+<span id="1315">1315</span>
+<span id="1316">1316</span>
+<span id="1317">1317</span>
+<span id="1318">1318</span>
+<span id="1319">1319</span>
+<span id="1320">1320</span>
+<span id="1321">1321</span>
+<span id="1322">1322</span>
+<span id="1323">1323</span>
+<span id="1324">1324</span>
+<span id="1325">1325</span>
+<span id="1326">1326</span>
+<span id="1327">1327</span>
+<span id="1328">1328</span>
+<span id="1329">1329</span>
+<span id="1330">1330</span>
+<span id="1331">1331</span>
+<span id="1332">1332</span>
+<span id="1333">1333</span>
+<span id="1334">1334</span>
+<span id="1335">1335</span>
+<span id="1336">1336</span>
+<span id="1337">1337</span>
+<span id="1338">1338</span>
+<span id="1339">1339</span>
+<span id="1340">1340</span>
+<span id="1341">1341</span>
 </pre><pre class="rust"><code><span class="comment">// Copyright 2020 Damir Jelić</span>
 <span class="comment">// Copyright 2020 The Matrix.org Foundation C.I.C.</span>
 <span class="comment">//</span>
@@ -1994,6 +2063,12 @@
             <span class="kw">let</span> <span class="ident">room</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">store</span>.<span class="ident">get_or_create_stripped_room</span>(<span class="kw-2">&amp;</span><span class="ident">room_id</span>).<span class="kw">await</span>;
             <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">room_info</span> <span class="op">=</span> <span class="ident">room</span>.<span class="ident">clone_info</span>();
 
+            <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">r</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">store</span>.<span class="ident">get_room</span>(<span class="kw-2">&amp;</span><span class="ident">room_id</span>) {
+                <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">room_info</span> <span class="op">=</span> <span class="ident">r</span>.<span class="ident">clone_info</span>();
+                <span class="ident">room_info</span>.<span class="ident">mark_as_invited</span>();
+                <span class="ident">changes</span>.<span class="ident">add_room</span>(<span class="ident">room_info</span>);
+            }
+
             <span class="kw">let</span> (<span class="ident">members</span>, <span class="ident">state_events</span>) <span class="op">=</span>
                 <span class="self">self</span>.<span class="ident">handle_invited_state</span>(<span class="kw-2">&amp;</span><span class="ident">new_info</span>.<span class="ident">invite_state</span>.<span class="ident">events</span>, <span class="kw-2">&amp;mut</span> <span class="ident">room_info</span>);
 
@@ -2546,7 +2621,70 @@
 }
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
-<span class="kw">mod</span> <span class="ident">test</span> {}
+<span class="kw">mod</span> <span class="ident">test</span> {
+    <span class="kw">use</span> <span class="ident">matrix_sdk_test</span>::{<span class="ident">async_test</span>, <span class="ident">EventBuilder</span>};
+    <span class="kw">use</span> <span class="ident">ruma</span>::{<span class="ident">room_id</span>, <span class="ident">user_id</span>};
+    <span class="kw">use</span> <span class="ident">serde_json::json</span>;
+
+    <span class="kw">use</span> <span class="ident"><span class="kw">super</span>::BaseClient</span>;
+    <span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">RoomType</span>, <span class="ident">Session</span>};
+
+    <span class="attribute">#[<span class="ident">async_test</span>]</span>
+    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">invite_after_leaving</span>() {
+        <span class="kw">let</span> <span class="ident">user_id</span> <span class="op">=</span> <span class="macro">user_id!</span>(<span class="string">&quot;@alice:example.org&quot;</span>);
+        <span class="kw">let</span> <span class="ident">room_id</span> <span class="op">=</span> <span class="macro">room_id!</span>(<span class="string">&quot;!test:example.org&quot;</span>);
+
+        <span class="kw">let</span> <span class="ident">client</span> <span class="op">=</span> <span class="ident">BaseClient::new</span>();
+        <span class="ident">client</span>
+            .<span class="ident">restore_login</span>(<span class="ident">Session</span> {
+                <span class="ident">access_token</span>: <span class="string">&quot;token&quot;</span>.<span class="ident">to_owned</span>(),
+                <span class="ident">user_id</span>: <span class="ident">user_id</span>.<span class="ident">to_owned</span>(),
+                <span class="ident">device_id</span>: <span class="string">&quot;FOOBAR&quot;</span>.<span class="ident">into</span>(),
+            })
+            .<span class="kw">await</span>
+            .<span class="ident">unwrap</span>();
+
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">ev_builder</span> <span class="op">=</span> <span class="ident">EventBuilder::new</span>();
+
+        <span class="kw">let</span> <span class="ident">response</span> <span class="op">=</span> <span class="ident">ev_builder</span>
+            .<span class="ident">add_custom_left_event</span>(
+                <span class="ident">room_id</span>,
+                <span class="macro">json!</span>({
+                    <span class="string">&quot;content&quot;</span>: {
+                        <span class="string">&quot;displayname&quot;</span>: <span class="string">&quot;Alice&quot;</span>,
+                        <span class="string">&quot;membership&quot;</span>: <span class="string">&quot;left&quot;</span>,
+                    },
+                    <span class="string">&quot;event_id&quot;</span>: <span class="string">&quot;$994173582443PhrSn:example.org&quot;</span>,
+                    <span class="string">&quot;origin_server_ts&quot;</span>: <span class="number">1432135524678u64</span>,
+                    <span class="string">&quot;sender&quot;</span>: <span class="ident">user_id</span>,
+                    <span class="string">&quot;state_key&quot;</span>: <span class="ident">user_id</span>,
+                    <span class="string">&quot;type&quot;</span>: <span class="string">&quot;m.room.member&quot;</span>,
+                }),
+            )
+            .<span class="ident">build_sync_response</span>();
+        <span class="ident">client</span>.<span class="ident">receive_sync_response</span>(<span class="ident">response</span>).<span class="kw">await</span>.<span class="ident">unwrap</span>();
+        <span class="macro">assert_eq!</span>(<span class="ident">client</span>.<span class="ident">get_room</span>(<span class="ident">room_id</span>).<span class="ident">unwrap</span>().<span class="ident">room_type</span>(), <span class="ident">RoomType::Left</span>);
+
+        <span class="kw">let</span> <span class="ident">response</span> <span class="op">=</span> <span class="ident">ev_builder</span>
+            .<span class="ident">add_custom_invited_event</span>(
+                <span class="ident">room_id</span>,
+                <span class="macro">json!</span>({
+                    <span class="string">&quot;content&quot;</span>: {
+                        <span class="string">&quot;displayname&quot;</span>: <span class="string">&quot;Alice&quot;</span>,
+                        <span class="string">&quot;membership&quot;</span>: <span class="string">&quot;invite&quot;</span>,
+                    },
+                    <span class="string">&quot;event_id&quot;</span>: <span class="string">&quot;$143273582443PhrSn:example.org&quot;</span>,
+                    <span class="string">&quot;origin_server_ts&quot;</span>: <span class="number">1432735824653u64</span>,
+                    <span class="string">&quot;sender&quot;</span>: <span class="string">&quot;@example:example.org&quot;</span>,
+                    <span class="string">&quot;state_key&quot;</span>: <span class="ident">user_id</span>,
+                    <span class="string">&quot;type&quot;</span>: <span class="string">&quot;m.room.member&quot;</span>,
+                }),
+            )
+            .<span class="ident">build_sync_response</span>();
+        <span class="ident">client</span>.<span class="ident">receive_sync_response</span>(<span class="ident">response</span>).<span class="kw">await</span>.<span class="ident">unwrap</span>();
+        <span class="macro">assert_eq!</span>(<span class="ident">client</span>.<span class="ident">get_room</span>(<span class="ident">room_id</span>).<span class="ident">unwrap</span>().<span class="ident">room_type</span>(), <span class="ident">RoomType::Invited</span>);
+    }
+}
 </code></pre></div>
-</section><section id="search" class="content hidden"></section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="matrix_sdk_base" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.61.0-nightly (5f3700105 2022-03-22)" ></div>
+</section><section id="search" class="content hidden"></section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="matrix_sdk_base" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.61.0-nightly (9f4dc0b4d 2022-03-23)" ></div>
 </body></html>
