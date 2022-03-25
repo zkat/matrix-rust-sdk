@@ -1697,10 +1697,6 @@
 <span id="1692">1692</span>
 <span id="1693">1693</span>
 <span id="1694">1694</span>
-<span id="1695">1695</span>
-<span id="1696">1696</span>
-<span id="1697">1697</span>
-<span id="1698">1698</span>
 </pre><pre class="rust"><code><span class="comment">// Copyright 2020 The Matrix.org Foundation C.I.C.</span>
 <span class="comment">//</span>
 <span class="comment">// Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);</span>
@@ -2637,7 +2633,7 @@
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
 <span class="kw">mod</span> <span class="ident">test</span> {
-    <span class="kw">use</span> <span class="ident">std</span>::{<span class="ident">convert::TryInto</span>, <span class="ident">sync::Arc</span>};
+    <span class="kw">use</span> <span class="ident">std::sync::Arc</span>;
 
     <span class="kw">use</span> <span class="ident">dashmap::DashMap</span>;
     <span class="kw">use</span> <span class="ident">matches::assert_matches</span>;
@@ -2759,8 +2755,7 @@
         <span class="kw">let</span> <span class="ident">machine</span> <span class="op">=</span> <span class="ident">get_machine</span>().<span class="kw">await</span>;
         <span class="kw">let</span> <span class="ident">account</span> <span class="op">=</span> <span class="ident">account</span>();
 
-        <span class="kw">let</span> (<span class="kw">_</span>, <span class="ident">session</span>) <span class="op">=</span>
-            <span class="ident">account</span>.<span class="ident">create_group_session_pair_with_defaults</span>(<span class="ident">room_id</span>()).<span class="kw">await</span>.<span class="ident">unwrap</span>();
+        <span class="kw">let</span> (<span class="kw">_</span>, <span class="ident">session</span>) <span class="op">=</span> <span class="ident">account</span>.<span class="ident">create_group_session_pair_with_defaults</span>(<span class="ident">room_id</span>()).<span class="kw">await</span>;
 
         <span class="macro">assert!</span>(<span class="ident">machine</span>.<span class="ident">outgoing_to_device_requests</span>().<span class="kw">await</span>.<span class="ident">unwrap</span>().<span class="ident">is_empty</span>());
         <span class="kw">let</span> (<span class="ident">cancel</span>, <span class="ident">request</span>) <span class="op">=</span> <span class="ident">machine</span>
@@ -2791,8 +2786,7 @@
         <span class="ident">alice_device</span>.<span class="ident">set_trust_state</span>(<span class="ident">LocalTrust::Verified</span>);
         <span class="ident">machine</span>.<span class="ident">store</span>.<span class="ident">save_devices</span>(<span class="kw-2">&amp;</span>[<span class="ident">alice_device</span>]).<span class="kw">await</span>.<span class="ident">unwrap</span>();
 
-        <span class="kw">let</span> (<span class="kw">_</span>, <span class="ident">session</span>) <span class="op">=</span>
-            <span class="ident">account</span>.<span class="ident">create_group_session_pair_with_defaults</span>(<span class="ident">room_id</span>()).<span class="kw">await</span>.<span class="ident">unwrap</span>();
+        <span class="kw">let</span> (<span class="kw">_</span>, <span class="ident">session</span>) <span class="op">=</span> <span class="ident">account</span>.<span class="ident">create_group_session_pair_with_defaults</span>(<span class="ident">room_id</span>()).<span class="kw">await</span>;
 
         <span class="macro">assert!</span>(<span class="ident">machine</span>.<span class="ident">outgoing_to_device_requests</span>().<span class="kw">await</span>.<span class="ident">unwrap</span>().<span class="ident">is_empty</span>());
         <span class="ident">machine</span>
@@ -2836,8 +2830,7 @@
         <span class="ident">alice_device</span>.<span class="ident">set_trust_state</span>(<span class="ident">LocalTrust::Verified</span>);
         <span class="ident">machine</span>.<span class="ident">store</span>.<span class="ident">save_devices</span>(<span class="kw-2">&amp;</span>[<span class="ident">alice_device</span>]).<span class="kw">await</span>.<span class="ident">unwrap</span>();
 
-        <span class="kw">let</span> (<span class="kw">_</span>, <span class="ident">session</span>) <span class="op">=</span>
-            <span class="ident">account</span>.<span class="ident">create_group_session_pair_with_defaults</span>(<span class="ident">room_id</span>()).<span class="kw">await</span>.<span class="ident">unwrap</span>();
+        <span class="kw">let</span> (<span class="kw">_</span>, <span class="ident">session</span>) <span class="op">=</span> <span class="ident">account</span>.<span class="ident">create_group_session_pair_with_defaults</span>(<span class="ident">room_id</span>()).<span class="kw">await</span>;
         <span class="ident">machine</span>
             .<span class="ident">create_outgoing_key_request</span>(
                 <span class="ident">session</span>.<span class="ident">room_id</span>(),
@@ -2931,8 +2924,7 @@
         <span class="kw">let</span> <span class="ident">own_device</span> <span class="op">=</span>
             <span class="ident">machine</span>.<span class="ident">store</span>.<span class="ident">get_device</span>(<span class="ident">alice_id</span>(), <span class="ident">alice2_device_id</span>()).<span class="kw">await</span>.<span class="ident">unwrap</span>().<span class="ident">unwrap</span>();
 
-        <span class="kw">let</span> (<span class="ident">outbound</span>, <span class="ident">inbound</span>) <span class="op">=</span>
-            <span class="ident">account</span>.<span class="ident">create_group_session_pair_with_defaults</span>(<span class="ident">room_id</span>()).<span class="kw">await</span>.<span class="ident">unwrap</span>();
+        <span class="kw">let</span> (<span class="ident">outbound</span>, <span class="ident">inbound</span>) <span class="op">=</span> <span class="ident">account</span>.<span class="ident">create_group_session_pair_with_defaults</span>(<span class="ident">room_id</span>()).<span class="kw">await</span>;
 
         <span class="comment">// We don&#39;t share keys with untrusted devices.</span>
         <span class="macro">assert_matches!</span>(
@@ -2990,7 +2982,7 @@
         <span class="macro">assert!</span>(<span class="ident">machine</span>.<span class="ident">should_share_key</span>(<span class="kw-2">&amp;</span><span class="ident">bob_device</span>, <span class="kw-2">&amp;</span><span class="ident">inbound</span>).<span class="kw">await</span>.<span class="ident">is_ok</span>());
 
         <span class="kw">let</span> (<span class="ident">other_outbound</span>, <span class="ident">other_inbound</span>) <span class="op">=</span>
-            <span class="ident">account</span>.<span class="ident">create_group_session_pair_with_defaults</span>(<span class="ident">room_id</span>()).<span class="kw">await</span>.<span class="ident">unwrap</span>();
+            <span class="ident">account</span>.<span class="ident">create_group_session_pair_with_defaults</span>(<span class="ident">room_id</span>()).<span class="kw">await</span>;
 
         <span class="comment">// But we don&#39;t share some other session that doesn&#39;t match our outbound</span>
         <span class="comment">// session.</span>
@@ -3068,7 +3060,7 @@
         <span class="ident">bob_machine</span>.<span class="ident">store</span>.<span class="ident">save_devices</span>(<span class="kw-2">&amp;</span>[<span class="ident">alice_device</span>.<span class="ident">clone</span>()]).<span class="kw">await</span>.<span class="ident">unwrap</span>();
 
         <span class="kw">let</span> (<span class="ident">group_session</span>, <span class="ident">inbound_group_session</span>) <span class="op">=</span>
-            <span class="ident">bob_account</span>.<span class="ident">create_group_session_pair_with_defaults</span>(<span class="ident">room_id</span>()).<span class="kw">await</span>.<span class="ident">unwrap</span>();
+            <span class="ident">bob_account</span>.<span class="ident">create_group_session_pair_with_defaults</span>(<span class="ident">room_id</span>()).<span class="kw">await</span>;
 
         <span class="ident">bob_machine</span>.<span class="ident">store</span>.<span class="ident">save_inbound_group_sessions</span>(<span class="kw-2">&amp;</span>[<span class="ident">inbound_group_session</span>]).<span class="kw">await</span>.<span class="ident">unwrap</span>();
 
@@ -3076,7 +3068,7 @@
         <span class="ident">alice_machine</span>
             .<span class="ident">create_outgoing_key_request</span>(
                 <span class="ident">room_id</span>(),
-                <span class="ident">bob_account</span>.<span class="ident">identity_keys</span>.<span class="ident">curve25519</span>(),
+                <span class="kw-2">&amp;</span><span class="ident">bob_account</span>.<span class="ident">identity_keys</span>.<span class="ident">curve25519</span>.<span class="ident">to_base64</span>(),
                 <span class="ident">group_session</span>.<span class="ident">session_id</span>(),
             )
             .<span class="kw">await</span>
@@ -3145,7 +3137,7 @@
             .<span class="ident">store</span>
             .<span class="ident">get_inbound_group_session</span>(
                 <span class="ident">room_id</span>(),
-                <span class="ident">bob_account</span>.<span class="ident">identity_keys</span>().<span class="ident">curve25519</span>(),
+                <span class="kw-2">&amp;</span><span class="ident">bob_account</span>.<span class="ident">identity_keys</span>().<span class="ident">curve25519</span>.<span class="ident">to_base64</span>(),
                 <span class="ident">group_session</span>.<span class="ident">session_id</span>()
             )
             .<span class="kw">await</span>
@@ -3272,7 +3264,7 @@
         <span class="ident">bob_machine</span>.<span class="ident">store</span>.<span class="ident">save_devices</span>(<span class="kw-2">&amp;</span>[<span class="ident">alice_device</span>.<span class="ident">clone</span>()]).<span class="kw">await</span>.<span class="ident">unwrap</span>();
 
         <span class="kw">let</span> (<span class="ident">group_session</span>, <span class="ident">inbound_group_session</span>) <span class="op">=</span>
-            <span class="ident">bob_account</span>.<span class="ident">create_group_session_pair_with_defaults</span>(<span class="ident">room_id</span>()).<span class="kw">await</span>.<span class="ident">unwrap</span>();
+            <span class="ident">bob_account</span>.<span class="ident">create_group_session_pair_with_defaults</span>(<span class="ident">room_id</span>()).<span class="kw">await</span>;
 
         <span class="ident">bob_machine</span>.<span class="ident">store</span>.<span class="ident">save_inbound_group_sessions</span>(<span class="kw-2">&amp;</span>[<span class="ident">inbound_group_session</span>]).<span class="kw">await</span>.<span class="ident">unwrap</span>();
 
@@ -3280,7 +3272,7 @@
         <span class="ident">alice_machine</span>
             .<span class="ident">create_outgoing_key_request</span>(
                 <span class="ident">room_id</span>(),
-                <span class="ident">bob_account</span>.<span class="ident">identity_keys</span>.<span class="ident">curve25519</span>(),
+                <span class="kw-2">&amp;</span><span class="ident">bob_account</span>.<span class="ident">identity_keys</span>.<span class="ident">curve25519</span>.<span class="ident">to_base64</span>(),
                 <span class="ident">group_session</span>.<span class="ident">session_id</span>(),
             )
             .<span class="kw">await</span>
@@ -3369,7 +3361,7 @@
             .<span class="ident">store</span>
             .<span class="ident">get_inbound_group_session</span>(
                 <span class="ident">room_id</span>(),
-                <span class="ident">bob_account</span>.<span class="ident">identity_keys</span>().<span class="ident">curve25519</span>(),
+                <span class="kw-2">&amp;</span><span class="ident">bob_account</span>.<span class="ident">identity_keys</span>().<span class="ident">curve25519</span>.<span class="ident">to_base64</span>(),
                 <span class="ident">group_session</span>.<span class="ident">session_id</span>()
             )
             .<span class="kw">await</span>
@@ -3400,5 +3392,5 @@
     }
 }
 </code></pre></div>
-</section><section id="search" class="content hidden"></section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="matrix_sdk_crypto" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.61.0-nightly (9f4dc0b4d 2022-03-23)" ></div>
+</section><section id="search" class="content hidden"></section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="matrix_sdk_crypto" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.61.0-nightly (63b8f01bb 2022-03-24)" ></div>
 </body></html>

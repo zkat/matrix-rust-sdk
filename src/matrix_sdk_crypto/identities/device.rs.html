@@ -754,12 +754,13 @@
 <span class="kw">use</span> <span class="ident">serde</span>::{<span class="ident">Deserialize</span>, <span class="ident">Deserializer</span>, <span class="ident">Serialize</span>, <span class="ident">Serializer</span>};
 <span class="kw">use</span> <span class="ident">serde_json</span>::{<span class="ident">json</span>, <span class="ident">Value</span>};
 <span class="kw">use</span> <span class="ident">tracing::warn</span>;
+<span class="kw">use</span> <span class="ident">vodozemac::Ed25519PublicKey</span>;
 
 <span class="kw">use</span> <span class="kw">super</span>::{<span class="ident">atomic_bool_deserializer</span>, <span class="ident">atomic_bool_serializer</span>};
 <span class="kw">use</span> <span class="kw">crate</span>::{
     <span class="ident">error</span>::{<span class="ident">EventError</span>, <span class="ident">OlmError</span>, <span class="ident">OlmResult</span>, <span class="ident">SignatureError</span>},
     <span class="ident">identities</span>::{<span class="ident">ReadOnlyOwnUserIdentity</span>, <span class="ident">ReadOnlyUserIdentities</span>},
-    <span class="ident">olm</span>::{<span class="ident">InboundGroupSession</span>, <span class="ident">Session</span>, <span class="ident">Utility</span>},
+    <span class="ident">olm</span>::{<span class="ident">InboundGroupSession</span>, <span class="ident">Session</span>, <span class="ident">VerifyJson</span>},
     <span class="ident">store</span>::{<span class="ident">Changes</span>, <span class="ident">CryptoStore</span>, <span class="ident">DeviceChanges</span>, <span class="prelude-ty">Result</span> <span class="kw">as</span> <span class="ident">StoreResult</span>},
     <span class="ident">verification::VerificationMachine</span>,
     <span class="ident">OutgoingVerificationRequest</span>, <span class="ident">Sas</span>, <span class="ident">ToDeviceRequest</span>, <span class="ident">VerificationRequest</span>,
@@ -1251,15 +1252,14 @@
     }
 
     <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">is_signed_by_device</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">json</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Value</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">SignatureError</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">signing_key</span> <span class="op">=</span>
+        <span class="kw">let</span> <span class="ident">key</span> <span class="op">=</span>
             <span class="self">self</span>.<span class="ident">get_key</span>(<span class="ident">DeviceKeyAlgorithm::Ed25519</span>).<span class="ident">ok_or</span>(<span class="ident">SignatureError::MissingSigningKey</span>)<span class="question-mark">?</span>;
 
-        <span class="kw">let</span> <span class="ident">utility</span> <span class="op">=</span> <span class="ident">Utility::new</span>();
+        <span class="kw">let</span> <span class="ident">key</span> <span class="op">=</span> <span class="ident">Ed25519PublicKey::from_base64</span>(<span class="ident">key</span>)<span class="question-mark">?</span>;
 
-        <span class="ident">utility</span>.<span class="ident">verify_json</span>(
+        <span class="ident">key</span>.<span class="ident">verify_json</span>(
             <span class="self">self</span>.<span class="ident">user_id</span>(),
             <span class="kw-2">&amp;</span><span class="ident">DeviceKeyId::from_parts</span>(<span class="ident">DeviceKeyAlgorithm::Ed25519</span>, <span class="self">self</span>.<span class="ident">device_id</span>()),
-            <span class="ident">signing_key</span>,
             <span class="ident">json</span>,
         )
     }
@@ -1428,5 +1428,5 @@
     }
 }
 </code></pre></div>
-</section><section id="search" class="content hidden"></section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="matrix_sdk_crypto" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.61.0-nightly (9f4dc0b4d 2022-03-23)" ></div>
+</section><section id="search" class="content hidden"></section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="matrix_sdk_crypto" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.61.0-nightly (63b8f01bb 2022-03-24)" ></div>
 </body></html>

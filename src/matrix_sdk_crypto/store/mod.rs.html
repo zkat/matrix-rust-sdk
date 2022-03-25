@@ -780,73 +780,6 @@
 <span id="775">775</span>
 <span id="776">776</span>
 <span id="777">777</span>
-<span id="778">778</span>
-<span id="779">779</span>
-<span id="780">780</span>
-<span id="781">781</span>
-<span id="782">782</span>
-<span id="783">783</span>
-<span id="784">784</span>
-<span id="785">785</span>
-<span id="786">786</span>
-<span id="787">787</span>
-<span id="788">788</span>
-<span id="789">789</span>
-<span id="790">790</span>
-<span id="791">791</span>
-<span id="792">792</span>
-<span id="793">793</span>
-<span id="794">794</span>
-<span id="795">795</span>
-<span id="796">796</span>
-<span id="797">797</span>
-<span id="798">798</span>
-<span id="799">799</span>
-<span id="800">800</span>
-<span id="801">801</span>
-<span id="802">802</span>
-<span id="803">803</span>
-<span id="804">804</span>
-<span id="805">805</span>
-<span id="806">806</span>
-<span id="807">807</span>
-<span id="808">808</span>
-<span id="809">809</span>
-<span id="810">810</span>
-<span id="811">811</span>
-<span id="812">812</span>
-<span id="813">813</span>
-<span id="814">814</span>
-<span id="815">815</span>
-<span id="816">816</span>
-<span id="817">817</span>
-<span id="818">818</span>
-<span id="819">819</span>
-<span id="820">820</span>
-<span id="821">821</span>
-<span id="822">822</span>
-<span id="823">823</span>
-<span id="824">824</span>
-<span id="825">825</span>
-<span id="826">826</span>
-<span id="827">827</span>
-<span id="828">828</span>
-<span id="829">829</span>
-<span id="830">830</span>
-<span id="831">831</span>
-<span id="832">832</span>
-<span id="833">833</span>
-<span id="834">834</span>
-<span id="835">835</span>
-<span id="836">836</span>
-<span id="837">837</span>
-<span id="838">838</span>
-<span id="839">839</span>
-<span id="840">840</span>
-<span id="841">841</span>
-<span id="842">842</span>
-<span id="843">843</span>
-<span id="844">844</span>
 </pre><pre class="rust"><code><span class="comment">// Copyright 2020 The Matrix.org Foundation C.I.C.</span>
 <span class="comment">//</span>
 <span class="comment">// Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);</span>
@@ -903,12 +836,8 @@
     <span class="ident">sync::Arc</span>,
 };
 
-<span class="kw">use</span> <span class="ident">base64::DecodeError</span>;
 <span class="kw">use</span> <span class="ident">matrix_sdk_common</span>::{<span class="ident">async_trait</span>, <span class="ident">locks::Mutex</span>, <span class="ident">AsyncTraitDeps</span>};
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">memorystore::MemoryStore</span>;
-<span class="kw">use</span> <span class="ident">olm_rs::errors</span>::{<span class="ident">OlmAccountError</span>, <span class="ident">OlmGroupSessionError</span>, <span class="ident">OlmSessionError</span>};
-<span class="attribute">#[<span class="ident">allow</span>(<span class="ident">unused_imports</span>)]</span>
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">olm_rs</span>::{<span class="ident">account::IdentityKeys</span>, <span class="ident">PicklingMode</span>};
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">pickle_key</span>::{<span class="ident">EncryptedPickleKey</span>, <span class="ident">PickleKey</span>};
 <span class="kw">use</span> <span class="ident">ruma</span>::{
     <span class="ident">events::secret::request::SecretName</span>, <span class="ident">identifiers::Error</span> <span class="kw">as</span> <span class="ident">IdentifierValidationError</span>, <span class="ident">DeviceId</span>,
@@ -921,7 +850,6 @@
 <span class="kw">use</span> <span class="ident">zeroize::Zeroize</span>;
 
 <span class="kw">use</span> <span class="kw">crate</span>::{
-    <span class="ident">error::SessionUnpicklingError</span>,
     <span class="ident">identities</span>::{
         <span class="ident">user</span>::{<span class="ident">OwnUserIdentity</span>, <span class="ident">UserIdentities</span>, <span class="ident">UserIdentity</span>},
         <span class="ident">Device</span>, <span class="ident">ReadOnlyDevice</span>, <span class="ident">ReadOnlyUserIdentities</span>, <span class="ident">UserDevices</span>,
@@ -1006,7 +934,7 @@
 }
 
 <span class="doccomment">/// The private part of a backup key.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Zeroize</span>)]</span>
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Zeroize</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>)]</span>
 <span class="attribute">#[<span class="ident">zeroize</span>(<span class="ident">drop</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">RecoveryKey</span> {
     <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">inner</span>: [<span class="ident">u8</span>; <span class="ident">RecoveryKey::KEY_SIZE</span>],
@@ -1032,68 +960,6 @@
 <span class="kw">impl</span> <span class="ident">RecoveryKey</span> {
     <span class="doccomment">/// The number of bytes the recovery key will hold.</span>
     <span class="kw">pub</span> <span class="kw">const</span> <span class="ident">KEY_SIZE</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="number">32</span>;
-    <span class="kw">const</span> <span class="ident">NONCE_SIZE</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="number">12</span>;
-
-    <span class="doccomment">/// Export this [`RecoveryKey`] as an encrypted pickle that can be safely</span>
-    <span class="doccomment">/// stored.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">pickle</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">pickle_key</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) -&gt; <span class="ident">PickledRecoveryKey</span> {
-        <span class="kw">use</span> <span class="ident">aes::cipher::generic_array::GenericArray</span>;
-        <span class="kw">use</span> <span class="ident">aes_gcm::aead</span>::{<span class="ident">Aead</span>, <span class="ident">NewAead</span>};
-        <span class="kw">use</span> <span class="ident">rand::Fill</span>;
-
-        <span class="kw">let</span> <span class="ident">key</span> <span class="op">=</span> <span class="ident">GenericArray::from_slice</span>(<span class="ident">pickle_key</span>);
-        <span class="kw">let</span> <span class="ident">cipher</span> <span class="op">=</span> <span class="ident">aes_gcm::Aes256Gcm::new</span>(<span class="ident">key</span>);
-
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">nonce</span> <span class="op">=</span> <span class="macro">vec!</span>[<span class="number">0u8</span>; <span class="ident"><span class="self">Self</span>::NONCE_SIZE</span>];
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">rng</span> <span class="op">=</span> <span class="ident">rand::thread_rng</span>();
-
-        <span class="ident">nonce</span>.<span class="ident">try_fill</span>(<span class="kw-2">&amp;mut</span> <span class="ident">rng</span>).<span class="ident">expect</span>(<span class="string">&quot;Can&#39;t generate random nocne to pickle the recovery key&quot;</span>);
-        <span class="kw">let</span> <span class="ident">nonce</span> <span class="op">=</span> <span class="ident">GenericArray::from_slice</span>(<span class="ident">nonce</span>.<span class="ident">as_slice</span>());
-
-        <span class="kw">let</span> <span class="ident">ciphertext</span> <span class="op">=</span>
-            <span class="ident">cipher</span>.<span class="ident">encrypt</span>(<span class="ident">nonce</span>, <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">as_ref</span>()).<span class="ident">expect</span>(<span class="string">&quot;Can&#39;t encrypt recovery key&quot;</span>);
-
-        <span class="kw">let</span> <span class="ident">ciphertext</span> <span class="op">=</span> <span class="ident"><span class="kw">crate</span>::utilities::encode_url_safe</span>(<span class="ident">ciphertext</span>);
-
-        <span class="kw">let</span> <span class="ident">pickle</span> <span class="op">=</span> <span class="ident">InnerPickle</span> {
-            <span class="ident">version</span>: <span class="number">1</span>,
-            <span class="ident">nonce</span>: <span class="ident"><span class="kw">crate</span>::utilities::encode_url_safe</span>(<span class="ident">nonce</span>.<span class="ident">as_slice</span>()),
-            <span class="ident">ciphertext</span>,
-        };
-
-        <span class="ident">PickledRecoveryKey</span>(<span class="ident">serde_json::to_string</span>(<span class="kw-2">&amp;</span><span class="ident">pickle</span>).<span class="ident">expect</span>(<span class="string">&quot;Can&#39;t encode pickled signing&quot;</span>))
-    }
-
-    <span class="doccomment">/// Try to import a `RecoveryKey` from a previously exported pickle.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">from_pickle</span>(
-        <span class="ident">pickle</span>: <span class="ident">PickledRecoveryKey</span>,
-        <span class="ident">pickle_key</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>],
-    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">CryptoStoreError</span><span class="op">&gt;</span> {
-        <span class="kw">use</span> <span class="ident">aes::cipher::generic_array::GenericArray</span>;
-        <span class="kw">use</span> <span class="ident">aes_gcm::aead</span>::{<span class="ident">Aead</span>, <span class="ident">NewAead</span>};
-
-        <span class="kw">let</span> <span class="ident">pickled</span>: <span class="ident">InnerPickle</span> <span class="op">=</span> <span class="ident">serde_json::from_str</span>(<span class="ident">pickle</span>.<span class="ident">as_ref</span>())<span class="question-mark">?</span>;
-
-        <span class="kw">let</span> <span class="ident">key</span> <span class="op">=</span> <span class="ident">GenericArray::from_slice</span>(<span class="ident">pickle_key</span>);
-        <span class="kw">let</span> <span class="ident">cipher</span> <span class="op">=</span> <span class="ident">aes_gcm::Aes256Gcm::new</span>(<span class="ident">key</span>);
-
-        <span class="kw">let</span> <span class="ident">nonce</span> <span class="op">=</span> <span class="ident"><span class="kw">crate</span>::utilities::decode_url_safe</span>(<span class="ident">pickled</span>.<span class="ident">nonce</span>).<span class="ident">unwrap</span>();
-        <span class="kw">let</span> <span class="ident">nonce</span> <span class="op">=</span> <span class="ident">GenericArray::from_slice</span>(<span class="kw-2">&amp;</span><span class="ident">nonce</span>);
-        <span class="kw">let</span> <span class="ident">ciphertext</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident"><span class="kw">crate</span>::utilities::decode_url_safe</span>(<span class="ident">pickled</span>.<span class="ident">ciphertext</span>).<span class="ident">unwrap</span>();
-
-        <span class="kw">let</span> <span class="ident">decrypted</span> <span class="op">=</span> <span class="ident">cipher</span>
-            .<span class="ident">decrypt</span>(<span class="ident">nonce</span>, <span class="ident">ciphertext</span>.<span class="ident">as_slice</span>())
-            .<span class="ident">map_err</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="ident">CryptoStoreError::UnpicklingError</span>)<span class="question-mark">?</span>;
-
-        <span class="kw">if</span> <span class="ident">decrypted</span>.<span class="ident">len</span>() <span class="op">!</span><span class="op">=</span> <span class="ident"><span class="self">Self</span>::KEY_SIZE</span> {
-            <span class="prelude-val">Err</span>(<span class="ident">CryptoStoreError::UnpicklingError</span>)
-        } <span class="kw">else</span> {
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">key</span> <span class="op">=</span> [<span class="number">0u8</span>; <span class="ident"><span class="self">Self</span>::KEY_SIZE</span>];
-            <span class="ident">key</span>.<span class="ident">copy_from_slice</span>(<span class="kw-2">&amp;</span><span class="ident">decrypted</span>);
-
-            <span class="prelude-val">Ok</span>(<span class="self">Self</span> { <span class="ident">inner</span>: <span class="ident">key</span> })
-        }
-    }
 }
 
 <span class="kw">impl</span> <span class="ident">Debug</span> <span class="kw">for</span> <span class="ident">RecoveryKey</span> {
@@ -1160,9 +1026,9 @@
 <span class="doccomment">/// or the key backup key.</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Error</span>)]</span>
 <span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">SecretImportError</span> {
-    <span class="doccomment">/// The seed for the private key wasn&#39;t valid base64.</span>
+    <span class="doccomment">/// The key that we tried to import was invalid.</span>
     <span class="attribute">#[<span class="ident">error</span>(<span class="ident">transparent</span>)]</span>
-    <span class="ident">Base64</span>(<span class="attribute">#[<span class="ident">from</span>]</span> <span class="ident">DecodeError</span>),
+    <span class="ident">Key</span>(<span class="attribute">#[<span class="ident">from</span>]</span> <span class="ident">vodozemac::KeyError</span>),
     <span class="doccomment">/// The public key of the imported private key doesn&#39;t match to the public</span>
     <span class="doccomment">/// key that was uploaded to the server.</span>
     <span class="attribute">#[<span class="ident">error</span>(
@@ -1482,8 +1348,8 @@
     }
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Error</span>)]</span>
 <span class="doccomment">/// The crypto store&#39;s error type.</span>
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Error</span>)]</span>
 <span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">CryptoStoreError</span> {
     <span class="doccomment">/// The account that owns the sessions, group sessions, and devices wasn&#39;t</span>
     <span class="doccomment">/// found.</span>
@@ -1494,25 +1360,17 @@
     <span class="attribute">#[<span class="ident">error</span>(<span class="ident">transparent</span>)]</span>
     <span class="ident">Io</span>(<span class="attribute">#[<span class="ident">from</span>]</span> <span class="ident">IoError</span>),
 
-    <span class="doccomment">/// The underlying Olm Account operation returned an error.</span>
-    <span class="attribute">#[<span class="ident">error</span>(<span class="ident">transparent</span>)]</span>
-    <span class="ident">OlmAccount</span>(<span class="attribute">#[<span class="ident">from</span>]</span> <span class="ident">OlmAccountError</span>),
-
-    <span class="doccomment">/// The underlying Olm session operation returned an error.</span>
-    <span class="attribute">#[<span class="ident">error</span>(<span class="ident">transparent</span>)]</span>
-    <span class="ident">OlmSession</span>(<span class="attribute">#[<span class="ident">from</span>]</span> <span class="ident">OlmSessionError</span>),
-
-    <span class="doccomment">/// The underlying Olm group session operation returned an error.</span>
-    <span class="attribute">#[<span class="ident">error</span>(<span class="ident">transparent</span>)]</span>
-    <span class="ident">OlmGroupSession</span>(<span class="attribute">#[<span class="ident">from</span>]</span> <span class="ident">OlmGroupSessionError</span>),
-
-    <span class="doccomment">/// A session time-stamp couldn&#39;t be loaded.</span>
-    <span class="attribute">#[<span class="ident">error</span>(<span class="ident">transparent</span>)]</span>
-    <span class="ident">SessionUnpickling</span>(<span class="attribute">#[<span class="ident">from</span>]</span> <span class="ident">SessionUnpicklingError</span>),
-
     <span class="doccomment">/// Failed to decrypt an pickled object.</span>
     <span class="attribute">#[<span class="ident">error</span>(<span class="string">&quot;An object failed to be decrypted while unpickling&quot;</span>)]</span>
     <span class="ident">UnpicklingError</span>,
+
+    <span class="doccomment">/// Failed to decrypt an pickled object.</span>
+    <span class="attribute">#[<span class="ident">error</span>(<span class="ident">transparent</span>)]</span>
+    <span class="ident">Pickle</span>(<span class="attribute">#[<span class="ident">from</span>]</span> <span class="ident">vodozemac::PickleError</span>),
+
+    <span class="doccomment">/// The received room key couldn&#39;t be converted into a valid Megolm session.</span>
+    <span class="attribute">#[<span class="ident">error</span>(<span class="ident">transparent</span>)]</span>
+    <span class="ident">SessionCreation</span>(<span class="attribute">#[<span class="ident">from</span>]</span> <span class="ident">vodozemac::megolm::SessionCreationError</span>),
 
     <span class="doccomment">/// A Matrix identifier failed to be validated.</span>
     <span class="attribute">#[<span class="ident">error</span>(<span class="ident">transparent</span>)]</span>
@@ -1521,6 +1379,14 @@
     <span class="doccomment">/// The store failed to (de)serialize a data type.</span>
     <span class="attribute">#[<span class="ident">error</span>(<span class="ident">transparent</span>)]</span>
     <span class="ident">Serialization</span>(<span class="attribute">#[<span class="ident">from</span>]</span> <span class="ident">SerdeError</span>),
+
+    <span class="doccomment">/// The database format has changed in a backwards incompatible way.</span>
+    <span class="attribute">#[<span class="ident">error</span>(
+        <span class="string">&quot;The database format changed in an incompatible way, current \
+        version: {0}, latest version: {1}&quot;</span>
+    )]</span>
+    <span class="ident">UnsupportedDatabaseVersion</span>(<span class="ident">usize</span>, <span class="ident">usize</span>),
+
     <span class="doccomment">/// A problem with the underlying database backend</span>
     <span class="attribute">#[<span class="ident">error</span>(<span class="ident">transparent</span>)]</span>
     <span class="ident">Backend</span>(<span class="attribute">#[<span class="ident">from</span>]</span> <span class="ident">anyhow::Error</span>),
@@ -1692,5 +1558,5 @@
     <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">delete_outgoing_secret_requests</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">request_id</span>: <span class="kw-2">&amp;</span><span class="ident">TransactionId</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span>;
 }
 </code></pre></div>
-</section><section id="search" class="content hidden"></section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="matrix_sdk_crypto" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.61.0-nightly (9f4dc0b4d 2022-03-23)" ></div>
+</section><section id="search" class="content hidden"></section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="matrix_sdk_crypto" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.61.0-nightly (63b8f01bb 2022-03-24)" ></div>
 </body></html>

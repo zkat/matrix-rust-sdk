@@ -203,17 +203,6 @@
 <span id="198">198</span>
 <span id="199">199</span>
 <span id="200">200</span>
-<span id="201">201</span>
-<span id="202">202</span>
-<span id="203">203</span>
-<span id="204">204</span>
-<span id="205">205</span>
-<span id="206">206</span>
-<span id="207">207</span>
-<span id="208">208</span>
-<span id="209">209</span>
-<span id="210">210</span>
-<span id="211">211</span>
 </pre><pre class="rust"><code><span class="comment">// Copyright 2020 The Matrix.org Foundation C.I.C.</span>
 <span class="comment">//</span>
 <span class="comment">// Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);</span>
@@ -237,34 +226,22 @@
     <span class="ident">DeviceKeyAlgorithm</span>, <span class="ident">EventEncryptionAlgorithm</span>, <span class="ident">RoomId</span>,
 };
 <span class="kw">use</span> <span class="ident">serde</span>::{<span class="ident">Deserialize</span>, <span class="ident">Serialize</span>};
-<span class="kw">use</span> <span class="ident">zeroize::Zeroize</span>;
 
 <span class="kw">mod</span> <span class="ident">inbound</span>;
 <span class="kw">mod</span> <span class="ident">outbound</span>;
 
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">inbound</span>::{<span class="ident">InboundGroupSession</span>, <span class="ident">InboundGroupSessionPickle</span>, <span class="ident">PickledInboundGroupSession</span>};
+<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">inbound</span>::{<span class="ident">InboundGroupSession</span>, <span class="ident">PickledInboundGroupSession</span>};
 <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">use</span> <span class="ident">outbound::ShareState</span>;
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">outbound</span>::{
-    <span class="ident">EncryptionSettings</span>, <span class="ident">OlmOutboundGroupSession</span>, <span class="ident">OutboundGroupSession</span>, <span class="ident">PickledOutboundGroupSession</span>,
-    <span class="ident">ShareInfo</span>,
+    <span class="ident">EncryptionSettings</span>, <span class="ident">GroupSession</span>, <span class="ident">OutboundGroupSession</span>, <span class="ident">PickledOutboundGroupSession</span>, <span class="ident">ShareInfo</span>,
 };
-
-<span class="doccomment">/// The private session key of a group session.</span>
-<span class="doccomment">/// Can be used to create a new inbound group session.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Serialize</span>, <span class="ident">Deserialize</span>, <span class="ident">Zeroize</span>)]</span>
-<span class="attribute">#[<span class="ident">zeroize</span>(<span class="ident">drop</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">GroupSessionKey</span>(<span class="kw">pub</span> <span class="ident">String</span>);
-
-<span class="doccomment">/// The exported version of an private session key of a group session.</span>
-<span class="doccomment">/// Can be used to create a new inbound group session.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Serialize</span>, <span class="ident">Deserialize</span>, <span class="ident">PartialEq</span>, <span class="ident">Zeroize</span>)]</span>
-<span class="attribute">#[<span class="ident">zeroize</span>(<span class="ident">drop</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">ExportedGroupSessionKey</span>(<span class="kw">pub</span> <span class="ident">String</span>);
+<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">vodozemac::megolm</span>::{<span class="ident">ExportedSessionKey</span>, <span class="ident">SessionKey</span>};
 
 <span class="doccomment">/// An exported version of an `InboundGroupSession`</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// This can be used to share the `InboundGroupSession` in an exported file.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>, <span class="ident">PartialEq</span>)]</span>
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Deserialize</span>, <span class="ident">Serialize</span>)]</span>
+<span class="attribute">#[<span class="ident">allow</span>(<span class="ident">missing_debug_implementations</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">ExportedRoomKey</span> {
     <span class="doccomment">/// The encryption algorithm that the session uses.</span>
     <span class="kw">pub</span> <span class="ident">algorithm</span>: <span class="ident">EventEncryptionAlgorithm</span>,
@@ -279,7 +256,7 @@
     <span class="kw">pub</span> <span class="ident">session_id</span>: <span class="ident">String</span>,
 
     <span class="doccomment">/// The key for the session.</span>
-    <span class="kw">pub</span> <span class="ident">session_key</span>: <span class="ident">ExportedGroupSessionKey</span>,
+    <span class="kw">pub</span> <span class="ident">session_key</span>: <span class="ident">ExportedSessionKey</span>,
 
     <span class="doccomment">/// The Ed25519 key of the device which initiated the session originally.</span>
     <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">default</span>)]</span>
@@ -294,7 +271,8 @@
 <span class="doccomment">/// A backed up version of an `InboundGroupSession`</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// This can be used to backup the `InboundGroupSession` to the server.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>, <span class="ident">PartialEq</span>)]</span>
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Deserialize</span>, <span class="ident">Serialize</span>)]</span>
+<span class="attribute">#[<span class="ident">allow</span>(<span class="ident">missing_debug_implementations</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">BackedUpRoomKey</span> {
     <span class="doccomment">/// The encryption algorithm that the session uses.</span>
     <span class="kw">pub</span> <span class="ident">algorithm</span>: <span class="ident">EventEncryptionAlgorithm</span>,
@@ -303,7 +281,7 @@
     <span class="kw">pub</span> <span class="ident">sender_key</span>: <span class="ident">String</span>,
 
     <span class="doccomment">/// The key for the session.</span>
-    <span class="kw">pub</span> <span class="ident">session_key</span>: <span class="ident">ExportedGroupSessionKey</span>,
+    <span class="kw">pub</span> <span class="ident">session_key</span>: <span class="ident">ExportedSessionKey</span>,
 
     <span class="doccomment">/// The Ed25519 key of the device which initiated the session originally.</span>
     <span class="kw">pub</span> <span class="ident">sender_claimed_keys</span>: <span class="ident">BTreeMap</span><span class="op">&lt;</span><span class="ident">DeviceKeyAlgorithm</span>, <span class="ident">String</span><span class="op">&gt;</span>,
@@ -372,7 +350,7 @@
             <span class="ident">forwarding_curve25519_key_chain</span>: <span class="ident">forwarded_key</span>.<span class="ident">forwarding_curve25519_key_chain</span>,
             <span class="ident">sender_claimed_keys</span>,
             <span class="ident">sender_key</span>: <span class="ident">forwarded_key</span>.<span class="ident">sender_key</span>,
-            <span class="ident">session_key</span>: <span class="ident">ExportedGroupSessionKey</span>(<span class="ident">forwarded_key</span>.<span class="ident">session_key</span>),
+            <span class="ident">session_key</span>: <span class="ident">ExportedSessionKey</span>(<span class="ident">forwarded_key</span>.<span class="ident">session_key</span>),
         }
     }
 }
@@ -426,5 +404,5 @@
     }
 }
 </code></pre></div>
-</section><section id="search" class="content hidden"></section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="matrix_sdk_crypto" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.61.0-nightly (9f4dc0b4d 2022-03-23)" ></div>
+</section><section id="search" class="content hidden"></section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="matrix_sdk_crypto" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.61.0-nightly (63b8f01bb 2022-03-24)" ></div>
 </body></html>

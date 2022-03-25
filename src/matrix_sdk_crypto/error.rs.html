@@ -218,9 +218,6 @@
 <span id="213">213</span>
 <span id="214">214</span>
 <span id="215">215</span>
-<span id="216">216</span>
-<span id="217">217</span>
-<span id="218">218</span>
 </pre><pre class="rust"><code><span class="comment">// Copyright 2020 The Matrix.org Foundation C.I.C.</span>
 <span class="comment">//</span>
 <span class="comment">// Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);</span>
@@ -235,7 +232,6 @@
 <span class="comment">// See the License for the specific language governing permissions and</span>
 <span class="comment">// limitations under the License.</span>
 
-<span class="kw">use</span> <span class="ident">olm_rs::errors</span>::{<span class="ident">OlmGroupSessionError</span>, <span class="ident">OlmSessionError</span>};
 <span class="kw">use</span> <span class="ident">ruma</span>::{<span class="ident">identifiers::Error</span> <span class="kw">as</span> <span class="ident">IdentifierError</span>, <span class="ident">DeviceId</span>, <span class="ident">RoomId</span>, <span class="ident">UserId</span>};
 <span class="kw">use</span> <span class="ident">serde_json::Error</span> <span class="kw">as</span> <span class="ident">SerdeError</span>;
 <span class="kw">use</span> <span class="ident">thiserror::Error</span>;
@@ -257,13 +253,13 @@
     <span class="attribute">#[<span class="ident">error</span>(<span class="ident">transparent</span>)]</span>
     <span class="ident">JsonError</span>(<span class="attribute">#[<span class="ident">from</span>]</span> <span class="ident">SerdeError</span>),
 
-    <span class="doccomment">/// The underlying Olm session operation returned an error.</span>
-    <span class="attribute">#[<span class="ident">error</span>(<span class="string">&quot;can&#39;t finish Olm Session operation {0}&quot;</span>)]</span>
-    <span class="ident">OlmSession</span>(<span class="attribute">#[<span class="ident">from</span>]</span> <span class="ident">OlmSessionError</span>),
+    <span class="doccomment">/// The event could not have been decrypted.</span>
+    <span class="attribute">#[<span class="ident">error</span>(<span class="ident">transparent</span>)]</span>
+    <span class="ident">Decryption</span>(<span class="attribute">#[<span class="ident">from</span>]</span> <span class="ident">vodozemac::olm::DecryptionError</span>),
 
-    <span class="doccomment">/// The underlying group session operation returned an error.</span>
-    <span class="attribute">#[<span class="ident">error</span>(<span class="string">&quot;can&#39;t finish Olm Session operation {0}&quot;</span>)]</span>
-    <span class="ident">OlmGroupSession</span>(<span class="attribute">#[<span class="ident">from</span>]</span> <span class="ident">OlmGroupSessionError</span>),
+    <span class="doccomment">/// The received room key couldn&#39;t be converted into a valid Megolm session.</span>
+    <span class="attribute">#[<span class="ident">error</span>(<span class="ident">transparent</span>)]</span>
+    <span class="ident">SessionCreation</span>(<span class="attribute">#[<span class="ident">from</span>]</span> <span class="ident">vodozemac::megolm::SessionCreationError</span>),
 
     <span class="doccomment">/// The storage layer returned an error.</span>
     <span class="attribute">#[<span class="ident">error</span>(<span class="string">&quot;failed to read or write to the crypto store {0}&quot;</span>)]</span>
@@ -305,13 +301,17 @@
     <span class="attribute">#[<span class="ident">error</span>(<span class="string">&quot;decryption failed because the room key is missing&quot;</span>)]</span>
     <span class="ident">MissingRoomKey</span>,
 
-    <span class="doccomment">/// The underlying group session operation returned an error.</span>
-    <span class="attribute">#[<span class="ident">error</span>(<span class="string">&quot;can&#39;t finish Olm group session operation {0}&quot;</span>)]</span>
-    <span class="ident">OlmGroupSession</span>(<span class="attribute">#[<span class="ident">from</span>]</span> <span class="ident">OlmGroupSessionError</span>),
+    <span class="doccomment">/// The encrypted megolm message couldn&#39;t be decoded.</span>
+    <span class="attribute">#[<span class="ident">error</span>(<span class="ident">transparent</span>)]</span>
+    <span class="ident">Decode</span>(<span class="attribute">#[<span class="ident">from</span>]</span> <span class="ident">vodozemac::DecodeError</span>),
 
     <span class="doccomment">/// The room where a group session should be shared is not encrypted.</span>
     <span class="attribute">#[<span class="ident">error</span>(<span class="string">&quot;The room where a group session should be shared is not encrypted&quot;</span>)]</span>
     <span class="ident">EncryptionNotEnabled</span>,
+
+    <span class="doccomment">/// The event could not have been decrypted.</span>
+    <span class="attribute">#[<span class="ident">error</span>(<span class="ident">transparent</span>)]</span>
+    <span class="ident">Decryption</span>(<span class="attribute">#[<span class="ident">from</span>]</span> <span class="ident">vodozemac::megolm::DecryptionError</span>),
 
     <span class="doccomment">/// The storage layer returned an error.</span>
     <span class="attribute">#[<span class="ident">error</span>(<span class="ident">transparent</span>)]</span>
@@ -360,16 +360,6 @@
     <span class="ident">MismatchedRoom</span>(<span class="ident">Box</span><span class="op">&lt;</span><span class="ident">RoomId</span><span class="op">&gt;</span>, <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Box</span><span class="op">&lt;</span><span class="ident">RoomId</span><span class="op">&gt;</span><span class="op">&gt;</span>),
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Error</span>, <span class="ident">Debug</span>)]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">SessionUnpicklingError</span> {
-    <span class="doccomment">/// The underlying Olm session operation returned an error.</span>
-    <span class="attribute">#[<span class="ident">error</span>(<span class="string">&quot;can&#39;t finish Olm Session operation {0}&quot;</span>)]</span>
-    <span class="ident">OlmSession</span>(<span class="attribute">#[<span class="ident">from</span>]</span> <span class="ident">OlmSessionError</span>),
-    <span class="doccomment">/// The Session timestamp was invalid.</span>
-    <span class="attribute">#[<span class="ident">error</span>(<span class="string">&quot;can&#39;t load session timestamps&quot;</span>)]</span>
-    <span class="ident">SessionTimestampError</span>,
-}
-
 <span class="doccomment">/// Error type describin different errors that happen when we check or create</span>
 <span class="doccomment">/// signatures for a Matrix JSON object.</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Error</span>, <span class="ident">Debug</span>)]</span>
@@ -402,8 +392,12 @@
     <span class="ident">NoSignatureFound</span>,
 
     <span class="doccomment">/// The signature couldn&#39;t be verified.</span>
-    <span class="attribute">#[<span class="ident">error</span>(<span class="string">&quot;the signature didn&#39;t match the provided key&quot;</span>)]</span>
-    <span class="ident">VerificationError</span>,
+    <span class="attribute">#[<span class="ident">error</span>(<span class="ident">transparent</span>)]</span>
+    <span class="ident">VerificationError</span>(<span class="attribute">#[<span class="ident">from</span>]</span> <span class="ident">vodozemac::SignatureError</span>),
+
+    <span class="doccomment">/// The public key isn&#39;t a valid ed25519 key.</span>
+    <span class="attribute">#[<span class="ident">error</span>(<span class="ident">transparent</span>)]</span>
+    <span class="ident">InvalidKey</span>(<span class="attribute">#[<span class="ident">from</span>]</span> <span class="ident">vodozemac::KeyError</span>),
 
     <span class="doccomment">/// The signed object couldn&#39;t be deserialized.</span>
     <span class="attribute">#[<span class="ident">error</span>(<span class="ident">transparent</span>)]</span>
@@ -434,11 +428,11 @@
         a curve25519 key&quot;</span>
     )]</span>
     <span class="ident">DeviceMissingCurveKey</span>(<span class="ident">Box</span><span class="op">&lt;</span><span class="ident">UserId</span><span class="op">&gt;</span>, <span class="ident">Box</span><span class="op">&lt;</span><span class="ident">DeviceId</span><span class="op">&gt;</span>),
-    <span class="attribute">#[<span class="ident">error</span>(<span class="string">&quot;Error creating new Olm session for {0} {1}: {2:?}&quot;</span>)]</span>
-    <span class="ident">OlmError</span>(<span class="ident">Box</span><span class="op">&lt;</span><span class="ident">UserId</span><span class="op">&gt;</span>, <span class="ident">Box</span><span class="op">&lt;</span><span class="ident">DeviceId</span><span class="op">&gt;</span>, <span class="ident">OlmSessionError</span>),
     <span class="attribute">#[<span class="ident">error</span>(<span class="string">&quot;Error deserializing the one-time key: {0}&quot;</span>)]</span>
     <span class="ident">InvalidJson</span>(<span class="attribute">#[<span class="ident">from</span>]</span> <span class="ident">serde_json::Error</span>),
+    <span class="attribute">#[<span class="ident">error</span>(<span class="string">&quot;The given curve25519 key is not a valid key&quot;</span>)]</span>
+    <span class="ident">InvalidCurveKey</span>(<span class="attribute">#[<span class="ident">from</span>]</span> <span class="ident">vodozemac::KeyError</span>),
 }
 </code></pre></div>
-</section><section id="search" class="content hidden"></section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="matrix_sdk_crypto" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.61.0-nightly (9f4dc0b4d 2022-03-23)" ></div>
+</section><section id="search" class="content hidden"></section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="matrix_sdk_crypto" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.61.0-nightly (63b8f01bb 2022-03-24)" ></div>
 </body></html>

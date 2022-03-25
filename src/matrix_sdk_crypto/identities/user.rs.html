@@ -1103,7 +1103,6 @@
 <span id="1098">1098</span>
 <span id="1099">1099</span>
 <span id="1100">1100</span>
-<span id="1101">1101</span>
 </pre><pre class="rust"><code><span class="comment">// Copyright 2020 The Matrix.org Foundation C.I.C.</span>
 <span class="comment">//</span>
 <span class="comment">// Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);</span>
@@ -1139,11 +1138,12 @@
 <span class="kw">use</span> <span class="ident">serde</span>::{<span class="ident">Deserialize</span>, <span class="ident">Serialize</span>};
 <span class="kw">use</span> <span class="ident">serde_json::to_value</span>;
 <span class="kw">use</span> <span class="ident">tracing::error</span>;
+<span class="kw">use</span> <span class="ident">vodozemac::Ed25519PublicKey</span>;
 
 <span class="kw">use</span> <span class="kw">super</span>::{<span class="ident">atomic_bool_deserializer</span>, <span class="ident">atomic_bool_serializer</span>};
 <span class="kw">use</span> <span class="kw">crate</span>::{
     <span class="ident">error::SignatureError</span>,
-    <span class="ident">olm::Utility</span>,
+    <span class="ident">olm::VerifyJson</span>,
     <span class="ident">store</span>::{<span class="ident">Changes</span>, <span class="ident">IdentityChanges</span>},
     <span class="ident">verification::VerificationMachine</span>,
     <span class="ident">CryptoStoreError</span>, <span class="ident">OutgoingVerificationRequest</span>, <span class="ident">ReadOnlyDevice</span>, <span class="ident">VerificationRequest</span>,
@@ -1593,11 +1593,11 @@
             <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">SignatureError::UserIdMismatch</span>);
         }
 
-        <span class="kw">let</span> <span class="ident">utility</span> <span class="op">=</span> <span class="ident">Utility::new</span>();
-        <span class="ident">utility</span>.<span class="ident">verify_json</span>(
+        <span class="kw">let</span> <span class="ident">key</span> <span class="op">=</span> <span class="ident">Ed25519PublicKey::from_base64</span>(<span class="ident">key</span>)<span class="question-mark">?</span>;
+
+        <span class="ident">key</span>.<span class="ident">verify_json</span>(
             <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="number">0</span>.<span class="ident">user_id</span>,
             <span class="ident">key_id</span>,
-            <span class="ident">key</span>,
             <span class="kw-2">&amp;mut</span> <span class="ident">to_value</span>(<span class="ident">subkey</span>.<span class="ident">cross_signing_key</span>()).<span class="ident">map_err</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="ident">SignatureError::NotAnObject</span>)<span class="question-mark">?</span>,
         )
     }
@@ -1640,11 +1640,10 @@
 
         <span class="comment">// TODO check that the usage is OK.</span>
 
-        <span class="kw">let</span> <span class="ident">utility</span> <span class="op">=</span> <span class="ident">Utility::new</span>();
-        <span class="ident">utility</span>.<span class="ident">verify_json</span>(
+        <span class="kw">let</span> <span class="ident">key</span> <span class="op">=</span> <span class="ident">Ed25519PublicKey::from_base64</span>(<span class="ident">key</span>)<span class="question-mark">?</span>;
+        <span class="ident">key</span>.<span class="ident">verify_json</span>(
             <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="number">0</span>.<span class="ident">user_id</span>,
             <span class="ident">key_id</span>.<span class="ident">as_str</span>().<span class="ident">try_into</span>()<span class="question-mark">?</span>,
-            <span class="ident">key</span>,
             <span class="kw-2">&amp;mut</span> <span class="ident">to_value</span>(<span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="ident">master_key</span>.<span class="number">0</span>).<span class="ident">map_err</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="ident">SignatureError::NotAnObject</span>)<span class="question-mark">?</span>,
         )
     }
@@ -1676,9 +1675,8 @@
 
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">device</span> <span class="op">=</span> <span class="ident">to_value</span>(<span class="ident">device_keys</span>)<span class="question-mark">?</span>;
 
-        <span class="kw">let</span> <span class="ident">utility</span> <span class="op">=</span> <span class="ident">Utility::new</span>();
-
-        <span class="ident">utility</span>.<span class="ident">verify_json</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="number">0</span>.<span class="ident">user_id</span>, <span class="ident">key_id</span>.<span class="ident">as_str</span>().<span class="ident">try_into</span>()<span class="question-mark">?</span>, <span class="ident">key</span>, <span class="kw-2">&amp;mut</span> <span class="ident">device</span>)
+        <span class="kw">let</span> <span class="ident">key</span> <span class="op">=</span> <span class="ident">Ed25519PublicKey::from_base64</span>(<span class="ident">key</span>)<span class="question-mark">?</span>;
+        <span class="ident">key</span>.<span class="ident">verify_json</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="number">0</span>.<span class="ident">user_id</span>, <span class="ident">key_id</span>.<span class="ident">as_str</span>().<span class="ident">try_into</span>()<span class="question-mark">?</span>, <span class="kw-2">&amp;mut</span> <span class="ident">device</span>)
     }
 
     <span class="doccomment">/// Check if the given device is signed by this self signing key.</span>
@@ -2206,5 +2204,5 @@
     }
 }
 </code></pre></div>
-</section><section id="search" class="content hidden"></section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="matrix_sdk_crypto" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.61.0-nightly (9f4dc0b4d 2022-03-23)" ></div>
+</section><section id="search" class="content hidden"></section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="matrix_sdk_crypto" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.61.0-nightly (63b8f01bb 2022-03-24)" ></div>
 </body></html>

@@ -584,26 +584,6 @@
 <span id="579">579</span>
 <span id="580">580</span>
 <span id="581">581</span>
-<span id="582">582</span>
-<span id="583">583</span>
-<span id="584">584</span>
-<span id="585">585</span>
-<span id="586">586</span>
-<span id="587">587</span>
-<span id="588">588</span>
-<span id="589">589</span>
-<span id="590">590</span>
-<span id="591">591</span>
-<span id="592">592</span>
-<span id="593">593</span>
-<span id="594">594</span>
-<span id="595">595</span>
-<span id="596">596</span>
-<span id="597">597</span>
-<span id="598">598</span>
-<span id="599">599</span>
-<span id="600">600</span>
-<span id="601">601</span>
 </pre><pre class="rust"><code><span class="attribute">#[<span class="ident">allow</span>(<span class="ident">unused_macros</span>)]</span>
 <span class="attribute">#[<span class="ident">macro_export</span>]</span>
 <span class="macro">macro_rules!</span> <span class="ident">cryptostore_integration_tests</span> {
@@ -611,7 +591,6 @@
     $(
         <span class="kw">mod</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span> {
             <span class="kw">use</span> <span class="ident"><span class="kw">super</span>::get_store</span>;
-            <span class="kw">use</span> <span class="ident">std::collections::BTreeMap</span>;
 
             <span class="kw">use</span> <span class="ident">matrix_sdk_test::async_test</span>;
             <span class="kw">use</span> <span class="ident">matrix_sdk_common::ruma</span>::{
@@ -623,9 +602,9 @@
             <span class="kw">use</span> <span class="macro-nonterminal">$</span><span class="kw">crate</span>::{
                 <span class="macro-nonterminal">SecretInfo</span>,
                 <span class="ident">testing</span>::{<span class="ident">get_device</span>, <span class="ident">get_other_identity</span>, <span class="ident">get_own_identity</span>},
+                <span class="ident">ReadOnlyDevice</span>,
                 <span class="ident">olm</span>::{
-                    <span class="ident">OlmOutboundGroupSession</span>,
-                    <span class="ident">GroupSessionKey</span>, <span class="ident">InboundGroupSession</span>, <span class="ident">OlmMessageHash</span>, <span class="ident">PrivateCrossSigningIdentity</span>,
+                    <span class="ident">InboundGroupSession</span>, <span class="ident">OlmMessageHash</span>, <span class="ident">PrivateCrossSigningIdentity</span>,
                     <span class="ident">ReadOnlyAccount</span>, <span class="ident">Session</span>,
                 },
                 <span class="ident">store</span>::{<span class="ident">CryptoStore</span>, <span class="ident">GossipRequest</span>, <span class="ident">Changes</span>, <span class="ident">DeviceChanges</span>, <span class="ident">IdentityChanges</span>},
@@ -664,12 +643,10 @@
                 <span class="kw">let</span> <span class="ident">bob</span> <span class="op">=</span> <span class="ident">ReadOnlyAccount::new</span>(<span class="kw-2">&amp;</span><span class="ident">bob_id</span>(), <span class="kw-2">&amp;</span><span class="ident">bob_device_id</span>());
 
                 <span class="ident">bob</span>.<span class="ident">generate_one_time_keys_helper</span>(<span class="number">1</span>).<span class="kw">await</span>;
-                <span class="kw">let</span> <span class="ident">one_time_key</span> <span class="op">=</span>
-                    <span class="ident">Base64::parse</span>(<span class="ident">bob</span>.<span class="ident">one_time_keys</span>().<span class="kw">await</span>.<span class="ident">curve25519</span>().<span class="ident">values</span>().<span class="ident">next</span>().<span class="ident">unwrap</span>()).<span class="ident">unwrap</span>();
-                <span class="kw">let</span> <span class="ident">one_time_key</span> <span class="op">=</span> <span class="ident">SignedKey::new</span>(<span class="ident">one_time_key</span>, <span class="ident">BTreeMap::new</span>());
-                <span class="kw">let</span> <span class="ident">sender_key</span> <span class="op">=</span> <span class="ident">bob</span>.<span class="ident">identity_keys</span>().<span class="ident">curve25519</span>().<span class="ident">to_owned</span>();
+                <span class="kw">let</span> <span class="ident">one_time_key</span> <span class="op">=</span> <span class="kw-2">*</span><span class="ident">bob</span>.<span class="ident">one_time_keys</span>().<span class="kw">await</span>.<span class="ident">values</span>().<span class="ident">next</span>().<span class="ident">unwrap</span>();
+                <span class="kw">let</span> <span class="ident">sender_key</span> <span class="op">=</span> <span class="ident">bob</span>.<span class="ident">identity_keys</span>().<span class="ident">curve25519</span>;
                 <span class="kw">let</span> <span class="ident">session</span> <span class="op">=</span>
-                    <span class="ident">alice</span>.<span class="ident">create_outbound_session_helper</span>(<span class="kw-2">&amp;</span><span class="ident">sender_key</span>, <span class="kw-2">&amp;</span><span class="ident">one_time_key</span>).<span class="kw">await</span>.<span class="ident">unwrap</span>();
+                    <span class="ident">alice</span>.<span class="ident">create_outbound_session_helper</span>(<span class="ident">sender_key</span>, <span class="ident">one_time_key</span>, <span class="bool-val">false</span>).<span class="kw">await</span>;
 
                 (<span class="ident">alice</span>, <span class="ident">session</span>)
             }
@@ -786,8 +763,7 @@
                 <span class="macro">assert!</span>(<span class="ident">store</span>.<span class="ident">get_outbound_group_sessions</span>(<span class="kw-2">&amp;</span><span class="ident">room_id</span>).<span class="kw">await</span>.<span class="ident">unwrap</span>().<span class="ident">is_none</span>());
 
                 <span class="kw">let</span> (<span class="ident">session</span>, <span class="kw">_</span>) <span class="op">=</span> <span class="ident">account</span>.<span class="ident">create_group_session_pair_with_defaults</span>(<span class="kw-2">&amp;</span><span class="ident">room_id</span>)
-                    .<span class="kw">await</span>
-                    .<span class="ident">expect</span>(<span class="string">&quot;Can&#39;t create session&quot;</span>);
+                    .<span class="kw">await</span>;
 
                 <span class="kw">let</span> <span class="ident">changes</span> <span class="op">=</span>
                     <span class="ident">Changes</span> { <span class="ident">outbound_group_sessions</span>: <span class="macro">vec!</span>[<span class="ident">session</span>.<span class="ident">clone</span>()], ..<span class="ident">Default::default</span>() };
@@ -811,16 +787,8 @@
             <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">save_inbound_group_session</span>() {
                 <span class="kw">let</span> (<span class="ident">account</span>, <span class="ident">store</span>) <span class="op">=</span> <span class="ident">get_loaded_store</span>(<span class="string">&quot;save_inbound_group_session&quot;</span>.<span class="ident">to_owned</span>()).<span class="kw">await</span>;
 
-                <span class="kw">let</span> <span class="ident">identity_keys</span> <span class="op">=</span> <span class="ident">account</span>.<span class="ident">identity_keys</span>();
-                <span class="kw">let</span> <span class="ident">outbound_session</span> <span class="op">=</span> <span class="ident">OlmOutboundGroupSession::new</span>();
-                <span class="kw">let</span> <span class="ident">session</span> <span class="op">=</span> <span class="ident">InboundGroupSession::new</span>(
-                    <span class="ident">identity_keys</span>.<span class="ident">curve25519</span>(),
-                    <span class="ident">identity_keys</span>.<span class="ident">ed25519</span>(),
-                    <span class="kw-2">&amp;</span><span class="macro">room_id!</span>(<span class="string">&quot;!test:localhost&quot;</span>),
-                    <span class="ident">GroupSessionKey</span>(<span class="ident">outbound_session</span>.<span class="ident">session_key</span>()),
-                    <span class="prelude-val">None</span>,
-                )
-                .<span class="ident">expect</span>(<span class="string">&quot;Can&#39;t create session&quot;</span>);
+                <span class="kw">let</span> <span class="ident">room_id</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="macro">room_id!</span>(<span class="string">&quot;!test:localhost&quot;</span>);
+                <span class="kw">let</span> (<span class="kw">_</span>, <span class="ident">session</span>) <span class="op">=</span> <span class="ident">account</span>.<span class="ident">create_group_session_pair_with_defaults</span>(<span class="ident">room_id</span>).<span class="kw">await</span>;
 
                 <span class="kw">let</span> <span class="ident">changes</span> <span class="op">=</span> <span class="ident">Changes</span> { <span class="ident">inbound_group_sessions</span>: <span class="macro">vec!</span>[<span class="ident">session</span>], ..<span class="ident">Default::default</span>() };
 
@@ -831,16 +799,8 @@
             <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">save_inbound_group_session_for_backup</span>() {
                 <span class="kw">let</span> (<span class="ident">account</span>, <span class="ident">store</span>) <span class="op">=</span> <span class="ident">get_loaded_store</span>(<span class="string">&quot;save_inbound_group_session_for_backup&quot;</span>.<span class="ident">to_owned</span>()).<span class="kw">await</span>;
 
-                <span class="kw">let</span> <span class="ident">identity_keys</span> <span class="op">=</span> <span class="ident">account</span>.<span class="ident">identity_keys</span>();
-                <span class="kw">let</span> <span class="ident">outbound_session</span> <span class="op">=</span> <span class="ident">OlmOutboundGroupSession::new</span>();
-                <span class="kw">let</span> <span class="ident">session</span> <span class="op">=</span> <span class="ident">InboundGroupSession::new</span>(
-                    <span class="ident">identity_keys</span>.<span class="ident">curve25519</span>(),
-                    <span class="ident">identity_keys</span>.<span class="ident">ed25519</span>(),
-                    <span class="kw-2">&amp;</span><span class="macro">room_id!</span>(<span class="string">&quot;!test:localhost&quot;</span>),
-                    <span class="ident">GroupSessionKey</span>(<span class="ident">outbound_session</span>.<span class="ident">session_key</span>()),
-                    <span class="prelude-val">None</span>,
-                )
-                .<span class="ident">expect</span>(<span class="string">&quot;Can&#39;t create session&quot;</span>);
+                <span class="kw">let</span> <span class="ident">room_id</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="macro">room_id!</span>(<span class="string">&quot;!test:localhost&quot;</span>);
+                <span class="kw">let</span> (<span class="kw">_</span>, <span class="ident">session</span>) <span class="op">=</span> <span class="ident">account</span>.<span class="ident">create_group_session_pair_with_defaults</span>(<span class="ident">room_id</span>).<span class="kw">await</span>;
 
                 <span class="kw">let</span> <span class="ident">changes</span> <span class="op">=</span> <span class="ident">Changes</span> { <span class="ident">inbound_group_sessions</span>: <span class="macro">vec!</span>[<span class="ident">session</span>.<span class="ident">clone</span>()], ..<span class="ident">Default::default</span>() };
 
@@ -866,16 +826,8 @@
                 <span class="kw">let</span> (<span class="ident">account</span>, <span class="ident">store</span>) <span class="op">=</span> <span class="ident">get_loaded_store</span>(<span class="string">&quot;reset_inbound_group_session_for_backup&quot;</span>.<span class="ident">to_owned</span>()).<span class="kw">await</span>;
                 <span class="macro">assert_eq!</span>(<span class="ident">store</span>.<span class="ident">inbound_group_session_counts</span>().<span class="kw">await</span>.<span class="ident">unwrap</span>().<span class="ident">total</span>, <span class="number">0</span>);
 
-                <span class="kw">let</span> <span class="ident">identity_keys</span> <span class="op">=</span> <span class="ident">account</span>.<span class="ident">identity_keys</span>();
-                <span class="kw">let</span> <span class="ident">outbound_session</span> <span class="op">=</span> <span class="ident">OlmOutboundGroupSession::new</span>();
-                <span class="kw">let</span> <span class="ident">session</span> <span class="op">=</span> <span class="ident">InboundGroupSession::new</span>(
-                    <span class="ident">identity_keys</span>.<span class="ident">curve25519</span>(),
-                    <span class="ident">identity_keys</span>.<span class="ident">ed25519</span>(),
-                    <span class="kw-2">&amp;</span><span class="macro">room_id!</span>(<span class="string">&quot;!test:localhost&quot;</span>),
-                    <span class="ident">GroupSessionKey</span>(<span class="ident">outbound_session</span>.<span class="ident">session_key</span>()),
-                    <span class="prelude-val">None</span>,
-                )
-                .<span class="ident">expect</span>(<span class="string">&quot;Can&#39;t create session&quot;</span>);
+                <span class="kw">let</span> <span class="ident">room_id</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="macro">room_id!</span>(<span class="string">&quot;!test:localhost&quot;</span>);
+                <span class="kw">let</span> (<span class="kw">_</span>, <span class="ident">session</span>) <span class="op">=</span> <span class="ident">account</span>.<span class="ident">create_group_session_pair_with_defaults</span>(<span class="ident">room_id</span>).<span class="kw">await</span>;
 
                 <span class="ident">session</span>.<span class="ident">mark_as_backed_up</span>();
 
@@ -902,16 +854,8 @@
                 <span class="kw">let</span> (<span class="ident">account</span>, <span class="ident">store</span>) <span class="op">=</span> <span class="ident">get_loaded_store</span>(<span class="ident">dir</span>.<span class="ident">clone</span>()).<span class="kw">await</span>;
                 <span class="macro">assert_eq!</span>(<span class="ident">store</span>.<span class="ident">get_inbound_group_sessions</span>().<span class="kw">await</span>.<span class="ident">unwrap</span>().<span class="ident">len</span>(), <span class="number">0</span>);
 
-                <span class="kw">let</span> <span class="ident">identity_keys</span> <span class="op">=</span> <span class="ident">account</span>.<span class="ident">identity_keys</span>();
-                <span class="kw">let</span> <span class="ident">outbound_session</span> <span class="op">=</span> <span class="ident">OlmOutboundGroupSession::new</span>();
-                <span class="kw">let</span> <span class="ident">session</span> <span class="op">=</span> <span class="ident">InboundGroupSession::new</span>(
-                    <span class="ident">identity_keys</span>.<span class="ident">curve25519</span>(),
-                    <span class="ident">identity_keys</span>.<span class="ident">ed25519</span>(),
-                    <span class="kw-2">&amp;</span><span class="macro">room_id!</span>(<span class="string">&quot;!test:localhost&quot;</span>),
-                    <span class="ident">GroupSessionKey</span>(<span class="ident">outbound_session</span>.<span class="ident">session_key</span>()),
-                    <span class="prelude-val">None</span>,
-                )
-                .<span class="ident">expect</span>(<span class="string">&quot;Can&#39;t create session&quot;</span>);
+                <span class="kw">let</span> <span class="ident">room_id</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="macro">room_id!</span>(<span class="string">&quot;!test:localhost&quot;</span>);
+                <span class="kw">let</span> (<span class="kw">_</span>, <span class="ident">session</span>) <span class="op">=</span> <span class="ident">account</span>.<span class="ident">create_group_session_pair_with_defaults</span>(<span class="ident">room_id</span>).<span class="kw">await</span>;
 
                 <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">export</span> <span class="op">=</span> <span class="ident">session</span>.<span class="ident">export</span>().<span class="kw">await</span>;
 
@@ -980,10 +924,25 @@
             <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">device_saving</span>() {
                 <span class="kw">let</span> <span class="ident">dir</span> <span class="op">=</span> <span class="string">&quot;device_saving&quot;</span>.<span class="ident">to_owned</span>();
                 <span class="kw">let</span> (<span class="ident">_account</span>, <span class="ident">store</span>) <span class="op">=</span> <span class="ident">get_loaded_store</span>(<span class="ident">dir</span>.<span class="ident">clone</span>()).<span class="kw">await</span>;
-                <span class="kw">let</span> <span class="ident">device</span> <span class="op">=</span> <span class="ident">get_device</span>();
+
+                <span class="kw">let</span> <span class="ident">alice_device_1</span> <span class="op">=</span> <span class="ident">ReadOnlyDevice::from_account</span>(
+                    <span class="kw-2">&amp;</span><span class="ident">ReadOnlyAccount::new</span>(
+                        <span class="string">&quot;@alice:localhost&quot;</span>.<span class="ident">try_into</span>().<span class="ident">unwrap</span>(),
+                        <span class="string">&quot;FIRSTDEVICE&quot;</span>.<span class="ident">into</span>()
+                )).<span class="kw">await</span>;
+
+                <span class="kw">let</span> <span class="ident">alice_device_2</span> <span class="op">=</span> <span class="ident">ReadOnlyDevice::from_account</span>(
+                    <span class="kw-2">&amp;</span><span class="ident">ReadOnlyAccount::new</span>(
+                        <span class="string">&quot;@alice:localhost&quot;</span>.<span class="ident">try_into</span>().<span class="ident">unwrap</span>(),
+                        <span class="string">&quot;SECONDDEVICE&quot;</span>.<span class="ident">into</span>()
+                )).<span class="kw">await</span>;
 
                 <span class="kw">let</span> <span class="ident">changes</span> <span class="op">=</span> <span class="ident">Changes</span> {
-                    <span class="ident">devices</span>: <span class="ident">DeviceChanges</span> { <span class="ident">changed</span>: <span class="macro">vec!</span>[<span class="ident">device</span>.<span class="ident">clone</span>()], ..<span class="ident">Default::default</span>() },
+                    <span class="ident">devices</span>: <span class="ident">DeviceChanges</span> {
+                        <span class="ident">new</span>: <span class="macro">vec!</span>[
+                            <span class="ident">alice_device_1</span>.<span class="ident">clone</span>(),
+                            <span class="ident">alice_device_2</span>.<span class="ident">clone</span>()
+                        ], ..<span class="ident">Default::default</span>() },
                     ..<span class="ident">Default::default</span>()
                 };
 
@@ -995,20 +954,21 @@
 
                 <span class="ident">store</span>.<span class="ident">load_account</span>().<span class="kw">await</span>.<span class="ident">unwrap</span>();
 
-                <span class="kw">let</span> <span class="ident">loaded_device</span> <span class="op">=</span>
-                    <span class="ident">store</span>.<span class="ident">get_device</span>(<span class="ident">device</span>.<span class="ident">user_id</span>(), <span class="ident">device</span>.<span class="ident">device_id</span>()).<span class="kw">await</span>.<span class="ident">unwrap</span>().<span class="ident">unwrap</span>();
+                <span class="kw">let</span> <span class="ident">loaded_device</span> <span class="op">=</span> <span class="ident">store</span>.<span class="ident">get_device</span>(
+                    <span class="ident">alice_device_1</span>.<span class="ident">user_id</span>(),
+                    <span class="ident">alice_device_1</span>.<span class="ident">device_id</span>()
+                ).<span class="kw">await</span>.<span class="ident">unwrap</span>().<span class="ident">unwrap</span>();
 
-                <span class="macro">assert_eq!</span>(<span class="ident">device</span>, <span class="ident">loaded_device</span>);
+                <span class="macro">assert_eq!</span>(<span class="ident">alice_device_1</span>, <span class="ident">loaded_device</span>);
 
                 <span class="kw">for</span> <span class="ident">algorithm</span> <span class="kw">in</span> <span class="ident">loaded_device</span>.<span class="ident">algorithms</span>() {
-                    <span class="macro">assert!</span>(<span class="ident">device</span>.<span class="ident">algorithms</span>().<span class="ident">contains</span>(<span class="ident">algorithm</span>));
+                    <span class="macro">assert!</span>(<span class="ident">alice_device_1</span>.<span class="ident">algorithms</span>().<span class="ident">contains</span>(<span class="ident">algorithm</span>));
                 }
-                <span class="macro">assert_eq!</span>(<span class="ident">device</span>.<span class="ident">algorithms</span>().<span class="ident">len</span>(), <span class="ident">loaded_device</span>.<span class="ident">algorithms</span>().<span class="ident">len</span>());
-                <span class="macro">assert_eq!</span>(<span class="ident">device</span>.<span class="ident">keys</span>(), <span class="ident">loaded_device</span>.<span class="ident">keys</span>());
+                <span class="macro">assert_eq!</span>(<span class="ident">alice_device_1</span>.<span class="ident">algorithms</span>().<span class="ident">len</span>(), <span class="ident">loaded_device</span>.<span class="ident">algorithms</span>().<span class="ident">len</span>());
+                <span class="macro">assert_eq!</span>(<span class="ident">alice_device_1</span>.<span class="ident">keys</span>(), <span class="ident">loaded_device</span>.<span class="ident">keys</span>());
 
-                <span class="kw">let</span> <span class="ident">user_devices</span> <span class="op">=</span> <span class="ident">store</span>.<span class="ident">get_user_devices</span>(<span class="ident">device</span>.<span class="ident">user_id</span>()).<span class="kw">await</span>.<span class="ident">unwrap</span>();
-                <span class="macro">assert_eq!</span>(<span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="kw-2">*</span><span class="ident">user_devices</span>.<span class="ident">keys</span>().<span class="ident">next</span>().<span class="ident">unwrap</span>(), <span class="ident">device</span>.<span class="ident">device_id</span>());
-                <span class="macro">assert_eq!</span>(<span class="ident">user_devices</span>.<span class="ident">values</span>().<span class="ident">next</span>().<span class="ident">unwrap</span>(), <span class="kw-2">&amp;</span><span class="ident">device</span>);
+                <span class="kw">let</span> <span class="ident">user_devices</span> <span class="op">=</span> <span class="ident">store</span>.<span class="ident">get_user_devices</span>(<span class="ident">alice_device_1</span>.<span class="ident">user_id</span>()).<span class="kw">await</span>.<span class="ident">unwrap</span>();
+                <span class="macro">assert_eq!</span>(<span class="ident">user_devices</span>.<span class="ident">len</span>(), <span class="number">2</span>);
             }
 
             <span class="attribute">#[<span class="ident">async_test</span>]</span>
@@ -1206,5 +1166,5 @@
     }
 }
 </code></pre></div>
-</section><section id="search" class="content hidden"></section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="matrix_sdk_crypto" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.61.0-nightly (9f4dc0b4d 2022-03-23)" ></div>
+</section><section id="search" class="content hidden"></section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="matrix_sdk_crypto" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.61.0-nightly (63b8f01bb 2022-03-24)" ></div>
 </body></html>

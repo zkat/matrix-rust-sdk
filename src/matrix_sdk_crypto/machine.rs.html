@@ -2310,8 +2310,6 @@
 <span id="2305">2305</span>
 <span id="2306">2306</span>
 <span id="2307">2307</span>
-<span id="2308">2308</span>
-<span id="2309">2309</span>
 </pre><pre class="rust"><code><span class="comment">// Copyright 2020 The Matrix.org Foundation C.I.C.</span>
 <span class="comment">//</span>
 <span class="comment">// Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);</span>
@@ -2371,9 +2369,9 @@
     <span class="ident">gossiping::GossipMachine</span>,
     <span class="ident">identities</span>::{<span class="ident">user::UserIdentities</span>, <span class="ident">Device</span>, <span class="ident">IdentityManager</span>, <span class="ident">UserDevices</span>},
     <span class="ident">olm</span>::{
-        <span class="ident">Account</span>, <span class="ident">CrossSigningStatus</span>, <span class="ident">EncryptionSettings</span>, <span class="ident">ExportedRoomKey</span>, <span class="ident">GroupSessionKey</span>,
-        <span class="ident">IdentityKeys</span>, <span class="ident">InboundGroupSession</span>, <span class="ident">OlmDecryptionInfo</span>, <span class="ident">PrivateCrossSigningIdentity</span>,
-        <span class="ident">ReadOnlyAccount</span>, <span class="ident">SessionType</span>,
+        <span class="ident">Account</span>, <span class="ident">CrossSigningStatus</span>, <span class="ident">EncryptionSettings</span>, <span class="ident">ExportedRoomKey</span>, <span class="ident">IdentityKeys</span>,
+        <span class="ident">InboundGroupSession</span>, <span class="ident">OlmDecryptionInfo</span>, <span class="ident">PrivateCrossSigningIdentity</span>, <span class="ident">ReadOnlyAccount</span>,
+        <span class="ident">SessionKey</span>, <span class="ident">SessionType</span>,
     },
     <span class="ident">requests</span>::{<span class="ident">IncomingResponse</span>, <span class="ident">OutgoingRequest</span>, <span class="ident">UploadSigningKeysRequest</span>},
     <span class="ident">session_manager</span>::{<span class="ident">GroupSessionManager</span>, <span class="ident">SessionManager</span>},
@@ -2541,13 +2539,16 @@
     ) -&gt; <span class="ident">StoreResult</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">account</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">store</span>.<span class="ident">load_account</span>().<span class="kw">await</span><span class="question-mark">?</span> {
             <span class="prelude-val">Some</span>(<span class="ident">a</span>) =&gt; {
-                <span class="macro">debug!</span>(<span class="ident">ed25519_key</span> <span class="op">=</span> <span class="ident">a</span>.<span class="ident">identity_keys</span>().<span class="ident">ed25519</span>(), <span class="string">&quot;Restored an Olm account&quot;</span>);
+                <span class="macro">debug!</span>(
+                    <span class="ident">ed25519_key</span> <span class="op">=</span> <span class="ident">a</span>.<span class="ident">identity_keys</span>().<span class="ident">ed25519</span>.<span class="ident">to_base64</span>().<span class="ident">as_str</span>(),
+                    <span class="string">&quot;Restored an Olm account&quot;</span>
+                );
                 <span class="ident">a</span>
             }
             <span class="prelude-val">None</span> =&gt; {
                 <span class="kw">let</span> <span class="ident">account</span> <span class="op">=</span> <span class="ident">ReadOnlyAccount::new</span>(<span class="kw-2">&amp;</span><span class="ident">user_id</span>, <span class="kw-2">&amp;</span><span class="ident">device_id</span>);
                 <span class="macro">debug!</span>(
-                    <span class="ident">ed25519_key</span> <span class="op">=</span> <span class="ident">account</span>.<span class="ident">identity_keys</span>().<span class="ident">ed25519</span>(),
+                    <span class="ident">ed25519_key</span> <span class="op">=</span> <span class="ident">account</span>.<span class="ident">identity_keys</span>().<span class="ident">ed25519</span>.<span class="ident">to_base64</span>().<span class="ident">as_str</span>(),
                     <span class="string">&quot;Created a new Olm account&quot;</span>
                 );
                 <span class="ident">store</span>.<span class="ident">save_account</span>(<span class="ident">account</span>.<span class="ident">clone</span>()).<span class="kw">await</span><span class="question-mark">?</span>;
@@ -2608,7 +2609,7 @@
     }
 
     <span class="doccomment">/// Get the public parts of our Olm identity keys.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">identity_keys</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">IdentityKeys</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">identity_keys</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">IdentityKeys</span> {
         <span class="self">self</span>.<span class="ident">account</span>.<span class="ident">identity_keys</span>()
     }
 
@@ -2889,7 +2890,7 @@
     ) -&gt; <span class="ident">OlmResult</span><span class="op">&lt;</span>(<span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">AnyToDeviceEvent</span><span class="op">&gt;</span>, <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">InboundGroupSession</span><span class="op">&gt;</span>)<span class="op">&gt;</span> {
         <span class="kw">match</span> <span class="ident">event</span>.<span class="ident">content</span>.<span class="ident">algorithm</span> {
             <span class="ident">EventEncryptionAlgorithm::MegolmV1AesSha2</span> =&gt; {
-                <span class="kw">let</span> <span class="ident">session_key</span> <span class="op">=</span> <span class="ident">GroupSessionKey</span>(<span class="ident">mem::take</span>(<span class="kw-2">&amp;mut</span> <span class="ident">event</span>.<span class="ident">content</span>.<span class="ident">session_key</span>));
+                <span class="kw">let</span> <span class="ident">session_key</span> <span class="op">=</span> <span class="ident">SessionKey</span>(<span class="ident">mem::take</span>(<span class="kw-2">&amp;mut</span> <span class="ident">event</span>.<span class="ident">content</span>.<span class="ident">session_key</span>));
 
                 <span class="kw">match</span> <span class="ident">InboundGroupSession::new</span>(
                     <span class="ident">sender_key</span>,
@@ -3799,7 +3800,10 @@
         <span class="kw">let</span> <span class="ident">device_key_id</span> <span class="op">=</span> <span class="ident">DeviceKeyId::from_parts</span>(<span class="ident">DeviceKeyAlgorithm::Ed25519</span>, <span class="kw-2">&amp;</span><span class="ident">master_key</span>);
         <span class="kw">let</span> <span class="ident">signature</span> <span class="op">=</span> <span class="ident">identity</span>.<span class="ident">sign</span>(<span class="ident">message</span>).<span class="kw">await</span><span class="question-mark">?</span>;
 
-        <span class="ident">signatures</span>.<span class="ident">entry</span>(<span class="self">self</span>.<span class="ident">user_id</span>().<span class="ident">to_owned</span>()).<span class="ident">or_default</span>().<span class="ident">insert</span>(<span class="ident">device_key_id</span>, <span class="ident">signature</span>);
+        <span class="ident">signatures</span>
+            .<span class="ident">entry</span>(<span class="self">self</span>.<span class="ident">user_id</span>().<span class="ident">to_owned</span>())
+            .<span class="ident">or_default</span>()
+            .<span class="ident">insert</span>(<span class="ident">device_key_id</span>, <span class="ident">signature</span>.<span class="ident">to_base64</span>());
 
         <span class="prelude-val">Ok</span>(())
     }
@@ -3870,11 +3874,12 @@
         <span class="ident">uint</span>, <span class="ident">user_id</span>, <span class="ident">DeviceId</span>, <span class="ident">DeviceKeyAlgorithm</span>, <span class="ident">DeviceKeyId</span>, <span class="ident">UserId</span>,
     };
     <span class="kw">use</span> <span class="ident">serde_json::json</span>;
+    <span class="kw">use</span> <span class="ident">vodozemac::Ed25519PublicKey</span>;
 
     <span class="kw">use</span> <span class="ident"><span class="kw">super</span>::testing::response_from_file</span>;
     <span class="kw">use</span> <span class="kw">crate</span>::{
         <span class="ident">machine::OlmMachine</span>,
-        <span class="ident">olm::Utility</span>,
+        <span class="ident">olm::VerifyJson</span>,
         <span class="ident">verification::test</span>::{<span class="ident">outgoing_request_to_event</span>, <span class="ident">request_to_event</span>},
         <span class="ident">EncryptionSettings</span>, <span class="ident">ReadOnlyDevice</span>, <span class="ident">ToDeviceRequest</span>,
     };
@@ -4049,13 +4054,11 @@
 
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">device_keys</span> <span class="op">=</span> <span class="ident">machine</span>.<span class="ident">account</span>.<span class="ident">device_keys</span>().<span class="kw">await</span>;
         <span class="kw">let</span> <span class="ident">identity_keys</span> <span class="op">=</span> <span class="ident">machine</span>.<span class="ident">account</span>.<span class="ident">identity_keys</span>();
-        <span class="kw">let</span> <span class="ident">ed25519_key</span> <span class="op">=</span> <span class="ident">identity_keys</span>.<span class="ident">ed25519</span>();
+        <span class="kw">let</span> <span class="ident">ed25519_key</span> <span class="op">=</span> <span class="ident">identity_keys</span>.<span class="ident">ed25519</span>;
 
-        <span class="kw">let</span> <span class="ident">utility</span> <span class="op">=</span> <span class="ident">Utility::new</span>();
-        <span class="kw">let</span> <span class="ident">ret</span> <span class="op">=</span> <span class="ident">utility</span>.<span class="ident">verify_json</span>(
+        <span class="kw">let</span> <span class="ident">ret</span> <span class="op">=</span> <span class="ident">ed25519_key</span>.<span class="ident">verify_json</span>(
             <span class="kw-2">&amp;</span><span class="ident">machine</span>.<span class="ident">user_id</span>,
             <span class="kw-2">&amp;</span><span class="ident">DeviceKeyId::from_parts</span>(<span class="ident">DeviceKeyAlgorithm::Ed25519</span>, <span class="ident">machine</span>.<span class="ident">device_id</span>()),
-            <span class="ident">ed25519_key</span>,
             <span class="kw-2">&amp;mut</span> <span class="macro">json!</span>(<span class="kw-2">&amp;mut</span> <span class="ident">device_keys</span>),
         );
         <span class="macro">assert!</span>(<span class="ident">ret</span>.<span class="ident">is_ok</span>());
@@ -4084,35 +4087,33 @@
 
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">device_keys</span> <span class="op">=</span> <span class="ident">machine</span>.<span class="ident">account</span>.<span class="ident">device_keys</span>().<span class="kw">await</span>;
 
-        <span class="kw">let</span> <span class="ident">utility</span> <span class="op">=</span> <span class="ident">Utility::new</span>();
-        <span class="kw">let</span> <span class="ident">ret</span> <span class="op">=</span> <span class="ident">utility</span>.<span class="ident">verify_json</span>(
+        <span class="kw">let</span> <span class="ident">key</span> <span class="op">=</span> <span class="ident">Ed25519PublicKey::from_slice</span>(<span class="kw-2">&amp;</span>[<span class="number">0u8</span>; <span class="number">32</span>]).<span class="ident">unwrap</span>();
+
+        <span class="kw">let</span> <span class="ident">ret</span> <span class="op">=</span> <span class="ident">key</span>.<span class="ident">verify_json</span>(
             <span class="kw-2">&amp;</span><span class="ident">machine</span>.<span class="ident">user_id</span>,
             <span class="kw-2">&amp;</span><span class="ident">DeviceKeyId::from_parts</span>(<span class="ident">DeviceKeyAlgorithm::Ed25519</span>, <span class="ident">machine</span>.<span class="ident">device_id</span>()),
-            <span class="string">&quot;fake_key&quot;</span>,
             <span class="kw-2">&amp;mut</span> <span class="macro">json!</span>(<span class="kw-2">&amp;mut</span> <span class="ident">device_keys</span>),
         );
         <span class="macro">assert!</span>(<span class="ident">ret</span>.<span class="ident">is_err</span>());
     }
 
     <span class="attribute">#[<span class="ident">async_test</span>]</span>
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">test_one_time_key_signing</span>() {
+    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">one_time_key_signing</span>() {
         <span class="kw">let</span> <span class="ident">machine</span> <span class="op">=</span> <span class="ident">OlmMachine::new</span>(<span class="ident">user_id</span>(), <span class="ident">alice_device_id</span>());
         <span class="ident">machine</span>.<span class="ident">account</span>.<span class="ident">inner</span>.<span class="ident">update_uploaded_key_count</span>(<span class="number">49</span>);
 
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">one_time_keys</span> <span class="op">=</span> <span class="ident">machine</span>.<span class="ident">account</span>.<span class="ident">signed_one_time_keys</span>().<span class="kw">await</span>.<span class="ident">unwrap</span>();
-        <span class="kw">let</span> <span class="ident">identity_keys</span> <span class="op">=</span> <span class="ident">machine</span>.<span class="ident">account</span>.<span class="ident">identity_keys</span>();
-        <span class="kw">let</span> <span class="ident">ed25519_key</span> <span class="op">=</span> <span class="ident">identity_keys</span>.<span class="ident">ed25519</span>();
+        <span class="kw">let</span> <span class="ident">ed25519_key</span> <span class="op">=</span> <span class="ident">machine</span>.<span class="ident">account</span>.<span class="ident">identity_keys</span>().<span class="ident">ed25519</span>;
 
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">one_time_key</span> <span class="op">=</span> <span class="ident">one_time_keys</span>.<span class="ident">values_mut</span>().<span class="ident">next</span>().<span class="ident">unwrap</span>();
 
-        <span class="kw">let</span> <span class="ident">utility</span> <span class="op">=</span> <span class="ident">Utility::new</span>();
-        <span class="kw">let</span> <span class="ident">ret</span> <span class="op">=</span> <span class="ident">utility</span>.<span class="ident">verify_json</span>(
-            <span class="kw-2">&amp;</span><span class="ident">machine</span>.<span class="ident">user_id</span>,
-            <span class="kw-2">&amp;</span><span class="ident">DeviceKeyId::from_parts</span>(<span class="ident">DeviceKeyAlgorithm::Ed25519</span>, <span class="ident">machine</span>.<span class="ident">device_id</span>()),
-            <span class="ident">ed25519_key</span>,
-            <span class="kw-2">&amp;mut</span> <span class="macro">json!</span>(<span class="kw-2">&amp;mut</span> <span class="ident">one_time_key</span>),
-        );
-        <span class="macro">assert!</span>(<span class="ident">ret</span>.<span class="ident">is_ok</span>());
+        <span class="ident">ed25519_key</span>
+            .<span class="ident">verify_json</span>(
+                <span class="kw-2">&amp;</span><span class="ident">machine</span>.<span class="ident">user_id</span>,
+                <span class="kw-2">&amp;</span><span class="ident">DeviceKeyId::from_parts</span>(<span class="ident">DeviceKeyAlgorithm::Ed25519</span>, <span class="ident">machine</span>.<span class="ident">device_id</span>()),
+                <span class="kw-2">&amp;mut</span> <span class="macro">json!</span>(<span class="kw-2">&amp;mut</span> <span class="ident">one_time_key</span>),
+            )
+            .<span class="ident">expect</span>(<span class="string">&quot;One-time key has been signed successfully&quot;</span>);
     }
 
     <span class="attribute">#[<span class="ident">async_test</span>]</span>
@@ -4120,26 +4121,21 @@
         <span class="kw">let</span> <span class="ident">machine</span> <span class="op">=</span> <span class="ident">OlmMachine::new</span>(<span class="ident">user_id</span>(), <span class="ident">alice_device_id</span>());
         <span class="ident">machine</span>.<span class="ident">account</span>.<span class="ident">inner</span>.<span class="ident">update_uploaded_key_count</span>(<span class="number">0</span>);
 
-        <span class="kw">let</span> <span class="ident">identity_keys</span> <span class="op">=</span> <span class="ident">machine</span>.<span class="ident">account</span>.<span class="ident">identity_keys</span>();
-        <span class="kw">let</span> <span class="ident">ed25519_key</span> <span class="op">=</span> <span class="ident">identity_keys</span>.<span class="ident">ed25519</span>();
+        <span class="kw">let</span> <span class="ident">ed25519_key</span> <span class="op">=</span> <span class="ident">machine</span>.<span class="ident">account</span>.<span class="ident">identity_keys</span>().<span class="ident">ed25519</span>;
 
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">request</span> <span class="op">=</span>
             <span class="ident">machine</span>.<span class="ident">keys_for_upload</span>().<span class="kw">await</span>.<span class="ident">expect</span>(<span class="string">&quot;Can&#39;t prepare initial key upload&quot;</span>);
 
-        <span class="kw">let</span> <span class="ident">utility</span> <span class="op">=</span> <span class="ident">Utility::new</span>();
-        <span class="kw">let</span> <span class="ident">ret</span> <span class="op">=</span> <span class="ident">utility</span>.<span class="ident">verify_json</span>(
+        <span class="kw">let</span> <span class="ident">ret</span> <span class="op">=</span> <span class="ident">ed25519_key</span>.<span class="ident">verify_json</span>(
             <span class="kw-2">&amp;</span><span class="ident">machine</span>.<span class="ident">user_id</span>,
             <span class="kw-2">&amp;</span><span class="ident">DeviceKeyId::from_parts</span>(<span class="ident">DeviceKeyAlgorithm::Ed25519</span>, <span class="ident">machine</span>.<span class="ident">device_id</span>()),
-            <span class="ident">ed25519_key</span>,
             <span class="kw-2">&amp;mut</span> <span class="macro">json!</span>(<span class="kw-2">&amp;mut</span> <span class="ident">request</span>.<span class="ident">one_time_keys</span>.<span class="ident">values_mut</span>().<span class="ident">next</span>()),
         );
         <span class="macro">assert!</span>(<span class="ident">ret</span>.<span class="ident">is_ok</span>());
 
-        <span class="kw">let</span> <span class="ident">utility</span> <span class="op">=</span> <span class="ident">Utility::new</span>();
-        <span class="kw">let</span> <span class="ident">ret</span> <span class="op">=</span> <span class="ident">utility</span>.<span class="ident">verify_json</span>(
+        <span class="kw">let</span> <span class="ident">ret</span> <span class="op">=</span> <span class="ident">ed25519_key</span>.<span class="ident">verify_json</span>(
             <span class="kw-2">&amp;</span><span class="ident">machine</span>.<span class="ident">user_id</span>,
             <span class="kw-2">&amp;</span><span class="ident">DeviceKeyId::from_parts</span>(<span class="ident">DeviceKeyAlgorithm::Ed25519</span>, <span class="ident">machine</span>.<span class="ident">device_id</span>()),
-            <span class="ident">ed25519_key</span>,
             <span class="kw-2">&amp;mut</span> <span class="macro">json!</span>(<span class="kw-2">&amp;mut</span> <span class="ident">request</span>.<span class="ident">device_keys</span>.<span class="ident">unwrap</span>()),
         );
         <span class="macro">assert!</span>(<span class="ident">ret</span>.<span class="ident">is_ok</span>());
@@ -4208,7 +4204,7 @@
 
         <span class="kw">let</span> <span class="ident">session</span> <span class="op">=</span> <span class="ident">alice_machine</span>
             .<span class="ident">store</span>
-            .<span class="ident">get_sessions</span>(<span class="ident">bob_machine</span>.<span class="ident">account</span>.<span class="ident">identity_keys</span>().<span class="ident">curve25519</span>())
+            .<span class="ident">get_sessions</span>(<span class="kw-2">&amp;</span><span class="ident">bob_machine</span>.<span class="ident">account</span>.<span class="ident">identity_keys</span>().<span class="ident">curve25519</span>.<span class="ident">to_base64</span>())
             .<span class="kw">await</span>
             .<span class="ident">unwrap</span>()
             .<span class="ident">unwrap</span>();
@@ -4279,7 +4275,7 @@
             .<span class="ident">store</span>
             .<span class="ident">get_inbound_group_session</span>(
                 <span class="ident">room_id</span>,
-                <span class="ident">alice</span>.<span class="ident">account</span>.<span class="ident">identity_keys</span>().<span class="ident">curve25519</span>(),
+                <span class="kw-2">&amp;</span><span class="ident">alice</span>.<span class="ident">account</span>.<span class="ident">identity_keys</span>().<span class="ident">curve25519</span>.<span class="ident">to_base64</span>(),
                 <span class="ident">alice_session</span>.<span class="ident">session_id</span>(),
             )
             .<span class="kw">await</span>;
@@ -4361,7 +4357,7 @@
 
         <span class="kw">let</span> <span class="ident">user_id</span> <span class="op">=</span> <span class="ident">machine</span>.<span class="ident">user_id</span>().<span class="ident">to_owned</span>();
         <span class="kw">let</span> <span class="ident">device_id</span> <span class="op">=</span> <span class="ident">machine</span>.<span class="ident">device_id</span>().<span class="ident">to_owned</span>();
-        <span class="kw">let</span> <span class="ident">ed25519_key</span> <span class="op">=</span> <span class="ident">machine</span>.<span class="ident">identity_keys</span>().<span class="ident">ed25519</span>().<span class="ident">to_owned</span>();
+        <span class="kw">let</span> <span class="ident">ed25519_key</span> <span class="op">=</span> <span class="ident">machine</span>.<span class="ident">identity_keys</span>().<span class="ident">ed25519</span>;
 
         <span class="ident">machine</span>.<span class="ident">receive_keys_upload_response</span>(<span class="kw-2">&amp;</span><span class="ident">keys_upload_response</span>()).<span class="kw">await</span>.<span class="ident">unwrap</span>();
 
@@ -4378,7 +4374,7 @@
 
         <span class="macro">assert_eq!</span>(<span class="kw-2">&amp;</span><span class="ident">user_id</span>, <span class="ident">machine</span>.<span class="ident">user_id</span>());
         <span class="macro">assert_eq!</span>(<span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="ident">device_id</span>, <span class="ident">machine</span>.<span class="ident">device_id</span>());
-        <span class="macro">assert_eq!</span>(<span class="ident">ed25519_key</span>, <span class="ident">machine</span>.<span class="ident">identity_keys</span>().<span class="ident">ed25519</span>());
+        <span class="macro">assert_eq!</span>(<span class="ident">ed25519_key</span>, <span class="ident">machine</span>.<span class="ident">identity_keys</span>().<span class="ident">ed25519</span>);
     }
 
     <span class="attribute">#[<span class="ident">async_test</span>]</span>
@@ -4622,5 +4618,5 @@
     }
 }
 </code></pre></div>
-</section><section id="search" class="content hidden"></section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="matrix_sdk_crypto" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.61.0-nightly (9f4dc0b4d 2022-03-23)" ></div>
+</section><section id="search" class="content hidden"></section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="matrix_sdk_crypto" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.61.0-nightly (63b8f01bb 2022-03-24)" ></div>
 </body></html>

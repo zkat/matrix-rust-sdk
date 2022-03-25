@@ -625,12 +625,6 @@
 <span id="620">620</span>
 <span id="621">621</span>
 <span id="622">622</span>
-<span id="623">623</span>
-<span id="624">624</span>
-<span id="625">625</span>
-<span id="626">626</span>
-<span id="627">627</span>
-<span id="628">628</span>
 </pre><pre class="rust"><code><span class="comment">// Copyright 2020 The Matrix.org Foundation C.I.C.</span>
 <span class="comment">//</span>
 <span class="comment">// Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);</span>
@@ -658,13 +652,6 @@
 
 <span class="kw">use</span> <span class="ident">dashmap::DashMap</span>;
 <span class="kw">use</span> <span class="ident">matrix_sdk_common</span>::{<span class="ident">instant::Instant</span>, <span class="ident">locks::Mutex</span>};
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">olm_rs</span>::{
-    <span class="ident">account::IdentityKeys</span>,
-    <span class="ident">outbound_group_session::OlmOutboundGroupSession</span>,
-    <span class="ident">session</span>::{<span class="ident">OlmMessage</span>, <span class="ident">PreKeyMessage</span>},
-    <span class="ident">utility::OlmUtility</span>,
-};
-<span class="kw">use</span> <span class="ident">olm_rs</span>::{<span class="ident">errors::OlmGroupSessionError</span>, <span class="ident">PicklingMode</span>};
 <span class="kw">use</span> <span class="ident">ruma</span>::{
     <span class="ident">events</span>::{
         <span class="ident">room</span>::{
@@ -682,11 +669,13 @@
 <span class="kw">use</span> <span class="ident">serde</span>::{<span class="ident">Deserialize</span>, <span class="ident">Serialize</span>};
 <span class="kw">use</span> <span class="ident">serde_json</span>::{<span class="ident">json</span>, <span class="ident">Value</span>};
 <span class="kw">use</span> <span class="ident">tracing</span>::{<span class="ident">debug</span>, <span class="ident">error</span>, <span class="ident">info</span>};
-
-<span class="kw">use</span> <span class="kw">super</span>::{
-    <span class="kw">super</span>::{<span class="ident">deserialize_instant</span>, <span class="ident">serialize_instant</span>},
-    <span class="ident">GroupSessionKey</span>,
+<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">vodozemac</span>::{
+    <span class="ident">megolm</span>::{<span class="ident">GroupSession</span>, <span class="ident">GroupSessionPickle</span>, <span class="ident">MegolmMessage</span>, <span class="ident">SessionKey</span>},
+    <span class="ident">olm::IdentityKeys</span>,
+    <span class="ident">PickleError</span>,
 };
+
+<span class="kw">use</span> <span class="ident"><span class="kw">super</span>::<span class="kw">super</span></span>::{<span class="ident">deserialize_instant</span>, <span class="ident">serialize_instant</span>};
 <span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">Device</span>, <span class="ident">ToDeviceRequest</span>};
 
 <span class="kw">const</span> <span class="ident">ROTATION_PERIOD</span>: <span class="ident">Duration</span> <span class="op">=</span> <span class="ident">Duration::from_millis</span>(<span class="number">604800000</span>);
@@ -750,7 +739,7 @@
 <span class="doccomment">/// messages.</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">OutboundGroupSession</span> {
-    <span class="ident">inner</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">Mutex</span><span class="op">&lt;</span><span class="ident">OlmOutboundGroupSession</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+    <span class="ident">inner</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">Mutex</span><span class="op">&lt;</span><span class="ident">GroupSession</span><span class="op">&gt;</span><span class="op">&gt;</span>,
     <span class="ident">device_id</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">DeviceId</span><span class="op">&gt;</span>,
     <span class="ident">account_identity_keys</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">IdentityKeys</span><span class="op">&gt;</span>,
     <span class="ident">session_id</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">str</span><span class="op">&gt;</span>,
@@ -803,8 +792,8 @@
         <span class="ident">room_id</span>: <span class="kw-2">&amp;</span><span class="ident">RoomId</span>,
         <span class="ident">settings</span>: <span class="ident">EncryptionSettings</span>,
     ) -&gt; <span class="self">Self</span> {
-        <span class="kw">let</span> <span class="ident">session</span> <span class="op">=</span> <span class="ident">OlmOutboundGroupSession::new</span>();
-        <span class="kw">let</span> <span class="ident">session_id</span> <span class="op">=</span> <span class="ident">session</span>.<span class="ident">session_id</span>();
+        <span class="kw">let</span> <span class="ident">session</span> <span class="op">=</span> <span class="ident">GroupSession::new</span>();
+        <span class="kw">let</span> <span class="ident">session_id</span> <span class="op">=</span> <span class="ident">session</span>.<span class="ident">session_id</span>().<span class="ident">to_owned</span>();
 
         <span class="ident">OutboundGroupSession</span> {
             <span class="ident">inner</span>: <span class="ident">Arc::new</span>(<span class="ident">Mutex::new</span>(<span class="ident">session</span>)),
@@ -889,8 +878,8 @@
     <span class="doccomment">/// # Arguments</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// * `plaintext` - The plaintext that should be encrypted.</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">encrypt_helper</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">plaintext</span>: <span class="ident">String</span>) -&gt; <span class="ident">String</span> {
-        <span class="kw">let</span> <span class="ident">session</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">lock</span>().<span class="kw">await</span>;
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">encrypt_helper</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">plaintext</span>: <span class="ident">String</span>) -&gt; <span class="ident">MegolmMessage</span> {
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">session</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">lock</span>().<span class="kw">await</span>;
         <span class="self">self</span>.<span class="ident">message_count</span>.<span class="ident">fetch_add</span>(<span class="number">1</span>, <span class="ident">Ordering::SeqCst</span>);
         <span class="ident">session</span>.<span class="ident">encrypt</span>(<span class="kw-2">&amp;</span><span class="ident">plaintext</span>)
     }
@@ -929,8 +918,8 @@
         <span class="kw">let</span> <span class="ident">ciphertext</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">encrypt_helper</span>(<span class="ident">plaintext</span>).<span class="kw">await</span>;
 
         <span class="kw">let</span> <span class="ident">encrypted_content</span> <span class="op">=</span> <span class="ident">MegolmV1AesSha2ContentInit</span> {
-            <span class="ident">ciphertext</span>,
-            <span class="ident">sender_key</span>: <span class="self">self</span>.<span class="ident">account_identity_keys</span>.<span class="ident">curve25519</span>().<span class="ident">to_owned</span>(),
+            <span class="ident">ciphertext</span>: <span class="ident">ciphertext</span>.<span class="ident">to_base64</span>(),
+            <span class="ident">sender_key</span>: <span class="self">self</span>.<span class="ident">account_identity_keys</span>.<span class="ident">curve25519</span>.<span class="ident">to_base64</span>(),
             <span class="ident">session_id</span>: <span class="self">self</span>.<span class="ident">session_id</span>().<span class="ident">to_owned</span>(),
             <span class="ident">device_id</span>: (<span class="kw-2">*</span><span class="self">self</span>.<span class="ident">device_id</span>).<span class="ident">to_owned</span>(),
         }
@@ -978,9 +967,9 @@
     <span class="doccomment">/// Get the session key of this session.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// A session key can be used to to create an `InboundGroupSession`.</span>
-    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">session_key</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">GroupSessionKey</span> {
+    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">session_key</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">SessionKey</span> {
         <span class="kw">let</span> <span class="ident">session</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">lock</span>().<span class="kw">await</span>;
-        <span class="ident">GroupSessionKey</span>(<span class="ident">session</span>.<span class="ident">session_key</span>())
+        <span class="ident">session</span>.<span class="ident">session_key</span>()
     }
 
     <span class="doccomment">/// Get the room id of the room this session belongs to.</span>
@@ -999,7 +988,7 @@
     <span class="doccomment">/// message index that will be used for the next encrypted message.</span>
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">message_index</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">u32</span> {
         <span class="kw">let</span> <span class="ident">session</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">lock</span>().<span class="kw">await</span>;
-        <span class="ident">session</span>.<span class="ident">session_message_index</span>()
+        <span class="ident">session</span>.<span class="ident">message_index</span>()
     }
 
     <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">as_content</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">AnyToDeviceEventContent</span> {
@@ -1114,10 +1103,9 @@
         <span class="ident">device_id</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">DeviceId</span><span class="op">&gt;</span>,
         <span class="ident">identity_keys</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">IdentityKeys</span><span class="op">&gt;</span>,
         <span class="ident">pickle</span>: <span class="ident">PickledOutboundGroupSession</span>,
-        <span class="ident">pickling_mode</span>: <span class="ident">PicklingMode</span>,
-    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">OlmGroupSessionError</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">inner</span> <span class="op">=</span> <span class="ident">OlmOutboundGroupSession::unpickle</span>(<span class="ident">pickle</span>.<span class="ident">pickle</span>.<span class="number">0</span>, <span class="ident">pickling_mode</span>)<span class="question-mark">?</span>;
-        <span class="kw">let</span> <span class="ident">session_id</span> <span class="op">=</span> <span class="ident">inner</span>.<span class="ident">session_id</span>();
+    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">PickleError</span><span class="op">&gt;</span> {
+        <span class="kw">let</span> <span class="ident">inner</span>: <span class="ident">GroupSession</span> <span class="op">=</span> <span class="ident">pickle</span>.<span class="ident">pickle</span>.<span class="ident">into</span>();
+        <span class="kw">let</span> <span class="ident">session_id</span> <span class="op">=</span> <span class="ident">inner</span>.<span class="ident">session_id</span>().<span class="ident">to_owned</span>();
 
         <span class="prelude-val">Ok</span>(<span class="self">Self</span> {
             <span class="ident">inner</span>: <span class="ident">Arc::new</span>(<span class="ident">Mutex::new</span>(<span class="ident">inner</span>)),
@@ -1149,9 +1137,8 @@
     <span class="doccomment">/// * `pickle_mode` - The mode that should be used to pickle the group</span>
     <span class="doccomment">///   session,</span>
     <span class="doccomment">/// either an unencrypted mode or an encrypted using passphrase.</span>
-    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">pickle</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">pickling_mode</span>: <span class="ident">PicklingMode</span>) -&gt; <span class="ident">PickledOutboundGroupSession</span> {
-        <span class="kw">let</span> <span class="ident">pickle</span>: <span class="ident">OutboundGroupSessionPickle</span> <span class="op">=</span>
-            <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">lock</span>().<span class="kw">await</span>.<span class="ident">pickle</span>(<span class="ident">pickling_mode</span>).<span class="ident">into</span>();
+    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">pickle</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">PickledOutboundGroupSession</span> {
+        <span class="kw">let</span> <span class="ident">pickle</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">lock</span>().<span class="kw">await</span>.<span class="ident">pickle</span>();
 
         <span class="ident">PickledOutboundGroupSession</span> {
             <span class="ident">pickle</span>,
@@ -1205,10 +1192,11 @@
 <span class="doccomment">///</span>
 <span class="doccomment">/// Holds all the information that needs to be stored in a database to restore</span>
 <span class="doccomment">/// an InboundGroupSession.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>)]</span>
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Deserialize</span>, <span class="ident">Serialize</span>)]</span>
+<span class="attribute">#[<span class="ident">allow</span>(<span class="ident">missing_debug_implementations</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">PickledOutboundGroupSession</span> {
     <span class="doccomment">/// The pickle string holding the OutboundGroupSession.</span>
-    <span class="kw">pub</span> <span class="ident">pickle</span>: <span class="ident">OutboundGroupSessionPickle</span>,
+    <span class="kw">pub</span> <span class="ident">pickle</span>: <span class="ident">GroupSessionPickle</span>,
     <span class="doccomment">/// The settings this session adheres to.</span>
     <span class="kw">pub</span> <span class="ident">settings</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">EncryptionSettings</span><span class="op">&gt;</span>,
     <span class="doccomment">/// The room id this session is used for.</span>
@@ -1260,5 +1248,5 @@
     }
 }
 </code></pre></div>
-</section><section id="search" class="content hidden"></section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="matrix_sdk_crypto" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.61.0-nightly (9f4dc0b4d 2022-03-23)" ></div>
+</section><section id="search" class="content hidden"></section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="matrix_sdk_crypto" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.61.0-nightly (63b8f01bb 2022-03-24)" ></div>
 </body></html>
