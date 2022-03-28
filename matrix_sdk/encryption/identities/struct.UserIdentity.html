@@ -154,7 +154,7 @@ the identity.</p>
     <span class="comment">// matches what we expect, for this we fetch the first public key we</span>
     <span class="comment">// can find, there&#39;s currently only a single key allowed so this is</span>
     <span class="comment">// fine.</span>
-    <span class="kw">if</span> <span class="ident">user</span>.<span class="ident">master_key</span>().<span class="ident">get_first_key</span>() <span class="op">==</span> <span class="prelude-val">Some</span>(<span class="string">&quot;MyMasterKey&quot;</span>) {
+    <span class="kw">if</span> <span class="ident">user</span>.<span class="ident">master_key</span>().<span class="ident">get_first_key</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">k</span><span class="op">|</span> <span class="ident">k</span>.<span class="ident">to_base64</span>()) <span class="op">==</span> <span class="prelude-val">Some</span>(<span class="string">&quot;MyMasterKey&quot;</span>.<span class="ident">to_string</span>()) {
         <span class="macro">println!</span>(
             <span class="string">&quot;Master keys match for user {}, marking the user as verified&quot;</span>,
             <span class="ident">user</span>.<span class="ident">user_id</span>().<span class="ident">as_str</span>(),

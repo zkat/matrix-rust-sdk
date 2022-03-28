@@ -107,6 +107,9 @@
     <span class="doccomment">/// The QR code data uses an invalid or unsupported version.</span>
     <span class="attribute">#[<span class="ident">error</span>(<span class="string">&quot;the QR code contains an invalid or unsupported version: {0}&quot;</span>)]</span>
     <span class="ident">Version</span>(<span class="ident">u8</span>),
+    <span class="doccomment">/// The QR code data doesn&#39;t contain valid ed25519 keys.</span>
+    <span class="attribute">#[<span class="ident">error</span>(<span class="string">&quot;the QR code contains invalid ed25519 keys: {0}&quot;</span>)]</span>
+    <span class="ident">Keys</span>(<span class="attribute">#[<span class="ident">from</span>]</span> <span class="ident">vodozemac::KeyError</span>),
 }
 
 <span class="doccomment">/// Error type describing errors that happen while QR data is being encoded.</span>
@@ -116,9 +119,6 @@
     <span class="doccomment">/// doesn&#39;t fit into a QR code.</span>
     <span class="attribute">#[<span class="ident">error</span>(<span class="ident">transparent</span>)]</span>
     <span class="ident">Qr</span>(<span class="attribute">#[<span class="ident">from</span>]</span> <span class="ident">qrcode::types::QrError</span>),
-    <span class="doccomment">/// Error decoding the identity keys as base64.</span>
-    <span class="attribute">#[<span class="ident">error</span>(<span class="ident">transparent</span>)]</span>
-    <span class="ident">Base64</span>(<span class="attribute">#[<span class="ident">from</span>]</span> <span class="ident">base64::DecodeError</span>),
     <span class="doccomment">/// Error encoding the given flow id, the flow id is too large.</span>
     <span class="attribute">#[<span class="ident">error</span>(<span class="string">&quot;The verification flow id length can&#39;t be converted into a u16: {0}&quot;</span>)]</span>
     <span class="ident">FlowId</span>(<span class="attribute">#[<span class="ident">from</span>]</span> <span class="ident">std::num::TryFromIntError</span>),

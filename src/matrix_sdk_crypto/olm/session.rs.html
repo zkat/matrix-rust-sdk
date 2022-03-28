@@ -248,6 +248,8 @@
 <span id="243">243</span>
 <span id="244">244</span>
 <span id="245">245</span>
+<span id="246">246</span>
+<span id="247">247</span>
 </pre><pre class="rust"><code><span class="comment">// Copyright 2020 The Matrix.org Foundation C.I.C.</span>
 <span class="comment">//</span>
 <span class="comment">// Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);</span>
@@ -273,11 +275,14 @@
         },
         <span class="ident">AnyToDeviceEventContent</span>, <span class="ident">EventContent</span>,
     },
-    <span class="ident">DeviceId</span>, <span class="ident">DeviceKeyAlgorithm</span>, <span class="ident">UserId</span>,
+    <span class="ident">DeviceId</span>, <span class="ident">UserId</span>,
 };
 <span class="kw">use</span> <span class="ident">serde</span>::{<span class="ident">Deserialize</span>, <span class="ident">Serialize</span>};
 <span class="kw">use</span> <span class="ident">serde_json::json</span>;
-<span class="kw">use</span> <span class="ident">vodozemac::olm</span>::{<span class="ident">DecryptionError</span>, <span class="ident">OlmMessage</span>, <span class="ident">Session</span> <span class="kw">as</span> <span class="ident">InnerSession</span>, <span class="ident">SessionPickle</span>};
+<span class="kw">use</span> <span class="ident">vodozemac</span>::{
+    <span class="ident">olm</span>::{<span class="ident">DecryptionError</span>, <span class="ident">OlmMessage</span>, <span class="ident">Session</span> <span class="kw">as</span> <span class="ident">InnerSession</span>, <span class="ident">SessionPickle</span>},
+    <span class="ident">Curve25519PublicKey</span>,
+};
 
 <span class="kw">use</span> <span class="kw">super</span>::{<span class="ident">deserialize_instant</span>, <span class="ident">serialize_instant</span>, <span class="ident">IdentityKeys</span>};
 <span class="kw">use</span> <span class="kw">crate</span>::{
@@ -300,7 +305,7 @@
     <span class="doccomment">/// Our sessionId</span>
     <span class="kw">pub</span> <span class="ident">session_id</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">str</span><span class="op">&gt;</span>,
     <span class="doccomment">/// The Key of the sender</span>
-    <span class="kw">pub</span> <span class="ident">sender_key</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">str</span><span class="op">&gt;</span>,
+    <span class="kw">pub</span> <span class="ident">sender_key</span>: <span class="ident">Curve25519PublicKey</span>,
     <span class="doccomment">/// Has this been created using the fallback key</span>
     <span class="kw">pub</span> <span class="ident">created_using_fallback_key</span>: <span class="ident">bool</span>,
     <span class="doccomment">/// When the session was created</span>
@@ -335,8 +340,8 @@
     }
 
     <span class="doccomment">/// Get the sender key that was used to establish this Session.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">sender_key</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">str</span> {
-        <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">sender_key</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">sender_key</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Curve25519PublicKey</span> {
+        <span class="self">self</span>.<span class="ident">sender_key</span>
     }
 
     <span class="doccomment">/// Encrypt the given plaintext as a OlmMessage.</span>
@@ -367,9 +372,8 @@
         <span class="ident">recipient_device</span>: <span class="kw-2">&amp;</span><span class="ident">ReadOnlyDevice</span>,
         <span class="ident">content</span>: <span class="ident">AnyToDeviceEventContent</span>,
     ) -&gt; <span class="ident">OlmResult</span><span class="op">&lt;</span><span class="ident">ToDeviceRoomEncryptedEventContent</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">recipient_signing_key</span> <span class="op">=</span> <span class="ident">recipient_device</span>
-            .<span class="ident">get_key</span>(<span class="ident">DeviceKeyAlgorithm::Ed25519</span>)
-            .<span class="ident">ok_or</span>(<span class="ident">EventError::MissingSigningKey</span>)<span class="question-mark">?</span>;
+        <span class="kw">let</span> <span class="ident">recipient_signing_key</span> <span class="op">=</span>
+            <span class="ident">recipient_device</span>.<span class="ident">ed25519_key</span>().<span class="ident">ok_or</span>(<span class="ident">EventError::MissingSigningKey</span>)<span class="question-mark">?</span>;
 
         <span class="kw">let</span> <span class="ident">event_type</span> <span class="op">=</span> <span class="ident">content</span>.<span class="ident">event_type</span>();
 
@@ -381,7 +385,7 @@
             },
             <span class="string">&quot;recipient&quot;</span>: <span class="ident">recipient_device</span>.<span class="ident">user_id</span>(),
             <span class="string">&quot;recipient_keys&quot;</span>: {
-                <span class="string">&quot;ed25519&quot;</span>: <span class="ident">recipient_signing_key</span>,
+                <span class="string">&quot;ed25519&quot;</span>: <span class="ident">recipient_signing_key</span>.<span class="ident">to_base64</span>(),
             },
             <span class="string">&quot;type&quot;</span>: <span class="ident">event_type</span>,
             <span class="string">&quot;content&quot;</span>: <span class="ident">content</span>,
@@ -394,7 +398,7 @@
         <span class="kw">let</span> <span class="ident">ciphertext</span> <span class="op">=</span> <span class="ident">CiphertextInfo::new</span>(<span class="ident">ciphertext</span>.<span class="number">1</span>, (<span class="ident">message_type</span> <span class="kw">as</span> <span class="ident">u32</span>).<span class="ident">into</span>());
 
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">content</span> <span class="op">=</span> <span class="ident">BTreeMap::new</span>();
-        <span class="ident">content</span>.<span class="ident">insert</span>((<span class="kw-2">*</span><span class="self">self</span>.<span class="ident">sender_key</span>).<span class="ident">to_owned</span>(), <span class="ident">ciphertext</span>);
+        <span class="ident">content</span>.<span class="ident">insert</span>(<span class="self">self</span>.<span class="ident">sender_key</span>.<span class="ident">to_base64</span>(), <span class="ident">ciphertext</span>);
 
         <span class="prelude-val">Ok</span>(<span class="ident">EncryptedEventScheme::OlmV1Curve25519AesSha2</span>(<span class="ident">OlmV1Curve25519AesSha2Content::new</span>(
             <span class="ident">content</span>,
@@ -419,7 +423,7 @@
 
         <span class="ident">PickledSession</span> {
             <span class="ident">pickle</span>,
-            <span class="ident">sender_key</span>: <span class="self">self</span>.<span class="ident">sender_key</span>.<span class="ident">to_string</span>(),
+            <span class="ident">sender_key</span>: <span class="self">self</span>.<span class="ident">sender_key</span>,
             <span class="ident">created_using_fallback_key</span>: <span class="self">self</span>.<span class="ident">created_using_fallback_key</span>,
             <span class="ident">creation_time</span>: <span class="kw-2">*</span><span class="self">self</span>.<span class="ident">creation_time</span>,
             <span class="ident">last_use_time</span>: <span class="kw-2">*</span><span class="self">self</span>.<span class="ident">last_use_time</span>,
@@ -459,7 +463,7 @@
             <span class="ident">inner</span>: <span class="ident">Arc::new</span>(<span class="ident">Mutex::new</span>(<span class="ident">session</span>)),
             <span class="ident">session_id</span>: <span class="ident">session_id</span>.<span class="ident">into</span>(),
             <span class="ident">created_using_fallback_key</span>: <span class="ident">pickle</span>.<span class="ident">created_using_fallback_key</span>,
-            <span class="ident">sender_key</span>: <span class="ident">pickle</span>.<span class="ident">sender_key</span>.<span class="ident">into</span>(),
+            <span class="ident">sender_key</span>: <span class="ident">pickle</span>.<span class="ident">sender_key</span>,
             <span class="ident">creation_time</span>: <span class="ident">Arc::new</span>(<span class="ident">pickle</span>.<span class="ident">creation_time</span>),
             <span class="ident">last_use_time</span>: <span class="ident">Arc::new</span>(<span class="ident">pickle</span>.<span class="ident">last_use_time</span>),
         }
@@ -482,7 +486,7 @@
     <span class="doccomment">/// The pickle string holding the Olm Session.</span>
     <span class="kw">pub</span> <span class="ident">pickle</span>: <span class="ident">SessionPickle</span>,
     <span class="doccomment">/// The curve25519 key of the other user that we share this session with.</span>
-    <span class="kw">pub</span> <span class="ident">sender_key</span>: <span class="ident">String</span>,
+    <span class="kw">pub</span> <span class="ident">sender_key</span>: <span class="ident">Curve25519PublicKey</span>,
     <span class="doccomment">/// Was the session created using a fallback key.</span>
     <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">default</span>)]</span>
     <span class="kw">pub</span> <span class="ident">created_using_fallback_key</span>: <span class="ident">bool</span>,

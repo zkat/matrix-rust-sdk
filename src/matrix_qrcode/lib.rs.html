@@ -200,6 +200,18 @@
 <span id="195">195</span>
 <span id="196">196</span>
 <span id="197">197</span>
+<span id="198">198</span>
+<span id="199">199</span>
+<span id="200">200</span>
+<span id="201">201</span>
+<span id="202">202</span>
+<span id="203">203</span>
+<span id="204">204</span>
+<span id="205">205</span>
+<span id="206">206</span>
+<span id="207">207</span>
+<span id="208">208</span>
+<span id="209">209</span>
 </pre><pre class="rust"><code><span class="comment">// Copyright 2021 The Matrix.org Foundation C.I.C.</span>
 <span class="comment">//</span>
 <span class="comment">// Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);</span>
@@ -389,12 +401,24 @@
         <span class="kw">let</span> <span class="ident">data</span> <span class="op">=</span> <span class="string">b&quot;MATRIX\
                    \x02\x00\x00\x0f\
                    test:localhost\
-                   AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA\
-                   BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB\
+                   kS /\x92i\x1e6\xcd&#39;g\xf9#\x11\xd8\x8a\xa2\xf61\x05\x1b6\xef\xfc\xa4%\x80\x1a\x0c\xd2\xe8\x04\
+                   \xbdR|\xf8n\x07\xa4\x1f\xb4\xcc3\x0eBT\xe7[~\xfd\x87\xd06B\xdfoVv%\x9b\x86\xae\xbcM\
                    SECRETISLONGENOUGH&quot;</span>;
 
         <span class="kw">let</span> <span class="ident">result</span> <span class="op">=</span> <span class="ident">QrVerificationData::from_bytes</span>(<span class="ident">data</span>);
         <span class="macro">assert!</span>(<span class="macro">matches!</span>(<span class="ident">result</span>, <span class="prelude-val">Err</span>(<span class="ident">DecodingError::Identifier</span>(<span class="kw">_</span>))))
+    }
+
+    <span class="attribute">#[<span class="ident">test</span>]</span>
+    <span class="kw">fn</span> <span class="ident">decode_invalid_keys</span>() {
+        <span class="kw">let</span> <span class="ident">data</span> <span class="op">=</span> <span class="string">b&quot;MATRIX\
+                   \x02\x00\x00\x0f\
+                   !test:localhost\
+                   AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA\
+                   BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB\
+                   SECRETISLONGENOUGH&quot;</span>;
+        <span class="kw">let</span> <span class="ident">result</span> <span class="op">=</span> <span class="ident">QrVerificationData::from_bytes</span>(<span class="ident">data</span>);
+        <span class="macro">assert!</span>(<span class="macro">matches!</span>(<span class="ident">result</span>, <span class="prelude-val">Err</span>(<span class="ident">DecodingError::Keys</span>(<span class="kw">_</span>))))
     }
 }
 </code></pre></div>

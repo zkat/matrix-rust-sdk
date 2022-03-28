@@ -762,6 +762,7 @@
 <span id="757">757</span>
 <span id="758">758</span>
 <span id="759">759</span>
+<span id="760">760</span>
 </pre><pre class="rust"><code><span class="comment">// Copyright 2020 The Matrix.org Foundation C.I.C.</span>
 <span class="comment">//</span>
 <span class="comment">// Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);</span>
@@ -800,7 +801,7 @@
     <span class="ident">identities</span>::{<span class="ident">MasterPubkey</span>, <span class="ident">SelfSigningPubkey</span>, <span class="ident">UserSigningPubkey</span>},
     <span class="ident">requests::UploadSigningKeysRequest</span>,
     <span class="ident">store::SecretImportError</span>,
-    <span class="ident">types::device_keys::DeviceKeys</span>,
+    <span class="ident">types::DeviceKeys</span>,
     <span class="ident">OwnUserIdentity</span>, <span class="ident">ReadOnlyAccount</span>, <span class="ident">ReadOnlyDevice</span>, <span class="ident">ReadOnlyOwnUserIdentity</span>,
     <span class="ident">ReadOnlyUserIdentity</span>,
 };
@@ -1168,6 +1169,7 @@
                 .<span class="ident">master_key</span>()
                 .<span class="ident">get_first_key</span>()
                 .<span class="ident">ok_or</span>(<span class="ident">SignatureError::MissingSigningKey</span>)<span class="question-mark">?</span>
+                .<span class="ident">to_base64</span>()
                 .<span class="ident">into</span>(),
             <span class="ident">master_key</span>.<span class="ident">to_raw</span>(),
         );

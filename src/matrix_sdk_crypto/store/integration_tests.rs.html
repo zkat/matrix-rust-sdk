@@ -716,7 +716,7 @@
                 <span class="ident">store</span>.<span class="ident">save_changes</span>(<span class="ident">changes</span>).<span class="kw">await</span>.<span class="ident">unwrap</span>();
 
                 <span class="kw">let</span> <span class="ident">sessions</span> <span class="op">=</span>
-                    <span class="ident">store</span>.<span class="ident">get_sessions</span>(<span class="kw-2">&amp;</span><span class="ident">session</span>.<span class="ident">sender_key</span>).<span class="kw">await</span>.<span class="ident">expect</span>(<span class="string">&quot;Can&#39;t load sessions&quot;</span>).<span class="ident">unwrap</span>();
+                    <span class="ident">store</span>.<span class="ident">get_sessions</span>(<span class="kw-2">&amp;</span><span class="ident">session</span>.<span class="ident">sender_key</span>.<span class="ident">to_base64</span>()).<span class="kw">await</span>.<span class="ident">expect</span>(<span class="string">&quot;Can&#39;t load sessions&quot;</span>).<span class="ident">unwrap</span>();
                 <span class="kw">let</span> <span class="ident">loaded_session</span> <span class="op">=</span> <span class="ident">sessions</span>.<span class="ident">lock</span>().<span class="kw">await</span>.<span class="ident">get</span>(<span class="number">0</span>).<span class="ident">cloned</span>().<span class="ident">unwrap</span>();
 
                 <span class="macro">assert_eq!</span>(<span class="kw-2">&amp;</span><span class="ident">session</span>, <span class="kw-2">&amp;</span><span class="ident">loaded_session</span>);
@@ -727,7 +727,7 @@
                 <span class="kw">let</span> <span class="ident">store_name</span> <span class="op">=</span> <span class="string">&quot;add_and_save_session&quot;</span>.<span class="ident">to_owned</span>();
                 <span class="kw">let</span> <span class="ident">store</span> <span class="op">=</span> <span class="ident">get_store</span>(<span class="ident">store_name</span>.<span class="ident">clone</span>(), <span class="prelude-val">None</span>).<span class="kw">await</span>;
                 <span class="kw">let</span> (<span class="ident">account</span>, <span class="ident">session</span>) <span class="op">=</span> <span class="ident">get_account_and_session</span>().<span class="kw">await</span>;
-                <span class="kw">let</span> <span class="ident">sender_key</span> <span class="op">=</span> <span class="ident">session</span>.<span class="ident">sender_key</span>.<span class="ident">to_owned</span>();
+                <span class="kw">let</span> <span class="ident">sender_key</span> <span class="op">=</span> <span class="ident">session</span>.<span class="ident">sender_key</span>.<span class="ident">to_base64</span>();
                 <span class="kw">let</span> <span class="ident">session_id</span> <span class="op">=</span> <span class="ident">session</span>.<span class="ident">session_id</span>().<span class="ident">to_owned</span>();
 
                 <span class="ident">store</span>.<span class="ident">save_account</span>(<span class="ident">account</span>.<span class="ident">clone</span>()).<span class="kw">await</span>.<span class="ident">expect</span>(<span class="string">&quot;Can&#39;t save account&quot;</span>);

@@ -678,6 +678,8 @@
 <span id="673">673</span>
 <span id="674">674</span>
 <span id="675">675</span>
+<span id="676">676</span>
+<span id="677">677</span>
 </pre><pre class="rust"><code><span class="comment">// Copyright 2021 The Matrix.org Foundation C.I.C.</span>
 <span class="comment">//</span>
 <span class="comment">// Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);</span>
@@ -703,12 +705,13 @@
 <span class="kw">use</span> <span class="ident">qrcode::QrCode</span>;
 <span class="kw">use</span> <span class="ident">ruma_identifiers::EventId</span>;
 <span class="kw">use</span> <span class="ident">ruma_serde::Base64</span>;
+<span class="kw">use</span> <span class="ident">vodozemac::Ed25519PublicKey</span>;
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;decode_image&quot;</span>)]</span>
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::utils::decode_qr</span>;
 <span class="kw">use</span> <span class="kw">crate</span>::{
     <span class="ident">error</span>::{<span class="ident">DecodingError</span>, <span class="ident">EncodingError</span>},
-    <span class="ident">utils</span>::{<span class="ident">base_64_encode</span>, <span class="ident">to_bytes</span>, <span class="ident">to_qr_code</span>, <span class="ident">HEADER</span>, <span class="ident">MAX_MODE</span>, <span class="ident">MIN_SECRET_LEN</span>, <span class="ident">VERSION</span>},
+    <span class="ident">utils</span>::{<span class="ident">to_bytes</span>, <span class="ident">to_qr_code</span>, <span class="ident">HEADER</span>, <span class="ident">MAX_MODE</span>, <span class="ident">MIN_SECRET_LEN</span>, <span class="ident">VERSION</span>},
 };
 
 <span class="doccomment">/// An enum representing the different modes a QR verification can be in.</span>
@@ -830,8 +833,8 @@
     <span class="doccomment">/// let data = b&quot;MATRIX\</span>
     <span class="doccomment">///              \x02\x02\x00\x07\</span>
     <span class="doccomment">///              FLOW_ID\</span>
-    <span class="doccomment">///              AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA\</span>
-    <span class="doccomment">///              BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB\</span>
+    <span class="doccomment">///              kS /\x92i\x1e6\xcd&#39;g\xf9#\x11\xd8\x8a\xa2\xf61\x05\x1b6\xef\xfc\xa4%\x80\x1a\x0c\xd2\xe8\x04\</span>
+    <span class="doccomment">///              \xbdR|\xf8n\x07\xa4\x1f\xb4\xcc3\x0eBT\xe7[~\xfd\x87\xd06B\xdfoVv%\x9b\x86\xae\xbcM\</span>
     <span class="doccomment">///              SHARED_SECRET&quot;;</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// let result = QrVerificationData::from_bytes(data)?;</span>
@@ -858,8 +861,8 @@
     <span class="doccomment">/// let data = b&quot;MATRIX\</span>
     <span class="doccomment">///              \x02\x02\x00\x07\</span>
     <span class="doccomment">///              FLOW_ID\</span>
-    <span class="doccomment">///              AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA\</span>
-    <span class="doccomment">///              BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB\</span>
+    <span class="doccomment">///              kS /\x92i\x1e6\xcd&#39;g\xf9#\x11\xd8\x8a\xa2\xf61\x05\x1b6\xef\xfc\xa4%\x80\x1a\x0c\xd2\xe8\x04\</span>
+    <span class="doccomment">///              \xbdR|\xf8n\x07\xa4\x1f\xb4\xcc3\x0eBT\xe7[~\xfd\x87\xd06B\xdfoVv%\x9b\x86\xae\xbcM\</span>
     <span class="doccomment">///              SHARED_SECRET&quot;;</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// let result = QrVerificationData::from_bytes(data)?;</span>
@@ -888,8 +891,8 @@
     <span class="doccomment">/// let data = b&quot;MATRIX\</span>
     <span class="doccomment">///              \x02\x02\x00\x07\</span>
     <span class="doccomment">///              FLOW_ID\</span>
-    <span class="doccomment">///              AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA\</span>
-    <span class="doccomment">///              BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB\</span>
+    <span class="doccomment">///              kS /\x92i\x1e6\xcd&#39;g\xf9#\x11\xd8\x8a\xa2\xf61\x05\x1b6\xef\xfc\xa4%\x80\x1a\x0c\xd2\xe8\x04\</span>
+    <span class="doccomment">///              \xbdR|\xf8n\x07\xa4\x1f\xb4\xcc3\x0eBT\xe7[~\xfd\x87\xd06B\xdfoVv%\x9b\x86\xae\xbcM\</span>
     <span class="doccomment">///              SHARED_SECRET&quot;;</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// let result = QrVerificationData::from_bytes(data)?;</span>
@@ -969,6 +972,9 @@
             <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">DecodingError::SharedSecret</span>(<span class="ident">shared_secret</span>.<span class="ident">len</span>()));
         }
 
+        <span class="kw">let</span> <span class="ident">first_key</span> <span class="op">=</span> <span class="ident">Ed25519PublicKey::from_slice</span>(<span class="kw-2">&amp;</span><span class="ident">first_key</span>)<span class="question-mark">?</span>;
+        <span class="kw">let</span> <span class="ident">second_key</span> <span class="op">=</span> <span class="ident">Ed25519PublicKey::from_slice</span>(<span class="kw-2">&amp;</span><span class="ident">second_key</span>)<span class="question-mark">?</span>;
+
         <span class="ident">QrVerificationData::new</span>(<span class="ident">mode</span>, <span class="ident">flow_id</span>, <span class="ident">first_key</span>, <span class="ident">second_key</span>, <span class="ident">shared_secret</span>)
     }
 
@@ -986,12 +992,10 @@
     <span class="kw">fn</span> <span class="ident">new</span>(
         <span class="ident">mode</span>: <span class="ident">u8</span>,
         <span class="ident">flow_id</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>,
-        <span class="ident">first_key</span>: [<span class="ident">u8</span>; <span class="number">32</span>],
-        <span class="ident">second_key</span>: [<span class="ident">u8</span>; <span class="number">32</span>],
+        <span class="ident">first_key</span>: <span class="ident">Ed25519PublicKey</span>,
+        <span class="ident">second_key</span>: <span class="ident">Ed25519PublicKey</span>,
         <span class="ident">shared_secret</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>,
     ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">DecodingError</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">first_key</span> <span class="op">=</span> <span class="ident">base_64_encode</span>(<span class="kw-2">&amp;</span><span class="ident">first_key</span>);
-        <span class="kw">let</span> <span class="ident">second_key</span> <span class="op">=</span> <span class="ident">base_64_encode</span>(<span class="kw-2">&amp;</span><span class="ident">second_key</span>);
         <span class="kw">let</span> <span class="ident">flow_id</span> <span class="op">=</span> <span class="ident">String::from_utf8</span>(<span class="ident">flow_id</span>)<span class="question-mark">?</span>;
         <span class="kw">let</span> <span class="ident">shared_secret</span> <span class="op">=</span> <span class="ident">Base64::new</span>(<span class="ident">shared_secret</span>);
 
@@ -1023,20 +1027,20 @@
     }
 
     <span class="doccomment">/// Get the first key of this `QrVerificationData`.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">first_key</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">str</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">first_key</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Ed25519PublicKey</span> {
         <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">QrVerificationData::Verification</span>(<span class="ident">v</span>) =&gt; <span class="kw-2">&amp;</span><span class="ident">v</span>.<span class="ident">first_master_key</span>,
-            <span class="ident">QrVerificationData::SelfVerification</span>(<span class="ident">v</span>) =&gt; <span class="kw-2">&amp;</span><span class="ident">v</span>.<span class="ident">master_key</span>,
-            <span class="ident">QrVerificationData::SelfVerificationNoMasterKey</span>(<span class="ident">v</span>) =&gt; <span class="kw-2">&amp;</span><span class="ident">v</span>.<span class="ident">device_key</span>,
+            <span class="ident">QrVerificationData::Verification</span>(<span class="ident">v</span>) =&gt; <span class="ident">v</span>.<span class="ident">first_master_key</span>,
+            <span class="ident">QrVerificationData::SelfVerification</span>(<span class="ident">v</span>) =&gt; <span class="ident">v</span>.<span class="ident">master_key</span>,
+            <span class="ident">QrVerificationData::SelfVerificationNoMasterKey</span>(<span class="ident">v</span>) =&gt; <span class="ident">v</span>.<span class="ident">device_key</span>,
         }
     }
 
     <span class="doccomment">/// Get the second key of this `QrVerificationData`.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">second_key</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">str</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">second_key</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Ed25519PublicKey</span> {
         <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">QrVerificationData::Verification</span>(<span class="ident">v</span>) =&gt; <span class="kw-2">&amp;</span><span class="ident">v</span>.<span class="ident">second_master_key</span>,
-            <span class="ident">QrVerificationData::SelfVerification</span>(<span class="ident">v</span>) =&gt; <span class="kw-2">&amp;</span><span class="ident">v</span>.<span class="ident">device_key</span>,
-            <span class="ident">QrVerificationData::SelfVerificationNoMasterKey</span>(<span class="ident">v</span>) =&gt; <span class="kw-2">&amp;</span><span class="ident">v</span>.<span class="ident">master_key</span>,
+            <span class="ident">QrVerificationData::Verification</span>(<span class="ident">v</span>) =&gt; <span class="ident">v</span>.<span class="ident">second_master_key</span>,
+            <span class="ident">QrVerificationData::SelfVerification</span>(<span class="ident">v</span>) =&gt; <span class="ident">v</span>.<span class="ident">device_key</span>,
+            <span class="ident">QrVerificationData::SelfVerificationNoMasterKey</span>(<span class="ident">v</span>) =&gt; <span class="ident">v</span>.<span class="ident">master_key</span>,
         }
     }
 
@@ -1057,8 +1061,8 @@
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">PartialEq</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">VerificationData</span> {
     <span class="ident">event_id</span>: <span class="ident">Box</span><span class="op">&lt;</span><span class="ident">EventId</span><span class="op">&gt;</span>,
-    <span class="ident">first_master_key</span>: <span class="ident">String</span>,
-    <span class="ident">second_master_key</span>: <span class="ident">String</span>,
+    <span class="ident">first_master_key</span>: <span class="ident">Ed25519PublicKey</span>,
+    <span class="ident">second_master_key</span>: <span class="ident">Ed25519PublicKey</span>,
     <span class="ident">shared_secret</span>: <span class="ident">Base64</span>,
 }
 
@@ -1080,8 +1084,8 @@
     <span class="doccomment">/// needs to be at least 8 bytes long.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(
         <span class="ident">event_id</span>: <span class="ident">Box</span><span class="op">&lt;</span><span class="ident">EventId</span><span class="op">&gt;</span>,
-        <span class="ident">first_key</span>: <span class="ident">String</span>,
-        <span class="ident">second_key</span>: <span class="ident">String</span>,
+        <span class="ident">first_key</span>: <span class="ident">Ed25519PublicKey</span>,
+        <span class="ident">second_key</span>: <span class="ident">Ed25519PublicKey</span>,
         <span class="ident">shared_secret</span>: <span class="ident">Base64</span>,
     ) -&gt; <span class="self">Self</span> {
         <span class="self">Self</span> { <span class="ident">event_id</span>, <span class="ident">first_master_key</span>: <span class="ident">first_key</span>, <span class="ident">second_master_key</span>: <span class="ident">second_key</span>, <span class="ident">shared_secret</span> }
@@ -1100,8 +1104,8 @@
     <span class="doccomment">/// let data = b&quot;MATRIX\</span>
     <span class="doccomment">///              \x02\x00\x00\x0f\</span>
     <span class="doccomment">///              $test:localhost\</span>
-    <span class="doccomment">///              AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA\</span>
-    <span class="doccomment">///              BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB\</span>
+    <span class="doccomment">///              kS /\x92i\x1e6\xcd&#39;g\xf9#\x11\xd8\x8a\xa2\xf61\x05\x1b6\xef\xfc\xa4%\x80\x1a\x0c\xd2\xe8\x04\</span>
+    <span class="doccomment">///              \xbdR|\xf8n\x07\xa4\x1f\xb4\xcc3\x0eBT\xe7[~\xfd\x87\xd06B\xdfoVv%\x9b\x86\xae\xbcM\</span>
     <span class="doccomment">///              SHARED_SECRET&quot;;</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// let result = QrVerificationData::from_bytes(data)?;</span>
@@ -1118,8 +1122,8 @@
         <span class="ident">to_bytes</span>(
             <span class="ident"><span class="self">Self</span>::QR_MODE</span>,
             <span class="self">self</span>.<span class="ident">event_id</span>.<span class="ident">as_str</span>(),
-            <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">first_master_key</span>,
-            <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">second_master_key</span>,
+            <span class="self">self</span>.<span class="ident">first_master_key</span>,
+            <span class="self">self</span>.<span class="ident">second_master_key</span>,
             <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">shared_secret</span>,
         )
     }
@@ -1135,8 +1139,8 @@
         <span class="ident">to_qr_code</span>(
             <span class="ident"><span class="self">Self</span>::QR_MODE</span>,
             <span class="self">self</span>.<span class="ident">event_id</span>.<span class="ident">as_str</span>(),
-            <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">first_master_key</span>,
-            <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">second_master_key</span>,
+            <span class="self">self</span>.<span class="ident">first_master_key</span>,
+            <span class="self">self</span>.<span class="ident">second_master_key</span>,
             <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">shared_secret</span>,
         )
     }
@@ -1156,8 +1160,8 @@
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">PartialEq</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">SelfVerificationData</span> {
     <span class="ident">transaction_id</span>: <span class="ident">String</span>,
-    <span class="ident">master_key</span>: <span class="ident">String</span>,
-    <span class="ident">device_key</span>: <span class="ident">String</span>,
+    <span class="ident">master_key</span>: <span class="ident">Ed25519PublicKey</span>,
+    <span class="ident">device_key</span>: <span class="ident">Ed25519PublicKey</span>,
     <span class="ident">shared_secret</span>: <span class="ident">Base64</span>,
 }
 
@@ -1183,8 +1187,8 @@
     <span class="doccomment">/// needs to be at least 8 bytes long.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(
         <span class="ident">transaction_id</span>: <span class="ident">String</span>,
-        <span class="ident">master_key</span>: <span class="ident">String</span>,
-        <span class="ident">device_key</span>: <span class="ident">String</span>,
+        <span class="ident">master_key</span>: <span class="ident">Ed25519PublicKey</span>,
+        <span class="ident">device_key</span>: <span class="ident">Ed25519PublicKey</span>,
         <span class="ident">shared_secret</span>: <span class="ident">Base64</span>,
     ) -&gt; <span class="self">Self</span> {
         <span class="self">Self</span> { <span class="ident">transaction_id</span>, <span class="ident">master_key</span>, <span class="ident">device_key</span>, <span class="ident">shared_secret</span> }
@@ -1203,8 +1207,8 @@
     <span class="doccomment">/// let data = b&quot;MATRIX\</span>
     <span class="doccomment">///              \x02\x01\x00\x06\</span>
     <span class="doccomment">///              FLOWID\</span>
-    <span class="doccomment">///              AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA\</span>
-    <span class="doccomment">///              BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB\</span>
+    <span class="doccomment">///              kS /\x92i\x1e6\xcd&#39;g\xf9#\x11\xd8\x8a\xa2\xf61\x05\x1b6\xef\xfc\xa4%\x80\x1a\x0c\xd2\xe8\x04\</span>
+    <span class="doccomment">///              \xbdR|\xf8n\x07\xa4\x1f\xb4\xcc3\x0eBT\xe7[~\xfd\x87\xd06B\xdfoVv%\x9b\x86\xae\xbcM\</span>
     <span class="doccomment">///              SHARED_SECRET&quot;;</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// let result = QrVerificationData::from_bytes(data)?;</span>
@@ -1221,8 +1225,8 @@
         <span class="ident">to_bytes</span>(
             <span class="ident"><span class="self">Self</span>::QR_MODE</span>,
             <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">transaction_id</span>,
-            <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">master_key</span>,
-            <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">device_key</span>,
+            <span class="self">self</span>.<span class="ident">master_key</span>,
+            <span class="self">self</span>.<span class="ident">device_key</span>,
             <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">shared_secret</span>,
         )
     }
@@ -1238,8 +1242,8 @@
         <span class="ident">to_qr_code</span>(
             <span class="ident"><span class="self">Self</span>::QR_MODE</span>,
             <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">transaction_id</span>,
-            <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">master_key</span>,
-            <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">device_key</span>,
+            <span class="self">self</span>.<span class="ident">master_key</span>,
+            <span class="self">self</span>.<span class="ident">device_key</span>,
             <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">shared_secret</span>,
         )
     }
@@ -1259,8 +1263,8 @@
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">PartialEq</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">SelfVerificationNoMasterKey</span> {
     <span class="ident">transaction_id</span>: <span class="ident">String</span>,
-    <span class="ident">device_key</span>: <span class="ident">String</span>,
-    <span class="ident">master_key</span>: <span class="ident">String</span>,
+    <span class="ident">device_key</span>: <span class="ident">Ed25519PublicKey</span>,
+    <span class="ident">master_key</span>: <span class="ident">Ed25519PublicKey</span>,
     <span class="ident">shared_secret</span>: <span class="ident">Base64</span>,
 }
 
@@ -1286,8 +1290,8 @@
     <span class="doccomment">/// needs to be at least 8 bytes long.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(
         <span class="ident">transaction_id</span>: <span class="ident">String</span>,
-        <span class="ident">device_key</span>: <span class="ident">String</span>,
-        <span class="ident">master_key</span>: <span class="ident">String</span>,
+        <span class="ident">device_key</span>: <span class="ident">Ed25519PublicKey</span>,
+        <span class="ident">master_key</span>: <span class="ident">Ed25519PublicKey</span>,
         <span class="ident">shared_secret</span>: <span class="ident">Base64</span>,
     ) -&gt; <span class="self">Self</span> {
         <span class="self">Self</span> { <span class="ident">transaction_id</span>, <span class="ident">device_key</span>, <span class="ident">master_key</span>, <span class="ident">shared_secret</span> }
@@ -1306,8 +1310,8 @@
     <span class="doccomment">/// let data = b&quot;MATRIX\</span>
     <span class="doccomment">///              \x02\x02\x00\x06\</span>
     <span class="doccomment">///              FLOWID\</span>
-    <span class="doccomment">///              AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA\</span>
-    <span class="doccomment">///              BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB\</span>
+    <span class="doccomment">///              kS /\x92i\x1e6\xcd&#39;g\xf9#\x11\xd8\x8a\xa2\xf61\x05\x1b6\xef\xfc\xa4%\x80\x1a\x0c\xd2\xe8\x04\</span>
+    <span class="doccomment">///              \xbdR|\xf8n\x07\xa4\x1f\xb4\xcc3\x0eBT\xe7[~\xfd\x87\xd06B\xdfoVv%\x9b\x86\xae\xbcM\</span>
     <span class="doccomment">///              SHARED_SECRET&quot;;</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// let result = QrVerificationData::from_bytes(data)?;</span>
@@ -1324,8 +1328,8 @@
         <span class="ident">to_bytes</span>(
             <span class="ident"><span class="self">Self</span>::QR_MODE</span>,
             <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">transaction_id</span>,
-            <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">device_key</span>,
-            <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">master_key</span>,
+            <span class="self">self</span>.<span class="ident">device_key</span>,
+            <span class="self">self</span>.<span class="ident">master_key</span>,
             <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">shared_secret</span>,
         )
     }
@@ -1341,8 +1345,8 @@
         <span class="ident">to_qr_code</span>(
             <span class="ident"><span class="self">Self</span>::QR_MODE</span>,
             <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">transaction_id</span>,
-            <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">device_key</span>,
-            <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">master_key</span>,
+            <span class="self">self</span>.<span class="ident">device_key</span>,
+            <span class="self">self</span>.<span class="ident">master_key</span>,
             <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">shared_secret</span>,
         )
     }
