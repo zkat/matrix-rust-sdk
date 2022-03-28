@@ -2281,10 +2281,10 @@
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         <span class="ident">their_identity_key</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>,
         <span class="ident">message</span>: <span class="kw-2">&amp;</span><span class="ident">PreKeyMessage</span>,
-    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">InboundCreationResult</span>, ()<span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">their_identity_key</span> <span class="op">=</span> <span class="ident">Curve25519PublicKey::from_base64</span>(<span class="ident">their_identity_key</span>).<span class="ident">unwrap</span>();
+    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">InboundCreationResult</span>, <span class="ident">SessionCreationError</span><span class="op">&gt;</span> {
+        <span class="kw">let</span> <span class="ident">their_identity_key</span> <span class="op">=</span> <span class="ident">Curve25519PublicKey::from_base64</span>(<span class="ident">their_identity_key</span>)<span class="question-mark">?</span>;
         <span class="kw">let</span> <span class="ident">result</span> <span class="op">=</span>
-            <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">lock</span>().<span class="kw">await</span>.<span class="ident">create_inbound_session</span>(<span class="kw-2">&amp;</span><span class="ident">their_identity_key</span>, <span class="ident">message</span>).<span class="ident">unwrap</span>();
+            <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">lock</span>().<span class="kw">await</span>.<span class="ident">create_inbound_session</span>(<span class="kw-2">&amp;</span><span class="ident">their_identity_key</span>, <span class="ident">message</span>)<span class="question-mark">?</span>;
 
         <span class="kw">let</span> <span class="ident">now</span> <span class="op">=</span> <span class="ident">Instant::now</span>();
         <span class="kw">let</span> <span class="ident">session_id</span> <span class="op">=</span> <span class="ident">result</span>.<span class="ident">session</span>.<span class="ident">session_id</span>();
@@ -2522,5 +2522,5 @@
     }
 }
 </code></pre></div>
-</section><section id="search" class="content hidden"></section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="matrix_sdk_crypto" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.61.0-nightly (63b8f01bb 2022-03-24)" ></div>
+</section><section id="search" class="content hidden"></section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="matrix_sdk_crypto" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.61.0-nightly (ab0c2e18d 2022-03-27)" ></div>
 </body></html>
