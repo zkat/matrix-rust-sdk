@@ -661,6 +661,9 @@
 <span id="656">656</span>
 <span id="657">657</span>
 <span id="658">658</span>
+<span id="659">659</span>
+<span id="660">660</span>
+<span id="661">661</span>
 </pre><pre class="rust"><code><span class="comment">// Copyright 2021 The Matrix.org Foundation C.I.C.</span>
 <span class="comment">//</span>
 <span class="comment">// Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);</span>
@@ -706,8 +709,7 @@
         <span class="ident">receipt</span>::{<span class="ident">Receipt</span>, <span class="ident">ReceiptEventContent</span>},
         <span class="ident">room::member::RoomMemberEventContent</span>,
         <span class="ident">AnyGlobalAccountDataEvent</span>, <span class="ident">AnyRoomAccountDataEvent</span>, <span class="ident">AnyStrippedStateEvent</span>,
-        <span class="ident">AnySyncStateEvent</span>, <span class="ident">EventContent</span>, <span class="ident">GlobalAccountDataEventType</span>, <span class="ident">RoomAccountDataEventType</span>,
-        <span class="ident">StateEventType</span>,
+        <span class="ident">AnySyncStateEvent</span>, <span class="ident">GlobalAccountDataEventType</span>, <span class="ident">RoomAccountDataEventType</span>, <span class="ident">StateEventType</span>,
     },
     <span class="ident">receipt::ReceiptType</span>,
     <span class="ident">serde::Raw</span>,
@@ -744,7 +746,7 @@
     <span class="doccomment">/// An error happened while deserializing a Matrix identifier, e.g. an user</span>
     <span class="doccomment">/// id.</span>
     <span class="attribute">#[<span class="ident">error</span>(<span class="ident">transparent</span>)]</span>
-    <span class="ident">Identifier</span>(<span class="attribute">#[<span class="ident">from</span>]</span> <span class="ident">ruma::identifiers::Error</span>),
+    <span class="ident">Identifier</span>(<span class="attribute">#[<span class="ident">from</span>]</span> <span class="ident">ruma::IdParseError</span>),
     <span class="doccomment">/// The store is locked with a passphrase and an incorrect passphrase was</span>
     <span class="doccomment">/// given.</span>
     <span class="attribute">#[<span class="ident">error</span>(<span class="string">&quot;The store failed to be unlocked&quot;</span>)]</span>
@@ -1142,7 +1144,7 @@
     <span class="doccomment">/// associated user account.</span>
     <span class="kw">pub</span> <span class="ident">session</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Session</span><span class="op">&gt;</span>,
     <span class="doccomment">/// A mapping of event type string to `AnyBasicEvent`.</span>
-    <span class="kw">pub</span> <span class="ident">account_data</span>: <span class="ident">BTreeMap</span><span class="op">&lt;</span><span class="ident">String</span>, <span class="ident">Raw</span><span class="op">&lt;</span><span class="ident">AnyGlobalAccountDataEvent</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+    <span class="kw">pub</span> <span class="ident">account_data</span>: <span class="ident">BTreeMap</span><span class="op">&lt;</span><span class="ident">GlobalAccountDataEventType</span>, <span class="ident">Raw</span><span class="op">&lt;</span><span class="ident">AnyGlobalAccountDataEvent</span><span class="op">&gt;</span><span class="op">&gt;</span>,
     <span class="doccomment">/// A mapping of `UserId` to `PresenceEvent`.</span>
     <span class="kw">pub</span> <span class="ident">presence</span>: <span class="ident">BTreeMap</span><span class="op">&lt;</span><span class="ident">Box</span><span class="op">&lt;</span><span class="ident">UserId</span><span class="op">&gt;</span>, <span class="ident">Raw</span><span class="op">&lt;</span><span class="ident">PresenceEvent</span><span class="op">&gt;</span><span class="op">&gt;</span>,
 
@@ -1155,9 +1157,11 @@
     <span class="doccomment">/// A mapping of `RoomId` to a map of event type string to a state key and</span>
     <span class="doccomment">/// `AnySyncStateEvent`.</span>
     <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy::type_complexity</span>)]</span>
-    <span class="kw">pub</span> <span class="ident">state</span>: <span class="ident">BTreeMap</span><span class="op">&lt;</span><span class="ident">Box</span><span class="op">&lt;</span><span class="ident">RoomId</span><span class="op">&gt;</span>, <span class="ident">BTreeMap</span><span class="op">&lt;</span><span class="ident">String</span>, <span class="ident">BTreeMap</span><span class="op">&lt;</span><span class="ident">String</span>, <span class="ident">Raw</span><span class="op">&lt;</span><span class="ident">AnySyncStateEvent</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+    <span class="kw">pub</span> <span class="ident">state</span>:
+        <span class="ident">BTreeMap</span><span class="op">&lt;</span><span class="ident">Box</span><span class="op">&lt;</span><span class="ident">RoomId</span><span class="op">&gt;</span>, <span class="ident">BTreeMap</span><span class="op">&lt;</span><span class="ident">StateEventType</span>, <span class="ident">BTreeMap</span><span class="op">&lt;</span><span class="ident">String</span>, <span class="ident">Raw</span><span class="op">&lt;</span><span class="ident">AnySyncStateEvent</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span>,
     <span class="doccomment">/// A mapping of `RoomId` to a map of event type string to `AnyBasicEvent`.</span>
-    <span class="kw">pub</span> <span class="ident">room_account_data</span>: <span class="ident">BTreeMap</span><span class="op">&lt;</span><span class="ident">Box</span><span class="op">&lt;</span><span class="ident">RoomId</span><span class="op">&gt;</span>, <span class="ident">BTreeMap</span><span class="op">&lt;</span><span class="ident">String</span>, <span class="ident">Raw</span><span class="op">&lt;</span><span class="ident">AnyRoomAccountDataEvent</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+    <span class="kw">pub</span> <span class="ident">room_account_data</span>:
+        <span class="ident">BTreeMap</span><span class="op">&lt;</span><span class="ident">Box</span><span class="op">&lt;</span><span class="ident">RoomId</span><span class="op">&gt;</span>, <span class="ident">BTreeMap</span><span class="op">&lt;</span><span class="ident">RoomAccountDataEventType</span>, <span class="ident">Raw</span><span class="op">&lt;</span><span class="ident">AnyRoomAccountDataEvent</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span>,
     <span class="doccomment">/// A map of `RoomId` to `RoomInfo`.</span>
     <span class="kw">pub</span> <span class="ident">room_infos</span>: <span class="ident">BTreeMap</span><span class="op">&lt;</span><span class="ident">Box</span><span class="op">&lt;</span><span class="ident">RoomId</span><span class="op">&gt;</span>, <span class="ident">RoomInfo</span><span class="op">&gt;</span>,
     <span class="doccomment">/// A map of `RoomId` to `ReceiptEventContent`.</span>
@@ -1166,8 +1170,10 @@
     <span class="doccomment">/// A mapping of `RoomId` to a map of event type to a map of state key to</span>
     <span class="doccomment">/// `AnyStrippedStateEvent`.</span>
     <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy::type_complexity</span>)]</span>
-    <span class="kw">pub</span> <span class="ident">stripped_state</span>:
-        <span class="ident">BTreeMap</span><span class="op">&lt;</span><span class="ident">Box</span><span class="op">&lt;</span><span class="ident">RoomId</span><span class="op">&gt;</span>, <span class="ident">BTreeMap</span><span class="op">&lt;</span><span class="ident">String</span>, <span class="ident">BTreeMap</span><span class="op">&lt;</span><span class="ident">String</span>, <span class="ident">Raw</span><span class="op">&lt;</span><span class="ident">AnyStrippedStateEvent</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+    <span class="kw">pub</span> <span class="ident">stripped_state</span>: <span class="ident">BTreeMap</span><span class="op">&lt;</span>
+        <span class="ident">Box</span><span class="op">&lt;</span><span class="ident">RoomId</span><span class="op">&gt;</span>,
+        <span class="ident">BTreeMap</span><span class="op">&lt;</span><span class="ident">StateEventType</span>, <span class="ident">BTreeMap</span><span class="op">&lt;</span><span class="ident">String</span>, <span class="ident">Raw</span><span class="op">&lt;</span><span class="ident">AnyStrippedStateEvent</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+    <span class="op">&gt;</span>,
     <span class="doccomment">/// A mapping of `RoomId` to a map of users and their `StrippedMemberEvent`.</span>
     <span class="kw">pub</span> <span class="ident">stripped_members</span>: <span class="ident">BTreeMap</span><span class="op">&lt;</span><span class="ident">Box</span><span class="op">&lt;</span><span class="ident">RoomId</span><span class="op">&gt;</span>, <span class="ident">BTreeMap</span><span class="op">&lt;</span><span class="ident">Box</span><span class="op">&lt;</span><span class="ident">UserId</span><span class="op">&gt;</span>, <span class="ident">StrippedMemberEvent</span><span class="op">&gt;</span><span class="op">&gt;</span>,
     <span class="doccomment">/// A map of `RoomId` to `RoomInfo` for stripped rooms (e.g. for invites or</span>
@@ -1210,7 +1216,7 @@
         <span class="ident">event</span>: <span class="ident">AnyGlobalAccountDataEvent</span>,
         <span class="ident">raw_event</span>: <span class="ident">Raw</span><span class="op">&lt;</span><span class="ident">AnyGlobalAccountDataEvent</span><span class="op">&gt;</span>,
     ) {
-        <span class="self">self</span>.<span class="ident">account_data</span>.<span class="ident">insert</span>(<span class="ident">event</span>.<span class="ident">content</span>().<span class="ident">event_type</span>().<span class="ident">to_owned</span>(), <span class="ident">raw_event</span>);
+        <span class="self">self</span>.<span class="ident">account_data</span>.<span class="ident">insert</span>(<span class="ident">event</span>.<span class="ident">event_type</span>(), <span class="ident">raw_event</span>);
     }
 
     <span class="doccomment">/// Update the `StateChanges` struct with the given room with a new</span>
@@ -1224,7 +1230,7 @@
         <span class="self">self</span>.<span class="ident">room_account_data</span>
             .<span class="ident">entry</span>(<span class="ident">room_id</span>.<span class="ident">to_owned</span>())
             .<span class="ident">or_insert_with</span>(<span class="ident">BTreeMap::new</span>)
-            .<span class="ident">insert</span>(<span class="ident">event</span>.<span class="ident">content</span>().<span class="ident">event_type</span>().<span class="ident">to_owned</span>(), <span class="ident">raw_event</span>);
+            .<span class="ident">insert</span>(<span class="ident">event</span>.<span class="ident">event_type</span>(), <span class="ident">raw_event</span>);
     }
 
     <span class="doccomment">/// Update the `StateChanges` struct with the given room with a new</span>
@@ -1249,7 +1255,7 @@
         <span class="self">self</span>.<span class="ident">state</span>
             .<span class="ident">entry</span>(<span class="ident">room_id</span>.<span class="ident">to_owned</span>())
             .<span class="ident">or_insert_with</span>(<span class="ident">BTreeMap::new</span>)
-            .<span class="ident">entry</span>(<span class="ident">event</span>.<span class="ident">content</span>().<span class="ident">event_type</span>().<span class="ident">to_owned</span>())
+            .<span class="ident">entry</span>(<span class="ident">event</span>.<span class="ident">event_type</span>())
             .<span class="ident">or_insert_with</span>(<span class="ident">BTreeMap::new</span>)
             .<span class="ident">insert</span>(<span class="ident">event</span>.<span class="ident">state_key</span>().<span class="ident">to_owned</span>(), <span class="ident">raw_event</span>);
     }

@@ -715,6 +715,7 @@
 <span id="710">710</span>
 <span id="711">711</span>
 <span id="712">712</span>
+<span id="713">713</span>
 </pre><pre class="rust"><code><span class="doccomment">//! Macro of integration tests for StateStore implementions.</span>
 
 <span class="doccomment">/// Macro building to allow your StateStore implementation to run the entire</span>
@@ -763,15 +764,16 @@
                     },
                     <span class="ident">device_id</span>, <span class="ident">event_id</span>,
                     <span class="ident">events</span>::{
-                        <span class="ident">presence::PresenceEvent</span>, <span class="ident">EventContent</span>,
+                        <span class="ident">presence::PresenceEvent</span>,
                         <span class="ident">room</span>::{
                             <span class="ident">member</span>::{<span class="ident">MembershipState</span>, <span class="ident">RoomMemberEventContent</span>},
                             <span class="ident">power_levels::RoomPowerLevelsEventContent</span>,
+                            <span class="ident">MediaSource</span>,
                         },
                         <span class="ident">AnyEphemeralRoomEventContent</span>, <span class="ident">AnySyncEphemeralRoomEvent</span>,
                         <span class="ident">AnyStrippedStateEvent</span>, <span class="ident">AnyGlobalAccountDataEvent</span>, <span class="ident">AnyRoomAccountDataEvent</span>,
                         <span class="ident">AnySyncStateEvent</span>, <span class="ident">GlobalAccountDataEventType</span>, <span class="ident">RoomAccountDataEventType</span>,
-                        <span class="ident">StateEventType</span>, <span class="ident">Unsigned</span>,
+                        <span class="ident">StateEventType</span>, <span class="ident">StateUnsigned</span>,
                     },
                     <span class="ident">mxc_uri</span>,
                     <span class="ident">receipt::ReceiptType</span>,
@@ -787,7 +789,7 @@
                     <span class="macro-nonterminal">http::Response</span>,
                     <span class="ident">RoomType</span>, <span class="ident">Session</span>,
                     <span class="ident">deserialized_responses</span>::{<span class="ident">MemberEvent</span>, <span class="ident">StrippedMemberEvent</span>, <span class="ident">RoomEvent</span>, <span class="ident">SyncRoomEvent</span>, <span class="ident">TimelineSlice</span>},
-                    <span class="ident">media</span>::{<span class="ident">MediaFormat</span>, <span class="ident">MediaRequest</span>, <span class="ident">MediaThumbnailSize</span>, <span class="ident">MediaType</span>},
+                    <span class="ident">media</span>::{<span class="ident">MediaFormat</span>, <span class="ident">MediaRequest</span>, <span class="ident">MediaThumbnailSize</span>},
                     <span class="ident">store</span>::{
                         <span class="ident">Store</span>,
                         <span class="ident">StateStore</span>,
@@ -933,7 +935,7 @@
                     <span class="ident">changes</span>.<span class="ident">stripped_state</span>.<span class="ident">insert</span>(
                         <span class="ident">stripped_room_id</span>.<span class="ident">to_owned</span>(),
                         <span class="ident">BTreeMap::from</span>([(
-                            <span class="ident">stripped_name_event</span>.<span class="ident">content</span>().<span class="ident">event_type</span>().<span class="ident">to_owned</span>(),
+                            <span class="ident">stripped_name_event</span>.<span class="ident">event_type</span>(),
                             <span class="ident">BTreeMap::from</span>([(
                                 <span class="ident">stripped_name_event</span>.<span class="ident">state_key</span>().<span class="ident">to_owned</span>(),
                                 <span class="ident">stripped_name_raw</span>.<span class="ident">clone</span>(),
@@ -962,7 +964,6 @@
                         <span class="string">&quot;type&quot;</span>: <span class="string">&quot;m.room.power_levels&quot;</span>,
                         <span class="string">&quot;origin_server_ts&quot;</span>: <span class="number">0u64</span>,
                         <span class="string">&quot;state_key&quot;</span>: <span class="string">&quot;&quot;</span>,
-                        <span class="string">&quot;unsigned&quot;</span>: <span class="ident">Unsigned::default</span>(),
                     });
 
                     <span class="ident">serde_json::from_value</span>(<span class="ident">event</span>).<span class="ident">unwrap</span>()
@@ -979,8 +980,7 @@
                         <span class="ident">sender</span>: <span class="ident">user_id</span>.<span class="ident">to_owned</span>(),
                         <span class="ident">origin_server_ts</span>: <span class="ident">MilliSecondsSinceUnixEpoch</span>(<span class="number">198u32</span>.<span class="ident">into</span>()),
                         <span class="ident">state_key</span>: <span class="ident">user_id</span>.<span class="ident">to_owned</span>(),
-                        <span class="ident">prev_content</span>: <span class="prelude-val">None</span>,
-                        <span class="ident">unsigned</span>: <span class="ident">Unsigned::default</span>(),
+                        <span class="ident">unsigned</span>: <span class="ident">StateUnsigned::default</span>(),
                     }
 
                 }
@@ -1171,11 +1171,13 @@
                     <span class="kw">let</span> <span class="ident">uri</span> <span class="op">=</span> <span class="macro">mxc_uri!</span>(<span class="string">&quot;mxc://localhost/media&quot;</span>);
                     <span class="kw">let</span> <span class="ident">content</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span> <span class="op">=</span> <span class="string">&quot;somebinarydata&quot;</span>.<span class="ident">into</span>();
 
-                    <span class="kw">let</span> <span class="ident">request_file</span> <span class="op">=</span>
-                        <span class="ident">MediaRequest</span> { <span class="ident">media_type</span>: <span class="ident">MediaType::Uri</span>(<span class="ident">uri</span>.<span class="ident">to_owned</span>()), <span class="ident">format</span>: <span class="ident">MediaFormat::File</span> };
+                    <span class="kw">let</span> <span class="ident">request_file</span> <span class="op">=</span> <span class="ident">MediaRequest</span> {
+                        <span class="ident">source</span>: <span class="ident">MediaSource::Plain</span>(<span class="ident">uri</span>.<span class="ident">to_owned</span>()),
+                        <span class="ident">format</span>: <span class="ident">MediaFormat::File</span>,
+                    };
 
                     <span class="kw">let</span> <span class="ident">request_thumbnail</span> <span class="op">=</span> <span class="ident">MediaRequest</span> {
-                        <span class="ident">media_type</span>: <span class="ident">MediaType::Uri</span>(<span class="ident">uri</span>.<span class="ident">to_owned</span>()),
+                        <span class="ident">source</span>: <span class="ident">MediaSource::Plain</span>(<span class="ident">uri</span>.<span class="ident">to_owned</span>()),
                         <span class="ident">format</span>: <span class="ident">MediaFormat::Thumbnail</span>(<span class="ident">MediaThumbnailSize</span> {
                             <span class="ident">method</span>: <span class="ident">Method::Crop</span>,
                             <span class="ident">width</span>: <span class="macro">uint!</span>(<span class="number">100</span>),

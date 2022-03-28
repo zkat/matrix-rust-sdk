@@ -422,6 +422,8 @@
 <span id="417">417</span>
 <span id="418">418</span>
 <span id="419">419</span>
+<span id="420">420</span>
+<span id="421">421</span>
 </pre><pre class="rust"><code><span class="comment">// Copyright 2020 The Matrix.org Foundation C.I.C.</span>
 <span class="comment">//</span>
 <span class="comment">// Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);</span>
@@ -453,7 +455,9 @@
         <span class="ident">message::send_message_event::v3::Response</span> <span class="kw">as</span> <span class="ident">RoomMessageResponse</span>,
         <span class="ident">to_device::send_event_to_device::v3::Response</span> <span class="kw">as</span> <span class="ident">ToDeviceResponse</span>,
     },
-    <span class="ident">events</span>::{<span class="ident">AnyMessageEventContent</span>, <span class="ident">AnyToDeviceEventContent</span>, <span class="ident">EventContent</span>, <span class="ident">ToDeviceEventType</span>},
+    <span class="ident">events</span>::{
+        <span class="ident">AnyMessageLikeEventContent</span>, <span class="ident">AnyToDeviceEventContent</span>, <span class="ident">EventContent</span>, <span class="ident">ToDeviceEventType</span>,
+    },
     <span class="ident">serde::Raw</span>,
     <span class="ident">to_device::DeviceIdOrAllDevices</span>,
     <span class="ident">DeviceId</span>, <span class="ident">RoomId</span>, <span class="ident">TransactionId</span>, <span class="ident">UserId</span>,
@@ -512,7 +516,7 @@
         <span class="kw">if</span> <span class="ident">recipient_devices</span>.<span class="ident">is_empty</span>() {
             <span class="ident"><span class="self">Self</span>::new</span>(<span class="ident">recipient</span>, <span class="ident">DeviceIdOrAllDevices::AllDevices</span>, <span class="ident">content</span>)
         } <span class="kw">else</span> {
-            <span class="kw">let</span> <span class="ident">event_type</span> <span class="op">=</span> <span class="ident">content</span>.<span class="ident">event_type</span>().<span class="ident">into</span>();
+            <span class="kw">let</span> <span class="ident">event_type</span> <span class="op">=</span> <span class="ident">content</span>.<span class="ident">event_type</span>();
             <span class="kw">let</span> <span class="ident">device_messages</span> <span class="op">=</span> <span class="ident">recipient_devices</span>
                 .<span class="ident">into_iter</span>()
                 .<span class="ident">map</span>(<span class="op">|</span><span class="ident">d</span><span class="op">|</span> {
@@ -533,7 +537,7 @@
         <span class="ident">content</span>: <span class="ident">AnyToDeviceEventContent</span>,
         <span class="ident">txn_id</span>: <span class="ident">Box</span><span class="op">&lt;</span><span class="ident">TransactionId</span><span class="op">&gt;</span>,
     ) -&gt; <span class="self">Self</span> {
-        <span class="kw">let</span> <span class="ident">event_type</span> <span class="op">=</span> <span class="ident">ToDeviceEventType::from</span>(<span class="ident">content</span>.<span class="ident">event_type</span>());
+        <span class="kw">let</span> <span class="ident">event_type</span> <span class="op">=</span> <span class="ident">content</span>.<span class="ident">event_type</span>();
         <span class="kw">let</span> <span class="ident">raw_content</span> <span class="op">=</span> <span class="ident">Raw::new</span>(<span class="kw-2">&amp;</span><span class="ident">content</span>).<span class="ident">expect</span>(<span class="string">&quot;Failed to serialize to-device event&quot;</span>);
 
         <span class="kw">let</span> <span class="ident">user_messages</span> <span class="op">=</span> <span class="ident">iter::once</span>((<span class="ident">recipient_device</span>.<span class="ident">into</span>(), <span class="ident">raw_content</span>)).<span class="ident">collect</span>();
@@ -789,7 +793,7 @@
     <span class="kw">pub</span> <span class="ident">txn_id</span>: <span class="ident">Box</span><span class="op">&lt;</span><span class="ident">TransactionId</span><span class="op">&gt;</span>,
 
     <span class="doccomment">/// The event content to send.</span>
-    <span class="kw">pub</span> <span class="ident">content</span>: <span class="ident">AnyMessageEventContent</span>,
+    <span class="kw">pub</span> <span class="ident">content</span>: <span class="ident">AnyMessageLikeEventContent</span>,
 }
 
 <span class="doccomment">/// A request that will back up a batch of room keys to the server.</span>

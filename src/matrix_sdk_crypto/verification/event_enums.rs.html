@@ -803,6 +803,10 @@
 <span id="798">798</span>
 <span id="799">799</span>
 <span id="800">800</span>
+<span id="801">801</span>
+<span id="802">802</span>
+<span id="803">803</span>
+<span id="804">804</span>
 </pre><pre class="rust"><code><span class="comment">// Copyright 2020 The Matrix.org Foundation C.I.C.</span>
 <span class="comment">//</span>
 <span class="comment">// Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);</span>
@@ -845,7 +849,7 @@
             <span class="ident">VerificationMethod</span>,
         },
         <span class="ident">room::message</span>::{<span class="ident">KeyVerificationRequestEventContent</span>, <span class="ident">MessageType</span>},
-        <span class="ident">AnyMessageEvent</span>, <span class="ident">AnyMessageEventContent</span>, <span class="ident">AnyToDeviceEvent</span>, <span class="ident">AnyToDeviceEventContent</span>,
+        <span class="ident">AnyMessageLikeEvent</span>, <span class="ident">AnyMessageLikeEventContent</span>, <span class="ident">AnyToDeviceEvent</span>, <span class="ident">AnyToDeviceEventContent</span>,
     },
     <span class="ident">serde</span>::{<span class="ident">Base64</span>, <span class="ident">CanonicalJsonValue</span>},
     <span class="ident">DeviceId</span>, <span class="ident">MilliSecondsSinceUnixEpoch</span>, <span class="ident">RoomId</span>, <span class="ident">UserId</span>,
@@ -855,7 +859,7 @@
 
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
 <span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">AnyEvent</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="ident">Room</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">AnyMessageEvent</span>),
+    <span class="ident">Room</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">AnyMessageLikeEvent</span>),
     <span class="ident">ToDevice</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">AnyToDeviceEvent</span>),
 }
 
@@ -884,37 +888,41 @@
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">verification_content</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">AnyVerificationContent</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="kw">match</span> <span class="self">self</span> {
             <span class="ident">AnyEvent::Room</span>(<span class="ident">e</span>) =&gt; <span class="kw">match</span> <span class="ident">e</span> {
-                <span class="ident">AnyMessageEvent::CallAnswer</span>(<span class="kw">_</span>)
-                <span class="op">|</span> <span class="ident">AnyMessageEvent::CallInvite</span>(<span class="kw">_</span>)
-                <span class="op">|</span> <span class="ident">AnyMessageEvent::CallHangup</span>(<span class="kw">_</span>)
-                <span class="op">|</span> <span class="ident">AnyMessageEvent::CallCandidates</span>(<span class="kw">_</span>)
-                <span class="op">|</span> <span class="ident">AnyMessageEvent::Reaction</span>(<span class="kw">_</span>)
-                <span class="op">|</span> <span class="ident">AnyMessageEvent::RoomEncrypted</span>(<span class="kw">_</span>)
-                <span class="op">|</span> <span class="ident">AnyMessageEvent::RoomMessageFeedback</span>(<span class="kw">_</span>)
-                <span class="op">|</span> <span class="ident">AnyMessageEvent::RoomRedaction</span>(<span class="kw">_</span>)
-                <span class="op">|</span> <span class="ident">AnyMessageEvent::Sticker</span>(<span class="kw">_</span>) =&gt; <span class="prelude-val">None</span>,
-                <span class="ident">AnyMessageEvent::RoomMessage</span>(<span class="ident">m</span>) =&gt; {
+                <span class="ident">AnyMessageLikeEvent::CallAnswer</span>(<span class="kw">_</span>)
+                <span class="op">|</span> <span class="ident">AnyMessageLikeEvent::CallInvite</span>(<span class="kw">_</span>)
+                <span class="op">|</span> <span class="ident">AnyMessageLikeEvent::CallHangup</span>(<span class="kw">_</span>)
+                <span class="op">|</span> <span class="ident">AnyMessageLikeEvent::CallCandidates</span>(<span class="kw">_</span>)
+                <span class="op">|</span> <span class="ident">AnyMessageLikeEvent::Reaction</span>(<span class="kw">_</span>)
+                <span class="op">|</span> <span class="ident">AnyMessageLikeEvent::RoomEncrypted</span>(<span class="kw">_</span>)
+                <span class="op">|</span> <span class="ident">AnyMessageLikeEvent::RoomMessageFeedback</span>(<span class="kw">_</span>)
+                <span class="op">|</span> <span class="ident">AnyMessageLikeEvent::RoomRedaction</span>(<span class="kw">_</span>)
+                <span class="op">|</span> <span class="ident">AnyMessageLikeEvent::Sticker</span>(<span class="kw">_</span>) =&gt; <span class="prelude-val">None</span>,
+                <span class="ident">AnyMessageLikeEvent::RoomMessage</span>(<span class="ident">m</span>) =&gt; {
                     <span class="kw">if</span> <span class="kw">let</span> <span class="ident">MessageType::VerificationRequest</span>(<span class="ident">v</span>) <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">m</span>.<span class="ident">content</span>.<span class="ident">msgtype</span> {
                         <span class="prelude-val">Some</span>(<span class="ident">RequestContent::from</span>(<span class="ident">v</span>).<span class="ident">into</span>())
                     } <span class="kw">else</span> {
                         <span class="prelude-val">None</span>
                     }
                 }
-                <span class="ident">AnyMessageEvent::KeyVerificationReady</span>(<span class="ident">e</span>) =&gt; {
+                <span class="ident">AnyMessageLikeEvent::KeyVerificationReady</span>(<span class="ident">e</span>) =&gt; {
                     <span class="prelude-val">Some</span>(<span class="ident">ReadyContent::from</span>(<span class="kw-2">&amp;</span><span class="ident">e</span>.<span class="ident">content</span>).<span class="ident">into</span>())
                 }
-                <span class="ident">AnyMessageEvent::KeyVerificationStart</span>(<span class="ident">e</span>) =&gt; {
+                <span class="ident">AnyMessageLikeEvent::KeyVerificationStart</span>(<span class="ident">e</span>) =&gt; {
                     <span class="prelude-val">Some</span>(<span class="ident">StartContent::from</span>(<span class="kw-2">&amp;</span><span class="ident">e</span>.<span class="ident">content</span>).<span class="ident">into</span>())
                 }
-                <span class="ident">AnyMessageEvent::KeyVerificationCancel</span>(<span class="ident">e</span>) =&gt; {
+                <span class="ident">AnyMessageLikeEvent::KeyVerificationCancel</span>(<span class="ident">e</span>) =&gt; {
                     <span class="prelude-val">Some</span>(<span class="ident">CancelContent::from</span>(<span class="kw-2">&amp;</span><span class="ident">e</span>.<span class="ident">content</span>).<span class="ident">into</span>())
                 }
-                <span class="ident">AnyMessageEvent::KeyVerificationAccept</span>(<span class="ident">e</span>) =&gt; {
+                <span class="ident">AnyMessageLikeEvent::KeyVerificationAccept</span>(<span class="ident">e</span>) =&gt; {
                     <span class="prelude-val">Some</span>(<span class="ident">AcceptContent::from</span>(<span class="kw-2">&amp;</span><span class="ident">e</span>.<span class="ident">content</span>).<span class="ident">into</span>())
                 }
-                <span class="ident">AnyMessageEvent::KeyVerificationKey</span>(<span class="ident">e</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">KeyContent::from</span>(<span class="kw-2">&amp;</span><span class="ident">e</span>.<span class="ident">content</span>).<span class="ident">into</span>()),
-                <span class="ident">AnyMessageEvent::KeyVerificationMac</span>(<span class="ident">e</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">MacContent::from</span>(<span class="kw-2">&amp;</span><span class="ident">e</span>.<span class="ident">content</span>).<span class="ident">into</span>()),
-                <span class="ident">AnyMessageEvent::KeyVerificationDone</span>(<span class="ident">e</span>) =&gt; {
+                <span class="ident">AnyMessageLikeEvent::KeyVerificationKey</span>(<span class="ident">e</span>) =&gt; {
+                    <span class="prelude-val">Some</span>(<span class="ident">KeyContent::from</span>(<span class="kw-2">&amp;</span><span class="ident">e</span>.<span class="ident">content</span>).<span class="ident">into</span>())
+                }
+                <span class="ident">AnyMessageLikeEvent::KeyVerificationMac</span>(<span class="ident">e</span>) =&gt; {
+                    <span class="prelude-val">Some</span>(<span class="ident">MacContent::from</span>(<span class="kw-2">&amp;</span><span class="ident">e</span>.<span class="ident">content</span>).<span class="ident">into</span>())
+                }
+                <span class="ident">AnyMessageLikeEvent::KeyVerificationDone</span>(<span class="ident">e</span>) =&gt; {
                     <span class="prelude-val">Some</span>(<span class="ident">DoneContent::from</span>(<span class="kw-2">&amp;</span><span class="ident">e</span>.<span class="ident">content</span>).<span class="ident">into</span>())
                 }
                 <span class="kw">_</span> =&gt; <span class="prelude-val">None</span>,
@@ -955,8 +963,8 @@
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">From</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">AnyMessageEvent</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">AnyEvent</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">e</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">AnyMessageEvent</span>) -&gt; <span class="self">Self</span> {
+<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">From</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">AnyMessageLikeEvent</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">AnyEvent</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">e</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">AnyMessageLikeEvent</span>) -&gt; <span class="self">Self</span> {
         <span class="ident"><span class="self">Self</span>::Room</span>(<span class="ident">e</span>)
     }
 }
@@ -978,40 +986,40 @@
     }
 }
 
-<span class="kw">impl</span> <span class="ident">TryFrom</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">AnyMessageEvent</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">FlowId</span> {
+<span class="kw">impl</span> <span class="ident">TryFrom</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">AnyMessageLikeEvent</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">FlowId</span> {
     <span class="kw">type</span> <span class="ident">Error</span> <span class="op">=</span> ();
 
-    <span class="kw">fn</span> <span class="ident">try_from</span>(<span class="ident">value</span>: <span class="kw-2">&amp;</span><span class="ident">AnyMessageEvent</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident"><span class="self">Self</span>::Error</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">try_from</span>(<span class="ident">value</span>: <span class="kw-2">&amp;</span><span class="ident">AnyMessageLikeEvent</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident"><span class="self">Self</span>::Error</span><span class="op">&gt;</span> {
         <span class="kw">match</span> <span class="ident">value</span> {
-            <span class="ident">AnyMessageEvent::CallAnswer</span>(<span class="kw">_</span>)
-            <span class="op">|</span> <span class="ident">AnyMessageEvent::CallInvite</span>(<span class="kw">_</span>)
-            <span class="op">|</span> <span class="ident">AnyMessageEvent::CallHangup</span>(<span class="kw">_</span>)
-            <span class="op">|</span> <span class="ident">AnyMessageEvent::CallCandidates</span>(<span class="kw">_</span>)
-            <span class="op">|</span> <span class="ident">AnyMessageEvent::Reaction</span>(<span class="kw">_</span>)
-            <span class="op">|</span> <span class="ident">AnyMessageEvent::RoomEncrypted</span>(<span class="kw">_</span>)
-            <span class="op">|</span> <span class="ident">AnyMessageEvent::RoomMessageFeedback</span>(<span class="kw">_</span>)
-            <span class="op">|</span> <span class="ident">AnyMessageEvent::RoomRedaction</span>(<span class="kw">_</span>)
-            <span class="op">|</span> <span class="ident">AnyMessageEvent::Sticker</span>(<span class="kw">_</span>) =&gt; <span class="prelude-val">Err</span>(()),
-            <span class="ident">AnyMessageEvent::KeyVerificationReady</span>(<span class="ident">e</span>) =&gt; {
+            <span class="ident">AnyMessageLikeEvent::CallAnswer</span>(<span class="kw">_</span>)
+            <span class="op">|</span> <span class="ident">AnyMessageLikeEvent::CallInvite</span>(<span class="kw">_</span>)
+            <span class="op">|</span> <span class="ident">AnyMessageLikeEvent::CallHangup</span>(<span class="kw">_</span>)
+            <span class="op">|</span> <span class="ident">AnyMessageLikeEvent::CallCandidates</span>(<span class="kw">_</span>)
+            <span class="op">|</span> <span class="ident">AnyMessageLikeEvent::Reaction</span>(<span class="kw">_</span>)
+            <span class="op">|</span> <span class="ident">AnyMessageLikeEvent::RoomEncrypted</span>(<span class="kw">_</span>)
+            <span class="op">|</span> <span class="ident">AnyMessageLikeEvent::RoomMessageFeedback</span>(<span class="kw">_</span>)
+            <span class="op">|</span> <span class="ident">AnyMessageLikeEvent::RoomRedaction</span>(<span class="kw">_</span>)
+            <span class="op">|</span> <span class="ident">AnyMessageLikeEvent::Sticker</span>(<span class="kw">_</span>) =&gt; <span class="prelude-val">Err</span>(()),
+            <span class="ident">AnyMessageLikeEvent::KeyVerificationReady</span>(<span class="ident">e</span>) =&gt; {
                 <span class="prelude-val">Ok</span>(<span class="ident">FlowId::from</span>((<span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="ident">e</span>.<span class="ident">room_id</span>, <span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="ident">e</span>.<span class="ident">content</span>.<span class="ident">relates_to</span>.<span class="ident">event_id</span>)))
             }
-            <span class="ident">AnyMessageEvent::RoomMessage</span>(<span class="ident">e</span>) =&gt; <span class="prelude-val">Ok</span>(<span class="ident">FlowId::from</span>((<span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="ident">e</span>.<span class="ident">room_id</span>, <span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="ident">e</span>.<span class="ident">event_id</span>))),
-            <span class="ident">AnyMessageEvent::KeyVerificationStart</span>(<span class="ident">e</span>) =&gt; {
+            <span class="ident">AnyMessageLikeEvent::RoomMessage</span>(<span class="ident">e</span>) =&gt; <span class="prelude-val">Ok</span>(<span class="ident">FlowId::from</span>((<span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="ident">e</span>.<span class="ident">room_id</span>, <span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="ident">e</span>.<span class="ident">event_id</span>))),
+            <span class="ident">AnyMessageLikeEvent::KeyVerificationStart</span>(<span class="ident">e</span>) =&gt; {
                 <span class="prelude-val">Ok</span>(<span class="ident">FlowId::from</span>((<span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="ident">e</span>.<span class="ident">room_id</span>, <span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="ident">e</span>.<span class="ident">content</span>.<span class="ident">relates_to</span>.<span class="ident">event_id</span>)))
             }
-            <span class="ident">AnyMessageEvent::KeyVerificationCancel</span>(<span class="ident">e</span>) =&gt; {
+            <span class="ident">AnyMessageLikeEvent::KeyVerificationCancel</span>(<span class="ident">e</span>) =&gt; {
                 <span class="prelude-val">Ok</span>(<span class="ident">FlowId::from</span>((<span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="ident">e</span>.<span class="ident">room_id</span>, <span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="ident">e</span>.<span class="ident">content</span>.<span class="ident">relates_to</span>.<span class="ident">event_id</span>)))
             }
-            <span class="ident">AnyMessageEvent::KeyVerificationAccept</span>(<span class="ident">e</span>) =&gt; {
+            <span class="ident">AnyMessageLikeEvent::KeyVerificationAccept</span>(<span class="ident">e</span>) =&gt; {
                 <span class="prelude-val">Ok</span>(<span class="ident">FlowId::from</span>((<span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="ident">e</span>.<span class="ident">room_id</span>, <span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="ident">e</span>.<span class="ident">content</span>.<span class="ident">relates_to</span>.<span class="ident">event_id</span>)))
             }
-            <span class="ident">AnyMessageEvent::KeyVerificationKey</span>(<span class="ident">e</span>) =&gt; {
+            <span class="ident">AnyMessageLikeEvent::KeyVerificationKey</span>(<span class="ident">e</span>) =&gt; {
                 <span class="prelude-val">Ok</span>(<span class="ident">FlowId::from</span>((<span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="ident">e</span>.<span class="ident">room_id</span>, <span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="ident">e</span>.<span class="ident">content</span>.<span class="ident">relates_to</span>.<span class="ident">event_id</span>)))
             }
-            <span class="ident">AnyMessageEvent::KeyVerificationMac</span>(<span class="ident">e</span>) =&gt; {
+            <span class="ident">AnyMessageLikeEvent::KeyVerificationMac</span>(<span class="ident">e</span>) =&gt; {
                 <span class="prelude-val">Ok</span>(<span class="ident">FlowId::from</span>((<span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="ident">e</span>.<span class="ident">room_id</span>, <span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="ident">e</span>.<span class="ident">content</span>.<span class="ident">relates_to</span>.<span class="ident">event_id</span>)))
             }
-            <span class="ident">AnyMessageEvent::KeyVerificationDone</span>(<span class="ident">e</span>) =&gt; {
+            <span class="ident">AnyMessageLikeEvent::KeyVerificationDone</span>(<span class="ident">e</span>) =&gt; {
                 <span class="prelude-val">Ok</span>(<span class="ident">FlowId::from</span>((<span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="ident">e</span>.<span class="ident">room_id</span>, <span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="ident">e</span>.<span class="ident">content</span>.<span class="ident">relates_to</span>.<span class="ident">event_id</span>)))
             }
             <span class="kw">_</span> =&gt; <span class="prelude-val">Err</span>(()),
@@ -1168,7 +1176,7 @@
             <span class="kw">fn</span> <span class="ident">try_from</span>(<span class="ident">value</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">OutgoingContent</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident"><span class="self">Self</span>::Error</span><span class="op">&gt;</span> {
                 <span class="kw">match</span> <span class="ident">value</span> {
                     <span class="ident">OutgoingContent::Room</span>(<span class="kw">_</span>, <span class="ident">c</span>) =&gt; {
-                        <span class="kw">if</span> <span class="kw">let</span> <span class="ident">AnyMessageEventContent</span>::<span class="macro-nonterminal">$</span><span class="macro-nonterminal">enum_variant</span>(<span class="ident">c</span>) <span class="op">=</span> <span class="ident">c</span> {
+                        <span class="kw">if</span> <span class="kw">let</span> <span class="ident">AnyMessageLikeEventContent</span>::<span class="macro-nonterminal">$</span><span class="macro-nonterminal">enum_variant</span>(<span class="ident">c</span>) <span class="op">=</span> <span class="ident">c</span> {
                             <span class="prelude-val">Ok</span>(<span class="ident"><span class="self">Self</span>::Room</span>(<span class="ident">c</span>))
                         } <span class="kw">else</span> {
                             <span class="prelude-val">Err</span>(())
@@ -1201,7 +1209,7 @@
     <span class="kw">fn</span> <span class="ident">try_from</span>(<span class="ident">value</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">OutgoingContent</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident"><span class="self">Self</span>::Error</span><span class="op">&gt;</span> {
         <span class="kw">match</span> <span class="ident">value</span> {
             <span class="ident">OutgoingContent::Room</span>(<span class="kw">_</span>, <span class="ident">c</span>) =&gt; {
-                <span class="kw">if</span> <span class="kw">let</span> <span class="ident">AnyMessageEventContent::RoomMessage</span>(<span class="ident">m</span>) <span class="op">=</span> <span class="ident">c</span> {
+                <span class="kw">if</span> <span class="kw">let</span> <span class="ident">AnyMessageLikeEventContent::RoomMessage</span>(<span class="ident">m</span>) <span class="op">=</span> <span class="ident">c</span> {
                     <span class="kw">if</span> <span class="kw">let</span> <span class="ident">MessageType::VerificationRequest</span>(<span class="ident">c</span>) <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">m</span>.<span class="ident">msgtype</span> {
                         <span class="prelude-val">Ok</span>(<span class="ident"><span class="self">Self</span>::Room</span>(<span class="ident">c</span>))
                     } <span class="kw">else</span> {
@@ -1480,7 +1488,7 @@
 
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>)]</span>
 <span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">OutgoingContent</span> {
-    <span class="ident">Room</span>(<span class="ident">Box</span><span class="op">&lt;</span><span class="ident">RoomId</span><span class="op">&gt;</span>, <span class="ident">AnyMessageEventContent</span>),
+    <span class="ident">Room</span>(<span class="ident">Box</span><span class="op">&lt;</span><span class="ident">RoomId</span><span class="op">&gt;</span>, <span class="ident">AnyMessageLikeEventContent</span>),
     <span class="ident">ToDevice</span>(<span class="ident">AnyToDeviceEventContent</span>),
 }
 
@@ -1488,7 +1496,7 @@
     <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">content</span>: <span class="ident">OwnedStartContent</span>) -&gt; <span class="self">Self</span> {
         <span class="kw">match</span> <span class="ident">content</span> {
             <span class="ident">OwnedStartContent::Room</span>(<span class="ident">r</span>, <span class="ident">c</span>) =&gt; {
-                (<span class="ident">r</span>, <span class="ident">AnyMessageEventContent::KeyVerificationStart</span>(<span class="ident">c</span>)).<span class="ident">into</span>()
+                (<span class="ident">r</span>, <span class="ident">AnyMessageLikeEventContent::KeyVerificationStart</span>(<span class="ident">c</span>)).<span class="ident">into</span>()
             }
             <span class="ident">OwnedStartContent::ToDevice</span>(<span class="ident">c</span>) =&gt; {
                 <span class="ident">AnyToDeviceEventContent::KeyVerificationStart</span>(<span class="ident">c</span>).<span class="ident">into</span>()
@@ -1503,8 +1511,8 @@
     }
 }
 
-<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span>(<span class="ident">Box</span><span class="op">&lt;</span><span class="ident">RoomId</span><span class="op">&gt;</span>, <span class="ident">AnyMessageEventContent</span>)<span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">OutgoingContent</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">content</span>: (<span class="ident">Box</span><span class="op">&lt;</span><span class="ident">RoomId</span><span class="op">&gt;</span>, <span class="ident">AnyMessageEventContent</span>)) -&gt; <span class="self">Self</span> {
+<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span>(<span class="ident">Box</span><span class="op">&lt;</span><span class="ident">RoomId</span><span class="op">&gt;</span>, <span class="ident">AnyMessageLikeEventContent</span>)<span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">OutgoingContent</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">content</span>: (<span class="ident">Box</span><span class="op">&lt;</span><span class="ident">RoomId</span><span class="op">&gt;</span>, <span class="ident">AnyMessageLikeEventContent</span>)) -&gt; <span class="self">Self</span> {
         <span class="ident">OutgoingContent::Room</span>(<span class="ident">content</span>.<span class="number">0</span>, <span class="ident">content</span>.<span class="number">1</span>)
     }
 }

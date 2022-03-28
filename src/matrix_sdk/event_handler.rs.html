@@ -602,6 +602,10 @@
 <span id="597">597</span>
 <span id="598">598</span>
 <span id="599">599</span>
+<span id="600">600</span>
+<span id="601">601</span>
+<span id="602">602</span>
+<span id="603">603</span>
 </pre><pre class="rust"><code><span class="comment">// Copyright 2021 Jonas Platte</span>
 <span class="comment">//</span>
 <span class="comment">// Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);</span>
@@ -994,35 +998,37 @@
     <span class="kw">use</span> <span class="ident">ruma::events</span>::{
         <span class="self">self</span>,
         <span class="ident">presence</span>::{<span class="ident">PresenceEvent</span>, <span class="ident">PresenceEventContent</span>},
-        <span class="ident">StaticEventContent</span>,
+        <span class="ident">EphemeralRoomEventType</span>, <span class="ident">EventContent</span>, <span class="ident">GlobalAccountDataEventType</span>, <span class="ident">MessageLikeEventType</span>,
+        <span class="ident">RedactedEventContent</span>, <span class="ident">RoomAccountDataEventType</span>, <span class="ident">StateEventType</span>, <span class="ident">StaticEventContent</span>,
+        <span class="ident">ToDeviceEventType</span>,
     };
 
     <span class="kw">use</span> <span class="kw">super</span>::{<span class="ident">EventKind</span>, <span class="ident">SyncEvent</span>};
 
     <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">C</span><span class="op">&gt;</span> <span class="ident">SyncEvent</span> <span class="kw">for</span> <span class="ident">events::GlobalAccountDataEvent</span><span class="op">&lt;</span><span class="ident">C</span><span class="op">&gt;</span>
     <span class="kw">where</span>
-        <span class="ident">C</span>: <span class="ident">StaticEventContent</span> <span class="op">+</span> <span class="ident">events::GlobalAccountDataEventContent</span>,
+        <span class="ident">C</span>: <span class="ident">StaticEventContent</span> <span class="op">+</span> <span class="ident">EventContent</span><span class="op">&lt;</span><span class="ident">EventType</span> <span class="op">=</span> <span class="ident">GlobalAccountDataEventType</span><span class="op">&gt;</span>,
     {
         <span class="kw">const</span> <span class="ident">ID</span>: (<span class="ident">EventKind</span>, <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>) <span class="op">=</span> (<span class="ident">EventKind::GlobalAccountData</span>, <span class="ident">C::TYPE</span>);
     }
 
     <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">C</span><span class="op">&gt;</span> <span class="ident">SyncEvent</span> <span class="kw">for</span> <span class="ident">events::RoomAccountDataEvent</span><span class="op">&lt;</span><span class="ident">C</span><span class="op">&gt;</span>
     <span class="kw">where</span>
-        <span class="ident">C</span>: <span class="ident">StaticEventContent</span> <span class="op">+</span> <span class="ident">events::RoomAccountDataEventContent</span>,
+        <span class="ident">C</span>: <span class="ident">StaticEventContent</span> <span class="op">+</span> <span class="ident">EventContent</span><span class="op">&lt;</span><span class="ident">EventType</span> <span class="op">=</span> <span class="ident">RoomAccountDataEventType</span><span class="op">&gt;</span>,
     {
         <span class="kw">const</span> <span class="ident">ID</span>: (<span class="ident">EventKind</span>, <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>) <span class="op">=</span> (<span class="ident">EventKind::RoomAccountData</span>, <span class="ident">C::TYPE</span>);
     }
 
     <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">C</span><span class="op">&gt;</span> <span class="ident">SyncEvent</span> <span class="kw">for</span> <span class="ident">events::SyncEphemeralRoomEvent</span><span class="op">&lt;</span><span class="ident">C</span><span class="op">&gt;</span>
     <span class="kw">where</span>
-        <span class="ident">C</span>: <span class="ident">StaticEventContent</span> <span class="op">+</span> <span class="ident">events::EphemeralRoomEventContent</span>,
+        <span class="ident">C</span>: <span class="ident">StaticEventContent</span> <span class="op">+</span> <span class="ident">EventContent</span><span class="op">&lt;</span><span class="ident">EventType</span> <span class="op">=</span> <span class="ident">EphemeralRoomEventType</span><span class="op">&gt;</span>,
     {
         <span class="kw">const</span> <span class="ident">ID</span>: (<span class="ident">EventKind</span>, <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>) <span class="op">=</span> (<span class="ident">EventKind::EphemeralRoomData</span>, <span class="ident">C::TYPE</span>);
     }
 
-    <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">C</span><span class="op">&gt;</span> <span class="ident">SyncEvent</span> <span class="kw">for</span> <span class="ident">events::SyncMessageEvent</span><span class="op">&lt;</span><span class="ident">C</span><span class="op">&gt;</span>
+    <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">C</span><span class="op">&gt;</span> <span class="ident">SyncEvent</span> <span class="kw">for</span> <span class="ident">events::SyncMessageLikeEvent</span><span class="op">&lt;</span><span class="ident">C</span><span class="op">&gt;</span>
     <span class="kw">where</span>
-        <span class="ident">C</span>: <span class="ident">StaticEventContent</span> <span class="op">+</span> <span class="ident">events::MessageEventContent</span>,
+        <span class="ident">C</span>: <span class="ident">StaticEventContent</span> <span class="op">+</span> <span class="ident">EventContent</span><span class="op">&lt;</span><span class="ident">EventType</span> <span class="op">=</span> <span class="ident">MessageLikeEventType</span><span class="op">&gt;</span>,
     {
         <span class="kw">const</span> <span class="ident">ID</span>: (<span class="ident">EventKind</span>, <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>) <span class="op">=</span> (<span class="ident">EventKind::Message</span> { <span class="ident">redacted</span>: <span class="bool-val">false</span> }, <span class="ident">C::TYPE</span>);
     }
@@ -1036,28 +1042,28 @@
 
     <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">C</span><span class="op">&gt;</span> <span class="ident">SyncEvent</span> <span class="kw">for</span> <span class="ident">events::SyncStateEvent</span><span class="op">&lt;</span><span class="ident">C</span><span class="op">&gt;</span>
     <span class="kw">where</span>
-        <span class="ident">C</span>: <span class="ident">StaticEventContent</span> <span class="op">+</span> <span class="ident">events::StateEventContent</span>,
+        <span class="ident">C</span>: <span class="ident">StaticEventContent</span> <span class="op">+</span> <span class="ident">EventContent</span><span class="op">&lt;</span><span class="ident">EventType</span> <span class="op">=</span> <span class="ident">StateEventType</span><span class="op">&gt;</span>,
     {
         <span class="kw">const</span> <span class="ident">ID</span>: (<span class="ident">EventKind</span>, <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>) <span class="op">=</span> (<span class="ident">EventKind::State</span> { <span class="ident">redacted</span>: <span class="bool-val">false</span> }, <span class="ident">C::TYPE</span>);
     }
 
     <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">C</span><span class="op">&gt;</span> <span class="ident">SyncEvent</span> <span class="kw">for</span> <span class="ident">events::StrippedStateEvent</span><span class="op">&lt;</span><span class="ident">C</span><span class="op">&gt;</span>
     <span class="kw">where</span>
-        <span class="ident">C</span>: <span class="ident">StaticEventContent</span> <span class="op">+</span> <span class="ident">events::StateEventContent</span>,
+        <span class="ident">C</span>: <span class="ident">StaticEventContent</span> <span class="op">+</span> <span class="ident">EventContent</span><span class="op">&lt;</span><span class="ident">EventType</span> <span class="op">=</span> <span class="ident">StateEventType</span><span class="op">&gt;</span>,
     {
         <span class="kw">const</span> <span class="ident">ID</span>: (<span class="ident">EventKind</span>, <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>) <span class="op">=</span> (<span class="ident">EventKind::StrippedState</span>, <span class="ident">C::TYPE</span>);
     }
 
     <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">C</span><span class="op">&gt;</span> <span class="ident">SyncEvent</span> <span class="kw">for</span> <span class="ident">events::InitialStateEvent</span><span class="op">&lt;</span><span class="ident">C</span><span class="op">&gt;</span>
     <span class="kw">where</span>
-        <span class="ident">C</span>: <span class="ident">StaticEventContent</span> <span class="op">+</span> <span class="ident">events::StateEventContent</span>,
+        <span class="ident">C</span>: <span class="ident">StaticEventContent</span> <span class="op">+</span> <span class="ident">EventContent</span><span class="op">&lt;</span><span class="ident">EventType</span> <span class="op">=</span> <span class="ident">StateEventType</span><span class="op">&gt;</span>,
     {
         <span class="kw">const</span> <span class="ident">ID</span>: (<span class="ident">EventKind</span>, <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>) <span class="op">=</span> (<span class="ident">EventKind::InitialState</span>, <span class="ident">C::TYPE</span>);
     }
 
     <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">C</span><span class="op">&gt;</span> <span class="ident">SyncEvent</span> <span class="kw">for</span> <span class="ident">events::ToDeviceEvent</span><span class="op">&lt;</span><span class="ident">C</span><span class="op">&gt;</span>
     <span class="kw">where</span>
-        <span class="ident">C</span>: <span class="ident">StaticEventContent</span> <span class="op">+</span> <span class="ident">events::ToDeviceEventContent</span>,
+        <span class="ident">C</span>: <span class="ident">StaticEventContent</span> <span class="op">+</span> <span class="ident">EventContent</span><span class="op">&lt;</span><span class="ident">EventType</span> <span class="op">=</span> <span class="ident">ToDeviceEventType</span><span class="op">&gt;</span>,
     {
         <span class="kw">const</span> <span class="ident">ID</span>: (<span class="ident">EventKind</span>, <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>) <span class="op">=</span> (<span class="ident">EventKind::ToDevice</span>, <span class="ident">C::TYPE</span>);
     }
@@ -1066,9 +1072,11 @@
         <span class="kw">const</span> <span class="ident">ID</span>: (<span class="ident">EventKind</span>, <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>) <span class="op">=</span> (<span class="ident">EventKind::Presence</span>, <span class="ident">PresenceEventContent::TYPE</span>);
     }
 
-    <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">C</span><span class="op">&gt;</span> <span class="ident">SyncEvent</span> <span class="kw">for</span> <span class="ident">events::RedactedSyncMessageEvent</span><span class="op">&lt;</span><span class="ident">C</span><span class="op">&gt;</span>
+    <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">C</span><span class="op">&gt;</span> <span class="ident">SyncEvent</span> <span class="kw">for</span> <span class="ident">events::RedactedSyncMessageLikeEvent</span><span class="op">&lt;</span><span class="ident">C</span><span class="op">&gt;</span>
     <span class="kw">where</span>
-        <span class="ident">C</span>: <span class="ident">StaticEventContent</span> <span class="op">+</span> <span class="ident">events::RedactedMessageEventContent</span>,
+        <span class="ident">C</span>: <span class="ident">StaticEventContent</span>
+            <span class="op">+</span> <span class="ident">EventContent</span><span class="op">&lt;</span><span class="ident">EventType</span> <span class="op">=</span> <span class="ident">MessageLikeEventType</span><span class="op">&gt;</span>
+            <span class="op">+</span> <span class="ident">RedactedEventContent</span>,
     {
         <span class="kw">const</span> <span class="ident">ID</span>: (<span class="ident">EventKind</span>, <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>) <span class="op">=</span> (<span class="ident">EventKind::Message</span> { <span class="ident">redacted</span>: <span class="bool-val">true</span> }, <span class="ident">C::TYPE</span>);
     }
@@ -1082,7 +1090,7 @@
 
     <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">C</span><span class="op">&gt;</span> <span class="ident">SyncEvent</span> <span class="kw">for</span> <span class="ident">events::RedactedSyncStateEvent</span><span class="op">&lt;</span><span class="ident">C</span><span class="op">&gt;</span>
     <span class="kw">where</span>
-        <span class="ident">C</span>: <span class="ident">StaticEventContent</span> <span class="op">+</span> <span class="ident">events::RedactedStateEventContent</span>,
+        <span class="ident">C</span>: <span class="ident">StaticEventContent</span> <span class="op">+</span> <span class="ident">EventContent</span><span class="op">&lt;</span><span class="ident">EventType</span> <span class="op">=</span> <span class="ident">StateEventType</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident">RedactedEventContent</span>,
     {
         <span class="kw">const</span> <span class="ident">ID</span>: (<span class="ident">EventKind</span>, <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>) <span class="op">=</span> (<span class="ident">EventKind::State</span> { <span class="ident">redacted</span>: <span class="bool-val">true</span> }, <span class="ident">C::TYPE</span>);
     }

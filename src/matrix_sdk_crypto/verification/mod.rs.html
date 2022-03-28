@@ -798,7 +798,7 @@
             },
             <span class="ident">Relation</span>,
         },
-        <span class="ident">AnyMessageEventContent</span>, <span class="ident">AnyToDeviceEventContent</span>,
+        <span class="ident">AnyMessageLikeEventContent</span>, <span class="ident">AnyToDeviceEventContent</span>,
     },
     <span class="ident">DeviceId</span>, <span class="ident">DeviceKeyId</span>, <span class="ident">EventId</span>, <span class="ident">RoomId</span>, <span class="ident">TransactionId</span>, <span class="ident">UserId</span>,
 };
@@ -1009,9 +1009,9 @@
             .<span class="ident">into</span>(),
             <span class="ident">FlowId::InRoom</span>(<span class="ident">r</span>, <span class="ident">e</span>) =&gt; (
                 <span class="ident">r</span>.<span class="ident">to_owned</span>(),
-                <span class="ident">AnyMessageEventContent::KeyVerificationDone</span>(<span class="ident">KeyVerificationDoneEventContent::new</span>(
-                    <span class="ident">Relation::new</span>(<span class="ident">e</span>.<span class="ident">to_owned</span>()),
-                )),
+                <span class="ident">AnyMessageLikeEventContent::KeyVerificationDone</span>(
+                    <span class="ident">KeyVerificationDoneEventContent::new</span>(<span class="ident">Relation::new</span>(<span class="ident">e</span>.<span class="ident">to_owned</span>())),
+                ),
             )
                 .<span class="ident">into</span>(),
         }
@@ -1094,7 +1094,7 @@
 
             <span class="ident">FlowId::InRoom</span>(<span class="ident">r</span>, <span class="ident">e</span>) =&gt; (
                 <span class="ident">r</span>.<span class="ident">clone</span>(),
-                <span class="ident">AnyMessageEventContent::KeyVerificationCancel</span>(
+                <span class="ident">AnyMessageLikeEventContent::KeyVerificationCancel</span>(
                     <span class="ident">KeyVerificationCancelEventContent::new</span>(
                         <span class="self">self</span>.<span class="ident">reason</span>.<span class="ident">to_owned</span>(),
                         <span class="self">self</span>.<span class="ident">cancel_code</span>.<span class="ident">clone</span>(),

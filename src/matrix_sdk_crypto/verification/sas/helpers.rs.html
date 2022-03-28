@@ -583,7 +583,7 @@
             <span class="ident">mac</span>::{<span class="ident">KeyVerificationMacEventContent</span>, <span class="ident">ToDeviceKeyVerificationMacEventContent</span>},
             <span class="ident">Relation</span>,
         },
-        <span class="ident">AnyMessageEventContent</span>, <span class="ident">AnyToDeviceEventContent</span>,
+        <span class="ident">AnyMessageLikeEventContent</span>, <span class="ident">AnyToDeviceEventContent</span>,
     },
     <span class="ident">serde::Base64</span>,
     <span class="ident">DeviceKeyAlgorithm</span>, <span class="ident">DeviceKeyId</span>, <span class="ident">UserId</span>,
@@ -909,15 +909,15 @@
             <span class="ident">ToDeviceKeyVerificationMacEventContent::new</span>(<span class="ident">s</span>.<span class="ident">clone</span>(), <span class="ident">mac</span>, <span class="ident">keys</span>),
         )
         .<span class="ident">into</span>(),
-        <span class="ident">FlowId::InRoom</span>(<span class="ident">r</span>, <span class="ident">e</span>) =&gt; (
-            <span class="ident">r</span>.<span class="ident">clone</span>(),
-            <span class="ident">AnyMessageEventContent::KeyVerificationMac</span>(<span class="ident">KeyVerificationMacEventContent::new</span>(
-                <span class="ident">mac</span>,
-                <span class="ident">keys</span>,
-                <span class="ident">Relation::new</span>(<span class="ident">e</span>.<span class="ident">clone</span>()),
-            )),
-        )
-            .<span class="ident">into</span>(),
+        <span class="ident">FlowId::InRoom</span>(<span class="ident">r</span>, <span class="ident">e</span>) =&gt; {
+            (
+                <span class="ident">r</span>.<span class="ident">clone</span>(),
+                <span class="ident">AnyMessageLikeEventContent::KeyVerificationMac</span>(
+                    <span class="ident">KeyVerificationMacEventContent::new</span>(<span class="ident">mac</span>, <span class="ident">keys</span>, <span class="ident">Relation::new</span>(<span class="ident">e</span>.<span class="ident">clone</span>())),
+                ),
+            )
+                .<span class="ident">into</span>()
+        }
     }
 }
 
