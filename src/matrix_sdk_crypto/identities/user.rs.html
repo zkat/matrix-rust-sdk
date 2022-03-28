@@ -1077,32 +1077,6 @@
 <span id="1072">1072</span>
 <span id="1073">1073</span>
 <span id="1074">1074</span>
-<span id="1075">1075</span>
-<span id="1076">1076</span>
-<span id="1077">1077</span>
-<span id="1078">1078</span>
-<span id="1079">1079</span>
-<span id="1080">1080</span>
-<span id="1081">1081</span>
-<span id="1082">1082</span>
-<span id="1083">1083</span>
-<span id="1084">1084</span>
-<span id="1085">1085</span>
-<span id="1086">1086</span>
-<span id="1087">1087</span>
-<span id="1088">1088</span>
-<span id="1089">1089</span>
-<span id="1090">1090</span>
-<span id="1091">1091</span>
-<span id="1092">1092</span>
-<span id="1093">1093</span>
-<span id="1094">1094</span>
-<span id="1095">1095</span>
-<span id="1096">1096</span>
-<span id="1097">1097</span>
-<span id="1098">1098</span>
-<span id="1099">1099</span>
-<span id="1100">1100</span>
 </pre><pre class="rust"><code><span class="comment">// Copyright 2020 The Matrix.org Foundation C.I.C.</span>
 <span class="comment">//</span>
 <span class="comment">// Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);</span>
@@ -1129,7 +1103,7 @@
 
 <span class="kw">use</span> <span class="ident">ruma</span>::{
     <span class="ident">api::client::keys::upload_signatures::v3::Request</span> <span class="kw">as</span> <span class="ident">SignatureUploadRequest</span>,
-    <span class="ident">encryption</span>::{<span class="ident">CrossSigningKey</span>, <span class="ident">DeviceKeys</span>, <span class="ident">KeyUsage</span>},
+    <span class="ident">encryption::KeyUsage</span>,
     <span class="ident">events</span>::{
         <span class="ident">key::verification::VerificationMethod</span>, <span class="ident">room::message::KeyVerificationRequestEventContent</span>,
     },
@@ -1145,6 +1119,7 @@
     <span class="ident">error::SignatureError</span>,
     <span class="ident">olm::VerifyJson</span>,
     <span class="ident">store</span>::{<span class="ident">Changes</span>, <span class="ident">IdentityChanges</span>},
+    <span class="ident">types</span>::{<span class="ident">cross_signing_key::CrossSigningKey</span>, <span class="ident">device_keys::DeviceKeys</span>},
     <span class="ident">verification::VerificationMachine</span>,
     <span class="ident">CryptoStoreError</span>, <span class="ident">OutgoingVerificationRequest</span>, <span class="ident">ReadOnlyDevice</span>, <span class="ident">VerificationRequest</span>,
 };
@@ -1418,40 +1393,19 @@
 
 <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">CrossSigningKey</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">MasterPubkey</span> {
     <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">key</span>: <span class="ident">CrossSigningKey</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">Self</span>(<span class="ident">Arc::new</span>(<span class="ident">key</span>))
+        <span class="self">Self</span>(<span class="ident">key</span>.<span class="ident">into</span>())
     }
 }
 
 <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">CrossSigningKey</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">SelfSigningPubkey</span> {
     <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">key</span>: <span class="ident">CrossSigningKey</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">Self</span>(<span class="ident">Arc::new</span>(<span class="ident">key</span>))
+        <span class="self">Self</span>(<span class="ident">key</span>.<span class="ident">into</span>())
     }
 }
 
 <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">CrossSigningKey</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">UserSigningPubkey</span> {
     <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">key</span>: <span class="ident">CrossSigningKey</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">Self</span>(<span class="ident">Arc::new</span>(<span class="ident">key</span>))
-    }
-}
-
-<span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy::from_over_into</span>)]</span>
-<span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">CrossSigningKey</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">MasterPubkey</span> {
-    <span class="kw">fn</span> <span class="ident">into</span>(<span class="self">self</span>) -&gt; <span class="ident">CrossSigningKey</span> {
-        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">as_ref</span>().<span class="ident">clone</span>()
-    }
-}
-
-<span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy::from_over_into</span>)]</span>
-<span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">CrossSigningKey</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">UserSigningPubkey</span> {
-    <span class="kw">fn</span> <span class="ident">into</span>(<span class="self">self</span>) -&gt; <span class="ident">CrossSigningKey</span> {
-        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">as_ref</span>().<span class="ident">clone</span>()
-    }
-}
-
-<span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy::from_over_into</span>)]</span>
-<span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">CrossSigningKey</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">SelfSigningPubkey</span> {
-    <span class="kw">fn</span> <span class="ident">into</span>(<span class="self">self</span>) -&gt; <span class="ident">CrossSigningKey</span> {
-        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">as_ref</span>().<span class="ident">clone</span>()
+        <span class="self">Self</span>(<span class="ident">key</span>.<span class="ident">into</span>())
     }
 }
 
@@ -1470,24 +1424,6 @@
 <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">CrossSigningKey</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">UserSigningPubkey</span> {
     <span class="kw">fn</span> <span class="ident">as_ref</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">CrossSigningKey</span> {
         <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="number">0</span>
-    }
-}
-
-<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">CrossSigningKey</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">MasterPubkey</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">key</span>: <span class="kw-2">&amp;</span><span class="ident">CrossSigningKey</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">Self</span>(<span class="ident">Arc::new</span>(<span class="ident">key</span>.<span class="ident">clone</span>()))
-    }
-}
-
-<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">CrossSigningKey</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">SelfSigningPubkey</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">key</span>: <span class="kw-2">&amp;</span><span class="ident">CrossSigningKey</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">Self</span>(<span class="ident">Arc::new</span>(<span class="ident">key</span>.<span class="ident">clone</span>()))
-    }
-}
-
-<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">CrossSigningKey</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">UserSigningPubkey</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">key</span>: <span class="kw-2">&amp;</span><span class="ident">CrossSigningKey</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">Self</span>(<span class="ident">Arc::new</span>(<span class="ident">key</span>.<span class="ident">clone</span>()))
     }
 }
 
@@ -1536,7 +1472,7 @@
     }
 
     <span class="doccomment">/// Get the keys map of containing the master keys.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">keys</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">BTreeMap</span><span class="op">&lt;</span><span class="ident">String</span>, <span class="ident">String</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">keys</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">BTreeMap</span><span class="op">&lt;</span><span class="ident">Box</span><span class="op">&lt;</span><span class="ident">DeviceKeyId</span><span class="op">&gt;</span>, <span class="ident">String</span><span class="op">&gt;</span> {
         <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="number">0</span>.<span class="ident">keys</span>
     }
 
@@ -1546,7 +1482,7 @@
     }
 
     <span class="doccomment">/// Get the signatures map of this cross signing key.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">signatures</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">BTreeMap</span><span class="op">&lt;</span><span class="ident">Box</span><span class="op">&lt;</span><span class="ident">UserId</span><span class="op">&gt;</span>, <span class="ident">BTreeMap</span><span class="op">&lt;</span><span class="ident">String</span>, <span class="ident">String</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">signatures</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">BTreeMap</span><span class="op">&lt;</span><span class="ident">Box</span><span class="op">&lt;</span><span class="ident">UserId</span><span class="op">&gt;</span>, <span class="ident">BTreeMap</span><span class="op">&lt;</span><span class="ident">Box</span><span class="op">&lt;</span><span class="ident">DeviceKeyId</span><span class="op">&gt;</span>, <span class="ident">String</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="number">0</span>.<span class="ident">signatures</span>
     }
 
@@ -1556,7 +1492,7 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// * `key_id` - The id of the key that should be fetched.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_key</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">key_id</span>: <span class="kw-2">&amp;</span><span class="ident">DeviceKeyId</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">keys</span>.<span class="ident">get</span>(<span class="ident">key_id</span>.<span class="ident">as_str</span>()).<span class="ident">map</span>(<span class="op">|</span><span class="ident">k</span><span class="op">|</span> <span class="ident">k</span>.<span class="ident">as_str</span>())
+        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">keys</span>.<span class="ident">get</span>(<span class="ident">key_id</span>).<span class="ident">map</span>(<span class="op">|</span><span class="ident">k</span><span class="op">|</span> <span class="ident">k</span>.<span class="ident">as_str</span>())
     }
 
     <span class="doccomment">/// Get the first available master key.</span>
@@ -1604,8 +1540,8 @@
 }
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">IntoIterator</span> <span class="kw">for</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">MasterPubkey</span> {
-    <span class="kw">type</span> <span class="ident">Item</span> <span class="op">=</span> (<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">String</span>, <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">String</span>);
-    <span class="kw">type</span> <span class="ident">IntoIter</span> <span class="op">=</span> <span class="ident">Iter</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">String</span>, <span class="ident">String</span><span class="op">&gt;</span>;
+    <span class="kw">type</span> <span class="ident">Item</span> <span class="op">=</span> (<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">Box</span><span class="op">&lt;</span><span class="ident">DeviceKeyId</span><span class="op">&gt;</span>, <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">String</span>);
+    <span class="kw">type</span> <span class="ident">IntoIter</span> <span class="op">=</span> <span class="ident">Iter</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">Box</span><span class="op">&lt;</span><span class="ident">DeviceKeyId</span><span class="op">&gt;</span>, <span class="ident">String</span><span class="op">&gt;</span>;
 
     <span class="kw">fn</span> <span class="ident">into_iter</span>(<span class="self">self</span>) -&gt; <span class="ident"><span class="self">Self</span>::IntoIter</span> {
         <span class="self">self</span>.<span class="ident">keys</span>().<span class="ident">iter</span>()
@@ -1619,7 +1555,7 @@
     }
 
     <span class="doccomment">/// Get the keys map of containing the user signing keys.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">keys</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">BTreeMap</span><span class="op">&lt;</span><span class="ident">String</span>, <span class="ident">String</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">keys</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">BTreeMap</span><span class="op">&lt;</span><span class="ident">Box</span><span class="op">&lt;</span><span class="ident">DeviceKeyId</span><span class="op">&gt;</span>, <span class="ident">String</span><span class="op">&gt;</span> {
         <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="number">0</span>.<span class="ident">keys</span>
     }
 
@@ -1644,14 +1580,14 @@
         <span class="ident">key</span>.<span class="ident">verify_json</span>(
             <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="number">0</span>.<span class="ident">user_id</span>,
             <span class="ident">key_id</span>.<span class="ident">as_str</span>().<span class="ident">try_into</span>()<span class="question-mark">?</span>,
-            <span class="kw-2">&amp;mut</span> <span class="ident">to_value</span>(<span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="ident">master_key</span>.<span class="number">0</span>).<span class="ident">map_err</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="ident">SignatureError::NotAnObject</span>)<span class="question-mark">?</span>,
+            <span class="kw-2">&amp;mut</span> <span class="ident">to_value</span>(<span class="kw-2">&amp;</span><span class="ident">master_key</span>.<span class="number">0</span>).<span class="ident">map_err</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="ident">SignatureError::NotAnObject</span>)<span class="question-mark">?</span>,
         )
     }
 }
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">IntoIterator</span> <span class="kw">for</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">UserSigningPubkey</span> {
-    <span class="kw">type</span> <span class="ident">Item</span> <span class="op">=</span> (<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">String</span>, <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">String</span>);
-    <span class="kw">type</span> <span class="ident">IntoIter</span> <span class="op">=</span> <span class="ident">Iter</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">String</span>, <span class="ident">String</span><span class="op">&gt;</span>;
+    <span class="kw">type</span> <span class="ident">Item</span> <span class="op">=</span> (<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">Box</span><span class="op">&lt;</span><span class="ident">DeviceKeyId</span><span class="op">&gt;</span>, <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">String</span>);
+    <span class="kw">type</span> <span class="ident">IntoIter</span> <span class="op">=</span> <span class="ident">Iter</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">Box</span><span class="op">&lt;</span><span class="ident">DeviceKeyId</span><span class="op">&gt;</span>, <span class="ident">String</span><span class="op">&gt;</span>;
 
     <span class="kw">fn</span> <span class="ident">into_iter</span>(<span class="self">self</span>) -&gt; <span class="ident"><span class="self">Self</span>::IntoIter</span> {
         <span class="self">self</span>.<span class="ident">keys</span>().<span class="ident">iter</span>()
@@ -1665,7 +1601,7 @@
     }
 
     <span class="doccomment">/// Get the keys map of containing the self signing keys.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">keys</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">BTreeMap</span><span class="op">&lt;</span><span class="ident">String</span>, <span class="ident">String</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">keys</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">BTreeMap</span><span class="op">&lt;</span><span class="ident">Box</span><span class="op">&lt;</span><span class="ident">DeviceKeyId</span><span class="op">&gt;</span>, <span class="ident">String</span><span class="op">&gt;</span> {
         <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="number">0</span>.<span class="ident">keys</span>
     }
 
@@ -1693,8 +1629,8 @@
 }
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">IntoIterator</span> <span class="kw">for</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">SelfSigningPubkey</span> {
-    <span class="kw">type</span> <span class="ident">Item</span> <span class="op">=</span> (<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">String</span>, <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">String</span>);
-    <span class="kw">type</span> <span class="ident">IntoIter</span> <span class="op">=</span> <span class="ident">Iter</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">String</span>, <span class="ident">String</span><span class="op">&gt;</span>;
+    <span class="kw">type</span> <span class="ident">Item</span> <span class="op">=</span> (<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">Box</span><span class="op">&lt;</span><span class="ident">DeviceKeyId</span><span class="op">&gt;</span>, <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">String</span>);
+    <span class="kw">type</span> <span class="ident">IntoIter</span> <span class="op">=</span> <span class="ident">Iter</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">Box</span><span class="op">&lt;</span><span class="ident">DeviceKeyId</span><span class="op">&gt;</span>, <span class="ident">String</span><span class="op">&gt;</span>;
 
     <span class="kw">fn</span> <span class="ident">into_iter</span>(<span class="self">self</span>) -&gt; <span class="ident"><span class="self">Self</span>::IntoIter</span> {
         <span class="self">self</span>.<span class="ident">keys</span>().<span class="ident">iter</span>()
@@ -2046,18 +1982,21 @@
     <span class="kw">use</span> <span class="ident">ruma</span>::{<span class="ident">api::client::keys::get_keys::v3::Response</span> <span class="kw">as</span> <span class="ident">KeyQueryResponse</span>, <span class="ident">user_id</span>};
 
     <span class="kw">use</span> <span class="kw">super</span>::{<span class="ident">ReadOnlyOwnUserIdentity</span>, <span class="ident">ReadOnlyUserIdentity</span>};
-    <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::identities</span>::{
-        <span class="ident">manager::testing</span>::{<span class="ident">other_key_query</span>, <span class="ident">own_key_query</span>},
-        <span class="ident">ReadOnlyDevice</span>,
+    <span class="kw">use</span> <span class="kw">crate</span>::{
+        <span class="ident">identities</span>::{
+            <span class="ident">manager::testing</span>::{<span class="ident">other_key_query</span>, <span class="ident">own_key_query</span>},
+            <span class="ident">ReadOnlyDevice</span>,
+        },
+        <span class="ident">types::cross_signing_key::CrossSigningKey</span>,
     };
 
     <span class="doccomment">/// Generate test devices from KeyQueryResponse</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">device</span>(<span class="ident">response</span>: <span class="kw-2">&amp;</span><span class="ident">KeyQueryResponse</span>) -&gt; (<span class="ident">ReadOnlyDevice</span>, <span class="ident">ReadOnlyDevice</span>) {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">devices</span> <span class="op">=</span> <span class="ident">response</span>.<span class="ident">device_keys</span>.<span class="ident">values</span>().<span class="ident">next</span>().<span class="ident">unwrap</span>().<span class="ident">values</span>();
         <span class="kw">let</span> <span class="ident">first</span> <span class="op">=</span>
-            <span class="ident">ReadOnlyDevice::try_from</span>(<span class="kw-2">&amp;</span><span class="ident">devices</span>.<span class="ident">next</span>().<span class="ident">unwrap</span>().<span class="ident">deserialize</span>().<span class="ident">unwrap</span>()).<span class="ident">unwrap</span>();
+            <span class="ident">ReadOnlyDevice::try_from</span>(<span class="kw-2">&amp;</span><span class="ident">devices</span>.<span class="ident">next</span>().<span class="ident">unwrap</span>().<span class="ident">deserialize_as</span>().<span class="ident">unwrap</span>()).<span class="ident">unwrap</span>();
         <span class="kw">let</span> <span class="ident">second</span> <span class="op">=</span>
-            <span class="ident">ReadOnlyDevice::try_from</span>(<span class="kw-2">&amp;</span><span class="ident">devices</span>.<span class="ident">next</span>().<span class="ident">unwrap</span>().<span class="ident">deserialize</span>().<span class="ident">unwrap</span>()).<span class="ident">unwrap</span>();
+            <span class="ident">ReadOnlyDevice::try_from</span>(<span class="kw-2">&amp;</span><span class="ident">devices</span>.<span class="ident">next</span>().<span class="ident">unwrap</span>().<span class="ident">deserialize_as</span>().<span class="ident">unwrap</span>()).<span class="ident">unwrap</span>();
         (<span class="ident">first</span>, <span class="ident">second</span>)
     }
 
@@ -2065,9 +2004,12 @@
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">own_identity</span>(<span class="ident">response</span>: <span class="kw-2">&amp;</span><span class="ident">KeyQueryResponse</span>) -&gt; <span class="ident">ReadOnlyOwnUserIdentity</span> {
         <span class="kw">let</span> <span class="ident">user_id</span> <span class="op">=</span> <span class="macro">user_id!</span>(<span class="string">&quot;@example:localhost&quot;</span>);
 
-        <span class="kw">let</span> <span class="ident">master_key</span> <span class="op">=</span> <span class="ident">response</span>.<span class="ident">master_keys</span>.<span class="ident">get</span>(<span class="ident">user_id</span>).<span class="ident">unwrap</span>().<span class="ident">deserialize</span>().<span class="ident">unwrap</span>();
-        <span class="kw">let</span> <span class="ident">user_signing</span> <span class="op">=</span> <span class="ident">response</span>.<span class="ident">user_signing_keys</span>.<span class="ident">get</span>(<span class="ident">user_id</span>).<span class="ident">unwrap</span>().<span class="ident">deserialize</span>().<span class="ident">unwrap</span>();
-        <span class="kw">let</span> <span class="ident">self_signing</span> <span class="op">=</span> <span class="ident">response</span>.<span class="ident">self_signing_keys</span>.<span class="ident">get</span>(<span class="ident">user_id</span>).<span class="ident">unwrap</span>().<span class="ident">deserialize</span>().<span class="ident">unwrap</span>();
+        <span class="kw">let</span> <span class="ident">master_key</span>: <span class="ident">CrossSigningKey</span> <span class="op">=</span>
+            <span class="ident">response</span>.<span class="ident">master_keys</span>.<span class="ident">get</span>(<span class="ident">user_id</span>).<span class="ident">unwrap</span>().<span class="ident">deserialize_as</span>().<span class="ident">unwrap</span>();
+        <span class="kw">let</span> <span class="ident">user_signing</span>: <span class="ident">CrossSigningKey</span> <span class="op">=</span>
+            <span class="ident">response</span>.<span class="ident">user_signing_keys</span>.<span class="ident">get</span>(<span class="ident">user_id</span>).<span class="ident">unwrap</span>().<span class="ident">deserialize_as</span>().<span class="ident">unwrap</span>();
+        <span class="kw">let</span> <span class="ident">self_signing</span>: <span class="ident">CrossSigningKey</span> <span class="op">=</span>
+            <span class="ident">response</span>.<span class="ident">self_signing_keys</span>.<span class="ident">get</span>(<span class="ident">user_id</span>).<span class="ident">unwrap</span>().<span class="ident">deserialize_as</span>().<span class="ident">unwrap</span>();
 
         <span class="ident">ReadOnlyOwnUserIdentity::new</span>(<span class="ident">master_key</span>.<span class="ident">into</span>(), <span class="ident">self_signing</span>.<span class="ident">into</span>(), <span class="ident">user_signing</span>.<span class="ident">into</span>())
             .<span class="ident">unwrap</span>()
@@ -2083,8 +2025,10 @@
         <span class="kw">let</span> <span class="ident">user_id</span> <span class="op">=</span> <span class="macro">user_id!</span>(<span class="string">&quot;@example2:localhost&quot;</span>);
         <span class="kw">let</span> <span class="ident">response</span> <span class="op">=</span> <span class="ident">other_key_query</span>();
 
-        <span class="kw">let</span> <span class="ident">master_key</span> <span class="op">=</span> <span class="ident">response</span>.<span class="ident">master_keys</span>.<span class="ident">get</span>(<span class="ident">user_id</span>).<span class="ident">unwrap</span>().<span class="ident">deserialize</span>().<span class="ident">unwrap</span>();
-        <span class="kw">let</span> <span class="ident">self_signing</span> <span class="op">=</span> <span class="ident">response</span>.<span class="ident">self_signing_keys</span>.<span class="ident">get</span>(<span class="ident">user_id</span>).<span class="ident">unwrap</span>().<span class="ident">deserialize</span>().<span class="ident">unwrap</span>();
+        <span class="kw">let</span> <span class="ident">master_key</span>: <span class="ident">CrossSigningKey</span> <span class="op">=</span>
+            <span class="ident">response</span>.<span class="ident">master_keys</span>.<span class="ident">get</span>(<span class="ident">user_id</span>).<span class="ident">unwrap</span>().<span class="ident">deserialize_as</span>().<span class="ident">unwrap</span>();
+        <span class="kw">let</span> <span class="ident">self_signing</span>: <span class="ident">CrossSigningKey</span> <span class="op">=</span>
+            <span class="ident">response</span>.<span class="ident">self_signing_keys</span>.<span class="ident">get</span>(<span class="ident">user_id</span>).<span class="ident">unwrap</span>().<span class="ident">deserialize_as</span>().<span class="ident">unwrap</span>();
 
         <span class="ident">ReadOnlyUserIdentity::new</span>(<span class="ident">master_key</span>.<span class="ident">into</span>(), <span class="ident">self_signing</span>.<span class="ident">into</span>()).<span class="ident">unwrap</span>()
     }
@@ -2106,6 +2050,7 @@
         <span class="ident">identities</span>::{<span class="ident">manager::testing::own_key_query</span>, <span class="ident">Device</span>},
         <span class="ident">olm</span>::{<span class="ident">PrivateCrossSigningIdentity</span>, <span class="ident">ReadOnlyAccount</span>},
         <span class="ident">store::MemoryStore</span>,
+        <span class="ident">types::cross_signing_key::CrossSigningKey</span>,
         <span class="ident">verification::VerificationMachine</span>,
     };
 
@@ -2114,9 +2059,12 @@
         <span class="kw">let</span> <span class="ident">user_id</span> <span class="op">=</span> <span class="macro">user_id!</span>(<span class="string">&quot;@example:localhost&quot;</span>);
         <span class="kw">let</span> <span class="ident">response</span> <span class="op">=</span> <span class="ident">own_key_query</span>();
 
-        <span class="kw">let</span> <span class="ident">master_key</span> <span class="op">=</span> <span class="ident">response</span>.<span class="ident">master_keys</span>.<span class="ident">get</span>(<span class="ident">user_id</span>).<span class="ident">unwrap</span>().<span class="ident">deserialize</span>().<span class="ident">unwrap</span>();
-        <span class="kw">let</span> <span class="ident">user_signing</span> <span class="op">=</span> <span class="ident">response</span>.<span class="ident">user_signing_keys</span>.<span class="ident">get</span>(<span class="ident">user_id</span>).<span class="ident">unwrap</span>().<span class="ident">deserialize</span>().<span class="ident">unwrap</span>();
-        <span class="kw">let</span> <span class="ident">self_signing</span> <span class="op">=</span> <span class="ident">response</span>.<span class="ident">self_signing_keys</span>.<span class="ident">get</span>(<span class="ident">user_id</span>).<span class="ident">unwrap</span>().<span class="ident">deserialize</span>().<span class="ident">unwrap</span>();
+        <span class="kw">let</span> <span class="ident">master_key</span>: <span class="ident">CrossSigningKey</span> <span class="op">=</span>
+            <span class="ident">response</span>.<span class="ident">master_keys</span>.<span class="ident">get</span>(<span class="ident">user_id</span>).<span class="ident">unwrap</span>().<span class="ident">deserialize_as</span>().<span class="ident">unwrap</span>();
+        <span class="kw">let</span> <span class="ident">user_signing</span>: <span class="ident">CrossSigningKey</span> <span class="op">=</span>
+            <span class="ident">response</span>.<span class="ident">user_signing_keys</span>.<span class="ident">get</span>(<span class="ident">user_id</span>).<span class="ident">unwrap</span>().<span class="ident">deserialize_as</span>().<span class="ident">unwrap</span>();
+        <span class="kw">let</span> <span class="ident">self_signing</span>: <span class="ident">CrossSigningKey</span> <span class="op">=</span>
+            <span class="ident">response</span>.<span class="ident">self_signing_keys</span>.<span class="ident">get</span>(<span class="ident">user_id</span>).<span class="ident">unwrap</span>().<span class="ident">deserialize_as</span>().<span class="ident">unwrap</span>();
 
         <span class="ident">ReadOnlyOwnUserIdentity::new</span>(<span class="ident">master_key</span>.<span class="ident">into</span>(), <span class="ident">self_signing</span>.<span class="ident">into</span>(), <span class="ident">user_signing</span>.<span class="ident">into</span>())
             .<span class="ident">unwrap</span>();
