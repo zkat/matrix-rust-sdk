@@ -72,7 +72,7 @@
     <span class="ident">store::CryptoStoreError</span> <span class="kw">as</span> <span class="ident">InnerStoreError</span>, <span class="ident">KeyExportError</span>, <span class="ident">MegolmError</span>, <span class="ident">OlmError</span>,
     <span class="ident">SecretImportError</span> <span class="kw">as</span> <span class="ident">RustSecretImportError</span>, <span class="ident">SignatureError</span> <span class="kw">as</span> <span class="ident">InnerSignatureError</span>,
 };
-<span class="kw">use</span> <span class="ident">ruma</span>::{<span class="ident">identifiers::Error</span> <span class="kw">as</span> <span class="ident">RumaIdentifierError</span>, <span class="ident">UserId</span>};
+<span class="kw">use</span> <span class="ident">ruma</span>::{<span class="ident">IdParseError</span>, <span class="ident">UserId</span>};
 
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">thiserror::Error</span>)]</span>
 <span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">KeyImportError</span> {
@@ -97,7 +97,7 @@
     <span class="attribute">#[<span class="ident">error</span>(<span class="ident">transparent</span>)]</span>
     <span class="ident">Signature</span>(<span class="attribute">#[<span class="ident">from</span>]</span> <span class="ident">InnerSignatureError</span>),
     <span class="attribute">#[<span class="ident">error</span>(<span class="ident">transparent</span>)]</span>
-    <span class="ident">Identifier</span>(<span class="attribute">#[<span class="ident">from</span>]</span> <span class="ident">RumaIdentifierError</span>),
+    <span class="ident">Identifier</span>(<span class="attribute">#[<span class="ident">from</span>]</span> <span class="ident">IdParseError</span>),
     <span class="attribute">#[<span class="ident">error</span>(<span class="ident">transparent</span>)]</span>
     <span class="ident">CryptoStore</span>(<span class="attribute">#[<span class="ident">from</span>]</span> <span class="ident">InnerStoreError</span>),
     <span class="attribute">#[<span class="ident">error</span>(<span class="string">&quot;Unknown device {0} {1}&quot;</span>)]</span>
@@ -115,9 +115,9 @@
     <span class="attribute">#[<span class="ident">error</span>(<span class="ident">transparent</span>)]</span>
     <span class="ident">Serialization</span>(<span class="attribute">#[<span class="ident">from</span>]</span> <span class="ident">serde_json::Error</span>),
     <span class="attribute">#[<span class="ident">error</span>(<span class="string">&quot;The given string is not a valid user ID: source {0}, error {1}&quot;</span>)]</span>
-    <span class="ident">InvalidUserId</span>(<span class="ident">String</span>, <span class="ident">RumaIdentifierError</span>),
+    <span class="ident">InvalidUserId</span>(<span class="ident">String</span>, <span class="ident">IdParseError</span>),
     <span class="attribute">#[<span class="ident">error</span>(<span class="ident">transparent</span>)]</span>
-    <span class="ident">Identifier</span>(<span class="attribute">#[<span class="ident">from</span>]</span> <span class="ident">RumaIdentifierError</span>),
+    <span class="ident">Identifier</span>(<span class="attribute">#[<span class="ident">from</span>]</span> <span class="ident">IdParseError</span>),
 }
 
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">thiserror::Error</span>)]</span>
@@ -125,7 +125,7 @@
     <span class="attribute">#[<span class="ident">error</span>(<span class="ident">transparent</span>)]</span>
     <span class="ident">Serialization</span>(<span class="attribute">#[<span class="ident">from</span>]</span> <span class="ident">serde_json::Error</span>),
     <span class="attribute">#[<span class="ident">error</span>(<span class="ident">transparent</span>)]</span>
-    <span class="ident">Identifier</span>(<span class="attribute">#[<span class="ident">from</span>]</span> <span class="ident">RumaIdentifierError</span>),
+    <span class="ident">Identifier</span>(<span class="attribute">#[<span class="ident">from</span>]</span> <span class="ident">IdParseError</span>),
     <span class="attribute">#[<span class="ident">error</span>(<span class="ident">transparent</span>)]</span>
     <span class="ident">Megolm</span>(<span class="attribute">#[<span class="ident">from</span>]</span> <span class="ident">MegolmError</span>),
 }

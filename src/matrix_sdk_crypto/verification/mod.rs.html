@@ -751,6 +751,7 @@
 <span id="746">746</span>
 <span id="747">747</span>
 <span id="748">748</span>
+<span id="749">749</span>
 </pre><pre class="rust"><code><span class="comment">// Copyright 2020 The Matrix.org Foundation C.I.C.</span>
 <span class="comment">//</span>
 <span class="comment">// Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);</span>
@@ -890,11 +891,12 @@
 
 <span class="doccomment">/// An enum over the different verification types the SDK supports.</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>)]</span>
+<span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
 <span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">Verification</span> {
     <span class="doccomment">/// The `m.sas.v1` verification variant.</span>
     <span class="ident">SasV1</span>(<span class="ident">Sas</span>),
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;qrcode&quot;</span>)]</span>
     <span class="doccomment">/// The `m.qr_code.*.v1` verification variant.</span>
+    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;qrcode&quot;</span>)]</span>
     <span class="ident">QrV1</span>(<span class="ident">QrVerification</span>),
 }
 
@@ -909,8 +911,8 @@
         }
     }
 
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;qrcode&quot;</span>)]</span>
     <span class="doccomment">/// Try to deconstruct this verification enum into a QR code verification.</span>
+    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;qrcode&quot;</span>)]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">qr_v1</span>(<span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">QrVerification</span><span class="op">&gt;</span> {
         <span class="kw">if</span> <span class="kw">let</span> <span class="ident">Verification::QrV1</span>(<span class="ident">qr</span>) <span class="op">=</span> <span class="self">self</span> {
             <span class="prelude-val">Some</span>(<span class="ident">qr</span>)

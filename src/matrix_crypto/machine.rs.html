@@ -1308,43 +1308,66 @@
 <span id="1303">1303</span>
 <span id="1304">1304</span>
 <span id="1305">1305</span>
+<span id="1306">1306</span>
+<span id="1307">1307</span>
+<span id="1308">1308</span>
+<span id="1309">1309</span>
+<span id="1310">1310</span>
+<span id="1311">1311</span>
+<span id="1312">1312</span>
+<span id="1313">1313</span>
+<span id="1314">1314</span>
+<span id="1315">1315</span>
+<span id="1316">1316</span>
+<span id="1317">1317</span>
+<span id="1318">1318</span>
+<span id="1319">1319</span>
+<span id="1320">1320</span>
+<span id="1321">1321</span>
+<span id="1322">1322</span>
+<span id="1323">1323</span>
+<span id="1324">1324</span>
+<span id="1325">1325</span>
+<span id="1326">1326</span>
+<span id="1327">1327</span>
+<span id="1328">1328</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">std</span>::{
     <span class="ident">collections</span>::{<span class="ident">BTreeMap</span>, <span class="ident">HashMap</span>},
-    <span class="ident">convert</span>::{<span class="ident">TryFrom</span>, <span class="ident">TryInto</span>},
+    <span class="ident">convert::TryInto</span>,
     <span class="ident">io::Cursor</span>,
     <span class="ident">ops::Deref</span>,
 };
 
+<span class="kw">use</span> <span class="ident">anyhow::anyhow</span>;
 <span class="kw">use</span> <span class="ident">base64</span>::{<span class="ident">decode_config</span>, <span class="ident">encode</span>, <span class="ident">STANDARD_NO_PAD</span>};
 <span class="kw">use</span> <span class="ident">js_int::UInt</span>;
-<span class="kw">use</span> <span class="ident">matrix_sdk_common</span>::{<span class="ident">deserialized_responses::AlgorithmInfo</span>, <span class="ident">uuid::Uuid</span>};
+<span class="kw">use</span> <span class="ident">matrix_sdk_common::deserialized_responses::AlgorithmInfo</span>;
 <span class="kw">use</span> <span class="ident">matrix_sdk_crypto</span>::{
-    <span class="ident">backups</span>::{<span class="ident">MegolmV1BackupKey</span> <span class="kw">as</span> <span class="ident">RustBackupKey</span>, <span class="ident">RecoveryKey</span>},
-    <span class="ident">decrypt_key_export</span>, <span class="ident">encrypt_key_export</span>,
-    <span class="ident">matrix_qrcode::QrVerificationData</span>,
-    <span class="ident">olm::ExportedRoomKey</span>,
+    <span class="ident">backups::MegolmV1BackupKey</span> <span class="kw">as</span> <span class="ident">RustBackupKey</span>, <span class="ident">decrypt_key_export</span>, <span class="ident">encrypt_key_export</span>,
+    <span class="ident">matrix_qrcode::QrVerificationData</span>, <span class="ident">olm::ExportedRoomKey</span>, <span class="ident">store::RecoveryKey</span>,
     <span class="ident">EncryptionSettings</span>, <span class="ident">LocalTrust</span>, <span class="ident">OlmMachine</span> <span class="kw">as</span> <span class="ident">InnerMachine</span>, <span class="ident">UserIdentities</span>,
     <span class="ident">Verification</span> <span class="kw">as</span> <span class="ident">RustVerification</span>,
 };
 <span class="kw">use</span> <span class="ident">ruma</span>::{
     <span class="ident">api</span>::{
-        <span class="ident">client::r0</span>::{
-            <span class="ident">backup::add_backup_keys::Response</span> <span class="kw">as</span> <span class="ident">KeysBackupResponse</span>,
+        <span class="ident">client</span>::{
+            <span class="ident">backup::add_backup_keys::v3::Response</span> <span class="kw">as</span> <span class="ident">KeysBackupResponse</span>,
             <span class="ident">keys</span>::{
-                <span class="ident">claim_keys::Response</span> <span class="kw">as</span> <span class="ident">KeysClaimResponse</span>, <span class="ident">get_keys::Response</span> <span class="kw">as</span> <span class="ident">KeysQueryResponse</span>,
-                <span class="ident">upload_keys::Response</span> <span class="kw">as</span> <span class="ident">KeysUploadResponse</span>,
-                <span class="ident">upload_signatures::Response</span> <span class="kw">as</span> <span class="ident">SignatureUploadResponse</span>,
+                <span class="ident">claim_keys::v3::Response</span> <span class="kw">as</span> <span class="ident">KeysClaimResponse</span>,
+                <span class="ident">get_keys::v3::Response</span> <span class="kw">as</span> <span class="ident">KeysQueryResponse</span>,
+                <span class="ident">upload_keys::v3::Response</span> <span class="kw">as</span> <span class="ident">KeysUploadResponse</span>,
+                <span class="ident">upload_signatures::v3::Response</span> <span class="kw">as</span> <span class="ident">SignatureUploadResponse</span>,
             },
-            <span class="ident">sync::sync_events</span>::{<span class="ident">DeviceLists</span> <span class="kw">as</span> <span class="ident">RumaDeviceLists</span>, <span class="ident">ToDevice</span>},
-            <span class="ident">to_device::send_event_to_device::Response</span> <span class="kw">as</span> <span class="ident">ToDeviceResponse</span>,
+            <span class="ident">sync::sync_events::v3</span>::{<span class="ident">DeviceLists</span> <span class="kw">as</span> <span class="ident">RumaDeviceLists</span>, <span class="ident">ToDevice</span>},
+            <span class="ident">to_device::send_event_to_device::v3::Response</span> <span class="kw">as</span> <span class="ident">ToDeviceResponse</span>,
         },
         <span class="ident">IncomingResponse</span>,
     },
     <span class="ident">events</span>::{
-        <span class="ident">key::verification::VerificationMethod</span>, <span class="ident">room::encrypted::RoomEncryptedEventContent</span>,
-        <span class="ident">AnyMessageEventContent</span>, <span class="ident">EventContent</span>, <span class="ident">SyncMessageEvent</span>,
+        <span class="ident">key::verification::VerificationMethod</span>, <span class="ident">room::encrypted::SyncRoomEncryptedEvent</span>,
+        <span class="ident">AnyMessageLikeEventContent</span>, <span class="ident">EventContent</span>,
     },
-    <span class="ident">DeviceKeyAlgorithm</span>, <span class="ident">EventId</span>, <span class="ident">RoomId</span>, <span class="ident">UserId</span>,
+    <span class="ident">DeviceKeyAlgorithm</span>, <span class="ident">EventId</span>, <span class="ident">RoomId</span>, <span class="ident">TransactionId</span>, <span class="ident">UserId</span>,
 };
 <span class="kw">use</span> <span class="ident">serde</span>::{<span class="ident">Deserialize</span>, <span class="ident">Serialize</span>};
 <span class="kw">use</span> <span class="ident">serde_json</span>::{<span class="ident">value::RawValue</span>, <span class="ident">Value</span>};
@@ -1392,9 +1415,23 @@
         <span class="kw">let</span> <span class="ident">device_id</span> <span class="op">=</span> <span class="ident">device_id</span>.<span class="ident">into</span>();
         <span class="kw">let</span> <span class="ident">runtime</span> <span class="op">=</span> <span class="ident">Runtime::new</span>().<span class="ident">expect</span>(<span class="string">&quot;Couldn&#39;t create a tokio runtime&quot;</span>);
 
+        <span class="kw">let</span> <span class="ident">store</span> <span class="op">=</span>
+            <span class="ident">Box::new</span>(<span class="ident">matrix_sdk_sled::CryptoStore::open_with_passphrase</span>(<span class="ident">path</span>, <span class="prelude-val">None</span>).<span class="ident">map_err</span>(
+                <span class="op">|</span><span class="ident">e</span><span class="op">|</span> <span class="kw">match</span> <span class="ident">e</span> {
+                    <span class="comment">// This is a bit of an error in the sled store, the</span>
+                    <span class="comment">// CryptoStore returns an `OpenStoreError` which has a</span>
+                    <span class="comment">// variant for the state store. Not sure what to do about</span>
+                    <span class="comment">// this.</span>
+                    <span class="ident">matrix_sdk_sled::OpenStoreError::Crypto</span>(<span class="ident">r</span>) =&gt; <span class="ident">r</span>.<span class="ident">into</span>(),
+                    <span class="ident">matrix_sdk_sled::OpenStoreError::Sled</span>(<span class="ident">s</span>) =&gt; {
+                        <span class="ident">CryptoStoreError::CryptoStore</span>(<span class="macro">anyhow!</span>(<span class="ident">s</span>).<span class="ident">into</span>())
+                    }
+                    <span class="kw">_</span> =&gt; <span class="macro">unreachable!</span>(),
+                },
+            )<span class="question-mark">?</span>);
+
         <span class="prelude-val">Ok</span>(<span class="ident">OlmMachine</span> {
-            <span class="ident">inner</span>: <span class="ident">runtime</span>
-                .<span class="ident">block_on</span>(<span class="ident">InnerMachine::new_with_default_store</span>(<span class="kw-2">&amp;</span><span class="ident">user_id</span>, <span class="ident">device_id</span>, <span class="ident">path</span>, <span class="prelude-val">None</span>))<span class="question-mark">?</span>,
+            <span class="ident">inner</span>: <span class="ident">runtime</span>.<span class="ident">block_on</span>(<span class="ident">InnerMachine::with_store</span>(<span class="ident">user_id</span>, <span class="ident">device_id</span>, <span class="ident">store</span>))<span class="question-mark">?</span>,
             <span class="ident">runtime</span>,
         })
     }
@@ -1451,7 +1488,7 @@
     <span class="doccomment">/// Returns a request that needs to be sent out for the user identity to be</span>
     <span class="doccomment">/// marked as verified.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">verify_identity</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">user_id</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">SignatureUploadRequest</span>, <span class="ident">SignatureError</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">user_id</span> <span class="op">=</span> <span class="ident">Box</span>::<span class="op">&lt;</span><span class="ident">UserId</span><span class="op">&gt;</span><span class="ident">::try_from</span>(<span class="ident">user_id</span>)<span class="question-mark">?</span>;
+        <span class="kw">let</span> <span class="ident">user_id</span> <span class="op">=</span> <span class="ident">UserId::parse</span>(<span class="ident">user_id</span>)<span class="question-mark">?</span>;
 
         <span class="kw">let</span> <span class="ident">user_identity</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">runtime</span>.<span class="ident">block_on</span>(<span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">get_identity</span>(<span class="kw-2">&amp;</span><span class="ident">user_id</span>))<span class="question-mark">?</span>;
 
@@ -1504,7 +1541,7 @@
         <span class="ident">user_id</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>,
         <span class="ident">device_id</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>,
     ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">SignatureUploadRequest</span>, <span class="ident">SignatureError</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">user_id</span> <span class="op">=</span> <span class="ident">Box</span>::<span class="op">&lt;</span><span class="ident">UserId</span><span class="op">&gt;</span><span class="ident">::try_from</span>(<span class="ident">user_id</span>)<span class="question-mark">?</span>;
+        <span class="kw">let</span> <span class="ident">user_id</span> <span class="op">=</span> <span class="ident">UserId::parse</span>(<span class="ident">user_id</span>)<span class="question-mark">?</span>;
         <span class="kw">let</span> <span class="ident">device</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">runtime</span>.<span class="ident">block_on</span>(<span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">get_device</span>(<span class="kw-2">&amp;</span><span class="ident">user_id</span>, <span class="ident">device_id</span>.<span class="ident">into</span>()))<span class="question-mark">?</span>;
 
         <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">device</span>) <span class="op">=</span> <span class="ident">device</span> {
@@ -1549,7 +1586,11 @@
 
     <span class="doccomment">/// Get our own identity keys.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">identity_keys</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">HashMap</span><span class="op">&lt;</span><span class="ident">String</span>, <span class="ident">String</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">identity_keys</span>().<span class="ident">iter</span>().<span class="ident">map</span>(<span class="op">|</span>(<span class="ident">k</span>, <span class="ident">v</span>)<span class="op">|</span> (<span class="ident">k</span>.<span class="ident">to_owned</span>(), <span class="ident">v</span>.<span class="ident">to_owned</span>())).<span class="ident">collect</span>()
+        <span class="kw">let</span> <span class="ident">identity_keys</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">identity_keys</span>();
+        <span class="kw">let</span> <span class="ident">curve_key</span> <span class="op">=</span> <span class="ident">identity_keys</span>.<span class="ident">curve25519</span>.<span class="ident">to_base64</span>();
+        <span class="kw">let</span> <span class="ident">ed25519_key</span> <span class="op">=</span> <span class="ident">identity_keys</span>.<span class="ident">ed25519</span>.<span class="ident">to_base64</span>();
+
+        <span class="ident">HashMap::from</span>([(<span class="string">&quot;ed25519&quot;</span>.<span class="ident">to_owned</span>(), <span class="ident">ed25519_key</span>), (<span class="string">&quot;curve25519&quot;</span>.<span class="ident">to_owned</span>(), <span class="ident">curve_key</span>)])
     }
 
     <span class="doccomment">/// Get the list of outgoing requests that need to be sent to the</span>
@@ -1585,7 +1626,7 @@
         <span class="ident">request_type</span>: <span class="ident">RequestType</span>,
         <span class="ident">response_body</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>,
     ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">CryptoStoreError</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">id</span> <span class="op">=</span> <span class="ident">Uuid::parse_str</span>(<span class="ident">request_id</span>).<span class="ident">expect</span>(<span class="string">&quot;Can&#39;t parse request id&quot;</span>);
+        <span class="kw">let</span> <span class="ident">id</span>: <span class="ident">Box</span><span class="op">&lt;</span><span class="ident">TransactionId</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">request_id</span>.<span class="ident">into</span>();
 
         <span class="kw">let</span> <span class="ident">response</span> <span class="op">=</span> <span class="ident">response_from_string</span>(<span class="ident">response_body</span>);
 
@@ -1677,7 +1718,7 @@
     <span class="doccomment">/// `users` - The users that should be queued up for a key query.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">update_tracked_users</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">users</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>) {
         <span class="kw">let</span> <span class="ident">users</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Box</span><span class="op">&lt;</span><span class="ident">UserId</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="op">=</span>
-            <span class="ident">users</span>.<span class="ident">into_iter</span>().<span class="ident">filter_map</span>(<span class="op">|</span><span class="ident">u</span><span class="op">|</span> <span class="ident">Box</span>::<span class="op">&lt;</span><span class="ident">UserId</span><span class="op">&gt;</span><span class="ident">::try_from</span>(<span class="ident">u</span>).<span class="ident">ok</span>()).<span class="ident">collect</span>();
+            <span class="ident">users</span>.<span class="ident">into_iter</span>().<span class="ident">filter_map</span>(<span class="op">|</span><span class="ident">u</span><span class="op">|</span> <span class="ident">UserId::parse</span>(<span class="ident">u</span>).<span class="ident">ok</span>()).<span class="ident">collect</span>();
 
         <span class="self">self</span>.<span class="ident">runtime</span>.<span class="ident">block_on</span>(<span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">update_tracked_users</span>(<span class="ident">users</span>.<span class="ident">iter</span>().<span class="ident">map</span>(<span class="ident">Deref::deref</span>)));
     }
@@ -1710,7 +1751,7 @@
         <span class="ident">users</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
     ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Request</span><span class="op">&gt;</span>, <span class="ident">CryptoStoreError</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">users</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Box</span><span class="op">&lt;</span><span class="ident">UserId</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="op">=</span>
-            <span class="ident">users</span>.<span class="ident">into_iter</span>().<span class="ident">filter_map</span>(<span class="op">|</span><span class="ident">u</span><span class="op">|</span> <span class="ident">Box</span>::<span class="op">&lt;</span><span class="ident">UserId</span><span class="op">&gt;</span><span class="ident">::try_from</span>(<span class="ident">u</span>).<span class="ident">ok</span>()).<span class="ident">collect</span>();
+            <span class="ident">users</span>.<span class="ident">into_iter</span>().<span class="ident">filter_map</span>(<span class="op">|</span><span class="ident">u</span><span class="op">|</span> <span class="ident">UserId::parse</span>(<span class="ident">u</span>).<span class="ident">ok</span>()).<span class="ident">collect</span>();
 
         <span class="prelude-val">Ok</span>(<span class="self">self</span>
             .<span class="ident">runtime</span>
@@ -1741,9 +1782,9 @@
         <span class="ident">users</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
     ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Request</span><span class="op">&gt;</span>, <span class="ident">CryptoStoreError</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">users</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Box</span><span class="op">&lt;</span><span class="ident">UserId</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="op">=</span>
-            <span class="ident">users</span>.<span class="ident">into_iter</span>().<span class="ident">filter_map</span>(<span class="op">|</span><span class="ident">u</span><span class="op">|</span> <span class="ident">Box</span>::<span class="op">&lt;</span><span class="ident">UserId</span><span class="op">&gt;</span><span class="ident">::try_from</span>(<span class="ident">u</span>).<span class="ident">ok</span>()).<span class="ident">collect</span>();
+            <span class="ident">users</span>.<span class="ident">into_iter</span>().<span class="ident">filter_map</span>(<span class="op">|</span><span class="ident">u</span><span class="op">|</span> <span class="ident">UserId::parse</span>(<span class="ident">u</span>).<span class="ident">ok</span>()).<span class="ident">collect</span>();
 
-        <span class="kw">let</span> <span class="ident">room_id</span> <span class="op">=</span> <span class="ident">Box</span>::<span class="op">&lt;</span><span class="ident">RoomId</span><span class="op">&gt;</span><span class="ident">::try_from</span>(<span class="ident">room_id</span>)<span class="question-mark">?</span>;
+        <span class="kw">let</span> <span class="ident">room_id</span> <span class="op">=</span> <span class="ident">RoomId::parse</span>(<span class="ident">room_id</span>)<span class="question-mark">?</span>;
         <span class="kw">let</span> <span class="ident">requests</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">runtime</span>.<span class="ident">block_on</span>(<span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">share_group_session</span>(
             <span class="kw-2">&amp;</span><span class="ident">room_id</span>,
             <span class="ident">users</span>.<span class="ident">iter</span>().<span class="ident">map</span>(<span class="ident">Deref::deref</span>),
@@ -1792,10 +1833,10 @@
         <span class="ident">event_type</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>,
         <span class="ident">content</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>,
     ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">String</span>, <span class="ident">CryptoStoreError</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">room_id</span> <span class="op">=</span> <span class="ident">Box</span>::<span class="op">&lt;</span><span class="ident">RoomId</span><span class="op">&gt;</span><span class="ident">::try_from</span>(<span class="ident">room_id</span>)<span class="question-mark">?</span>;
+        <span class="kw">let</span> <span class="ident">room_id</span> <span class="op">=</span> <span class="ident">RoomId::parse</span>(<span class="ident">room_id</span>)<span class="question-mark">?</span>;
         <span class="kw">let</span> <span class="ident">content</span>: <span class="ident">Box</span><span class="op">&lt;</span><span class="ident">RawValue</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">serde_json::from_str</span>(<span class="ident">content</span>)<span class="question-mark">?</span>;
 
-        <span class="kw">let</span> <span class="ident">content</span> <span class="op">=</span> <span class="ident">AnyMessageEventContent::from_parts</span>(<span class="ident">event_type</span>, <span class="kw-2">&amp;</span><span class="ident">content</span>)<span class="question-mark">?</span>;
+        <span class="kw">let</span> <span class="ident">content</span> <span class="op">=</span> <span class="ident">AnyMessageLikeEventContent::from_parts</span>(<span class="ident">event_type</span>, <span class="kw-2">&amp;</span><span class="ident">content</span>)<span class="question-mark">?</span>;
         <span class="kw">let</span> <span class="ident">encrypted_content</span> <span class="op">=</span> <span class="self">self</span>
             .<span class="ident">runtime</span>
             .<span class="ident">block_on</span>(<span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">encrypt</span>(<span class="kw-2">&amp;</span><span class="ident">room_id</span>, <span class="ident">content</span>))
@@ -1827,8 +1868,8 @@
             <span class="ident">content</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">RawValue</span>,
         }
 
-        <span class="kw">let</span> <span class="ident">event</span>: <span class="ident">SyncMessageEvent</span><span class="op">&lt;</span><span class="ident">RoomEncryptedEventContent</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">serde_json::from_str</span>(<span class="ident">event</span>)<span class="question-mark">?</span>;
-        <span class="kw">let</span> <span class="ident">room_id</span> <span class="op">=</span> <span class="ident">Box</span>::<span class="op">&lt;</span><span class="ident">RoomId</span><span class="op">&gt;</span><span class="ident">::try_from</span>(<span class="ident">room_id</span>)<span class="question-mark">?</span>;
+        <span class="kw">let</span> <span class="ident">event</span>: <span class="ident">SyncRoomEncryptedEvent</span> <span class="op">=</span> <span class="ident">serde_json::from_str</span>(<span class="ident">event</span>)<span class="question-mark">?</span>;
+        <span class="kw">let</span> <span class="ident">room_id</span> <span class="op">=</span> <span class="ident">RoomId::parse</span>(<span class="ident">room_id</span>)<span class="question-mark">?</span>;
 
         <span class="kw">let</span> <span class="ident">decrypted</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">runtime</span>.<span class="ident">block_on</span>(<span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">decrypt_room_event</span>(<span class="kw-2">&amp;</span><span class="ident">event</span>, <span class="kw-2">&amp;</span><span class="ident">room_id</span>))<span class="question-mark">?</span>;
 
@@ -1865,8 +1906,8 @@
         <span class="ident">event</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>,
         <span class="ident">room_id</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>,
     ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">KeyRequestPair</span>, <span class="ident">DecryptionError</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">event</span>: <span class="ident">SyncMessageEvent</span><span class="op">&lt;</span><span class="ident">RoomEncryptedEventContent</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">serde_json::from_str</span>(<span class="ident">event</span>)<span class="question-mark">?</span>;
-        <span class="kw">let</span> <span class="ident">room_id</span> <span class="op">=</span> <span class="ident">Box</span>::<span class="op">&lt;</span><span class="ident">RoomId</span><span class="op">&gt;</span><span class="ident">::try_from</span>(<span class="ident">room_id</span>)<span class="question-mark">?</span>;
+        <span class="kw">let</span> <span class="ident">event</span>: <span class="ident">SyncRoomEncryptedEvent</span> <span class="op">=</span> <span class="ident">serde_json::from_str</span>(<span class="ident">event</span>)<span class="question-mark">?</span>;
+        <span class="kw">let</span> <span class="ident">room_id</span> <span class="op">=</span> <span class="ident">RoomId::parse</span>(<span class="ident">room_id</span>)<span class="question-mark">?</span>;
 
         <span class="kw">let</span> (<span class="ident">cancel</span>, <span class="ident">request</span>) <span class="op">=</span>
             <span class="self">self</span>.<span class="ident">runtime</span>.<span class="ident">block_on</span>(<span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">request_room_key</span>(<span class="kw-2">&amp;</span><span class="ident">event</span>, <span class="kw-2">&amp;</span><span class="ident">room_id</span>))<span class="question-mark">?</span>;
@@ -1972,7 +2013,7 @@
     <span class="doccomment">/// Discard the currently active room key for the given room if there is</span>
     <span class="doccomment">/// one.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">discard_room_key</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">room_id</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">CryptoStoreError</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">room_id</span> <span class="op">=</span> <span class="ident">Box</span>::<span class="op">&lt;</span><span class="ident">RoomId</span><span class="op">&gt;</span><span class="ident">::try_from</span>(<span class="ident">room_id</span>)<span class="question-mark">?</span>;
+        <span class="kw">let</span> <span class="ident">room_id</span> <span class="op">=</span> <span class="ident">RoomId::parse</span>(<span class="ident">room_id</span>)<span class="question-mark">?</span>;
 
         <span class="self">self</span>.<span class="ident">runtime</span>.<span class="ident">block_on</span>(<span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">invalidate_group_session</span>(<span class="kw-2">&amp;</span><span class="ident">room_id</span>))<span class="question-mark">?</span>;
 
@@ -1986,7 +2027,7 @@
     <span class="doccomment">/// * `user_id` - The ID of the user for which we would like to fetch the</span>
     <span class="doccomment">/// verification requests.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_verification_requests</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">user_id</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">VerificationRequest</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">user_id</span> <span class="op">=</span> <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Ok</span>(<span class="ident">user_id</span>) <span class="op">=</span> <span class="ident">Box</span>::<span class="op">&lt;</span><span class="ident">UserId</span><span class="op">&gt;</span><span class="ident">::try_from</span>(<span class="ident">user_id</span>) {
+        <span class="kw">let</span> <span class="ident">user_id</span> <span class="op">=</span> <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Ok</span>(<span class="ident">user_id</span>) <span class="op">=</span> <span class="ident">UserId::parse</span>(<span class="ident">user_id</span>) {
             <span class="ident">user_id</span>
         } <span class="kw">else</span> {
             <span class="kw">return</span> <span class="macro">vec!</span>[];
@@ -2009,7 +2050,7 @@
         <span class="ident">user_id</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>,
         <span class="ident">flow_id</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>,
     ) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">VerificationRequest</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">user_id</span> <span class="op">=</span> <span class="ident">Box</span>::<span class="op">&lt;</span><span class="ident">UserId</span><span class="op">&gt;</span><span class="ident">::try_from</span>(<span class="ident">user_id</span>).<span class="ident">ok</span>()<span class="question-mark">?</span>;
+        <span class="kw">let</span> <span class="ident">user_id</span> <span class="op">=</span> <span class="ident">UserId::parse</span>(<span class="ident">user_id</span>).<span class="ident">ok</span>()<span class="question-mark">?</span>;
 
         <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">get_verification_request</span>(<span class="kw-2">&amp;</span><span class="ident">user_id</span>, <span class="ident">flow_id</span>).<span class="ident">map</span>(<span class="op">|</span><span class="ident">v</span><span class="op">|</span> <span class="ident">v</span>.<span class="ident">into</span>())
     }
@@ -2034,7 +2075,7 @@
         <span class="ident">flow_id</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>,
         <span class="ident">methods</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
     ) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">OutgoingVerificationRequest</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">user_id</span> <span class="op">=</span> <span class="ident">Box</span>::<span class="op">&lt;</span><span class="ident">UserId</span><span class="op">&gt;</span><span class="ident">::try_from</span>(<span class="ident">user_id</span>).<span class="ident">ok</span>()<span class="question-mark">?</span>;
+        <span class="kw">let</span> <span class="ident">user_id</span> <span class="op">=</span> <span class="ident">UserId::parse</span>(<span class="ident">user_id</span>).<span class="ident">ok</span>()<span class="question-mark">?</span>;
         <span class="kw">let</span> <span class="ident">methods</span> <span class="op">=</span> <span class="ident">methods</span>.<span class="ident">into_iter</span>().<span class="ident">map</span>(<span class="ident">VerificationMethod::from</span>).<span class="ident">collect</span>();
 
         <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">verification</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">get_verification_request</span>(<span class="kw-2">&amp;</span><span class="ident">user_id</span>, <span class="ident">flow_id</span>) {
@@ -2101,8 +2142,8 @@
         <span class="ident">methods</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
     ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">VerificationRequest</span><span class="op">&gt;</span>, <span class="ident">CryptoStoreError</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">user_id</span> <span class="op">=</span> <span class="ident">parse_user_id</span>(<span class="ident">user_id</span>)<span class="question-mark">?</span>;
-        <span class="kw">let</span> <span class="ident">event_id</span> <span class="op">=</span> <span class="ident">Box</span>::<span class="op">&lt;</span><span class="ident">EventId</span><span class="op">&gt;</span><span class="ident">::try_from</span>(<span class="ident">event_id</span>)<span class="question-mark">?</span>;
-        <span class="kw">let</span> <span class="ident">room_id</span> <span class="op">=</span> <span class="ident">Box</span>::<span class="op">&lt;</span><span class="ident">RoomId</span><span class="op">&gt;</span><span class="ident">::try_from</span>(<span class="ident">room_id</span>)<span class="question-mark">?</span>;
+        <span class="kw">let</span> <span class="ident">event_id</span> <span class="op">=</span> <span class="ident">EventId::parse</span>(<span class="ident">event_id</span>)<span class="question-mark">?</span>;
+        <span class="kw">let</span> <span class="ident">room_id</span> <span class="op">=</span> <span class="ident">RoomId::parse</span>(<span class="ident">room_id</span>)<span class="question-mark">?</span>;
 
         <span class="kw">let</span> <span class="ident">identity</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">runtime</span>.<span class="ident">block_on</span>(<span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">get_identity</span>(<span class="kw-2">&amp;</span><span class="ident">user_id</span>))<span class="question-mark">?</span>;
 
@@ -2195,11 +2236,12 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// * `flow_id` - The ID that uniquely identifies the verification flow.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_verification</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">user_id</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">flow_id</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Verification</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">user_id</span> <span class="op">=</span> <span class="ident">Box</span>::<span class="op">&lt;</span><span class="ident">UserId</span><span class="op">&gt;</span><span class="ident">::try_from</span>(<span class="ident">user_id</span>).<span class="ident">ok</span>()<span class="question-mark">?</span>;
+        <span class="kw">let</span> <span class="ident">user_id</span> <span class="op">=</span> <span class="ident">UserId::parse</span>(<span class="ident">user_id</span>).<span class="ident">ok</span>()<span class="question-mark">?</span>;
 
         <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">get_verification</span>(<span class="kw-2">&amp;</span><span class="ident">user_id</span>, <span class="ident">flow_id</span>).<span class="ident">map</span>(<span class="op">|</span><span class="ident">v</span><span class="op">|</span> <span class="kw">match</span> <span class="ident">v</span> {
             <span class="ident">RustVerification::SasV1</span>(<span class="ident">s</span>) =&gt; <span class="ident">Verification::SasV1</span> { <span class="ident">sas</span>: <span class="ident">s</span>.<span class="ident">into</span>() },
             <span class="ident">RustVerification::QrV1</span>(<span class="ident">qr</span>) =&gt; <span class="ident">Verification::QrCodeV1</span> { <span class="ident">qrcode</span>: <span class="ident">qr</span>.<span class="ident">into</span>() },
+            <span class="kw">_</span> =&gt; <span class="macro">unreachable!</span>(),
         })
     }
 
@@ -2224,7 +2266,7 @@
         <span class="ident">flow_id</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>,
         <span class="ident">cancel_code</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>,
     ) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">OutgoingVerificationRequest</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">user_id</span> <span class="op">=</span> <span class="ident">Box</span>::<span class="op">&lt;</span><span class="ident">UserId</span><span class="op">&gt;</span><span class="ident">::try_from</span>(<span class="ident">user_id</span>).<span class="ident">ok</span>()<span class="question-mark">?</span>;
+        <span class="kw">let</span> <span class="ident">user_id</span> <span class="op">=</span> <span class="ident">UserId::parse</span>(<span class="ident">user_id</span>).<span class="ident">ok</span>()<span class="question-mark">?</span>;
 
         <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">request</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">get_verification_request</span>(<span class="kw-2">&amp;</span><span class="ident">user_id</span>, <span class="ident">flow_id</span>) {
             <span class="ident">request</span>.<span class="ident">cancel</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">r</span><span class="op">|</span> <span class="ident">r</span>.<span class="ident">into</span>())
@@ -2236,6 +2278,7 @@
                 <span class="ident">RustVerification::QrV1</span>(<span class="ident">v</span>) =&gt; {
                     <span class="ident">v</span>.<span class="ident">cancel_with_code</span>(<span class="ident">cancel_code</span>.<span class="ident">into</span>()).<span class="ident">map</span>(<span class="op">|</span><span class="ident">r</span><span class="op">|</span> <span class="ident">r</span>.<span class="ident">into</span>())
                 }
+                <span class="kw">_</span> =&gt; <span class="macro">unreachable!</span>(),
             }
         } <span class="kw">else</span> {
             <span class="prelude-val">None</span>
@@ -2264,16 +2307,19 @@
         <span class="prelude-val">Ok</span>(<span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">verification</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">get_verification</span>(<span class="kw-2">&amp;</span><span class="ident">user_id</span>, <span class="ident">flow_id</span>) {
             <span class="kw">match</span> <span class="ident">verification</span> {
                 <span class="ident">RustVerification::SasV1</span>(<span class="ident">v</span>) =&gt; {
-                    <span class="kw">let</span> (<span class="ident">request</span>, <span class="ident">signature_request</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">runtime</span>.<span class="ident">block_on</span>(<span class="ident">v</span>.<span class="ident">confirm</span>())<span class="question-mark">?</span>;
+                    <span class="kw">let</span> (<span class="ident">requests</span>, <span class="ident">signature_request</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">runtime</span>.<span class="ident">block_on</span>(<span class="ident">v</span>.<span class="ident">confirm</span>())<span class="question-mark">?</span>;
 
-                    <span class="ident">request</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">r</span><span class="op">|</span> <span class="ident">ConfirmVerificationResult</span> {
-                        <span class="ident">request</span>: <span class="ident">r</span>.<span class="ident">into</span>(),
+                    <span class="kw">let</span> <span class="ident">requests</span> <span class="op">=</span> <span class="ident">requests</span>.<span class="ident">into_iter</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">r</span><span class="op">|</span> <span class="ident">r</span>.<span class="ident">into</span>()).<span class="ident">collect</span>();
+
+                    <span class="prelude-val">Some</span>(<span class="ident">ConfirmVerificationResult</span> {
+                        <span class="ident">requests</span>,
                         <span class="ident">signature_request</span>: <span class="ident">signature_request</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">s</span><span class="op">|</span> <span class="ident">s</span>.<span class="ident">into</span>()),
                     })
                 }
                 <span class="ident">RustVerification::QrV1</span>(<span class="ident">v</span>) =&gt; <span class="ident">v</span>.<span class="ident">confirm_scanning</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">r</span><span class="op">|</span> {
-                    <span class="ident">ConfirmVerificationResult</span> { <span class="ident">request</span>: <span class="ident">r</span>.<span class="ident">into</span>(), <span class="ident">signature_request</span>: <span class="prelude-val">None</span> }
+                    <span class="ident">ConfirmVerificationResult</span> { <span class="ident">requests</span>: <span class="macro">vec!</span>[<span class="ident">r</span>.<span class="ident">into</span>()], <span class="ident">signature_request</span>: <span class="prelude-val">None</span> }
                 }),
+                <span class="kw">_</span> =&gt; <span class="macro">unreachable!</span>(),
             }
         } <span class="kw">else</span> {
             <span class="prelude-val">None</span>
@@ -2325,7 +2371,7 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// [start_qr_verification()]: #method.start_qr_verification</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">generate_qr_code</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">user_id</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">flow_id</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">user_id</span> <span class="op">=</span> <span class="ident">Box</span>::<span class="op">&lt;</span><span class="ident">UserId</span><span class="op">&gt;</span><span class="ident">::try_from</span>(<span class="ident">user_id</span>).<span class="ident">ok</span>()<span class="question-mark">?</span>;
+        <span class="kw">let</span> <span class="ident">user_id</span> <span class="op">=</span> <span class="ident">UserId::parse</span>(<span class="ident">user_id</span>).<span class="ident">ok</span>()<span class="question-mark">?</span>;
         <span class="self">self</span>.<span class="ident">inner</span>
             .<span class="ident">get_verification</span>(<span class="kw-2">&amp;</span><span class="ident">user_id</span>, <span class="ident">flow_id</span>)
             .<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">v</span><span class="op">|</span> <span class="ident">v</span>.<span class="ident">qr_v1</span>().<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">qr</span><span class="op">|</span> <span class="ident">qr</span>.<span class="ident">to_bytes</span>().<span class="ident">map</span>(<span class="ident">encode</span>).<span class="ident">ok</span>()))
@@ -2348,7 +2394,7 @@
     <span class="doccomment">/// * `data` - The data that was extracted from the scanned QR code as an</span>
     <span class="doccomment">/// base64 encoded string, without padding.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">scan_qr_code</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">user_id</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">flow_id</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">data</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ScanResult</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">user_id</span> <span class="op">=</span> <span class="ident">Box</span>::<span class="op">&lt;</span><span class="ident">UserId</span><span class="op">&gt;</span><span class="ident">::try_from</span>(<span class="ident">user_id</span>).<span class="ident">ok</span>()<span class="question-mark">?</span>;
+        <span class="kw">let</span> <span class="ident">user_id</span> <span class="op">=</span> <span class="ident">UserId::parse</span>(<span class="ident">user_id</span>).<span class="ident">ok</span>()<span class="question-mark">?</span>;
         <span class="kw">let</span> <span class="ident">data</span> <span class="op">=</span> <span class="ident">decode_config</span>(<span class="ident">data</span>, <span class="ident">STANDARD_NO_PAD</span>).<span class="ident">ok</span>()<span class="question-mark">?</span>;
         <span class="kw">let</span> <span class="ident">data</span> <span class="op">=</span> <span class="ident">QrVerificationData::from_bytes</span>(<span class="ident">data</span>).<span class="ident">ok</span>()<span class="question-mark">?</span>;
 
@@ -2438,7 +2484,7 @@
         <span class="ident">user_id</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>,
         <span class="ident">flow_id</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>,
     ) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">OutgoingVerificationRequest</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">user_id</span> <span class="op">=</span> <span class="ident">Box</span>::<span class="op">&lt;</span><span class="ident">UserId</span><span class="op">&gt;</span><span class="ident">::try_from</span>(<span class="ident">user_id</span>).<span class="ident">ok</span>()<span class="question-mark">?</span>;
+        <span class="kw">let</span> <span class="ident">user_id</span> <span class="op">=</span> <span class="ident">UserId::parse</span>(<span class="ident">user_id</span>).<span class="ident">ok</span>()<span class="question-mark">?</span>;
 
         <span class="self">self</span>.<span class="ident">inner</span>
             .<span class="ident">get_verification</span>(<span class="kw-2">&amp;</span><span class="ident">user_id</span>, <span class="ident">flow_id</span>)
@@ -2460,7 +2506,7 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// * `flow_id` - The ID that uniquely identifies the verification flow.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_emoji_index</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">user_id</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">flow_id</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">i32</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">user_id</span> <span class="op">=</span> <span class="ident">Box</span>::<span class="op">&lt;</span><span class="ident">UserId</span><span class="op">&gt;</span><span class="ident">::try_from</span>(<span class="ident">user_id</span>).<span class="ident">ok</span>()<span class="question-mark">?</span>;
+        <span class="kw">let</span> <span class="ident">user_id</span> <span class="op">=</span> <span class="ident">UserId::parse</span>(<span class="ident">user_id</span>).<span class="ident">ok</span>()<span class="question-mark">?</span>;
 
         <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">get_verification</span>(<span class="kw-2">&amp;</span><span class="ident">user_id</span>, <span class="ident">flow_id</span>).<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">s</span><span class="op">|</span> {
             <span class="ident">s</span>.<span class="ident">sas_v1</span>()
@@ -2481,7 +2527,7 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// * `flow_id` - The ID that uniquely identifies the verification flow.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_decimals</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">user_id</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">flow_id</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">i32</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">user_id</span> <span class="op">=</span> <span class="ident">Box</span>::<span class="op">&lt;</span><span class="ident">UserId</span><span class="op">&gt;</span><span class="ident">::try_from</span>(<span class="ident">user_id</span>).<span class="ident">ok</span>()<span class="question-mark">?</span>;
+        <span class="kw">let</span> <span class="ident">user_id</span> <span class="op">=</span> <span class="ident">UserId::parse</span>(<span class="ident">user_id</span>).<span class="ident">ok</span>()<span class="question-mark">?</span>;
 
         <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">get_verification</span>(<span class="kw-2">&amp;</span><span class="ident">user_id</span>, <span class="ident">flow_id</span>).<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">s</span><span class="op">|</span> {
             <span class="ident">s</span>.<span class="ident">sas_v1</span>()
