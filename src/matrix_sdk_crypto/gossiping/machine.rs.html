@@ -1931,7 +1931,7 @@
             <span class="comment">// We ignore cancellations here since there&#39;s nothing to serve.</span>
             <span class="ident">RequestAction::RequestCancellation</span> =&gt; <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="prelude-val">None</span>),
             <span class="ident">action</span> =&gt; {
-                <span class="macro">warn!</span>(<span class="ident">action</span> <span class="op">=</span><span class="question-mark">?</span> <span class="ident">action</span>, <span class="string">&quot;Unknown secret request action&quot;</span>);
+                <span class="macro">warn!</span>(<span class="question-mark">?</span><span class="ident">action</span>, <span class="string">&quot;Unknown secret request action&quot;</span>);
                 <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="prelude-val">None</span>);
             }
         };
@@ -1939,7 +1939,7 @@
         <span class="kw">let</span> <span class="ident">content</span> <span class="op">=</span> <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">secret</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">store</span>.<span class="ident">export_secret</span>(<span class="ident">secret_name</span>).<span class="kw">await</span> {
             <span class="ident">SecretSendEventContent::new</span>(<span class="ident">event</span>.<span class="ident">content</span>.<span class="ident">request_id</span>.<span class="ident">to_owned</span>(), <span class="ident">secret</span>)
         } <span class="kw">else</span> {
-            <span class="macro">info!</span>(<span class="ident">secret_name</span> <span class="op">=</span><span class="question-mark">?</span> <span class="ident">secret_name</span>, <span class="string">&quot;Can&#39;t serve a secret request, secret isn&#39;t found&quot;</span>);
+            <span class="macro">info!</span>(<span class="question-mark">?</span><span class="ident">secret_name</span>, <span class="string">&quot;Can&#39;t serve a secret request, secret isn&#39;t found&quot;</span>);
             <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="prelude-val">None</span>);
         };
 
@@ -1952,7 +1952,7 @@
                     <span class="macro">info!</span>(
                         <span class="ident">user_id</span> <span class="op">=</span> <span class="ident">device</span>.<span class="ident">user_id</span>().<span class="ident">as_str</span>(),
                         <span class="ident">device_id</span> <span class="op">=</span> <span class="ident">device</span>.<span class="ident">device_id</span>().<span class="ident">as_str</span>(),
-                        <span class="ident">secret_name</span> <span class="op">=</span><span class="question-mark">?</span> <span class="ident">secret_name</span>,
+                        <span class="question-mark">?</span><span class="ident">secret_name</span>,
                         <span class="string">&quot;Sharing a secret with a device&quot;</span>,
                     );
 
@@ -1976,7 +1976,7 @@
                     <span class="macro">info!</span>(
                         <span class="ident">user_id</span> <span class="op">=</span> <span class="ident">device</span>.<span class="ident">user_id</span>().<span class="ident">as_str</span>(),
                         <span class="ident">device_id</span> <span class="op">=</span> <span class="ident">device</span>.<span class="ident">device_id</span>().<span class="ident">as_str</span>(),
-                        <span class="ident">secret_name</span> <span class="op">=</span><span class="question-mark">?</span> <span class="ident">secret_name</span>,
+                        <span class="question-mark">?</span><span class="ident">secret_name</span>,
                         <span class="string">&quot;Received a secret request that we won&#39;t serve, the device isn&#39;t trusted&quot;</span>,
                     );
 
@@ -1986,7 +1986,7 @@
                 <span class="macro">info!</span>(
                     <span class="ident">user_id</span> <span class="op">=</span> <span class="ident">device</span>.<span class="ident">user_id</span>().<span class="ident">as_str</span>(),
                     <span class="ident">device_id</span> <span class="op">=</span> <span class="ident">device</span>.<span class="ident">device_id</span>().<span class="ident">as_str</span>(),
-                    <span class="ident">secret_name</span> <span class="op">=</span><span class="question-mark">?</span> <span class="ident">secret_name</span>,
+                    <span class="question-mark">?</span><span class="ident">secret_name</span>,
                     <span class="string">&quot;Received a secret request that we won&#39;t serve, the device doesn&#39;t belong to us&quot;</span>,
                 );
 
@@ -1996,7 +1996,7 @@
             <span class="macro">warn!</span>(
                 <span class="ident">user_id</span> <span class="op">=</span> <span class="ident">event</span>.<span class="ident">sender</span>.<span class="ident">as_str</span>(),
                 <span class="ident">device_id</span> <span class="op">=</span> <span class="ident">event</span>.<span class="ident">content</span>.<span class="ident">requesting_device_id</span>.<span class="ident">as_str</span>(),
-                <span class="ident">secret_name</span> <span class="op">=</span><span class="question-mark">?</span> <span class="ident">secret_name</span>,
+                <span class="question-mark">?</span><span class="ident">secret_name</span>,
                 <span class="string">&quot;Received a secret request form an unknown device&quot;</span>,
             );
             <span class="self">self</span>.<span class="ident">store</span>.<span class="ident">update_tracked_user</span>(<span class="kw-2">&amp;</span><span class="ident">event</span>.<span class="ident">sender</span>, <span class="bool-val">true</span>).<span class="kw">await</span><span class="question-mark">?</span>;
@@ -2076,7 +2076,7 @@
                         <span class="macro">debug!</span>(
                             <span class="ident">user_id</span> <span class="op">=</span> <span class="ident">device</span>.<span class="ident">user_id</span>().<span class="ident">as_str</span>(),
                             <span class="ident">device_id</span> <span class="op">=</span> <span class="ident">device</span>.<span class="ident">device_id</span>().<span class="ident">as_str</span>(),
-                            <span class="ident">reason</span> <span class="op">=</span><span class="question-mark">?</span> <span class="ident">e</span>,
+                            <span class="ident">reason</span> <span class="op">=</span> <span class="question-mark">?</span><span class="ident">e</span>,
                             <span class="string">&quot;Received a key request that we won&#39;t serve&quot;</span>,
                         );
                     }
@@ -2089,7 +2089,7 @@
                         <span class="ident">device_id</span> <span class="op">=</span> <span class="ident">device</span>.<span class="ident">device_id</span>().<span class="ident">as_str</span>(),
                         <span class="ident">session_id</span> <span class="op">=</span> <span class="ident">key_info</span>.<span class="ident">session_id</span>.<span class="ident">as_str</span>(),
                         <span class="ident">room_id</span> <span class="op">=</span> <span class="ident">key_info</span>.<span class="ident">room_id</span>.<span class="ident">as_str</span>(),
-                        <span class="ident">message_index</span> <span class="op">=</span><span class="question-mark">?</span> <span class="ident">message_index</span>,
+                        <span class="question-mark">?</span><span class="ident">message_index</span>,
                         <span class="string">&quot;Serving a room key request&quot;</span>,
                     );
 
@@ -2317,7 +2317,7 @@
         <span class="ident">secret_names</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">SecretName</span><span class="op">&gt;</span>,
     ) -&gt; <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">GossipRequest</span><span class="op">&gt;</span> {
         <span class="kw">if</span> <span class="op">!</span><span class="ident">secret_names</span>.<span class="ident">is_empty</span>() {
-            <span class="macro">info!</span>(<span class="ident">secret_names</span> <span class="op">=</span><span class="question-mark">?</span> <span class="ident">secret_names</span>, <span class="string">&quot;Creating new outgoing secret requests&quot;</span>);
+            <span class="macro">info!</span>(<span class="question-mark">?</span><span class="ident">secret_names</span>, <span class="string">&quot;Creating new outgoing secret requests&quot;</span>);
 
             <span class="ident">secret_names</span>
                 .<span class="ident">into_iter</span>()
@@ -2506,7 +2506,7 @@
                                             <span class="comment">// something wrong with the secret.</span>
                                             <span class="macro">warn!</span>(
                                                 <span class="ident">secret_name</span> <span class="op">=</span> <span class="ident">secret_name</span>.<span class="ident">as_ref</span>(),
-                                                <span class="ident">error</span> <span class="op">=</span><span class="question-mark">?</span> <span class="ident">e</span>,
+                                                <span class="ident">error</span> <span class="op">=</span> <span class="question-mark">?</span><span class="ident">e</span>,
                                                 <span class="string">&quot;Error while importing a secret&quot;</span>
                                             )
                                         }
@@ -3392,5 +3392,5 @@
     }
 }
 </code></pre></div>
-</section><section id="search" class="content hidden"></section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="matrix_sdk_crypto" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.61.0-nightly (ab0c2e18d 2022-03-27)" ></div>
+</section><section id="search" class="content hidden"></section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="matrix_sdk_crypto" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.61.0-nightly (9c06e1ba4 2022-03-29)" ></div>
 </body></html>

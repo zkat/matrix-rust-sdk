@@ -1344,6 +1344,7 @@
 <span id="1339">1339</span>
 <span id="1340">1340</span>
 <span id="1341">1341</span>
+<span id="1342">1342</span>
 </pre><pre class="rust"><code><span class="comment">// Copyright 2020 Damir Jelić</span>
 <span class="comment">// Copyright 2020 The Matrix.org Foundation C.I.C.</span>
 <span class="comment">//</span>
@@ -1398,9 +1399,9 @@
 <span class="kw">use</span> <span class="ident">ruma</span>::{
     <span class="ident">api::client</span>::{<span class="self">self</span> <span class="kw">as</span> <span class="ident">api</span>, <span class="ident">push::get_notifications::v3::Notification</span>},
     <span class="ident">events</span>::{
-        <span class="ident">room::member::MembershipState</span>, <span class="ident">AnyGlobalAccountDataEvent</span>, <span class="ident">AnyRoomAccountDataEvent</span>,
-        <span class="ident">AnyStrippedStateEvent</span>, <span class="ident">AnySyncEphemeralRoomEvent</span>, <span class="ident">AnySyncRoomEvent</span>, <span class="ident">AnySyncStateEvent</span>,
-        <span class="ident">GlobalAccountDataEventType</span>, <span class="ident">StateEventType</span>,
+        <span class="ident">push_rules::PushRulesEvent</span>, <span class="ident">room::member::MembershipState</span>, <span class="ident">AnyGlobalAccountDataEvent</span>,
+        <span class="ident">AnyRoomAccountDataEvent</span>, <span class="ident">AnyStrippedStateEvent</span>, <span class="ident">AnySyncEphemeralRoomEvent</span>,
+        <span class="ident">AnySyncRoomEvent</span>, <span class="ident">AnySyncStateEvent</span>, <span class="ident">GlobalAccountDataEventType</span>, <span class="ident">StateEventType</span>,
     },
     <span class="ident">push</span>::{<span class="ident">Action</span>, <span class="ident">PushConditionRoomCtx</span>, <span class="ident">Ruleset</span>},
     <span class="ident">serde::Raw</span>,
@@ -1843,7 +1844,7 @@
             <span class="kw">let</span> <span class="ident">event</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">raw_event</span>.<span class="ident">deserialize</span>() {
                 <span class="prelude-val">Ok</span>(<span class="ident">e</span>) =&gt; <span class="ident">e</span>,
                 <span class="prelude-val">Err</span>(<span class="ident">e</span>) =&gt; {
-                    <span class="macro">warn!</span>(<span class="ident">error</span> <span class="op">=</span><span class="question-mark">?</span> <span class="ident">e</span>, <span class="string">&quot;Failed to deserialize a global account data event&quot;</span>);
+                    <span class="macro">warn!</span>(<span class="ident">error</span> <span class="op">=</span> <span class="question-mark">?</span><span class="ident">e</span>, <span class="string">&quot;Failed to deserialize a global account data event&quot;</span>);
                     <span class="kw">continue</span>;
                 }
             };
@@ -2506,11 +2507,12 @@
             .<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">e</span><span class="op">|</span> <span class="ident">e</span>.<span class="ident">deserialize</span>().<span class="ident">ok</span>())
         {
             <span class="prelude-val">Ok</span>(<span class="ident">event</span>.<span class="ident">content</span>.<span class="ident">global</span>)
-        } <span class="kw">else</span> <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">AnyGlobalAccountDataEvent::PushRules</span>(<span class="ident">event</span>)) <span class="op">=</span> <span class="self">self</span>
+        } <span class="kw">else</span> <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">event</span>) <span class="op">=</span> <span class="self">self</span>
             .<span class="ident">store</span>
             .<span class="ident">get_account_data_event</span>(<span class="ident">GlobalAccountDataEventType::PushRules</span>)
             .<span class="kw">await</span><span class="question-mark">?</span>
-            .<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">e</span><span class="op">|</span> <span class="ident">e</span>.<span class="ident">deserialize</span>().<span class="ident">ok</span>())
+            .<span class="ident">map</span>(<span class="op">|</span><span class="ident">e</span><span class="op">|</span> <span class="ident">e</span>.<span class="ident">deserialize_as</span>::<span class="op">&lt;</span><span class="ident">PushRulesEvent</span><span class="op">&gt;</span>())
+            .<span class="ident">transpose</span>()<span class="question-mark">?</span>
         {
             <span class="prelude-val">Ok</span>(<span class="ident">event</span>.<span class="ident">content</span>.<span class="ident">global</span>)
         } <span class="kw">else</span> <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">session</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">get_session</span>().<span class="kw">await</span> {
@@ -2686,5 +2688,5 @@
     }
 }
 </code></pre></div>
-</section><section id="search" class="content hidden"></section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="matrix_sdk_base" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.61.0-nightly (ab0c2e18d 2022-03-27)" ></div>
+</section><section id="search" class="content hidden"></section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="matrix_sdk_base" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.61.0-nightly (9c06e1ba4 2022-03-29)" ></div>
 </body></html>

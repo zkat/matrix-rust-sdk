@@ -680,7 +680,7 @@
                     <span class="macro">warn!</span>(
                         <span class="ident">user_id</span> <span class="op">=</span> <span class="ident">device</span>.<span class="ident">user_id</span>().<span class="ident">as_str</span>(),
                         <span class="ident">device_id</span> <span class="op">=</span> <span class="ident">device</span>.<span class="ident">device_id</span>().<span class="ident">as_str</span>(),
-                        <span class="ident">algorithms</span> <span class="op">=</span><span class="question-mark">?</span> <span class="ident">device</span>.<span class="ident">algorithms</span>(),
+                        <span class="ident">algorithms</span> <span class="op">=</span> <span class="question-mark">?</span><span class="ident">device</span>.<span class="ident">algorithms</span>(),
                         <span class="string">&quot;Device doesn&#39;t support any of our 1-to-1 E2EE \
                         algorithms, can&#39;t establish an Olm session&quot;</span>
                     );
@@ -744,7 +744,7 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// * `response` - The response containing the claimed one-time keys.</span>
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">receive_keys_claim_response</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">response</span>: <span class="kw-2">&amp;</span><span class="ident">KeysClaimResponse</span>) -&gt; <span class="ident">OlmResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-        <span class="macro">debug!</span>(<span class="ident">failures</span> <span class="op">=</span><span class="question-mark">?</span> <span class="ident">response</span>.<span class="ident">failures</span>, <span class="string">&quot;Received a /keys/claim response&quot;</span>);
+        <span class="macro">debug!</span>(<span class="ident">failures</span> <span class="op">=</span> <span class="question-mark">?</span><span class="ident">response</span>.<span class="ident">failures</span>, <span class="string">&quot;Received a /keys/claim response&quot;</span>);
 
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">changes</span> <span class="op">=</span> <span class="ident">Changes::default</span>();
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">new_sessions</span>: <span class="ident">BTreeMap</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">UserId</span>, <span class="ident">BTreeSet</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">DeviceId</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">BTreeMap::new</span>();
@@ -766,7 +766,7 @@
                         <span class="macro">warn!</span>(
                             <span class="ident">user_id</span> <span class="op">=</span> <span class="ident">user_id</span>.<span class="ident">as_str</span>(),
                             <span class="ident">device_id</span> <span class="op">=</span> <span class="ident">device_id</span>.<span class="ident">as_str</span>(),
-                            <span class="ident">error</span> <span class="op">=</span><span class="question-mark">?</span> <span class="ident">e</span>,
+                            <span class="ident">error</span> <span class="op">=</span> <span class="question-mark">?</span><span class="ident">e</span>,
                             <span class="string">&quot;Tried to create an Olm session, but we can&#39;t \
                             fetch the device from the store&quot;</span>,
                         );
@@ -780,7 +780,7 @@
                         <span class="macro">warn!</span>(
                             <span class="ident">user_id</span> <span class="op">=</span> <span class="ident">user_id</span>.<span class="ident">as_str</span>(),
                             <span class="ident">device_id</span> <span class="op">=</span> <span class="ident">device_id</span>.<span class="ident">as_str</span>(),
-                            <span class="ident">error</span> <span class="op">=</span><span class="question-mark">?</span> <span class="ident">e</span>,
+                            <span class="ident">error</span> <span class="op">=</span> <span class="question-mark">?</span><span class="ident">e</span>,
                             <span class="string">&quot;Error creating outbound session&quot;</span>
                         );
                         <span class="kw">continue</span>;
@@ -802,7 +802,7 @@
         }
 
         <span class="self">self</span>.<span class="ident">store</span>.<span class="ident">save_changes</span>(<span class="ident">changes</span>).<span class="kw">await</span><span class="question-mark">?</span>;
-        <span class="macro">info!</span>(<span class="ident">sessions</span> <span class="op">=</span><span class="question-mark">?</span> <span class="ident">new_sessions</span>, <span class="string">&quot;Established new Olm sessions&quot;</span>);
+        <span class="macro">info!</span>(<span class="ident">sessions</span> <span class="op">=</span> <span class="question-mark">?</span><span class="ident">new_sessions</span>, <span class="string">&quot;Established new Olm sessions&quot;</span>);
 
         <span class="kw">match</span> <span class="self">self</span>.<span class="ident">key_request_machine</span>.<span class="ident">collect_incoming_key_requests</span>().<span class="kw">await</span> {
             <span class="prelude-val">Ok</span>(<span class="ident">sessions</span>) =&gt; {
@@ -812,7 +812,7 @@
             <span class="comment">// We don&#39;t propagate the error here since the next sync will retry</span>
             <span class="comment">// this.</span>
             <span class="prelude-val">Err</span>(<span class="ident">e</span>) =&gt; {
-                <span class="macro">warn!</span>(<span class="ident">error</span> <span class="op">=</span><span class="question-mark">?</span> <span class="ident">e</span>, <span class="string">&quot;Error while trying to collect the incoming secret requests&quot;</span>)
+                <span class="macro">warn!</span>(<span class="ident">error</span> <span class="op">=</span> <span class="question-mark">?</span><span class="ident">e</span>, <span class="string">&quot;Error while trying to collect the incoming secret requests&quot;</span>)
             }
         }
 
@@ -974,5 +974,5 @@
     }
 }
 </code></pre></div>
-</section><section id="search" class="content hidden"></section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="matrix_sdk_crypto" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.61.0-nightly (ab0c2e18d 2022-03-27)" ></div>
+</section><section id="search" class="content hidden"></section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="matrix_sdk_crypto" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.61.0-nightly (9c06e1ba4 2022-03-29)" ></div>
 </body></html>
