@@ -782,6 +782,22 @@
 <span id="777">777</span>
 <span id="778">778</span>
 <span id="779">779</span>
+<span id="780">780</span>
+<span id="781">781</span>
+<span id="782">782</span>
+<span id="783">783</span>
+<span id="784">784</span>
+<span id="785">785</span>
+<span id="786">786</span>
+<span id="787">787</span>
+<span id="788">788</span>
+<span id="789">789</span>
+<span id="790">790</span>
+<span id="791">791</span>
+<span id="792">792</span>
+<span id="793">793</span>
+<span id="794">794</span>
+<span id="795">795</span>
 </pre><pre class="rust"><code><span class="comment">// Copyright 2020 The Matrix.org Foundation C.I.C.</span>
 <span class="comment">//</span>
 <span class="comment">// Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);</span>
@@ -860,6 +876,7 @@
         <span class="ident">InboundGroupSession</span>, <span class="ident">OlmMessageHash</span>, <span class="ident">OutboundGroupSession</span>, <span class="ident">PrivateCrossSigningIdentity</span>,
         <span class="ident">ReadOnlyAccount</span>, <span class="ident">Session</span>,
     },
+    <span class="ident">utilities::encode</span>,
     <span class="ident">verification::VerificationMachine</span>,
     <span class="ident">CrossSigningStatus</span>,
 };
@@ -962,6 +979,21 @@
 <span class="kw">impl</span> <span class="ident">RecoveryKey</span> {
     <span class="doccomment">/// The number of bytes the recovery key will hold.</span>
     <span class="kw">pub</span> <span class="kw">const</span> <span class="ident">KEY_SIZE</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="number">32</span>;
+
+    <span class="doccomment">/// Create a new random recovery key.</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>() -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">rand::Error</span><span class="op">&gt;</span> {
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">rng</span> <span class="op">=</span> <span class="ident">rand::thread_rng</span>();
+
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">key</span> <span class="op">=</span> [<span class="number">0u8</span>; <span class="ident"><span class="self">Self</span>::KEY_SIZE</span>];
+        <span class="ident">rand::Fill::try_fill</span>(<span class="kw-2">&amp;mut</span> <span class="ident">key</span>, <span class="kw-2">&amp;mut</span> <span class="ident">rng</span>)<span class="question-mark">?</span>;
+
+        <span class="prelude-val">Ok</span>(<span class="self">Self</span> { <span class="ident">inner</span>: <span class="ident">key</span> })
+    }
+
+    <span class="doccomment">/// Export the `RecoveryKey` as a base64 encoded string.</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">to_base64</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">String</span> {
+        <span class="ident">encode</span>(<span class="self">self</span>.<span class="ident">inner</span>)
+    }
 }
 
 <span class="kw">impl</span> <span class="ident">Debug</span> <span class="kw">for</span> <span class="ident">RecoveryKey</span> {

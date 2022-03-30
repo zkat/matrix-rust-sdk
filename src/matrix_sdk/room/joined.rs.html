@@ -920,7 +920,7 @@
 <span id="915">915</span>
 <span id="916">916</span>
 <span id="917">917</span>
-</pre><pre class="rust"><code><span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;image_proc&quot;</span>)]</span>
+</pre><pre class="rust"><code><span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;image-proc&quot;</span>)]</span>
 <span class="kw">use</span> <span class="ident">std::io::Cursor</span>;
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;encryption&quot;</span>)]</span>
 <span class="kw">use</span> <span class="ident">std::sync::Arc</span>;
@@ -960,7 +960,7 @@
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;encryption&quot;</span>)]</span>
 <span class="kw">use</span> <span class="ident">tracing::instrument</span>;
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;image_proc&quot;</span>)]</span>
+<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;image-proc&quot;</span>)]</span>
 <span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">attachment::generate_image_thumbnail</span>, <span class="ident">error::ImageError</span>};
 <span class="kw">use</span> <span class="kw">crate</span>::{
     <span class="ident">attachment</span>::{<span class="ident">AttachmentConfig</span>, <span class="ident">Thumbnail</span>},
@@ -1572,16 +1572,16 @@
     ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">send_message_event::v3::Response</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">reader</span> <span class="op">=</span> <span class="kw-2">&amp;mut</span> <span class="ident">BufReader::new</span>(<span class="ident">reader</span>);
 
-        <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;image_proc&quot;</span>)]</span>
+        <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;image-proc&quot;</span>)]</span>
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">cursor</span>;
 
         <span class="kw">if</span> <span class="ident">config</span>.<span class="ident">thumbnail</span>.<span class="ident">is_some</span>() {
             <span class="self">self</span>.<span class="ident">prepare_and_send_attachment</span>(<span class="ident">body</span>, <span class="ident">content_type</span>, <span class="ident">reader</span>, <span class="ident">config</span>).<span class="kw">await</span>
         } <span class="kw">else</span> {
-            <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;image_proc&quot;</span>))]</span>
+            <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;image-proc&quot;</span>))]</span>
             <span class="kw">let</span> <span class="ident">thumbnail</span> <span class="op">=</span> <span class="ident">Thumbnail::NONE</span>;
 
-            <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;image_proc&quot;</span>)]</span>
+            <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;image-proc&quot;</span>)]</span>
             <span class="kw">let</span> <span class="ident">thumbnail</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">config</span>.<span class="ident">generate_thumbnail</span> {
                 <span class="kw">match</span> <span class="ident">generate_image_thumbnail</span>(<span class="ident">content_type</span>, <span class="ident">reader</span>, <span class="ident">config</span>.<span class="ident">thumbnail_size</span>) {
                     <span class="prelude-val">Ok</span>((<span class="ident">thumbnail_data</span>, <span class="ident">thumbnail_info</span>)) =&gt; {
@@ -1610,9 +1610,9 @@
                 <span class="ident">txn_id</span>: <span class="ident">config</span>.<span class="ident">txn_id</span>,
                 <span class="ident">info</span>: <span class="ident">config</span>.<span class="ident">info</span>,
                 <span class="ident">thumbnail</span>,
-                <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;image_proc&quot;</span>)]</span>
+                <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;image-proc&quot;</span>)]</span>
                 <span class="ident">generate_thumbnail</span>: <span class="bool-val">false</span>,
-                <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;image_proc&quot;</span>)]</span>
+                <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;image-proc&quot;</span>)]</span>
                 <span class="ident">thumbnail_size</span>: <span class="prelude-val">None</span>,
             };
 

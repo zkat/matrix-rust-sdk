@@ -2229,65 +2229,6 @@
 <span id="2224">2224</span>
 <span id="2225">2225</span>
 <span id="2226">2226</span>
-<span id="2227">2227</span>
-<span id="2228">2228</span>
-<span id="2229">2229</span>
-<span id="2230">2230</span>
-<span id="2231">2231</span>
-<span id="2232">2232</span>
-<span id="2233">2233</span>
-<span id="2234">2234</span>
-<span id="2235">2235</span>
-<span id="2236">2236</span>
-<span id="2237">2237</span>
-<span id="2238">2238</span>
-<span id="2239">2239</span>
-<span id="2240">2240</span>
-<span id="2241">2241</span>
-<span id="2242">2242</span>
-<span id="2243">2243</span>
-<span id="2244">2244</span>
-<span id="2245">2245</span>
-<span id="2246">2246</span>
-<span id="2247">2247</span>
-<span id="2248">2248</span>
-<span id="2249">2249</span>
-<span id="2250">2250</span>
-<span id="2251">2251</span>
-<span id="2252">2252</span>
-<span id="2253">2253</span>
-<span id="2254">2254</span>
-<span id="2255">2255</span>
-<span id="2256">2256</span>
-<span id="2257">2257</span>
-<span id="2258">2258</span>
-<span id="2259">2259</span>
-<span id="2260">2260</span>
-<span id="2261">2261</span>
-<span id="2262">2262</span>
-<span id="2263">2263</span>
-<span id="2264">2264</span>
-<span id="2265">2265</span>
-<span id="2266">2266</span>
-<span id="2267">2267</span>
-<span id="2268">2268</span>
-<span id="2269">2269</span>
-<span id="2270">2270</span>
-<span id="2271">2271</span>
-<span id="2272">2272</span>
-<span id="2273">2273</span>
-<span id="2274">2274</span>
-<span id="2275">2275</span>
-<span id="2276">2276</span>
-<span id="2277">2277</span>
-<span id="2278">2278</span>
-<span id="2279">2279</span>
-<span id="2280">2280</span>
-<span id="2281">2281</span>
-<span id="2282">2282</span>
-<span id="2283">2283</span>
-<span id="2284">2284</span>
-<span id="2285">2285</span>
 </pre><pre class="rust"><code><span class="comment">// Copyright 2020 The Matrix.org Foundation C.I.C.</span>
 <span class="comment">//</span>
 <span class="comment">// Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);</span>
@@ -2549,27 +2490,6 @@
         };
 
         <span class="prelude-val">Ok</span>(<span class="ident">OlmMachine::new_helper</span>(<span class="kw-2">&amp;</span><span class="ident">user_id</span>, <span class="ident">device_id</span>, <span class="ident">store</span>, <span class="ident">account</span>, <span class="ident">identity</span>))
-    }
-
-    <span class="doccomment">/// Create a new machine with the default crypto store.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// The default store uses a Sled database to store the encryption keys.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Arguments</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// * `user_id` - The unique id of the user that owns this machine.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// * `device_id` - The unique id of the device that owns this machine.</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;sled_cryptostore&quot;</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">with_default_store</span>(
-        <span class="ident">user_id</span>: <span class="kw-2">&amp;</span><span class="ident">UserId</span>,
-        <span class="ident">device_id</span>: <span class="kw-2">&amp;</span><span class="ident">DeviceId</span>,
-        <span class="ident">path</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">Path</span><span class="op">&gt;</span>,
-        <span class="ident">passphrase</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span>,
-    ) -&gt; <span class="ident">StoreResult</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">store</span> <span class="op">=</span> <span class="ident">SledStore::open_with_passphrase</span>(<span class="ident">path</span>, <span class="ident">passphrase</span>)<span class="question-mark">?</span>;
-
-        <span class="ident">OlmMachine::with_store</span>(<span class="ident">user_id</span>.<span class="ident">to_owned</span>(), <span class="ident">device_id</span>.<span class="ident">into</span>(), <span class="ident">Box::new</span>(<span class="ident">store</span>)).<span class="kw">await</span>
     }
 
     <span class="doccomment">/// The unique user id that owns this `OlmMachine` instance.</span>
@@ -4293,44 +4213,6 @@
         } <span class="kw">else</span> {
             <span class="macro">panic!</span>(<span class="string">&quot;Decrypted room event has the wrong type&quot;</span>)
         }
-    }
-
-    <span class="attribute">#[<span class="ident">async_test</span>]</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;sled_cryptostore&quot;</span>)]</span>
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">test_machine_with_default_store</span>() {
-        <span class="kw">use</span> <span class="ident">tempfile::tempdir</span>;
-
-        <span class="kw">let</span> <span class="ident">tmpdir</span> <span class="op">=</span> <span class="ident">tempdir</span>().<span class="ident">unwrap</span>();
-
-        <span class="kw">let</span> <span class="ident">machine</span> <span class="op">=</span> <span class="ident">OlmMachine::with_default_store</span>(
-            <span class="ident">user_id</span>(),
-            <span class="ident">alice_device_id</span>(),
-            <span class="ident">tmpdir</span>.<span class="ident">as_ref</span>(),
-            <span class="prelude-val">Some</span>(<span class="string">&quot;test&quot;</span>),
-        )
-        .<span class="kw">await</span>
-        .<span class="ident">unwrap</span>();
-
-        <span class="kw">let</span> <span class="ident">user_id</span> <span class="op">=</span> <span class="ident">machine</span>.<span class="ident">user_id</span>().<span class="ident">to_owned</span>();
-        <span class="kw">let</span> <span class="ident">device_id</span> <span class="op">=</span> <span class="ident">machine</span>.<span class="ident">device_id</span>().<span class="ident">to_owned</span>();
-        <span class="kw">let</span> <span class="ident">ed25519_key</span> <span class="op">=</span> <span class="ident">machine</span>.<span class="ident">identity_keys</span>().<span class="ident">ed25519</span>;
-
-        <span class="ident">machine</span>.<span class="ident">receive_keys_upload_response</span>(<span class="kw-2">&amp;</span><span class="ident">keys_upload_response</span>()).<span class="kw">await</span>.<span class="ident">unwrap</span>();
-
-        <span class="ident">drop</span>(<span class="ident">machine</span>);
-
-        <span class="kw">let</span> <span class="ident">machine</span> <span class="op">=</span> <span class="ident">OlmMachine::with_default_store</span>(
-            <span class="kw-2">&amp;</span><span class="ident">user_id</span>,
-            <span class="ident">alice_device_id</span>(),
-            <span class="ident">tmpdir</span>.<span class="ident">as_ref</span>(),
-            <span class="prelude-val">Some</span>(<span class="string">&quot;test&quot;</span>),
-        )
-        .<span class="kw">await</span>
-        .<span class="ident">unwrap</span>();
-
-        <span class="macro">assert_eq!</span>(<span class="kw-2">&amp;</span><span class="ident">user_id</span>, <span class="ident">machine</span>.<span class="ident">user_id</span>());
-        <span class="macro">assert_eq!</span>(<span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="ident">device_id</span>, <span class="ident">machine</span>.<span class="ident">device_id</span>());
-        <span class="macro">assert_eq!</span>(<span class="ident">ed25519_key</span>, <span class="ident">machine</span>.<span class="ident">identity_keys</span>().<span class="ident">ed25519</span>);
     }
 
     <span class="attribute">#[<span class="ident">async_test</span>]</span>

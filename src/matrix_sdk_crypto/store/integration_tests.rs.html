@@ -584,6 +584,40 @@
 <span id="579">579</span>
 <span id="580">580</span>
 <span id="581">581</span>
+<span id="582">582</span>
+<span id="583">583</span>
+<span id="584">584</span>
+<span id="585">585</span>
+<span id="586">586</span>
+<span id="587">587</span>
+<span id="588">588</span>
+<span id="589">589</span>
+<span id="590">590</span>
+<span id="591">591</span>
+<span id="592">592</span>
+<span id="593">593</span>
+<span id="594">594</span>
+<span id="595">595</span>
+<span id="596">596</span>
+<span id="597">597</span>
+<span id="598">598</span>
+<span id="599">599</span>
+<span id="600">600</span>
+<span id="601">601</span>
+<span id="602">602</span>
+<span id="603">603</span>
+<span id="604">604</span>
+<span id="605">605</span>
+<span id="606">606</span>
+<span id="607">607</span>
+<span id="608">608</span>
+<span id="609">609</span>
+<span id="610">610</span>
+<span id="611">611</span>
+<span id="612">612</span>
+<span id="613">613</span>
+<span id="614">614</span>
+<span id="615">615</span>
 </pre><pre class="rust"><code><span class="attribute">#[<span class="ident">allow</span>(<span class="ident">unused_macros</span>)]</span>
 <span class="attribute">#[<span class="ident">macro_export</span>]</span>
 <span class="macro">macro_rules!</span> <span class="ident">cryptostore_integration_tests</span> {
@@ -607,7 +641,7 @@
                     <span class="ident">InboundGroupSession</span>, <span class="ident">OlmMessageHash</span>, <span class="ident">PrivateCrossSigningIdentity</span>,
                     <span class="ident">ReadOnlyAccount</span>, <span class="ident">Session</span>,
                 },
-                <span class="ident">store</span>::{<span class="ident">CryptoStore</span>, <span class="ident">GossipRequest</span>, <span class="ident">Changes</span>, <span class="ident">DeviceChanges</span>, <span class="ident">IdentityChanges</span>},
+                <span class="ident">store</span>::{<span class="ident">CryptoStore</span>, <span class="ident">GossipRequest</span>, <span class="ident">Changes</span>, <span class="ident">DeviceChanges</span>, <span class="ident">IdentityChanges</span>, <span class="ident">RecoveryKey</span>},
             };
 
             <span class="kw">fn</span> <span class="ident">alice_id</span>() -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">UserId</span> {
@@ -1160,6 +1194,40 @@
                 <span class="kw">let</span> <span class="ident">stored_request</span> <span class="op">=</span> <span class="ident">store</span>.<span class="ident">get_secret_request_by_info</span>(<span class="kw-2">&amp;</span><span class="ident">info</span>).<span class="kw">await</span>.<span class="ident">unwrap</span>();
                 <span class="macro">assert_eq!</span>(<span class="prelude-val">None</span>, <span class="ident">stored_request</span>);
                 <span class="macro">assert!</span>(<span class="ident">store</span>.<span class="ident">get_unsent_secret_requests</span>().<span class="kw">await</span>.<span class="ident">unwrap</span>().<span class="ident">is_empty</span>());
+            }
+
+            <span class="attribute">#[<span class="ident">async_test</span>]</span>
+            <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">recovery_key_saving</span>() {
+                <span class="kw">let</span> <span class="ident">dir</span> <span class="op">=</span> <span class="string">&quot;recovery_key_saving&quot;</span>.<span class="ident">to_owned</span>();
+                <span class="kw">let</span> (<span class="ident">account</span>, <span class="ident">store</span>) <span class="op">=</span> <span class="ident">get_loaded_store</span>(<span class="ident">dir</span>).<span class="kw">await</span>;
+
+                <span class="kw">let</span> <span class="ident">recovery_key</span> <span class="op">=</span> <span class="ident">RecoveryKey::new</span>().<span class="ident">expect</span>(<span class="string">&quot;Can&#39;t create new recovery key&quot;</span>);
+                <span class="kw">let</span> <span class="ident">encoded_key</span> <span class="op">=</span> <span class="ident">recovery_key</span>.<span class="ident">to_base64</span>();
+
+                <span class="kw">let</span> <span class="ident">changes</span> <span class="op">=</span> <span class="ident">Changes</span> {
+                    <span class="ident">recovery_key</span>: <span class="prelude-val">Some</span>(<span class="ident">recovery_key</span>),
+                    <span class="ident">backup_version</span>: <span class="prelude-val">Some</span>(<span class="string">&quot;1&quot;</span>.<span class="ident">to_owned</span>()),
+                    ..<span class="ident">Default::default</span>()
+                };
+
+                <span class="ident">store</span>.<span class="ident">save_changes</span>(<span class="ident">changes</span>).<span class="kw">await</span>.<span class="ident">unwrap</span>();
+
+                <span class="kw">let</span> <span class="ident">loded_backup</span> <span class="op">=</span> <span class="ident">store</span>.<span class="ident">load_backup_keys</span>().<span class="kw">await</span>.<span class="ident">unwrap</span>();
+
+                <span class="macro">assert_eq!</span>(
+                    <span class="ident">encoded_key</span>,
+                    <span class="ident">loded_backup</span>
+                        .<span class="ident">recovery_key</span>
+                        .<span class="ident">expect</span>(<span class="string">&quot;The recovery key wasn&#39;t loaded from the store&quot;</span>)
+                        .<span class="ident">to_base64</span>(),
+                    <span class="string">&quot;The loaded key matches to the one we stored&quot;</span>
+                );
+
+                <span class="macro">assert_eq!</span>(
+                    <span class="prelude-val">Some</span>(<span class="string">&quot;1&quot;</span>),
+                    <span class="ident">loded_backup</span>.<span class="ident">backup_version</span>.<span class="ident">as_deref</span>(),
+                    <span class="string">&quot;The loaded version matches to the one we stored&quot;</span>
+                );
             }
         }
     )<span class="op">*</span>
