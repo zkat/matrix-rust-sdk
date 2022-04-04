@@ -395,6 +395,20 @@
 <span id="390">390</span>
 <span id="391">391</span>
 <span id="392">392</span>
+<span id="393">393</span>
+<span id="394">394</span>
+<span id="395">395</span>
+<span id="396">396</span>
+<span id="397">397</span>
+<span id="398">398</span>
+<span id="399">399</span>
+<span id="400">400</span>
+<span id="401">401</span>
+<span id="402">402</span>
+<span id="403">403</span>
+<span id="404">404</span>
+<span id="405">405</span>
+<span id="406">406</span>
 </pre><pre class="rust"><code><span class="comment">// Copyright 2020 The Matrix.org Foundation C.I.C.</span>
 <span class="comment">//</span>
 <span class="comment">// Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);</span>
@@ -422,6 +436,7 @@
 <span class="kw">use</span> <span class="ident">serde_json::Error</span> <span class="kw">as</span> <span class="ident">SerdeError</span>;
 <span class="kw">use</span> <span class="ident">sha2</span>::{<span class="ident">Sha256</span>, <span class="ident">Sha512</span>};
 <span class="kw">use</span> <span class="ident">thiserror::Error</span>;
+<span class="kw">use</span> <span class="ident">zeroize::Zeroize</span>;
 
 <span class="kw">use</span> <span class="kw">crate</span>::{
     <span class="ident">olm::ExportedRoomKey</span>,
@@ -498,7 +513,13 @@
     <span class="kw">let</span> <span class="ident">payload</span>: <span class="ident">String</span> <span class="op">=</span>
         <span class="ident">x</span>.<span class="ident">lines</span>().<span class="ident">filter</span>(<span class="op">|</span><span class="ident">l</span><span class="op">|</span> <span class="op">!</span>(<span class="ident">l</span>.<span class="ident">starts_with</span>(<span class="ident">HEADER</span>) <span class="op">|</span><span class="op">|</span> <span class="ident">l</span>.<span class="ident">starts_with</span>(<span class="ident">FOOTER</span>))).<span class="ident">collect</span>();
 
-    <span class="prelude-val">Ok</span>(<span class="ident">serde_json::from_str</span>(<span class="kw-2">&amp;</span><span class="ident">decrypt_helper</span>(<span class="kw-2">&amp;</span><span class="ident">payload</span>, <span class="ident">passphrase</span>)<span class="question-mark">?</span>)<span class="question-mark">?</span>)
+    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">decrypted</span> <span class="op">=</span> <span class="ident">decrypt_helper</span>(<span class="kw-2">&amp;</span><span class="ident">payload</span>, <span class="ident">passphrase</span>)<span class="question-mark">?</span>;
+
+    <span class="kw">let</span> <span class="ident">ret</span> <span class="op">=</span> <span class="ident">serde_json::from_str</span>(<span class="kw-2">&amp;</span><span class="ident">decrypted</span>);
+
+    <span class="ident">decrypted</span>.<span class="ident">zeroize</span>();
+
+    <span class="prelude-val">Ok</span>(<span class="ident">ret</span><span class="question-mark">?</span>)
 }
 
 <span class="doccomment">/// Encrypt the list of exported room keys using the given passphrase.</span>
@@ -541,6 +562,9 @@
 ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">String</span>, <span class="ident">SerdeError</span><span class="op">&gt;</span> {
     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">plaintext</span> <span class="op">=</span> <span class="ident">serde_json::to_string</span>(<span class="ident">keys</span>)<span class="question-mark">?</span>.<span class="ident">into_bytes</span>();
     <span class="kw">let</span> <span class="ident">ciphertext</span> <span class="op">=</span> <span class="ident">encrypt_helper</span>(<span class="kw-2">&amp;mut</span> <span class="ident">plaintext</span>, <span class="ident">passphrase</span>, <span class="ident">rounds</span>);
+
+    <span class="ident">plaintext</span>.<span class="ident">zeroize</span>();
+
     <span class="prelude-val">Ok</span>([<span class="ident">HEADER</span>.<span class="ident">to_owned</span>(), <span class="ident">ciphertext</span>, <span class="ident">FOOTER</span>.<span class="ident">to_owned</span>()].<span class="ident">join</span>(<span class="string">&quot;\n&quot;</span>))
 }
 
@@ -629,7 +653,11 @@
     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">aes</span> <span class="op">=</span> <span class="ident">Aes256Ctr::from_block_cipher</span>(<span class="ident">aes</span>, <span class="ident">iv</span>);
     <span class="ident">aes</span>.<span class="ident">apply_keystream</span>(<span class="ident">ciphertext</span>);
 
-    <span class="prelude-val">Ok</span>(<span class="ident">String::from_utf8</span>(<span class="ident">ciphertext</span>.<span class="ident">to_owned</span>())<span class="question-mark">?</span>)
+    <span class="kw">let</span> <span class="ident">ret</span> <span class="op">=</span> <span class="ident">String::from_utf8</span>(<span class="ident">ciphertext</span>.<span class="ident">to_owned</span>());
+
+    <span class="ident">ciphertext</span>.<span class="ident">zeroize</span>();
+
+    <span class="prelude-val">Ok</span>(<span class="ident">ret</span><span class="question-mark">?</span>)
 }
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">test</span>, <span class="ident">not</span>(<span class="ident">target_arch</span> <span class="op">=</span> <span class="string">&quot;wasm32&quot;</span>)))]</span>
