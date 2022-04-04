@@ -845,6 +845,42 @@
 <span id="840">840</span>
 <span id="841">841</span>
 <span id="842">842</span>
+<span id="843">843</span>
+<span id="844">844</span>
+<span id="845">845</span>
+<span id="846">846</span>
+<span id="847">847</span>
+<span id="848">848</span>
+<span id="849">849</span>
+<span id="850">850</span>
+<span id="851">851</span>
+<span id="852">852</span>
+<span id="853">853</span>
+<span id="854">854</span>
+<span id="855">855</span>
+<span id="856">856</span>
+<span id="857">857</span>
+<span id="858">858</span>
+<span id="859">859</span>
+<span id="860">860</span>
+<span id="861">861</span>
+<span id="862">862</span>
+<span id="863">863</span>
+<span id="864">864</span>
+<span id="865">865</span>
+<span id="866">866</span>
+<span id="867">867</span>
+<span id="868">868</span>
+<span id="869">869</span>
+<span id="870">870</span>
+<span id="871">871</span>
+<span id="872">872</span>
+<span id="873">873</span>
+<span id="874">874</span>
+<span id="875">875</span>
+<span id="876">876</span>
+<span id="877">877</span>
+<span id="878">878</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">std</span>::{<span class="ident">ops::Deref</span>, <span class="ident">sync::Arc</span>};
 
 <span class="kw">use</span> <span class="ident">futures_core::stream::Stream</span>;
@@ -865,7 +901,8 @@
     <span class="ident">events</span>::{
         <span class="ident">room</span>::{<span class="ident">history_visibility::HistoryVisibility</span>, <span class="ident">MediaSource</span>},
         <span class="ident">tag</span>::{<span class="ident">TagInfo</span>, <span class="ident">TagName</span>},
-        <span class="ident">AnyStateEvent</span>, <span class="ident">AnySyncStateEvent</span>, <span class="ident">EventContent</span>, <span class="ident">StateEventType</span>, <span class="ident">StaticEventContent</span>,
+        <span class="ident">AnyRoomAccountDataEvent</span>, <span class="ident">AnyStateEvent</span>, <span class="ident">AnySyncStateEvent</span>, <span class="ident">EventContent</span>,
+        <span class="ident">RoomAccountDataEvent</span>, <span class="ident">RoomAccountDataEventType</span>, <span class="ident">StateEventType</span>, <span class="ident">StaticEventContent</span>,
         <span class="ident">SyncStateEvent</span>,
     },
     <span class="ident">serde::Raw</span>,
@@ -1553,6 +1590,41 @@
         <span class="prelude-val">Ok</span>(<span class="self">self</span>.<span class="ident">get_state_event</span>(<span class="ident">C::TYPE</span>.<span class="ident">into</span>(), <span class="ident">state_key</span>).<span class="kw">await</span><span class="question-mark">?</span>.<span class="ident">map</span>(<span class="ident">Raw::cast</span>))
     }
 
+    <span class="doccomment">/// Get account data in this room.</span>
+    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">account_data</span>(
+        <span class="kw-2">&amp;</span><span class="self">self</span>,
+        <span class="ident">data_type</span>: <span class="ident">RoomAccountDataEventType</span>,
+    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Raw</span><span class="op">&lt;</span><span class="ident">AnyRoomAccountDataEvent</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+        <span class="self">self</span>.<span class="ident">client</span>
+            .<span class="ident">store</span>()
+            .<span class="ident">get_room_account_data_event</span>(<span class="self">self</span>.<span class="ident">room_id</span>(), <span class="ident">data_type</span>)
+            .<span class="kw">await</span>
+            .<span class="ident">map_err</span>(<span class="ident">Into::into</span>)
+    }
+
+    <span class="doccomment">/// Get account data of statically-known type in this room.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// # Example</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// ```no_run</span>
+    <span class="doccomment">/// # async {</span>
+    <span class="doccomment">/// # let room: matrix_sdk::room::Common = todo!();</span>
+    <span class="doccomment">/// use matrix_sdk::ruma::events::fully_read::FullyReadEventContent;</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// match room.account_data_static::&lt;FullyReadEventContent&gt;().await? {</span>
+    <span class="doccomment">///     Some(fully_read) =&gt; println!(&quot;Found read marker: {:?}&quot;, fully_read.deserialize()?),</span>
+    <span class="doccomment">///     None =&gt; println!(&quot;No read marker for this room&quot;),</span>
+    <span class="doccomment">/// }</span>
+    <span class="doccomment">/// # anyhow::Ok(())</span>
+    <span class="doccomment">/// # };</span>
+    <span class="doccomment">/// ```</span>
+    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">account_data_static</span><span class="op">&lt;</span><span class="ident">C</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Raw</span><span class="op">&lt;</span><span class="ident">RoomAccountDataEvent</span><span class="op">&lt;</span><span class="ident">C</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span>
+    <span class="kw">where</span>
+        <span class="ident">C</span>: <span class="ident">StaticEventContent</span> <span class="op">+</span> <span class="ident">EventContent</span><span class="op">&lt;</span><span class="ident">EventType</span> <span class="op">=</span> <span class="ident">RoomAccountDataEventType</span><span class="op">&gt;</span>,
+    {
+        <span class="prelude-val">Ok</span>(<span class="self">self</span>.<span class="ident">account_data</span>(<span class="ident">C::TYPE</span>.<span class="ident">into</span>()).<span class="kw">await</span><span class="question-mark">?</span>.<span class="ident">map</span>(<span class="ident">Raw::cast</span>))
+    }
+
     <span class="doccomment">/// Check if all members of this room are verified and all their devices are</span>
     <span class="doccomment">/// verified.</span>
     <span class="doccomment">///</span>
@@ -1688,5 +1760,5 @@
     }
 }
 </code></pre></div>
-</section><section id="search" class="content hidden"></section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="matrix_sdk" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.61.0-nightly (c5cf08d37 2022-03-30)" ></div>
+</section><section id="search" class="content hidden"></section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="matrix_sdk" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.61.0-nightly (6af09d250 2022-04-03)" ></div>
 </body></html>
