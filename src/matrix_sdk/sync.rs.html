@@ -147,9 +147,16 @@
 <span id="142">142</span>
 <span id="143">143</span>
 <span id="144">144</span>
+<span id="145">145</span>
+<span id="146">146</span>
+<span id="147">147</span>
+<span id="148">148</span>
+<span id="149">149</span>
+<span id="150">150</span>
+<span id="151">151</span>
+<span id="152">152</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">std::time::Duration</span>;
 
-<span class="kw">use</span> <span class="ident">futures_timer::Delay</span> <span class="kw">as</span> <span class="ident">sleep</span>;
 <span class="kw">use</span> <span class="ident">matrix_sdk_base</span>::{
     <span class="ident">deserialized_responses</span>::{<span class="ident">JoinedRoom</span>, <span class="ident">LeftRoom</span>, <span class="ident">SyncResponse</span>},
     <span class="ident">instant::Instant</span>,
@@ -257,6 +264,14 @@
         <span class="prelude-val">Ok</span>(<span class="ident">response</span>)
     }
 
+    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">sleep</span>() {
+        <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">target_arch</span> <span class="op">=</span> <span class="string">&quot;wasm32&quot;</span>)]</span>
+        <span class="kw">let</span> <span class="kw">_</span> <span class="op">=</span> <span class="ident">wasm_timer::Delay::new</span>(<span class="ident">Duration::from_secs</span>(<span class="number">1</span>)).<span class="kw">await</span>;
+
+        <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">target_arch</span> <span class="op">=</span> <span class="string">&quot;wasm32&quot;</span>))]</span>
+        <span class="ident">tokio::time::sleep</span>(<span class="ident">Duration::from_secs</span>(<span class="number">1</span>)).<span class="kw">await</span>;
+    }
+
     <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">sync_loop_helper</span>(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         <span class="ident">sync_settings</span>: <span class="kw-2">&amp;mut</span> <span class="ident"><span class="kw">crate</span>::config::SyncSettings</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>,
@@ -270,7 +285,8 @@
             }
             <span class="prelude-val">Err</span>(<span class="ident">e</span>) =&gt; {
                 <span class="macro">error!</span>(<span class="string">&quot;Received an invalid response: {}&quot;</span>, <span class="ident">e</span>);
-                <span class="ident">sleep::new</span>(<span class="ident">Duration::from_secs</span>(<span class="number">1</span>)).<span class="kw">await</span>;
+                <span class="ident"><span class="self">Self</span>::sleep</span>().<span class="kw">await</span>;
+
                 <span class="prelude-val">Err</span>(<span class="ident">e</span>)
             }
         }
@@ -284,7 +300,7 @@
         <span class="comment">// the sync timeout.</span>
         <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">t</span>) <span class="op">=</span> <span class="ident">last_sync_time</span> {
             <span class="kw">if</span> <span class="ident">now</span> <span class="op">-</span> <span class="kw-2">*</span><span class="ident">t</span> <span class="op">&lt;</span><span class="op">=</span> <span class="ident">Duration::from_secs</span>(<span class="number">1</span>) {
-                <span class="ident">sleep::new</span>(<span class="ident">Duration::from_secs</span>(<span class="number">1</span>)).<span class="kw">await</span>;
+                <span class="ident"><span class="self">Self</span>::sleep</span>().<span class="kw">await</span>;
             }
         }
 
