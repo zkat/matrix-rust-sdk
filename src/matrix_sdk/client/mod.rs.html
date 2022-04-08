@@ -3984,6 +3984,30 @@
 <span id="3979">3979</span>
 <span id="3980">3980</span>
 <span id="3981">3981</span>
+<span id="3982">3982</span>
+<span id="3983">3983</span>
+<span id="3984">3984</span>
+<span id="3985">3985</span>
+<span id="3986">3986</span>
+<span id="3987">3987</span>
+<span id="3988">3988</span>
+<span id="3989">3989</span>
+<span id="3990">3990</span>
+<span id="3991">3991</span>
+<span id="3992">3992</span>
+<span id="3993">3993</span>
+<span id="3994">3994</span>
+<span id="3995">3995</span>
+<span id="3996">3996</span>
+<span id="3997">3997</span>
+<span id="3998">3998</span>
+<span id="3999">3999</span>
+<span id="4000">4000</span>
+<span id="4001">4001</span>
+<span id="4002">4002</span>
+<span id="4003">4003</span>
+<span id="4004">4004</span>
+<span id="4005">4005</span>
 </pre><pre class="rust"><code><span class="comment">// Copyright 2020 Damir Jelić</span>
 <span class="comment">// Copyright 2020 The Matrix.org Foundation C.I.C.</span>
 <span class="comment">//</span>
@@ -4029,7 +4053,10 @@
             <span class="ident">account</span>::{<span class="ident">register</span>, <span class="ident">whoami</span>},
             <span class="ident">device</span>::{<span class="ident">delete_devices</span>, <span class="ident">get_devices</span>},
             <span class="ident">directory</span>::{<span class="ident">get_public_rooms</span>, <span class="ident">get_public_rooms_filtered</span>},
-            <span class="ident">discovery::get_capabilities</span>::{<span class="self">self</span>, <span class="ident">Capabilities</span>},
+            <span class="ident">discovery</span>::{
+                <span class="ident">get_capabilities</span>::{<span class="self">self</span>, <span class="ident">Capabilities</span>},
+                <span class="ident">get_supported_versions</span>,
+            },
             <span class="ident">filter</span>::{<span class="ident">create_filter::v3::Request</span> <span class="kw">as</span> <span class="ident">FilterUploadRequest</span>, <span class="ident">FilterDefinition</span>},
             <span class="ident">media</span>::{<span class="ident">create_content</span>, <span class="ident">get_content</span>, <span class="ident">get_content_thumbnail</span>},
             <span class="ident">membership</span>::{<span class="ident">join_room_by_id</span>, <span class="ident">join_room_by_id_or_alias</span>},
@@ -4111,7 +4138,7 @@
     <span class="doccomment">/// User session data.</span>
     <span class="ident">base_client</span>: <span class="ident">BaseClient</span>,
     <span class="doccomment">/// The Matrix versions the server supports (well-known ones only)</span>
-    <span class="ident">server_versions</span>: <span class="ident">Arc</span><span class="op">&lt;</span>[<span class="ident">MatrixVersion</span>]<span class="op">&gt;</span>,
+    <span class="ident">server_versions</span>: <span class="ident">Mutex</span><span class="op">&lt;</span><span class="ident">Arc</span><span class="op">&lt;</span>[<span class="ident">MatrixVersion</span>]<span class="op">&gt;</span><span class="op">&gt;</span>,
     <span class="doccomment">/// Locks making sure we only have one group session sharing request in</span>
     <span class="doccomment">/// flight per room.</span>
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;encryption&quot;</span>)]</span>
@@ -4617,19 +4644,20 @@
         <span class="ident">idp_id</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span>,
     ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">homeserver</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">homeserver</span>().<span class="kw">await</span>;
+        <span class="kw">let</span> <span class="ident">server_versions</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">server_versions</span>().<span class="kw">await</span><span class="question-mark">?</span>;
 
         <span class="kw">let</span> <span class="ident">request</span> <span class="op">=</span> <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">id</span>) <span class="op">=</span> <span class="ident">idp_id</span> {
             <span class="ident">sso_login_with_provider::v3::Request::new</span>(<span class="ident">id</span>, <span class="ident">redirect_url</span>)
                 .<span class="ident">try_into_http_request</span>::<span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span><span class="op">&gt;</span>(
                     <span class="ident">homeserver</span>.<span class="ident">as_str</span>(),
                     <span class="ident">SendAccessToken::None</span>,
-                    <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">server_versions</span>,
+                    <span class="kw-2">&amp;</span><span class="ident">server_versions</span>,
                 )
         } <span class="kw">else</span> {
             <span class="ident">sso_login::v3::Request::new</span>(<span class="ident">redirect_url</span>).<span class="ident">try_into_http_request</span>::<span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span><span class="op">&gt;</span>(
                 <span class="ident">homeserver</span>.<span class="ident">as_str</span>(),
                 <span class="ident">SendAccessToken::None</span>,
-                <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">server_versions</span>,
+                <span class="kw-2">&amp;</span><span class="ident">server_versions</span>,
             )
         };
 
@@ -5411,7 +5439,7 @@
         <span class="prelude-val">Ok</span>(<span class="self">self</span>
             .<span class="ident">inner</span>
             .<span class="ident">http_client</span>
-            .<span class="ident">send</span>(<span class="ident">request</span>, <span class="prelude-val">Some</span>(<span class="ident">request_config</span>), <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">server_versions</span>.<span class="ident">clone</span>())
+            .<span class="ident">send</span>(<span class="ident">request</span>, <span class="prelude-val">Some</span>(<span class="ident">request_config</span>), <span class="self">self</span>.<span class="ident">server_versions</span>().<span class="kw">await</span><span class="question-mark">?</span>)
             .<span class="kw">await</span><span class="question-mark">?</span>)
     }
 
@@ -5464,7 +5492,33 @@
         <span class="ident">Request</span>: <span class="ident">OutgoingRequest</span> <span class="op">+</span> <span class="ident">Debug</span>,
         <span class="ident">HttpError</span>: <span class="ident">From</span><span class="op">&lt;</span><span class="ident">FromHttpResponseError</span><span class="op">&lt;</span><span class="ident">Request::EndpointError</span><span class="op">&gt;</span><span class="op">&gt;</span>,
     {
-        <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">http_client</span>.<span class="ident">send</span>(<span class="ident">request</span>, <span class="ident">config</span>, <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">server_versions</span>.<span class="ident">clone</span>()).<span class="kw">await</span>
+        <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">http_client</span>.<span class="ident">send</span>(<span class="ident">request</span>, <span class="ident">config</span>, <span class="self">self</span>.<span class="ident">server_versions</span>().<span class="kw">await</span><span class="question-mark">?</span>).<span class="kw">await</span>
+    }
+
+    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">server_versions</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">HttpResult</span><span class="op">&lt;</span><span class="ident">Arc</span><span class="op">&lt;</span>[<span class="ident">MatrixVersion</span>]<span class="op">&gt;</span><span class="op">&gt;</span> {
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">server_versions</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">server_versions</span>.<span class="ident">lock</span>().<span class="kw">await</span>;
+
+        <span class="kw">if</span> <span class="ident">server_versions</span>.<span class="ident">is_empty</span>() {
+            <span class="comment">// Not initialized before</span>
+            <span class="kw-2">*</span><span class="ident">server_versions</span> <span class="op">=</span> <span class="self">self</span>
+                .<span class="ident">inner</span>
+                .<span class="ident">http_client</span>
+                .<span class="ident">send</span>(
+                    <span class="ident">get_supported_versions::Request::new</span>(),
+                    <span class="prelude-val">None</span>,
+                    [<span class="ident">MatrixVersion::V1_0</span>].<span class="ident">into_iter</span>().<span class="ident">collect</span>(),
+                )
+                .<span class="kw">await</span><span class="question-mark">?</span>
+                .<span class="ident">known_versions</span>()
+                .<span class="ident">collect</span>();
+
+            <span class="kw">if</span> <span class="ident">server_versions</span>.<span class="ident">is_empty</span>() {
+                <span class="comment">// No known versions, fall back to v1.0 (r0 paths)</span>
+                <span class="kw-2">*</span><span class="ident">server_versions</span> <span class="op">=</span> <span class="macro">vec!</span>[<span class="ident">MatrixVersion::V1_0</span>].<span class="ident">into</span>();
+            }
+        }
+
+        <span class="prelude-val">Ok</span>(<span class="ident">server_versions</span>.<span class="ident">clone</span>())
     }
 
     <span class="doccomment">/// Get information of all our own devices.</span>
@@ -6312,17 +6366,11 @@
         <span class="kw">let</span> <span class="ident">domain</span> <span class="op">=</span> <span class="ident">server_url</span>.<span class="ident">strip_prefix</span>(<span class="string">&quot;http://&quot;</span>).<span class="ident">unwrap</span>();
         <span class="kw">let</span> <span class="ident">alice</span> <span class="op">=</span> <span class="ident">UserId::parse</span>(<span class="string">&quot;@alice:&quot;</span>.<span class="ident">to_owned</span>() <span class="op">+</span> <span class="ident">domain</span>).<span class="ident">unwrap</span>();
 
-        <span class="kw">let</span> <span class="ident">_m</span> <span class="op">=</span> <span class="ident">mock</span>(<span class="string">&quot;GET&quot;</span>, <span class="string">&quot;/.well-known/matrix/client&quot;</span>)
-            .<span class="ident">with_status</span>(<span class="number">200</span>)
-            .<span class="ident">with_body</span>(
-                <span class="ident">test_json::WELL_KNOWN</span>.<span class="ident">to_string</span>().<span class="ident">replace</span>(<span class="string">&quot;HOMESERVER_URL&quot;</span>, <span class="ident">server_url</span>.<span class="ident">as_ref</span>()),
-            )
-            .<span class="ident">create</span>();
+        <span class="kw">let</span> <span class="ident">_m</span> <span class="op">=</span> <span class="ident">mock</span>(<span class="string">&quot;GET&quot;</span>, <span class="string">&quot;/.well-known/matrix/client&quot;</span>).<span class="ident">with_status</span>(<span class="number">404</span>).<span class="ident">create</span>();
 
         <span class="macro">assert!</span>(
             <span class="ident">Client::builder</span>().<span class="ident">user_id</span>(<span class="kw-2">&amp;</span><span class="ident">alice</span>).<span class="ident">build</span>().<span class="kw">await</span>.<span class="ident">is_err</span>(),
-            <span class="string">&quot;Creating a client from a user ID should fail when the \
-                .well-known server returns no version information.&quot;</span>
+            <span class="string">&quot;Creating a client from a user ID should fail when the .well-known request fails.&quot;</span>
         );
     }
 
@@ -7966,5 +8014,5 @@
     }
 }
 </code></pre></div>
-</section><section id="search" class="content hidden"></section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="matrix_sdk" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.62.0-nightly (306ba8357 2022-04-05)" ></div>
+</section><section id="search" class="content hidden"></section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="matrix_sdk" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.62.0-nightly (e745b4ddb 2022-04-07)" ></div>
 </body></html>
