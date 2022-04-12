@@ -887,6 +887,13 @@
 <span id="882">882</span>
 <span id="883">883</span>
 <span id="884">884</span>
+<span id="885">885</span>
+<span id="886">886</span>
+<span id="887">887</span>
+<span id="888">888</span>
+<span id="889">889</span>
+<span id="890">890</span>
+<span id="891">891</span>
 </pre><pre class="rust"><code><span class="comment">// Copyright 2021 The Matrix.org Foundation C.I.C.</span>
 <span class="comment">// Copyright 2021 Damir Jelić</span>
 <span class="comment">//</span>
@@ -945,7 +952,10 @@
 };
 <span class="kw">use</span> <span class="ident">tracing</span>::{<span class="ident">debug</span>, <span class="ident">instrument</span>, <span class="ident">trace</span>, <span class="ident">warn</span>};
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;encryption&quot;</span>)]</span>
-<span class="kw">use</span> {<span class="ident">ruma::api::client::config::set_global_account_data</span>, <span class="ident">ruma::events::EventContent</span>};
+<span class="kw">use</span> {
+    <span class="ident">ruma::api::client::config::set_global_account_data</span>,
+    <span class="ident">ruma::events</span>::{<span class="ident">GlobalAccountDataEventContent</span>, <span class="ident">SyncMessageLikeEvent</span>},
+};
 
 <span class="kw">use</span> <span class="kw">crate</span>::{
     <span class="ident">attachment</span>::{<span class="ident">AttachmentInfo</span>, <span class="ident">Thumbnail</span>},
@@ -969,7 +979,10 @@
                     <span class="comment">// Turn the AnyMessageLikeEvent into a AnySyncMessageLikeEvent</span>
                     <span class="kw">let</span> <span class="ident">event</span> <span class="op">=</span> <span class="ident">event</span>.<span class="ident">clone</span>().<span class="ident">into</span>();
 
-                    <span class="kw">if</span> <span class="kw">let</span> <span class="ident">AnySyncMessageLikeEvent::RoomEncrypted</span>(<span class="ident">e</span>) <span class="op">=</span> <span class="ident">event</span> {
+                    <span class="kw">if</span> <span class="kw">let</span> <span class="ident">AnySyncMessageLikeEvent::RoomEncrypted</span>(<span class="ident">SyncMessageLikeEvent::Original</span>(
+                        <span class="ident">e</span>,
+                    )) <span class="op">=</span> <span class="ident">event</span>
+                    {
                         <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Ok</span>(<span class="ident">decrypted</span>) <span class="op">=</span> <span class="ident">machine</span>.<span class="ident">decrypt_room_event</span>(<span class="kw-2">&amp;</span><span class="ident">e</span>, <span class="ident">room_id</span>).<span class="kw">await</span> {
                             <span class="kw">return</span> <span class="ident">decrypted</span>;
                         }
@@ -979,6 +992,7 @@
         }
 
         <span class="comment">// Fallback to still-encrypted room event</span>
+
         <span class="ident">RoomEvent</span> { <span class="ident">event</span>, <span class="ident">encryption_info</span>: <span class="prelude-val">None</span> }
     }
 
@@ -1126,7 +1140,7 @@
         <span class="ident">content</span>: <span class="ident">T</span>,
     ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">set_global_account_data::v3::Response</span><span class="op">&gt;</span>
     <span class="kw">where</span>
-        <span class="ident">T</span>: <span class="ident">EventContent</span><span class="op">&lt;</span><span class="ident">EventType</span> <span class="op">=</span> <span class="ident">GlobalAccountDataEventType</span><span class="op">&gt;</span>,
+        <span class="ident">T</span>: <span class="ident">GlobalAccountDataEventContent</span>,
     {
         <span class="kw">let</span> <span class="ident">own_user</span> <span class="op">=</span>
             <span class="self">self</span>.<span class="ident">user_id</span>().<span class="kw">await</span>.<span class="ident">ok_or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">Error::from</span>(<span class="ident">HttpError::AuthenticationRequired</span>))<span class="question-mark">?</span>;

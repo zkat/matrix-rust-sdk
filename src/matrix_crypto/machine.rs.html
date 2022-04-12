@@ -1364,7 +1364,7 @@
         <span class="ident">IncomingResponse</span>,
     },
     <span class="ident">events</span>::{
-        <span class="ident">key::verification::VerificationMethod</span>, <span class="ident">room::encrypted::SyncRoomEncryptedEvent</span>,
+        <span class="ident">key::verification::VerificationMethod</span>, <span class="ident">room::encrypted::OriginalSyncRoomEncryptedEvent</span>,
         <span class="ident">AnyMessageLikeEventContent</span>, <span class="ident">EventContent</span>,
     },
     <span class="ident">DeviceKeyAlgorithm</span>, <span class="ident">EventId</span>, <span class="ident">RoomId</span>, <span class="ident">TransactionId</span>, <span class="ident">UserId</span>,
@@ -1868,7 +1868,7 @@
             <span class="ident">content</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">RawValue</span>,
         }
 
-        <span class="kw">let</span> <span class="ident">event</span>: <span class="ident">SyncRoomEncryptedEvent</span> <span class="op">=</span> <span class="ident">serde_json::from_str</span>(<span class="ident">event</span>)<span class="question-mark">?</span>;
+        <span class="kw">let</span> <span class="ident">event</span>: <span class="ident">OriginalSyncRoomEncryptedEvent</span> <span class="op">=</span> <span class="ident">serde_json::from_str</span>(<span class="ident">event</span>)<span class="question-mark">?</span>;
         <span class="kw">let</span> <span class="ident">room_id</span> <span class="op">=</span> <span class="ident">RoomId::parse</span>(<span class="ident">room_id</span>)<span class="question-mark">?</span>;
 
         <span class="kw">let</span> <span class="ident">decrypted</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">runtime</span>.<span class="ident">block_on</span>(<span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">decrypt_room_event</span>(<span class="kw-2">&amp;</span><span class="ident">event</span>, <span class="kw-2">&amp;</span><span class="ident">room_id</span>))<span class="question-mark">?</span>;
@@ -1906,7 +1906,7 @@
         <span class="ident">event</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>,
         <span class="ident">room_id</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>,
     ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">KeyRequestPair</span>, <span class="ident">DecryptionError</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">event</span>: <span class="ident">SyncRoomEncryptedEvent</span> <span class="op">=</span> <span class="ident">serde_json::from_str</span>(<span class="ident">event</span>)<span class="question-mark">?</span>;
+        <span class="kw">let</span> <span class="ident">event</span>: <span class="ident">OriginalSyncRoomEncryptedEvent</span> <span class="op">=</span> <span class="ident">serde_json::from_str</span>(<span class="ident">event</span>)<span class="question-mark">?</span>;
         <span class="kw">let</span> <span class="ident">room_id</span> <span class="op">=</span> <span class="ident">RoomId::parse</span>(<span class="ident">room_id</span>)<span class="question-mark">?</span>;
 
         <span class="kw">let</span> (<span class="ident">cancel</span>, <span class="ident">request</span>) <span class="op">=</span>

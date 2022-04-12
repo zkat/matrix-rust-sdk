@@ -2228,8 +2228,6 @@
 <span id="2223">2223</span>
 <span id="2224">2224</span>
 <span id="2225">2225</span>
-<span id="2226">2226</span>
-<span id="2227">2227</span>
 </pre><pre class="rust"><code><span class="comment">// Copyright 2020 The Matrix.org Foundation C.I.C.</span>
 <span class="comment">//</span>
 <span class="comment">// Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);</span>
@@ -2267,12 +2265,12 @@
     <span class="ident">assign</span>,
     <span class="ident">events</span>::{
         <span class="ident">room::encrypted</span>::{
-            <span class="ident">EncryptedEventScheme</span>, <span class="ident">MegolmV1AesSha2Content</span>, <span class="ident">RoomEncryptedEventContent</span>,
-            <span class="ident">SyncRoomEncryptedEvent</span>, <span class="ident">ToDeviceRoomEncryptedEvent</span>,
+            <span class="ident">EncryptedEventScheme</span>, <span class="ident">MegolmV1AesSha2Content</span>, <span class="ident">OriginalSyncRoomEncryptedEvent</span>,
+            <span class="ident">RoomEncryptedEventContent</span>, <span class="ident">ToDeviceRoomEncryptedEvent</span>,
         },
         <span class="ident">room_key::ToDeviceRoomKeyEvent</span>,
         <span class="ident">secret::request::SecretName</span>,
-        <span class="ident">AnyRoomEvent</span>, <span class="ident">AnyToDeviceEvent</span>, <span class="ident">EventContent</span>, <span class="ident">MessageLikeEventType</span>,
+        <span class="ident">AnyRoomEvent</span>, <span class="ident">AnyToDeviceEvent</span>, <span class="ident">MessageLikeEventContent</span>,
     },
     <span class="ident">DeviceId</span>, <span class="ident">DeviceKeyAlgorithm</span>, <span class="ident">DeviceKeyId</span>, <span class="ident">EventEncryptionAlgorithm</span>, <span class="ident">RoomId</span>, <span class="ident">TransactionId</span>,
     <span class="ident">UInt</span>, <span class="ident">UserId</span>,
@@ -2891,7 +2889,7 @@
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">encrypt</span>(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         <span class="ident">room_id</span>: <span class="kw-2">&amp;</span><span class="ident">RoomId</span>,
-        <span class="ident">content</span>: <span class="kw">impl</span> <span class="ident">EventContent</span><span class="op">&lt;</span><span class="ident">EventType</span> <span class="op">=</span> <span class="ident">MessageLikeEventType</span><span class="op">&gt;</span>,
+        <span class="ident">content</span>: <span class="kw">impl</span> <span class="ident">MessageLikeEventContent</span>,
     ) -&gt; <span class="ident">MegolmResult</span><span class="op">&lt;</span><span class="ident">RoomEncryptedEventContent</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">event_type</span> <span class="op">=</span> <span class="ident">content</span>.<span class="ident">event_type</span>().<span class="ident">to_string</span>();
         <span class="kw">let</span> <span class="ident">content</span> <span class="op">=</span> <span class="ident">serde_json::to_value</span>(<span class="kw-2">&amp;</span><span class="ident">content</span>)<span class="question-mark">?</span>;
@@ -3218,7 +3216,7 @@
     <span class="doccomment">/// * `session_id` - The id that uniquely identifies the session.</span>
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">request_room_key</span>(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
-        <span class="ident">event</span>: <span class="kw-2">&amp;</span><span class="ident">SyncRoomEncryptedEvent</span>,
+        <span class="ident">event</span>: <span class="kw-2">&amp;</span><span class="ident">OriginalSyncRoomEncryptedEvent</span>,
         <span class="ident">room_id</span>: <span class="kw-2">&amp;</span><span class="ident">RoomId</span>,
     ) -&gt; <span class="ident">MegolmResult</span><span class="op">&lt;</span>(<span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">OutgoingRequest</span><span class="op">&gt;</span>, <span class="ident">OutgoingRequest</span>)<span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">content</span> <span class="op">=</span> <span class="kw">match</span> <span class="kw-2">&amp;</span><span class="ident">event</span>.<span class="ident">content</span>.<span class="ident">scheme</span> {
@@ -3271,7 +3269,7 @@
     <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">decrypt_megolm_v1_event</span>(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         <span class="ident">room_id</span>: <span class="kw-2">&amp;</span><span class="ident">RoomId</span>,
-        <span class="ident">event</span>: <span class="kw-2">&amp;</span><span class="ident">SyncRoomEncryptedEvent</span>,
+        <span class="ident">event</span>: <span class="kw-2">&amp;</span><span class="ident">OriginalSyncRoomEncryptedEvent</span>,
         <span class="ident">content</span>: <span class="kw-2">&amp;</span><span class="ident">MegolmV1AesSha2Content</span>,
     ) -&gt; <span class="ident">MegolmResult</span><span class="op">&lt;</span><span class="ident">RoomEvent</span><span class="op">&gt;</span> {
         <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">session</span>) <span class="op">=</span> <span class="self">self</span>
@@ -3332,7 +3330,7 @@
     <span class="doccomment">/// * `room_id` - The ID of the room where the event was sent to.</span>
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">decrypt_room_event</span>(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
-        <span class="ident">event</span>: <span class="kw-2">&amp;</span><span class="ident">SyncRoomEncryptedEvent</span>,
+        <span class="ident">event</span>: <span class="kw-2">&amp;</span><span class="ident">OriginalSyncRoomEncryptedEvent</span>,
         <span class="ident">room_id</span>: <span class="kw-2">&amp;</span><span class="ident">RoomId</span>,
     ) -&gt; <span class="ident">MegolmResult</span><span class="op">&lt;</span><span class="ident">RoomEvent</span><span class="op">&gt;</span> {
         <span class="kw">match</span> <span class="kw-2">&amp;</span><span class="ident">event</span>.<span class="ident">content</span>.<span class="ident">scheme</span> {
@@ -3768,8 +3766,8 @@
                 <span class="ident">message</span>::{<span class="ident">MessageType</span>, <span class="ident">RoomMessageEventContent</span>},
             },
             <span class="ident">AnyMessageLikeEvent</span>, <span class="ident">AnyMessageLikeEventContent</span>, <span class="ident">AnyRoomEvent</span>, <span class="ident">AnyToDeviceEvent</span>,
-            <span class="ident">AnyToDeviceEventContent</span>, <span class="ident">MessageLikeEvent</span>, <span class="ident">MessageLikeUnsigned</span>, <span class="ident">SyncMessageLikeEvent</span>,
-            <span class="ident">ToDeviceEvent</span>,
+            <span class="ident">AnyToDeviceEventContent</span>, <span class="ident">MessageLikeEvent</span>, <span class="ident">MessageLikeUnsigned</span>,
+            <span class="ident">OriginalMessageLikeEvent</span>, <span class="ident">OriginalSyncMessageLikeEvent</span>, <span class="ident">ToDeviceEvent</span>,
         },
         <span class="ident">room_id</span>,
         <span class="ident">serde::Raw</span>,
@@ -4189,7 +4187,7 @@
             .<span class="kw">await</span>
             .<span class="ident">unwrap</span>();
 
-        <span class="kw">let</span> <span class="ident">event</span> <span class="op">=</span> <span class="ident">SyncMessageLikeEvent</span> {
+        <span class="kw">let</span> <span class="ident">event</span> <span class="op">=</span> <span class="ident">OriginalSyncMessageLikeEvent</span> {
             <span class="ident">event_id</span>: <span class="macro">event_id!</span>(<span class="string">&quot;$xxxxx:example.org&quot;</span>).<span class="ident">to_owned</span>(),
             <span class="ident">origin_server_ts</span>: <span class="ident">milli_seconds_since_unix_epoch</span>(),
             <span class="ident">sender</span>: <span class="ident">alice</span>.<span class="ident">user_id</span>().<span class="ident">to_owned</span>(),
@@ -4200,11 +4198,9 @@
         <span class="kw">let</span> <span class="ident">decrypted_event</span> <span class="op">=</span>
             <span class="ident">bob</span>.<span class="ident">decrypt_room_event</span>(<span class="kw-2">&amp;</span><span class="ident">event</span>, <span class="ident">room_id</span>).<span class="kw">await</span>.<span class="ident">unwrap</span>().<span class="ident">event</span>.<span class="ident">deserialize</span>().<span class="ident">unwrap</span>();
 
-        <span class="kw">if</span> <span class="kw">let</span> <span class="ident">AnyRoomEvent::MessageLike</span>(<span class="ident">AnyMessageLikeEvent::RoomMessage</span>(<span class="ident">MessageLikeEvent</span> {
-            <span class="ident">sender</span>,
-            <span class="ident">content</span>,
-            ..
-        })) <span class="op">=</span> <span class="ident">decrypted_event</span>
+        <span class="kw">if</span> <span class="kw">let</span> <span class="ident">AnyRoomEvent::MessageLike</span>(<span class="ident">AnyMessageLikeEvent::RoomMessage</span>(
+            <span class="ident">MessageLikeEvent::Original</span>(<span class="ident">OriginalMessageLikeEvent</span> { <span class="ident">sender</span>, <span class="ident">content</span>, .. }),
+        )) <span class="op">=</span> <span class="ident">decrypted_event</span>
         {
             <span class="macro">assert_eq!</span>(<span class="kw-2">&amp;</span><span class="ident">sender</span>, <span class="ident">alice</span>.<span class="ident">user_id</span>());
             <span class="kw">if</span> <span class="kw">let</span> <span class="ident">MessageType::Text</span>(<span class="ident">c</span>) <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">content</span>.<span class="ident">msgtype</span> {
