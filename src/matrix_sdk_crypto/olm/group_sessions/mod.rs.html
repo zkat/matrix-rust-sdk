@@ -203,6 +203,15 @@
 <span id="198">198</span>
 <span id="199">199</span>
 <span id="200">200</span>
+<span id="201">201</span>
+<span id="202">202</span>
+<span id="203">203</span>
+<span id="204">204</span>
+<span id="205">205</span>
+<span id="206">206</span>
+<span id="207">207</span>
+<span id="208">208</span>
+<span id="209">209</span>
 </pre><pre class="rust"><code><span class="comment">// Copyright 2020 The Matrix.org Foundation C.I.C.</span>
 <span class="comment">//</span>
 <span class="comment">// Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);</span>
@@ -235,7 +244,9 @@
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">outbound</span>::{
     <span class="ident">EncryptionSettings</span>, <span class="ident">GroupSession</span>, <span class="ident">OutboundGroupSession</span>, <span class="ident">PickledOutboundGroupSession</span>, <span class="ident">ShareInfo</span>,
 };
+<span class="kw">use</span> <span class="ident">vodozemac::megolm::SessionKeyDecodeError</span>;
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">vodozemac::megolm</span>::{<span class="ident">ExportedSessionKey</span>, <span class="ident">SessionKey</span>};
+<span class="kw">use</span> <span class="ident">zeroize::Zeroize</span>;
 
 <span class="doccomment">/// An exported version of an `InboundGroupSession`</span>
 <span class="doccomment">///</span>
@@ -315,7 +326,7 @@
                 <span class="ident">room_id</span>: <span class="self">self</span>.<span class="ident">room_id</span>,
                 <span class="ident">sender_key</span>: <span class="self">self</span>.<span class="ident">sender_key</span>,
                 <span class="ident">session_id</span>: <span class="self">self</span>.<span class="ident">session_id</span>,
-                <span class="ident">session_key</span>: <span class="self">self</span>.<span class="ident">session_key</span>.<span class="number">0</span>.<span class="ident">clone</span>(),
+                <span class="ident">session_key</span>: <span class="self">self</span>.<span class="ident">session_key</span>.<span class="ident">to_base64</span>(),
                 <span class="ident">sender_claimed_ed25519_key</span>: <span class="ident">claimed_key</span>.<span class="ident">to_owned</span>(),
                 <span class="ident">forwarding_curve25519_key_chain</span>: <span class="self">self</span>.<span class="ident">forwarding_curve25519_key_chain</span>,
             }
@@ -336,22 +347,29 @@
     }
 }
 
-<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">ToDeviceForwardedRoomKeyEventContent</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">ExportedRoomKey</span> {
+<span class="kw">impl</span> <span class="ident">TryFrom</span><span class="op">&lt;</span><span class="ident">ToDeviceForwardedRoomKeyEventContent</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">ExportedRoomKey</span> {
+    <span class="kw">type</span> <span class="ident">Error</span> <span class="op">=</span> <span class="ident">SessionKeyDecodeError</span>;
+
     <span class="doccomment">/// Convert the content of a forwarded room key into a exported room key.</span>
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">forwarded_key</span>: <span class="ident">ToDeviceForwardedRoomKeyEventContent</span>) -&gt; <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">try_from</span>(
+        <span class="kw-2">mut</span> <span class="ident">forwarded_key</span>: <span class="ident">ToDeviceForwardedRoomKeyEventContent</span>,
+    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident"><span class="self">Self</span>::Error</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">sender_claimed_keys</span>: <span class="ident">BTreeMap</span><span class="op">&lt;</span><span class="ident">DeviceKeyAlgorithm</span>, <span class="ident">String</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">BTreeMap::new</span>();
         <span class="ident">sender_claimed_keys</span>
             .<span class="ident">insert</span>(<span class="ident">DeviceKeyAlgorithm::Ed25519</span>, <span class="ident">forwarded_key</span>.<span class="ident">sender_claimed_ed25519_key</span>);
 
-        <span class="self">Self</span> {
+        <span class="kw">let</span> <span class="ident">session_key</span> <span class="op">=</span> <span class="ident">ExportedSessionKey::from_base64</span>(<span class="kw-2">&amp;</span><span class="ident">forwarded_key</span>.<span class="ident">session_key</span>)<span class="question-mark">?</span>;
+        <span class="ident">forwarded_key</span>.<span class="ident">session_key</span>.<span class="ident">zeroize</span>();
+
+        <span class="prelude-val">Ok</span>(<span class="self">Self</span> {
             <span class="ident">algorithm</span>: <span class="ident">forwarded_key</span>.<span class="ident">algorithm</span>,
             <span class="ident">room_id</span>: <span class="ident">forwarded_key</span>.<span class="ident">room_id</span>,
             <span class="ident">session_id</span>: <span class="ident">forwarded_key</span>.<span class="ident">session_id</span>,
             <span class="ident">forwarding_curve25519_key_chain</span>: <span class="ident">forwarded_key</span>.<span class="ident">forwarding_curve25519_key_chain</span>,
             <span class="ident">sender_claimed_keys</span>,
             <span class="ident">sender_key</span>: <span class="ident">forwarded_key</span>.<span class="ident">sender_key</span>,
-            <span class="ident">session_key</span>: <span class="ident">ExportedSessionKey</span>(<span class="ident">forwarded_key</span>.<span class="ident">session_key</span>),
-        }
+            <span class="ident">session_key</span>,
+        })
     }
 }
 
@@ -404,5 +422,5 @@
     }
 }
 </code></pre></div>
-</section><section id="search" class="content hidden"></section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="matrix_sdk_crypto" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.62.0-nightly (e745b4ddb 2022-04-07)" ></div>
+</section><section id="search" class="content hidden"></section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="matrix_sdk_crypto" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.62.0-nightly (90ca44752 2022-04-11)" ></div>
 </body></html>
