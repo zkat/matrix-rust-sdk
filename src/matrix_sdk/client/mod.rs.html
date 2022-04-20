@@ -4771,7 +4771,7 @@
     <span class="doccomment">///   `Err`, the error will be forwarded.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// * `server_url` - The local URL the server is going to try to bind to, e.g. `http://localhost:3030`.</span>
-    <span class="doccomment">///   If `None`, the server will try to open a random port on localhost.</span>
+    <span class="doccomment">///   If `None`, the server will try to open a random port on `127.0.0.1`.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// * `server_response` - The text that will be shown on the webpage at the</span>
     <span class="doccomment">///   end of the login process. This can be an HTML page. If `None`, a</span>
@@ -4844,7 +4844,10 @@
         <span class="kw">use</span> <span class="ident">rand</span>::{<span class="ident">thread_rng</span>, <span class="ident">Rng</span>};
         <span class="kw">use</span> <span class="ident">warp::Filter</span>;
 
-        <span class="doccomment">/// The range of ports the SSO server will try to bind to randomly</span>
+        <span class="doccomment">/// The range of ports the SSO server will try to bind to randomly.</span>
+        <span class="doccomment">///</span>
+        <span class="doccomment">/// This is used to avoid binding to a port blocked by browsers.</span>
+        <span class="doccomment">/// See &lt;https://fetch.spec.whatwg.org/#port-blocking&gt;.</span>
         <span class="kw">const</span> <span class="ident">SSO_SERVER_BIND_RANGE</span>: <span class="ident">Range</span><span class="op">&lt;</span><span class="ident">u16</span><span class="op">&gt;</span> <span class="op">=</span> <span class="number">20000</span>..<span class="number">30000</span>;
         <span class="doccomment">/// The number of times the SSO server will try to bind to a random port</span>
         <span class="kw">const</span> <span class="ident">SSO_SERVER_BIND_TRIES</span>: <span class="ident">u8</span> <span class="op">=</span> <span class="number">10</span>;
@@ -4857,12 +4860,9 @@
         <span class="kw">let</span> <span class="ident">data_tx_mutex</span> <span class="op">=</span> <span class="ident">Arc::new</span>(<span class="ident">std::sync::Mutex::new</span>(<span class="prelude-val">Some</span>(<span class="ident">data_tx</span>)));
 
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">redirect_url</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">server_url</span> {
-            <span class="prelude-val">Some</span>(<span class="ident">s</span>) =&gt; <span class="kw">match</span> <span class="ident">Url::parse</span>(<span class="ident">s</span>) {
-                <span class="prelude-val">Ok</span>(<span class="ident">url</span>) =&gt; <span class="ident">url</span>,
-                <span class="prelude-val">Err</span>(<span class="ident">err</span>) =&gt; <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">IoError::new</span>(<span class="ident">IoErrorKind::InvalidData</span>, <span class="ident">err</span>).<span class="ident">into</span>()),
-            },
+            <span class="prelude-val">Some</span>(<span class="ident">s</span>) =&gt; <span class="ident">Url::parse</span>(<span class="ident">s</span>)<span class="question-mark">?</span>,
             <span class="prelude-val">None</span> =&gt; {
-                <span class="ident">Url::parse</span>(<span class="string">&quot;http://localhost:0/&quot;</span>).<span class="ident">expect</span>(<span class="string">&quot;Couldn&#39;t parse good known localhost URL&quot;</span>)
+                <span class="ident">Url::parse</span>(<span class="string">&quot;http://127.0.0.1:0/&quot;</span>).<span class="ident">expect</span>(<span class="string">&quot;Couldn&#39;t parse good known localhost URL&quot;</span>)
             }
         };
 
