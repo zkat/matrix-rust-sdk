@@ -627,6 +627,11 @@
 <span id="622">622</span>
 <span id="623">623</span>
 <span id="624">624</span>
+<span id="625">625</span>
+<span id="626">626</span>
+<span id="627">627</span>
+<span id="628">628</span>
+<span id="629">629</span>
 </pre><pre class="rust"><code><span class="comment">// Copyright 2020 The Matrix.org Foundation C.I.C.</span>
 <span class="comment">//</span>
 <span class="comment">// Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);</span>
@@ -653,7 +658,7 @@
 };
 
 <span class="kw">use</span> <span class="ident">dashmap::DashMap</span>;
-<span class="kw">use</span> <span class="ident">matrix_sdk_common</span>::{<span class="ident">instant::Instant</span>, <span class="ident">locks::Mutex</span>};
+<span class="kw">use</span> <span class="ident">matrix_sdk_common</span>::{<span class="ident">locks::Mutex</span>, <span class="ident">util::seconds_since_unix_epoch</span>};
 <span class="kw">use</span> <span class="ident">ruma</span>::{
     <span class="ident">events</span>::{
         <span class="ident">room</span>::{
@@ -666,7 +671,7 @@
         <span class="ident">room_key::ToDeviceRoomKeyEventContent</span>,
         <span class="ident">AnyToDeviceEventContent</span>,
     },
-    <span class="ident">DeviceId</span>, <span class="ident">EventEncryptionAlgorithm</span>, <span class="ident">RoomId</span>, <span class="ident">TransactionId</span>, <span class="ident">UserId</span>,
+    <span class="ident">DeviceId</span>, <span class="ident">EventEncryptionAlgorithm</span>, <span class="ident">RoomId</span>, <span class="ident">SecondsSinceUnixEpoch</span>, <span class="ident">TransactionId</span>, <span class="ident">UserId</span>,
 };
 <span class="kw">use</span> <span class="ident">serde</span>::{<span class="ident">Deserialize</span>, <span class="ident">Serialize</span>};
 <span class="kw">use</span> <span class="ident">serde_json</span>::{<span class="ident">json</span>, <span class="ident">Value</span>};
@@ -678,7 +683,6 @@
     <span class="ident">PickleError</span>,
 };
 
-<span class="kw">use</span> <span class="ident"><span class="kw">super</span>::<span class="kw">super</span></span>::{<span class="ident">deserialize_instant</span>, <span class="ident">serialize_instant</span>};
 <span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">Device</span>, <span class="ident">ToDeviceRequest</span>};
 
 <span class="kw">const</span> <span class="ident">ROTATION_PERIOD</span>: <span class="ident">Duration</span> <span class="op">=</span> <span class="ident">Duration::from_millis</span>(<span class="number">604800000</span>);
@@ -747,7 +751,7 @@
     <span class="ident">account_identity_keys</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">IdentityKeys</span><span class="op">&gt;</span>,
     <span class="ident">session_id</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">str</span><span class="op">&gt;</span>,
     <span class="ident">room_id</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">RoomId</span><span class="op">&gt;</span>,
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">creation_time</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">Instant</span><span class="op">&gt;</span>,
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">creation_time</span>: <span class="ident">SecondsSinceUnixEpoch</span>,
     <span class="ident">message_count</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">AtomicU64</span><span class="op">&gt;</span>,
     <span class="ident">shared</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">AtomicBool</span><span class="op">&gt;</span>,
     <span class="ident">invalidated</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">AtomicBool</span><span class="op">&gt;</span>,
@@ -804,7 +808,7 @@
             <span class="ident">device_id</span>,
             <span class="ident">account_identity_keys</span>: <span class="ident">identity_keys</span>,
             <span class="ident">session_id</span>: <span class="ident">session_id</span>.<span class="ident">into</span>(),
-            <span class="ident">creation_time</span>: <span class="ident">Arc::new</span>(<span class="ident">Instant::now</span>()),
+            <span class="ident">creation_time</span>: <span class="ident">seconds_since_unix_epoch</span>(),
             <span class="ident">message_count</span>: <span class="ident">Arc::new</span>(<span class="ident">AtomicU64::new</span>(<span class="number">0</span>)),
             <span class="ident">shared</span>: <span class="ident">Arc::new</span>(<span class="ident">AtomicBool::new</span>(<span class="bool-val">false</span>)),
             <span class="ident">invalidated</span>: <span class="ident">Arc::new</span>(<span class="ident">AtomicBool::new</span>(<span class="bool-val">false</span>)),
@@ -934,6 +938,18 @@
         )
     }
 
+    <span class="kw">fn</span> <span class="ident">elapsed</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
+        <span class="kw">let</span> <span class="ident">creation_time</span> <span class="op">=</span> <span class="ident">Duration::from_secs</span>(<span class="self">self</span>.<span class="ident">creation_time</span>.<span class="ident">get</span>().<span class="ident">into</span>());
+        <span class="kw">let</span> <span class="ident">now</span> <span class="op">=</span> <span class="ident">Duration::from_secs</span>(<span class="ident">seconds_since_unix_epoch</span>().<span class="ident">get</span>().<span class="ident">into</span>());
+
+        <span class="comment">// Since the encryption settings are provided by users and not</span>
+        <span class="comment">// checked someone could set a really low rotation period so</span>
+        <span class="comment">// clamp it to an hour.</span>
+        <span class="ident">now</span>.<span class="ident">checked_sub</span>(<span class="ident">creation_time</span>)
+            .<span class="ident">map</span>(<span class="op">|</span><span class="ident">elapsed</span><span class="op">|</span> <span class="ident">elapsed</span> <span class="op">&gt;</span><span class="op">=</span> <span class="ident">max</span>(<span class="self">self</span>.<span class="ident">settings</span>.<span class="ident">rotation_period</span>, <span class="ident">Duration::from_secs</span>(<span class="number">3600</span>)))
+            .<span class="ident">unwrap_or</span>(<span class="bool-val">true</span>)
+    }
+
     <span class="doccomment">/// Check if the session has expired and if it should be rotated.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// A session will expire after some time or if enough messages have been</span>
@@ -941,12 +957,7 @@
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">expired</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
         <span class="kw">let</span> <span class="ident">count</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">message_count</span>.<span class="ident">load</span>(<span class="ident">Ordering::SeqCst</span>);
 
-        <span class="ident">count</span> <span class="op">&gt;</span><span class="op">=</span> <span class="self">self</span>.<span class="ident">settings</span>.<span class="ident">rotation_period_msgs</span>
-            <span class="op">|</span><span class="op">|</span> <span class="self">self</span>.<span class="ident">creation_time</span>.<span class="ident">elapsed</span>()
-                <span class="comment">// Since the encryption settings are provided by users and not</span>
-                <span class="comment">// checked someone could set a really low rotation period so</span>
-                <span class="comment">// clamp it to an hour.</span>
-                <span class="op">&gt;</span><span class="op">=</span> <span class="ident">max</span>(<span class="self">self</span>.<span class="ident">settings</span>.<span class="ident">rotation_period</span>, <span class="ident">Duration::from_secs</span>(<span class="number">3600</span>))
+        <span class="ident">count</span> <span class="op">&gt;</span><span class="op">=</span> <span class="self">self</span>.<span class="ident">settings</span>.<span class="ident">rotation_period_msgs</span> <span class="op">|</span><span class="op">|</span> <span class="self">self</span>.<span class="ident">elapsed</span>()
     }
 
     <span class="doccomment">/// Has the session been invalidated.</span>
@@ -1117,7 +1128,7 @@
             <span class="ident">account_identity_keys</span>: <span class="ident">identity_keys</span>,
             <span class="ident">session_id</span>: <span class="ident">session_id</span>.<span class="ident">into</span>(),
             <span class="ident">room_id</span>: <span class="ident">pickle</span>.<span class="ident">room_id</span>,
-            <span class="ident">creation_time</span>: <span class="ident">pickle</span>.<span class="ident">creation_time</span>.<span class="ident">into</span>(),
+            <span class="ident">creation_time</span>: <span class="ident">pickle</span>.<span class="ident">creation_time</span>,
             <span class="ident">message_count</span>: <span class="ident">AtomicU64::from</span>(<span class="ident">pickle</span>.<span class="ident">message_count</span>).<span class="ident">into</span>(),
             <span class="ident">shared</span>: <span class="ident">AtomicBool::from</span>(<span class="ident">pickle</span>.<span class="ident">shared</span>).<span class="ident">into</span>(),
             <span class="ident">invalidated</span>: <span class="ident">AtomicBool::from</span>(<span class="ident">pickle</span>.<span class="ident">invalidated</span>).<span class="ident">into</span>(),
@@ -1148,7 +1159,7 @@
             <span class="ident">pickle</span>,
             <span class="ident">room_id</span>: <span class="self">self</span>.<span class="ident">room_id</span>.<span class="ident">clone</span>(),
             <span class="ident">settings</span>: <span class="self">self</span>.<span class="ident">settings</span>.<span class="ident">clone</span>(),
-            <span class="ident">creation_time</span>: <span class="kw-2">*</span><span class="self">self</span>.<span class="ident">creation_time</span>,
+            <span class="ident">creation_time</span>: <span class="self">self</span>.<span class="ident">creation_time</span>,
             <span class="ident">message_count</span>: <span class="self">self</span>.<span class="ident">message_count</span>.<span class="ident">load</span>(<span class="ident">Ordering::SeqCst</span>),
             <span class="ident">shared</span>: <span class="self">self</span>.<span class="ident">shared</span>(),
             <span class="ident">invalidated</span>: <span class="self">self</span>.<span class="ident">invalidated</span>(),
@@ -1206,8 +1217,7 @@
     <span class="doccomment">/// The room id this session is used for.</span>
     <span class="kw">pub</span> <span class="ident">room_id</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">RoomId</span><span class="op">&gt;</span>,
     <span class="doccomment">/// The timestamp when this session was created.</span>
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">deserialize_with</span> <span class="op">=</span> <span class="string">&quot;deserialize_instant&quot;</span>, <span class="ident">serialize_with</span> <span class="op">=</span> <span class="string">&quot;serialize_instant&quot;</span>)]</span>
-    <span class="kw">pub</span> <span class="ident">creation_time</span>: <span class="ident">Instant</span>,
+    <span class="kw">pub</span> <span class="ident">creation_time</span>: <span class="ident">SecondsSinceUnixEpoch</span>,
     <span class="doccomment">/// The number of messages this session has already encrypted.</span>
     <span class="kw">pub</span> <span class="ident">message_count</span>: <span class="ident">u64</span>,
     <span class="doccomment">/// Is the session shared.</span>
@@ -1252,5 +1262,5 @@
     }
 }
 </code></pre></div>
-</section><section id="search" class="content hidden"></section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="matrix_sdk_crypto" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.62.0-nightly (311e2683e 2022-04-18)" ></div>
+</section><section id="search" class="content hidden"></section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="matrix_sdk_crypto" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.62.0-nightly (4ca19e09d 2022-04-19)" ></div>
 </body></html>

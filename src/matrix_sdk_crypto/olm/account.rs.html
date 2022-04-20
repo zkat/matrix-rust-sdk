@@ -1272,7 +1272,7 @@
     },
 };
 
-<span class="kw">use</span> <span class="ident">matrix_sdk_common</span>::{<span class="ident">instant::Instant</span>, <span class="ident">locks::Mutex</span>};
+<span class="kw">use</span> <span class="ident">matrix_sdk_common</span>::{<span class="ident">locks::Mutex</span>, <span class="ident">util::seconds_since_unix_epoch</span>};
 <span class="kw">use</span> <span class="ident">ruma</span>::{
     <span class="ident">api::client::keys</span>::{
         <span class="ident">upload_keys</span>,
@@ -2170,7 +2170,7 @@
     ) -&gt; <span class="ident">Session</span> {
         <span class="kw">let</span> <span class="ident">session</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">lock</span>().<span class="kw">await</span>.<span class="ident">create_outbound_session</span>(<span class="ident">identity_key</span>, <span class="ident">one_time_key</span>);
 
-        <span class="kw">let</span> <span class="ident">now</span> <span class="op">=</span> <span class="ident">Instant::now</span>();
+        <span class="kw">let</span> <span class="ident">now</span> <span class="op">=</span> <span class="ident">seconds_since_unix_epoch</span>();
         <span class="kw">let</span> <span class="ident">session_id</span> <span class="op">=</span> <span class="ident">session</span>.<span class="ident">session_id</span>();
 
         <span class="ident">Session</span> {
@@ -2181,8 +2181,8 @@
             <span class="ident">session_id</span>: <span class="ident">session_id</span>.<span class="ident">into</span>(),
             <span class="ident">sender_key</span>: <span class="ident">identity_key</span>,
             <span class="ident">created_using_fallback_key</span>: <span class="ident">fallback_used</span>,
-            <span class="ident">creation_time</span>: <span class="ident">Arc::new</span>(<span class="ident">now</span>),
-            <span class="ident">last_use_time</span>: <span class="ident">Arc::new</span>(<span class="ident">now</span>),
+            <span class="ident">creation_time</span>: <span class="ident">now</span>,
+            <span class="ident">last_use_time</span>: <span class="ident">now</span>,
         }
     }
 
@@ -2266,7 +2266,7 @@
         <span class="kw">let</span> <span class="ident">result</span> <span class="op">=</span>
             <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">lock</span>().<span class="kw">await</span>.<span class="ident">create_inbound_session</span>(<span class="kw-2">&amp;</span><span class="ident">their_identity_key</span>, <span class="ident">message</span>)<span class="question-mark">?</span>;
 
-        <span class="kw">let</span> <span class="ident">now</span> <span class="op">=</span> <span class="ident">Instant::now</span>();
+        <span class="kw">let</span> <span class="ident">now</span> <span class="op">=</span> <span class="ident">seconds_since_unix_epoch</span>();
         <span class="kw">let</span> <span class="ident">session_id</span> <span class="op">=</span> <span class="ident">result</span>.<span class="ident">session</span>.<span class="ident">session_id</span>();
 
         <span class="kw">let</span> <span class="ident">session</span> <span class="op">=</span> <span class="ident">Session</span> {
@@ -2277,8 +2277,8 @@
             <span class="ident">session_id</span>: <span class="ident">session_id</span>.<span class="ident">into</span>(),
             <span class="ident">sender_key</span>: <span class="ident">their_identity_key</span>,
             <span class="ident">created_using_fallback_key</span>: <span class="bool-val">false</span>,
-            <span class="ident">creation_time</span>: <span class="ident">Arc::new</span>(<span class="ident">now</span>),
-            <span class="ident">last_use_time</span>: <span class="ident">Arc::new</span>(<span class="ident">now</span>),
+            <span class="ident">creation_time</span>: <span class="ident">now</span>,
+            <span class="ident">last_use_time</span>: <span class="ident">now</span>,
         };
 
         <span class="prelude-val">Ok</span>(<span class="ident">InboundCreationResult</span> { <span class="ident">session</span>, <span class="ident">plaintext</span>: <span class="ident">result</span>.<span class="ident">plaintext</span> })
@@ -2492,5 +2492,5 @@
     }
 }
 </code></pre></div>
-</section><section id="search" class="content hidden"></section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="matrix_sdk_crypto" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.62.0-nightly (311e2683e 2022-04-18)" ></div>
+</section><section id="search" class="content hidden"></section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="matrix_sdk_crypto" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.62.0-nightly (4ca19e09d 2022-04-19)" ></div>
 </body></html>

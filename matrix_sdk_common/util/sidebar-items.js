@@ -1,1 +1,1 @@
-initSidebarItems({"fn":[["milli_seconds_since_unix_epoch","Platform agnostic helper function to create MilliSecondsSinceUnixEpoch"]]});
+initSidebarItems({"fn":[["milli_seconds_since_unix_epoch","Platform agnostic helper function to create MilliSecondsSinceUnixEpoch"],["seconds_since_unix_epoch","Platform agnostic helper function to create SecondsSinceUnixEpoch"]]});
