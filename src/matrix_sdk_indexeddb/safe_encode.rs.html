@@ -314,11 +314,6 @@
 <span id="309">309</span>
 <span id="310">310</span>
 <span id="311">311</span>
-<span id="312">312</span>
-<span id="313">313</span>
-<span id="314">314</span>
-<span id="315">315</span>
-<span id="316">316</span>
 </pre><pre class="rust"><code><span class="attribute">#![<span class="ident">allow</span>(<span class="ident">dead_code</span>)]</span>
 <span class="kw">use</span> <span class="ident">base64</span>::{<span class="ident">encode_config</span> <span class="kw">as</span> <span class="ident">base64_encode</span>, <span class="ident">STANDARD_NO_PAD</span>};
 <span class="kw">use</span> <span class="ident">matrix_sdk_base::ruma::events</span>::{
@@ -381,7 +376,7 @@
     <span class="doccomment">/// encode self into a JsValue, internally using `as_encoded_string`</span>
     <span class="doccomment">/// to escape the value of self, and append the given counter</span>
     <span class="kw">fn</span> <span class="ident">encode_with_counter</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">i</span>: <span class="ident">usize</span>) -&gt; <span class="ident">JsValue</span> {
-        <span class="macro">format!</span>(<span class="string">&quot;{}{}{:0000000x}&quot;</span>, <span class="self">self</span>.<span class="ident">as_encoded_string</span>(), <span class="ident">KEY_SEPARATOR</span>, <span class="ident">i</span>).<span class="ident">into</span>()
+        <span class="macro">format!</span>(<span class="string">&quot;{}{}{:016x}&quot;</span>, <span class="self">self</span>.<span class="ident">as_encoded_string</span>(), <span class="ident">KEY_SEPARATOR</span>, <span class="ident">i</span>).<span class="ident">into</span>()
     }
 
     <span class="doccomment">/// encode self into a JsValue, internally using `as_secure_string`</span>
@@ -392,13 +387,8 @@
         <span class="ident">store_cipher</span>: <span class="kw-2">&amp;</span><span class="ident">StoreCipher</span>,
         <span class="ident">i</span>: <span class="ident">usize</span>,
     ) -&gt; <span class="ident">JsValue</span> {
-        <span class="macro">format!</span>(
-            <span class="string">&quot;{}{}{:0000000x}&quot;</span>,
-            <span class="self">self</span>.<span class="ident">as_secure_string</span>(<span class="ident">table_name</span>, <span class="ident">store_cipher</span>),
-            <span class="ident">KEY_SEPARATOR</span>,
-            <span class="ident">i</span>
-        )
-        .<span class="ident">into</span>()
+        <span class="macro">format!</span>(<span class="string">&quot;{}{}{:016x}&quot;</span>, <span class="self">self</span>.<span class="ident">as_secure_string</span>(<span class="ident">table_name</span>, <span class="ident">store_cipher</span>), <span class="ident">KEY_SEPARATOR</span>, <span class="ident">i</span>,)
+            .<span class="ident">into</span>()
     }
 
     <span class="doccomment">/// Encode self into a IdbKeyRange for searching all keys that are</span>
@@ -636,5 +626,5 @@
     }
 }
 </code></pre></div>
-</section><section id="search" class="content hidden"></section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="matrix_sdk_indexeddb" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.62.0-nightly (4ca19e09d 2022-04-19)" ></div>
+</section><section id="search" class="content hidden"></section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="matrix_sdk_indexeddb" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.62.0-nightly (879aff385 2022-04-20)" ></div>
 </body></html>
