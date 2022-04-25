@@ -292,6 +292,21 @@
 <span id="287">287</span>
 <span id="288">288</span>
 <span id="289">289</span>
+<span id="290">290</span>
+<span id="291">291</span>
+<span id="292">292</span>
+<span id="293">293</span>
+<span id="294">294</span>
+<span id="295">295</span>
+<span id="296">296</span>
+<span id="297">297</span>
+<span id="298">298</span>
+<span id="299">299</span>
+<span id="300">300</span>
+<span id="301">301</span>
+<span id="302">302</span>
+<span id="303">303</span>
+<span id="304">304</span>
 </pre><pre class="rust"><code><span class="comment">// Copyright 2020 The Matrix.org Foundation C.I.C.</span>
 <span class="comment">//</span>
 <span class="comment">// Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);</span>
@@ -321,11 +336,8 @@
 <span class="kw">use</span> <span class="ident">reqwest::Error</span> <span class="kw">as</span> <span class="ident">ReqwestError</span>;
 <span class="kw">use</span> <span class="ident">ruma</span>::{
     <span class="ident">api</span>::{
-        <span class="ident">client</span>::{
-            <span class="ident">uiaa</span>::{<span class="ident">UiaaInfo</span>, <span class="ident">UiaaResponse</span> <span class="kw">as</span> <span class="ident">UiaaError</span>},
-            <span class="ident">Error</span> <span class="kw">as</span> <span class="ident">RumaClientApiError</span>,
-        },
-        <span class="ident">error</span>::{<span class="ident">FromHttpResponseError</span>, <span class="ident">IntoHttpError</span>, <span class="ident">MatrixError</span> <span class="kw">as</span> <span class="ident">RumaApiError</span>, <span class="ident">ServerError</span>},
+        <span class="ident">client::uiaa</span>::{<span class="ident">UiaaInfo</span>, <span class="ident">UiaaResponse</span> <span class="kw">as</span> <span class="ident">UiaaError</span>},
+        <span class="ident">error</span>::{<span class="ident">FromHttpResponseError</span>, <span class="ident">IntoHttpError</span>, <span class="ident">ServerError</span>},
     },
     <span class="ident">events::tag::InvalidUserTagName</span>,
     <span class="ident">IdParseError</span>,
@@ -339,6 +351,16 @@
 
 <span class="doccomment">/// Result type of a pure HTTP request.</span>
 <span class="kw">pub</span> <span class="kw">type</span> <span class="ident">HttpResult</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">std::result::Result</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">HttpError</span><span class="op">&gt;</span>;
+
+<span class="doccomment">/// An error response from a Matrix API call, using a client API specific</span>
+<span class="doccomment">/// representation if the endpoint is from that.</span>
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Error</span>, <span class="ident">Debug</span>)]</span>
+<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">RumaApiError</span> {
+    <span class="attribute">#[<span class="ident">error</span>(<span class="ident">transparent</span>)]</span>
+    <span class="ident">ClientApi</span>(<span class="ident">ruma::api::client::Error</span>),
+    <span class="attribute">#[<span class="ident">error</span>(<span class="ident">transparent</span>)]</span>
+    <span class="ident">Other</span>(<span class="ident">ruma::api::error::MatrixError</span>),
+}
 
 <span class="doccomment">/// An HTTP error, representing either a connection error or an error while</span>
 <span class="doccomment">/// converting the raw HTTP response into a Matrix response.</span>
@@ -359,11 +381,7 @@
 
     <span class="doccomment">/// An error converting between ruma_*_api types and Hyper types.</span>
     <span class="attribute">#[<span class="ident">error</span>(<span class="ident">transparent</span>)]</span>
-    <span class="ident">Api</span>(<span class="attribute">#[<span class="ident">from</span>]</span> <span class="ident">FromHttpResponseError</span><span class="op">&lt;</span><span class="ident">RumaApiError</span><span class="op">&gt;</span>),
-
-    <span class="doccomment">/// An error converting between ruma_client_api types and Hyper types.</span>
-    <span class="attribute">#[<span class="ident">error</span>(<span class="ident">transparent</span>)]</span>
-    <span class="ident">ClientApi</span>(<span class="attribute">#[<span class="ident">from</span>]</span> <span class="ident">FromHttpResponseError</span><span class="op">&lt;</span><span class="ident">RumaClientApiError</span><span class="op">&gt;</span>),
+    <span class="ident">Api</span>(<span class="ident">FromHttpResponseError</span><span class="op">&lt;</span><span class="ident">RumaApiError</span><span class="op">&gt;</span>),
 
     <span class="doccomment">/// An error converting between ruma_client_api types and Hyper types.</span>
     <span class="attribute">#[<span class="ident">error</span>(<span class="ident">transparent</span>)]</span>
@@ -537,6 +555,18 @@
         } <span class="kw">else</span> {
             <span class="prelude-val">None</span>
         }
+    }
+}
+
+<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">FromHttpResponseError</span><span class="op">&lt;</span><span class="ident">ruma::api::client::Error</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">HttpError</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">err</span>: <span class="ident">FromHttpResponseError</span><span class="op">&lt;</span><span class="ident">ruma::api::client::Error</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
+        <span class="ident"><span class="self">Self</span>::Api</span>(<span class="ident">err</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">e</span><span class="op">|</span> <span class="ident">e</span>.<span class="ident">map</span>(<span class="ident">RumaApiError::ClientApi</span>)))
+    }
+}
+
+<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">FromHttpResponseError</span><span class="op">&lt;</span><span class="ident">ruma::api::error::MatrixError</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">HttpError</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">err</span>: <span class="ident">FromHttpResponseError</span><span class="op">&lt;</span><span class="ident">ruma::api::error::MatrixError</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
+        <span class="ident"><span class="self">Self</span>::Api</span>(<span class="ident">err</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">e</span><span class="op">|</span> <span class="ident">e</span>.<span class="ident">map</span>(<span class="ident">RumaApiError::Other</span>)))
     }
 }
 

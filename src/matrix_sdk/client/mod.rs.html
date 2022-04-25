@@ -4008,6 +4008,11 @@
 <span id="4003">4003</span>
 <span id="4004">4004</span>
 <span id="4005">4005</span>
+<span id="4006">4006</span>
+<span id="4007">4007</span>
+<span id="4008">4008</span>
+<span id="4009">4009</span>
+<span id="4010">4010</span>
 </pre><pre class="rust"><code><span class="comment">// Copyright 2020 Damir Jelić</span>
 <span class="comment">// Copyright 2020 The Matrix.org Foundation C.I.C.</span>
 <span class="comment">//</span>
@@ -6301,6 +6306,7 @@
             <span class="ident">Thumbnail</span>,
         },
         <span class="ident">config</span>::{<span class="ident">RequestConfig</span>, <span class="ident">SyncSettings</span>},
+        <span class="ident">error::RumaApiError</span>,
         <span class="ident">HttpError</span>, <span class="ident">RoomMember</span>,
     };
 
@@ -6618,8 +6624,12 @@
             .<span class="ident">create</span>();
 
         <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Err</span>(<span class="ident">err</span>) <span class="op">=</span> <span class="ident">client</span>.<span class="ident">login</span>(<span class="string">&quot;example&quot;</span>, <span class="string">&quot;wordpass&quot;</span>, <span class="prelude-val">None</span>, <span class="prelude-val">None</span>).<span class="kw">await</span> {
-            <span class="kw">if</span> <span class="kw">let</span> <span class="ident"><span class="kw">crate</span>::Error::Http</span>(<span class="ident">HttpError::ClientApi</span>(<span class="ident">FromHttpResponseError::Server</span>(
-                <span class="ident">ServerError::Known</span>(<span class="ident">client_api::Error</span> { <span class="ident">kind</span>, <span class="ident">message</span>, <span class="ident">status_code</span> }),
+            <span class="kw">if</span> <span class="kw">let</span> <span class="ident"><span class="kw">crate</span>::Error::Http</span>(<span class="ident">HttpError::Api</span>(<span class="ident">FromHttpResponseError::Server</span>(
+                <span class="ident">ServerError::Known</span>(<span class="ident">RumaApiError::ClientApi</span>(<span class="ident">client_api::Error</span> {
+                    <span class="ident">kind</span>,
+                    <span class="ident">message</span>,
+                    <span class="ident">status_code</span>,
+                })),
             ))) <span class="op">=</span> <span class="ident">err</span>
             {
                 <span class="kw">if</span> <span class="kw">let</span> <span class="ident">client_api::error::ErrorKind::Forbidden</span> <span class="op">=</span> <span class="ident">kind</span> {
