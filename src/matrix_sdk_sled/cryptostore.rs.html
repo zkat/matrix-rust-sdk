@@ -1040,6 +1040,27 @@
 <span id="1035">1035</span>
 <span id="1036">1036</span>
 <span id="1037">1037</span>
+<span id="1038">1038</span>
+<span id="1039">1039</span>
+<span id="1040">1040</span>
+<span id="1041">1041</span>
+<span id="1042">1042</span>
+<span id="1043">1043</span>
+<span id="1044">1044</span>
+<span id="1045">1045</span>
+<span id="1046">1046</span>
+<span id="1047">1047</span>
+<span id="1048">1048</span>
+<span id="1049">1049</span>
+<span id="1050">1050</span>
+<span id="1051">1051</span>
+<span id="1052">1052</span>
+<span id="1053">1053</span>
+<span id="1054">1054</span>
+<span id="1055">1055</span>
+<span id="1056">1056</span>
+<span id="1057">1057</span>
+<span id="1058">1058</span>
 </pre><pre class="rust"><code><span class="comment">// Copyright 2020 The Matrix.org Foundation C.I.C.</span>
 <span class="comment">//</span>
 <span class="comment">// Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);</span>
@@ -1084,7 +1105,7 @@
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">sled::Error</span>;
 <span class="kw">use</span> <span class="ident">sled</span>::{
     <span class="ident">transaction</span>::{<span class="ident">ConflictableTransactionError</span>, <span class="ident">TransactionError</span>},
-    <span class="ident">Config</span>, <span class="ident">Db</span>, <span class="ident">IVec</span>, <span class="ident">Transactional</span>, <span class="ident">Tree</span>,
+    <span class="ident">Batch</span>, <span class="ident">Config</span>, <span class="ident">Db</span>, <span class="ident">IVec</span>, <span class="ident">Transactional</span>, <span class="ident">Tree</span>,
 };
 <span class="kw">use</span> <span class="ident">tracing::debug</span>;
 
@@ -1686,6 +1707,34 @@
 
         <span class="prelude-val">Ok</span>(<span class="ident">request</span>)
     }
+
+    <span class="doccomment">/// Save a batch of tracked users.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// # Arguments</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// * `tracked_users` - A list of tuples. The first element of the tuple is</span>
+    <span class="doccomment">/// the user ID, the second element is if the user should be considered to</span>
+    <span class="doccomment">/// be dirty.</span>
+    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">save_tracked_users</span>(
+        <span class="kw-2">&amp;</span><span class="self">self</span>,
+        <span class="ident">tracked_users</span>: <span class="kw-2">&amp;</span>[(<span class="kw-2">&amp;</span><span class="ident">UserId</span>, <span class="ident">bool</span>)],
+    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">CryptoStoreError</span><span class="op">&gt;</span> {
+        <span class="kw">let</span> <span class="ident">users</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">TrackedUser</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">tracked_users</span>
+            .<span class="ident">iter</span>()
+            .<span class="ident">map</span>(<span class="op">|</span>(<span class="ident">u</span>, <span class="ident">d</span>)<span class="op">|</span> <span class="ident">TrackedUser</span> { <span class="ident">user_id</span>: (<span class="kw-2">*</span><span class="ident">u</span>).<span class="ident">into</span>(), <span class="ident">dirty</span>: <span class="kw-2">*</span><span class="ident">d</span> })
+            .<span class="ident">collect</span>();
+
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">batch</span> <span class="op">=</span> <span class="ident">Batch::default</span>();
+
+        <span class="kw">for</span> <span class="ident">user</span> <span class="kw">in</span> <span class="ident">users</span> {
+            <span class="ident">batch</span>.<span class="ident">insert</span>(
+                <span class="self">self</span>.<span class="ident">encode_key</span>(<span class="ident">TRACKED_USERS_TABLE</span>, <span class="ident">user</span>.<span class="ident">user_id</span>.<span class="ident">as_str</span>()),
+                <span class="self">self</span>.<span class="ident">serialize_value</span>(<span class="kw-2">&amp;</span><span class="ident">user</span>)<span class="question-mark">?</span>,
+            );
+        }
+
+        <span class="self">self</span>.<span class="ident">tracked_users</span>.<span class="ident">apply_batch</span>(<span class="ident">batch</span>).<span class="ident">map_err</span>(<span class="op">|</span><span class="ident">e</span><span class="op">|</span> <span class="ident">CryptoStoreError::Backend</span>(<span class="macro">anyhow!</span>(<span class="ident">e</span>)))
+    }
 }
 
 <span class="attribute">#[<span class="ident">async_trait</span>]</span>
@@ -1888,14 +1937,7 @@
             <span class="self">self</span>.<span class="ident">users_for_key_query_cache</span>.<span class="ident">remove</span>(<span class="ident">user</span>);
         }
 
-        <span class="kw">let</span> <span class="ident">user</span> <span class="op">=</span> <span class="ident">TrackedUser</span> { <span class="ident">user_id</span>: <span class="ident">user</span>.<span class="ident">to_owned</span>(), <span class="ident">dirty</span> };
-
-        <span class="self">self</span>.<span class="ident">tracked_users</span>
-            .<span class="ident">insert</span>(
-                <span class="self">self</span>.<span class="ident">encode_key</span>(<span class="ident">TRACKED_USERS_TABLE</span>, <span class="ident">user</span>.<span class="ident">user_id</span>.<span class="ident">as_str</span>()),
-                <span class="self">self</span>.<span class="ident">serialize_value</span>(<span class="kw-2">&amp;</span><span class="ident">user</span>)<span class="question-mark">?</span>,
-            )
-            .<span class="ident">map_err</span>(<span class="op">|</span><span class="ident">e</span><span class="op">|</span> <span class="ident">CryptoStoreError::Backend</span>(<span class="macro">anyhow!</span>(<span class="ident">e</span>)))<span class="question-mark">?</span>;
+        <span class="self">self</span>.<span class="ident">save_tracked_users</span>(<span class="kw-2">&amp;</span>[(<span class="ident">user</span>, <span class="ident">dirty</span>)]).<span class="kw">await</span><span class="question-mark">?</span>;
 
         <span class="prelude-val">Ok</span>(<span class="ident">already_added</span>)
     }

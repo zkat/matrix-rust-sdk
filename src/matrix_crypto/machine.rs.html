@@ -1331,6 +1331,20 @@
 <span id="1326">1326</span>
 <span id="1327">1327</span>
 <span id="1328">1328</span>
+<span id="1329">1329</span>
+<span id="1330">1330</span>
+<span id="1331">1331</span>
+<span id="1332">1332</span>
+<span id="1333">1333</span>
+<span id="1334">1334</span>
+<span id="1335">1335</span>
+<span id="1336">1336</span>
+<span id="1337">1337</span>
+<span id="1338">1338</span>
+<span id="1339">1339</span>
+<span id="1340">1340</span>
+<span id="1341">1341</span>
+<span id="1342">1342</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">std</span>::{
     <span class="ident">collections</span>::{<span class="ident">BTreeMap</span>, <span class="ident">HashMap</span>},
     <span class="ident">convert::TryInto</span>,
@@ -1372,6 +1386,7 @@
 <span class="kw">use</span> <span class="ident">serde</span>::{<span class="ident">Deserialize</span>, <span class="ident">Serialize</span>};
 <span class="kw">use</span> <span class="ident">serde_json</span>::{<span class="ident">value::RawValue</span>, <span class="ident">Value</span>};
 <span class="kw">use</span> <span class="ident">tokio::runtime::Runtime</span>;
+<span class="kw">use</span> <span class="ident">zeroize::Zeroize</span>;
 
 <span class="kw">use</span> <span class="kw">crate</span>::{
     <span class="ident">error</span>::{<span class="ident">CryptoStoreError</span>, <span class="ident">DecryptionError</span>, <span class="ident">SecretImportError</span>, <span class="ident">SignatureError</span>},
@@ -1386,8 +1401,8 @@
 
 <span class="doccomment">/// A high level state machine that handles E2EE for Matrix.</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">OlmMachine</span> {
-    <span class="ident">inner</span>: <span class="ident">InnerMachine</span>,
-    <span class="ident">runtime</span>: <span class="ident">Runtime</span>,
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">inner</span>: <span class="ident">InnerMachine</span>,
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">runtime</span>: <span class="ident">Runtime</span>,
 }
 
 <span class="doccomment">/// A pair of outgoing room key requests, both of those are sendToDevice</span>
@@ -1410,25 +1425,38 @@
     <span class="doccomment">/// * `device_id` - The unique ID of the device that owns this machine.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// * `path` - The path where the state of the machine should be persisted.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">user_id</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">device_id</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">path</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">CryptoStoreError</span><span class="op">&gt;</span> {
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// * `passphrase` - The passphrase that should be used to encrypt the data</span>
+    <span class="doccomment">///   at rest in the Sled store. **Warning**, if no passphrase is given, the</span>
+    <span class="doccomment">///   store and all its data will remain unencyrpted.</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(
+        <span class="ident">user_id</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>,
+        <span class="ident">device_id</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>,
+        <span class="ident">path</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>,
+        <span class="kw-2">mut</span> <span class="ident">passphrase</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
+    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">CryptoStoreError</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">user_id</span> <span class="op">=</span> <span class="ident">parse_user_id</span>(<span class="ident">user_id</span>)<span class="question-mark">?</span>;
         <span class="kw">let</span> <span class="ident">device_id</span> <span class="op">=</span> <span class="ident">device_id</span>.<span class="ident">into</span>();
         <span class="kw">let</span> <span class="ident">runtime</span> <span class="op">=</span> <span class="ident">Runtime::new</span>().<span class="ident">expect</span>(<span class="string">&quot;Couldn&#39;t create a tokio runtime&quot;</span>);
 
-        <span class="kw">let</span> <span class="ident">store</span> <span class="op">=</span>
-            <span class="ident">Box::new</span>(<span class="ident">matrix_sdk_sled::CryptoStore::open_with_passphrase</span>(<span class="ident">path</span>, <span class="prelude-val">None</span>).<span class="ident">map_err</span>(
-                <span class="op">|</span><span class="ident">e</span><span class="op">|</span> <span class="kw">match</span> <span class="ident">e</span> {
-                    <span class="comment">// This is a bit of an error in the sled store, the</span>
-                    <span class="comment">// CryptoStore returns an `OpenStoreError` which has a</span>
-                    <span class="comment">// variant for the state store. Not sure what to do about</span>
-                    <span class="comment">// this.</span>
-                    <span class="ident">matrix_sdk_sled::OpenStoreError::Crypto</span>(<span class="ident">r</span>) =&gt; <span class="ident">r</span>.<span class="ident">into</span>(),
-                    <span class="ident">matrix_sdk_sled::OpenStoreError::Sled</span>(<span class="ident">s</span>) =&gt; {
-                        <span class="ident">CryptoStoreError::CryptoStore</span>(<span class="macro">anyhow!</span>(<span class="ident">s</span>).<span class="ident">into</span>())
+        <span class="kw">let</span> <span class="ident">store</span> <span class="op">=</span> <span class="ident">Box::new</span>(
+            <span class="ident">matrix_sdk_sled::CryptoStore::open_with_passphrase</span>(<span class="ident">path</span>, <span class="ident">passphrase</span>.<span class="ident">as_deref</span>())
+                .<span class="ident">map_err</span>(<span class="op">|</span><span class="ident">e</span><span class="op">|</span> {
+                    <span class="kw">match</span> <span class="ident">e</span> {
+                        <span class="comment">// This is a bit of an error in the sled store, the</span>
+                        <span class="comment">// CryptoStore returns an `OpenStoreError` which has a</span>
+                        <span class="comment">// variant for the state store. Not sure what to do about</span>
+                        <span class="comment">// this.</span>
+                        <span class="ident">matrix_sdk_sled::OpenStoreError::Crypto</span>(<span class="ident">r</span>) =&gt; <span class="ident">r</span>.<span class="ident">into</span>(),
+                        <span class="ident">matrix_sdk_sled::OpenStoreError::Sled</span>(<span class="ident">s</span>) =&gt; {
+                            <span class="ident">CryptoStoreError::CryptoStore</span>(<span class="macro">anyhow!</span>(<span class="ident">s</span>).<span class="ident">into</span>())
+                        }
+                        <span class="kw">_</span> =&gt; <span class="macro">unreachable!</span>(),
                     }
-                    <span class="kw">_</span> =&gt; <span class="macro">unreachable!</span>(),
-                },
-            )<span class="question-mark">?</span>);
+                })<span class="question-mark">?</span>,
+        );
+
+        <span class="ident">passphrase</span>.<span class="ident">zeroize</span>();
 
         <span class="prelude-val">Ok</span>(<span class="ident">OlmMachine</span> {
             <span class="ident">inner</span>: <span class="ident">runtime</span>.<span class="ident">block_on</span>(<span class="ident">InnerMachine::with_store</span>(<span class="ident">user_id</span>, <span class="ident">device_id</span>, <span class="ident">store</span>))<span class="question-mark">?</span>,
