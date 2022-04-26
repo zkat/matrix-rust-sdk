@@ -371,7 +371,7 @@
 <span class="kw">use</span> <span class="ident">clap</span>::{<span class="ident">Arg</span>, <span class="ident">ArgMatches</span>, <span class="ident">Command</span> <span class="kw">as</span> <span class="ident">Argparse</span>};
 <span class="kw">use</span> <span class="ident">futures::executor::block_on</span>;
 <span class="kw">use</span> <span class="ident">matrix_sdk_base</span>::{
-    <span class="ident">ruma</span>::{<span class="ident">events::StateEventType</span>, <span class="ident">RoomId</span>, <span class="ident">UserId</span>},
+    <span class="ident">ruma</span>::{<span class="ident">events::StateEventType</span>, <span class="ident">OwnedRoomId</span>, <span class="ident">OwnedUserId</span>, <span class="ident">RoomId</span>},
     <span class="ident">RoomInfo</span>, <span class="ident">Store</span>,
 };
 <span class="kw">use</span> <span class="ident">matrix_sdk_sled::StateStore</span>;
@@ -610,13 +610,13 @@
         <span class="self">self</span>.<span class="ident">printer</span>.<span class="ident">pretty_print_struct</span>(<span class="kw-2">&amp;</span><span class="ident">rooms</span>);
     }
 
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">get_display_name_owners</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">room_id</span>: <span class="ident">Box</span><span class="op">&lt;</span><span class="ident">RoomId</span><span class="op">&gt;</span>, <span class="ident">display_name</span>: <span class="ident">String</span>) {
+    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">get_display_name_owners</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">room_id</span>: <span class="ident">OwnedRoomId</span>, <span class="ident">display_name</span>: <span class="ident">String</span>) {
         <span class="kw">let</span> <span class="ident">users</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">store</span>.<span class="ident">get_users_with_display_name</span>(<span class="kw-2">&amp;</span><span class="ident">room_id</span>, <span class="kw-2">&amp;</span><span class="ident">display_name</span>).<span class="kw">await</span>.<span class="ident">unwrap</span>();
         <span class="self">self</span>.<span class="ident">printer</span>.<span class="ident">pretty_print_struct</span>(<span class="kw-2">&amp;</span><span class="ident">users</span>);
     }
 
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">get_profiles</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">room_id</span>: <span class="ident">Box</span><span class="op">&lt;</span><span class="ident">RoomId</span><span class="op">&gt;</span>) {
-        <span class="kw">let</span> <span class="ident">joined</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Box</span><span class="op">&lt;</span><span class="ident">UserId</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">store</span>.<span class="ident">get_joined_user_ids</span>(<span class="kw-2">&amp;</span><span class="ident">room_id</span>).<span class="kw">await</span>.<span class="ident">unwrap</span>();
+    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">get_profiles</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">room_id</span>: <span class="ident">OwnedRoomId</span>) {
+        <span class="kw">let</span> <span class="ident">joined</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">OwnedUserId</span><span class="op">&gt;</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">store</span>.<span class="ident">get_joined_user_ids</span>(<span class="kw-2">&amp;</span><span class="ident">room_id</span>).<span class="kw">await</span>.<span class="ident">unwrap</span>();
 
         <span class="kw">for</span> <span class="ident">member</span> <span class="kw">in</span> <span class="ident">joined</span> {
             <span class="kw">let</span> <span class="ident">event</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">store</span>.<span class="ident">get_profile</span>(<span class="kw-2">&amp;</span><span class="ident">room_id</span>, <span class="kw-2">&amp;</span><span class="ident">member</span>).<span class="kw">await</span>.<span class="ident">unwrap</span>();
@@ -624,8 +624,8 @@
         }
     }
 
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">get_members</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">room_id</span>: <span class="ident">Box</span><span class="op">&lt;</span><span class="ident">RoomId</span><span class="op">&gt;</span>) {
-        <span class="kw">let</span> <span class="ident">joined</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Box</span><span class="op">&lt;</span><span class="ident">UserId</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">store</span>.<span class="ident">get_joined_user_ids</span>(<span class="kw-2">&amp;</span><span class="ident">room_id</span>).<span class="kw">await</span>.<span class="ident">unwrap</span>();
+    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">get_members</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">room_id</span>: <span class="ident">OwnedRoomId</span>) {
+        <span class="kw">let</span> <span class="ident">joined</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">OwnedUserId</span><span class="op">&gt;</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">store</span>.<span class="ident">get_joined_user_ids</span>(<span class="kw-2">&amp;</span><span class="ident">room_id</span>).<span class="kw">await</span>.<span class="ident">unwrap</span>();
 
         <span class="kw">for</span> <span class="ident">member</span> <span class="kw">in</span> <span class="ident">joined</span> {
             <span class="kw">let</span> <span class="ident">event</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">store</span>.<span class="ident">get_member_event</span>(<span class="kw-2">&amp;</span><span class="ident">room_id</span>, <span class="kw-2">&amp;</span><span class="ident">member</span>).<span class="kw">await</span>.<span class="ident">unwrap</span>();
@@ -633,7 +633,7 @@
         }
     }
 
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">get_state</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">room_id</span>: <span class="ident">Box</span><span class="op">&lt;</span><span class="ident">RoomId</span><span class="op">&gt;</span>, <span class="ident">event_type</span>: <span class="ident">StateEventType</span>) {
+    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">get_state</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">room_id</span>: <span class="ident">OwnedRoomId</span>, <span class="ident">event_type</span>: <span class="ident">StateEventType</span>) {
         <span class="self">self</span>.<span class="ident">printer</span>.<span class="ident">pretty_print_struct</span>(
             <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">store</span>.<span class="ident">get_state_event</span>(<span class="kw-2">&amp;</span><span class="ident">room_id</span>, <span class="ident">event_type</span>, <span class="string">&quot;&quot;</span>).<span class="kw">await</span>.<span class="ident">unwrap</span>(),
         );

@@ -190,7 +190,7 @@
 <span class="kw">use</span> <span class="ident">std::sync::Arc</span>;
 
 <span class="kw">use</span> <span class="ident">dashmap::DashMap</span>;
-<span class="kw">use</span> <span class="ident">ruma</span>::{<span class="ident">DeviceId</span>, <span class="ident">TransactionId</span>, <span class="ident">UserId</span>};
+<span class="kw">use</span> <span class="ident">ruma</span>::{<span class="ident">DeviceId</span>, <span class="ident">OwnedTransactionId</span>, <span class="ident">OwnedUserId</span>, <span class="ident">TransactionId</span>, <span class="ident">UserId</span>};
 <span class="kw">use</span> <span class="ident">tracing::trace</span>;
 
 <span class="kw">use</span> <span class="kw">super</span>::{<span class="ident">event_enums::OutgoingContent</span>, <span class="ident">Sas</span>, <span class="ident">Verification</span>};
@@ -200,8 +200,8 @@
 
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">VerificationCache</span> {
-    <span class="ident">verification</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">DashMap</span><span class="op">&lt;</span><span class="ident">Box</span><span class="op">&lt;</span><span class="ident">UserId</span><span class="op">&gt;</span>, <span class="ident">DashMap</span><span class="op">&lt;</span><span class="ident">String</span>, <span class="ident">Verification</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-    <span class="ident">outgoing_requests</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">DashMap</span><span class="op">&lt;</span><span class="ident">Box</span><span class="op">&lt;</span><span class="ident">TransactionId</span><span class="op">&gt;</span>, <span class="ident">OutgoingRequest</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+    <span class="ident">verification</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">DashMap</span><span class="op">&lt;</span><span class="ident">OwnedUserId</span>, <span class="ident">DashMap</span><span class="op">&lt;</span><span class="ident">String</span>, <span class="ident">Verification</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+    <span class="ident">outgoing_requests</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">DashMap</span><span class="op">&lt;</span><span class="ident">OwnedTransactionId</span>, <span class="ident">OutgoingRequest</span><span class="op">&gt;</span><span class="op">&gt;</span>,
 }
 
 <span class="kw">impl</span> <span class="ident">VerificationCache</span> {

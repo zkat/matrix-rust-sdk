@@ -422,7 +422,7 @@
     },
     <span class="ident">room_id</span>,
     <span class="ident">serde::Raw</span>,
-    <span class="ident">RoomId</span>,
+    <span class="ident">OwnedRoomId</span>, <span class="ident">RoomId</span>,
 };
 <span class="kw">use</span> <span class="ident">serde_json::Value</span> <span class="kw">as</span> <span class="ident">JsonValue</span>;
 
@@ -500,11 +500,11 @@
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Default</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">EventBuilder</span> {
     <span class="doccomment">/// The events that determine the state of a `Room`.</span>
-    <span class="ident">joined_room_events</span>: <span class="ident">HashMap</span><span class="op">&lt;</span><span class="ident">Box</span><span class="op">&lt;</span><span class="ident">RoomId</span><span class="op">&gt;</span>, <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Raw</span><span class="op">&lt;</span><span class="ident">AnySyncRoomEvent</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+    <span class="ident">joined_room_events</span>: <span class="ident">HashMap</span><span class="op">&lt;</span><span class="ident">OwnedRoomId</span>, <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Raw</span><span class="op">&lt;</span><span class="ident">AnySyncRoomEvent</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span>,
     <span class="doccomment">/// The events that determine the state of a `Room`.</span>
-    <span class="ident">invited_room_events</span>: <span class="ident">HashMap</span><span class="op">&lt;</span><span class="ident">Box</span><span class="op">&lt;</span><span class="ident">RoomId</span><span class="op">&gt;</span>, <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Raw</span><span class="op">&lt;</span><span class="ident">AnySyncStateEvent</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+    <span class="ident">invited_room_events</span>: <span class="ident">HashMap</span><span class="op">&lt;</span><span class="ident">OwnedRoomId</span>, <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Raw</span><span class="op">&lt;</span><span class="ident">AnySyncStateEvent</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span>,
     <span class="doccomment">/// The events that determine the state of a `Room`.</span>
-    <span class="ident">left_room_events</span>: <span class="ident">HashMap</span><span class="op">&lt;</span><span class="ident">Box</span><span class="op">&lt;</span><span class="ident">RoomId</span><span class="op">&gt;</span>, <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Raw</span><span class="op">&lt;</span><span class="ident">AnySyncRoomEvent</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+    <span class="ident">left_room_events</span>: <span class="ident">HashMap</span><span class="op">&lt;</span><span class="ident">OwnedRoomId</span>, <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Raw</span><span class="op">&lt;</span><span class="ident">AnySyncRoomEvent</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span>,
     <span class="doccomment">/// The presence events that determine the presence state of a `RoomMember`.</span>
     <span class="ident">presence_events</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">PresenceEvent</span><span class="op">&gt;</span>,
     <span class="doccomment">/// The state events that determine the state of a `Room`.</span>
@@ -672,7 +672,7 @@
             }
         });
 
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">joined_rooms</span>: <span class="ident">HashMap</span><span class="op">&lt;</span><span class="ident">Box</span><span class="op">&lt;</span><span class="ident">RoomId</span><span class="op">&gt;</span>, <span class="ident">serde_json::Value</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">HashMap::new</span>();
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">joined_rooms</span> <span class="op">=</span> <span class="ident">HashMap::new</span>();
 
         <span class="ident">joined_rooms</span>.<span class="ident">insert</span>(<span class="ident">main_room_id</span>.<span class="ident">to_owned</span>(), <span class="ident">joined_room</span>);
 
@@ -701,7 +701,7 @@
             <span class="ident">joined_rooms</span>.<span class="ident">insert</span>(<span class="ident">room_id</span>, <span class="ident">joined_room</span>);
         }
 
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">left_rooms</span>: <span class="ident">HashMap</span><span class="op">&lt;</span><span class="ident">Box</span><span class="op">&lt;</span><span class="ident">RoomId</span><span class="op">&gt;</span>, <span class="ident">serde_json::Value</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">HashMap::new</span>();
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">left_rooms</span> <span class="op">=</span> <span class="ident">HashMap::new</span>();
 
         <span class="kw">for</span> (<span class="ident">room_id</span>, <span class="ident">events</span>) <span class="kw">in</span> <span class="self">self</span>.<span class="ident">left_room_events</span>.<span class="ident">drain</span>() {
             <span class="kw">let</span> <span class="ident">room</span> <span class="op">=</span> <span class="macro">serde_json::json!</span>({
@@ -717,7 +717,7 @@
             <span class="ident">left_rooms</span>.<span class="ident">insert</span>(<span class="ident">room_id</span>, <span class="ident">room</span>);
         }
 
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">invited_rooms</span>: <span class="ident">HashMap</span><span class="op">&lt;</span><span class="ident">Box</span><span class="op">&lt;</span><span class="ident">RoomId</span><span class="op">&gt;</span>, <span class="ident">serde_json::Value</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">HashMap::new</span>();
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">invited_rooms</span> <span class="op">=</span> <span class="ident">HashMap::new</span>();
 
         <span class="kw">for</span> (<span class="ident">room_id</span>, <span class="ident">events</span>) <span class="kw">in</span> <span class="self">self</span>.<span class="ident">invited_room_events</span>.<span class="ident">drain</span>() {
             <span class="kw">let</span> <span class="ident">room</span> <span class="op">=</span> <span class="macro">serde_json::json!</span>({

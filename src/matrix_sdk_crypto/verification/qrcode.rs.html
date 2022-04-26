@@ -1002,8 +1002,6 @@
 <span id="997">997</span>
 <span id="998">998</span>
 <span id="999">999</span>
-<span id="1000">1000</span>
-<span id="1001">1001</span>
 </pre><pre class="rust"><code><span class="comment">// Copyright 2021 The Matrix.org Foundation C.I.C.</span>
 <span class="comment">//</span>
 <span class="comment">// Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);</span>
@@ -1040,7 +1038,7 @@
         <span class="ident">AnyMessageLikeEventContent</span>, <span class="ident">AnyToDeviceEventContent</span>,
     },
     <span class="ident">serde::Base64</span>,
-    <span class="ident">DeviceId</span>, <span class="ident">RoomId</span>, <span class="ident">TransactionId</span>, <span class="ident">UserId</span>,
+    <span class="ident">DeviceId</span>, <span class="ident">OwnedDeviceId</span>, <span class="ident">OwnedUserId</span>, <span class="ident">RoomId</span>, <span class="ident">TransactionId</span>, <span class="ident">UserId</span>,
 };
 <span class="kw">use</span> <span class="ident">thiserror::Error</span>;
 <span class="kw">use</span> <span class="ident">tracing::trace</span>;
@@ -1078,11 +1076,11 @@
     <span class="doccomment">/// One of the users that is participating in this verification doesn&#39;t have</span>
     <span class="doccomment">/// a valid cross signing identity.</span>
     <span class="attribute">#[<span class="ident">error</span>(<span class="string">&quot;The user {0} is missing a valid cross signing identity&quot;</span>)]</span>
-    <span class="ident">MissingCrossSigningIdentity</span>(<span class="ident">Box</span><span class="op">&lt;</span><span class="ident">UserId</span><span class="op">&gt;</span>),
+    <span class="ident">MissingCrossSigningIdentity</span>(<span class="ident">OwnedUserId</span>),
     <span class="doccomment">/// The device of the user that is participating in this verification</span>
     <span class="doccomment">/// doesn&#39;t have a valid device key.</span>
     <span class="attribute">#[<span class="ident">error</span>(<span class="string">&quot;The user&#39;s {0} device {1} is not E2E capable&quot;</span>)]</span>
-    <span class="ident">MissingDeviceKeys</span>(<span class="ident">Box</span><span class="op">&lt;</span><span class="ident">UserId</span><span class="op">&gt;</span>, <span class="ident">Box</span><span class="op">&lt;</span><span class="ident">DeviceId</span><span class="op">&gt;</span>),
+    <span class="ident">MissingDeviceKeys</span>(<span class="ident">OwnedUserId</span>, <span class="ident">OwnedDeviceId</span>),
     <span class="doccomment">/// The ID uniquely identifying this verification flow didn&#39;t match to the</span>
     <span class="doccomment">/// one that has been scanned.</span>
     <span class="attribute">#[<span class="ident">error</span>(<span class="string">&quot;The unique verification flow id did not match (expected {expected}, found {found})&quot;</span>)]</span>
@@ -1514,8 +1512,8 @@
     <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">from_scan</span>(
         <span class="ident">store</span>: <span class="ident">VerificationStore</span>,
         <span class="ident">private_identity</span>: <span class="ident">PrivateCrossSigningIdentity</span>,
-        <span class="ident">other_user_id</span>: <span class="ident">Box</span><span class="op">&lt;</span><span class="ident">UserId</span><span class="op">&gt;</span>,
-        <span class="ident">other_device_id</span>: <span class="ident">Box</span><span class="op">&lt;</span><span class="ident">DeviceId</span><span class="op">&gt;</span>,
+        <span class="ident">other_user_id</span>: <span class="ident">OwnedUserId</span>,
+        <span class="ident">other_device_id</span>: <span class="ident">OwnedDeviceId</span>,
         <span class="ident">flow_id</span>: <span class="ident">FlowId</span>,
         <span class="ident">qr_code</span>: <span class="ident">QrVerificationData</span>,
         <span class="ident">we_started</span>: <span class="ident">bool</span>,
@@ -1667,7 +1665,7 @@
 
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>)]</span>
 <span class="kw">struct</span> <span class="ident">Reciprocated</span> {
-    <span class="ident">own_device_id</span>: <span class="ident">Box</span><span class="op">&lt;</span><span class="ident">DeviceId</span><span class="op">&gt;</span>,
+    <span class="ident">own_device_id</span>: <span class="ident">OwnedDeviceId</span>,
     <span class="ident">secret</span>: <span class="ident">Base64</span>,
 }
 
@@ -1919,9 +1917,7 @@
             <span class="ident">store</span>.<span class="ident">save_changes</span>(<span class="ident">changes</span>).<span class="kw">await</span>.<span class="ident">unwrap</span>();
 
             <span class="kw">let</span> <span class="ident">identities</span> <span class="op">=</span> <span class="ident">IdentitiesBeingVerified</span> {
-                <span class="ident">private_identity</span>: <span class="ident">PrivateCrossSigningIdentity::empty</span>(
-                    <span class="ident">alice_account</span>.<span class="ident">user_id</span>().<span class="ident">to_owned</span>(),
-                ),
+                <span class="ident">private_identity</span>: <span class="ident">PrivateCrossSigningIdentity::empty</span>(<span class="ident">alice_account</span>.<span class="ident">user_id</span>()),
                 <span class="ident">store</span>: <span class="ident">store</span>.<span class="ident">clone</span>(),
                 <span class="ident">device_being_verified</span>: <span class="ident">alice_device</span>.<span class="ident">clone</span>(),
                 <span class="ident">identity_being_verified</span>: <span class="prelude-val">Some</span>(<span class="ident">identity</span>.<span class="ident">clone</span>().<span class="ident">into</span>()),

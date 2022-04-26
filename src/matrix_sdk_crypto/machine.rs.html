@@ -2227,7 +2227,6 @@
 <span id="2222">2222</span>
 <span id="2223">2223</span>
 <span id="2224">2224</span>
-<span id="2225">2225</span>
 </pre><pre class="rust"><code><span class="comment">// Copyright 2020 The Matrix.org Foundation C.I.C.</span>
 <span class="comment">//</span>
 <span class="comment">// Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);</span>
@@ -2272,8 +2271,8 @@
         <span class="ident">secret::request::SecretName</span>,
         <span class="ident">AnyRoomEvent</span>, <span class="ident">AnyToDeviceEvent</span>, <span class="ident">MessageLikeEventContent</span>,
     },
-    <span class="ident">DeviceId</span>, <span class="ident">DeviceKeyAlgorithm</span>, <span class="ident">DeviceKeyId</span>, <span class="ident">EventEncryptionAlgorithm</span>, <span class="ident">RoomId</span>, <span class="ident">TransactionId</span>,
-    <span class="ident">UInt</span>, <span class="ident">UserId</span>,
+    <span class="ident">DeviceId</span>, <span class="ident">DeviceKeyAlgorithm</span>, <span class="ident">DeviceKeyId</span>, <span class="ident">EventEncryptionAlgorithm</span>, <span class="ident">OwnedDeviceId</span>,
+    <span class="ident">OwnedDeviceKeyId</span>, <span class="ident">OwnedTransactionId</span>, <span class="ident">OwnedUserId</span>, <span class="ident">RoomId</span>, <span class="ident">TransactionId</span>, <span class="ident">UInt</span>, <span class="ident">UserId</span>,
 };
 <span class="kw">use</span> <span class="ident">serde_json::Value</span>;
 <span class="kw">use</span> <span class="ident">tracing</span>::{<span class="ident">debug</span>, <span class="ident">error</span>, <span class="ident">info</span>, <span class="ident">trace</span>, <span class="ident">warn</span>};
@@ -2360,21 +2359,20 @@
     <span class="doccomment">/// * `device_id` - The unique id of the device that owns this machine.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">user_id</span>: <span class="kw-2">&amp;</span><span class="ident">UserId</span>, <span class="ident">device_id</span>: <span class="kw-2">&amp;</span><span class="ident">DeviceId</span>) -&gt; <span class="self">Self</span> {
         <span class="kw">let</span> <span class="ident">store</span>: <span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">CryptoStore</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">Box::new</span>(<span class="ident">MemoryStore::new</span>());
-        <span class="kw">let</span> <span class="ident">device_id</span>: <span class="ident">Box</span><span class="op">&lt;</span><span class="ident">DeviceId</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">device_id</span>.<span class="ident">into</span>();
-        <span class="kw">let</span> <span class="ident">account</span> <span class="op">=</span> <span class="ident">ReadOnlyAccount::new</span>(<span class="ident">user_id</span>, <span class="kw-2">&amp;</span><span class="ident">device_id</span>);
+        <span class="kw">let</span> <span class="ident">account</span> <span class="op">=</span> <span class="ident">ReadOnlyAccount::new</span>(<span class="ident">user_id</span>, <span class="ident">device_id</span>);
 
         <span class="ident">OlmMachine::new_helper</span>(
             <span class="ident">user_id</span>,
             <span class="ident">device_id</span>,
             <span class="ident">store</span>,
             <span class="ident">account</span>,
-            <span class="ident">PrivateCrossSigningIdentity::empty</span>(<span class="ident">user_id</span>.<span class="ident">to_owned</span>()),
+            <span class="ident">PrivateCrossSigningIdentity::empty</span>(<span class="ident">user_id</span>),
         )
     }
 
     <span class="kw">fn</span> <span class="ident">new_helper</span>(
         <span class="ident">user_id</span>: <span class="kw-2">&amp;</span><span class="ident">UserId</span>,
-        <span class="ident">device_id</span>: <span class="ident">Box</span><span class="op">&lt;</span><span class="ident">DeviceId</span><span class="op">&gt;</span>,
+        <span class="ident">device_id</span>: <span class="kw-2">&amp;</span><span class="ident">DeviceId</span>,
         <span class="ident">store</span>: <span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">CryptoStore</span><span class="op">&gt;</span>,
         <span class="ident">account</span>: <span class="ident">ReadOnlyAccount</span>,
         <span class="ident">user_identity</span>: <span class="ident">PrivateCrossSigningIdentity</span>,
@@ -2450,8 +2448,8 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// [`Cryptostore`]: trait.CryptoStore.html</span>
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">with_store</span>(
-        <span class="ident">user_id</span>: <span class="ident">Box</span><span class="op">&lt;</span><span class="ident">UserId</span><span class="op">&gt;</span>,
-        <span class="ident">device_id</span>: <span class="ident">Box</span><span class="op">&lt;</span><span class="ident">DeviceId</span><span class="op">&gt;</span>,
+        <span class="ident">user_id</span>: <span class="kw-2">&amp;</span><span class="ident">UserId</span>,
+        <span class="ident">device_id</span>: <span class="kw-2">&amp;</span><span class="ident">DeviceId</span>,
         <span class="ident">store</span>: <span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">CryptoStore</span><span class="op">&gt;</span>,
     ) -&gt; <span class="ident">StoreResult</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">account</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">store</span>.<span class="ident">load_account</span>().<span class="kw">await</span><span class="question-mark">?</span> {
@@ -2463,7 +2461,7 @@
                 <span class="ident">a</span>
             }
             <span class="prelude-val">None</span> =&gt; {
-                <span class="kw">let</span> <span class="ident">account</span> <span class="op">=</span> <span class="ident">ReadOnlyAccount::new</span>(<span class="kw-2">&amp;</span><span class="ident">user_id</span>, <span class="kw-2">&amp;</span><span class="ident">device_id</span>);
+                <span class="kw">let</span> <span class="ident">account</span> <span class="op">=</span> <span class="ident">ReadOnlyAccount::new</span>(<span class="ident">user_id</span>, <span class="ident">device_id</span>);
                 <span class="macro">debug!</span>(
                     <span class="ident">ed25519_key</span> <span class="op">=</span> <span class="ident">account</span>.<span class="ident">identity_keys</span>().<span class="ident">ed25519</span>.<span class="ident">to_base64</span>().<span class="ident">as_str</span>(),
                     <span class="string">&quot;Created a new Olm account&quot;</span>
@@ -2484,11 +2482,11 @@
             }
             <span class="prelude-val">None</span> =&gt; {
                 <span class="macro">debug!</span>(<span class="string">&quot;Creating an empty cross signing identity stub&quot;</span>);
-                <span class="ident">PrivateCrossSigningIdentity::empty</span>(<span class="ident">user_id</span>.<span class="ident">clone</span>())
+                <span class="ident">PrivateCrossSigningIdentity::empty</span>(<span class="ident">user_id</span>)
             }
         };
 
-        <span class="prelude-val">Ok</span>(<span class="ident">OlmMachine::new_helper</span>(<span class="kw-2">&amp;</span><span class="ident">user_id</span>, <span class="ident">device_id</span>, <span class="ident">store</span>, <span class="ident">account</span>, <span class="ident">identity</span>))
+        <span class="prelude-val">Ok</span>(<span class="ident">OlmMachine::new_helper</span>(<span class="ident">user_id</span>, <span class="ident">device_id</span>, <span class="ident">store</span>, <span class="ident">account</span>, <span class="ident">identity</span>))
     }
 
     <span class="doccomment">/// The unique user id that owns this `OlmMachine` instance.</span>
@@ -2512,7 +2510,7 @@
     }
 
     <span class="doccomment">/// Get all the tracked users we know about</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">tracked_users</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">HashSet</span><span class="op">&lt;</span><span class="ident">Box</span><span class="op">&lt;</span><span class="ident">UserId</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">tracked_users</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">HashSet</span><span class="op">&lt;</span><span class="ident">OwnedUserId</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">store</span>.<span class="ident">tracked_users</span>()
     }
 
@@ -2694,7 +2692,7 @@
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">get_missing_sessions</span>(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         <span class="ident">users</span>: <span class="kw">impl</span> <span class="ident">Iterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">UserId</span><span class="op">&gt;</span>,
-    ) -&gt; <span class="ident">StoreResult</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span>(<span class="ident">Box</span><span class="op">&lt;</span><span class="ident">TransactionId</span><span class="op">&gt;</span>, <span class="ident">KeysClaimRequest</span>)<span class="op">&gt;</span><span class="op">&gt;</span> {
+    ) -&gt; <span class="ident">StoreResult</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span>(<span class="ident">OwnedTransactionId</span>, <span class="ident">KeysClaimRequest</span>)<span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">session_manager</span>.<span class="ident">get_missing_sessions</span>(<span class="ident">users</span>).<span class="kw">await</span>
     }
 
@@ -3670,7 +3668,7 @@
     <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">sign_account</span>(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         <span class="ident">message</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>,
-        <span class="ident">signatures</span>: <span class="kw-2">&amp;mut</span> <span class="ident">BTreeMap</span><span class="op">&lt;</span><span class="ident">Box</span><span class="op">&lt;</span><span class="ident">UserId</span><span class="op">&gt;</span>, <span class="ident">BTreeMap</span><span class="op">&lt;</span><span class="ident">Box</span><span class="op">&lt;</span><span class="ident">DeviceKeyId</span><span class="op">&gt;</span>, <span class="ident">String</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+        <span class="ident">signatures</span>: <span class="kw-2">&amp;mut</span> <span class="ident">BTreeMap</span><span class="op">&lt;</span><span class="ident">OwnedUserId</span>, <span class="ident">BTreeMap</span><span class="op">&lt;</span><span class="ident">OwnedDeviceKeyId</span>, <span class="ident">String</span><span class="op">&gt;</span><span class="op">&gt;</span>,
     ) {
         <span class="kw">let</span> <span class="ident">device_key_id</span> <span class="op">=</span> <span class="ident">DeviceKeyId::from_parts</span>(<span class="ident">DeviceKeyAlgorithm::Ed25519</span>, <span class="self">self</span>.<span class="ident">device_id</span>());
         <span class="kw">let</span> <span class="ident">signature</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">account</span>.<span class="ident">sign</span>(<span class="ident">message</span>).<span class="kw">await</span>;
@@ -3684,11 +3682,11 @@
     <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">sign_master</span>(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         <span class="ident">message</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>,
-        <span class="ident">signatures</span>: <span class="kw-2">&amp;mut</span> <span class="ident">BTreeMap</span><span class="op">&lt;</span><span class="ident">Box</span><span class="op">&lt;</span><span class="ident">UserId</span><span class="op">&gt;</span>, <span class="ident">BTreeMap</span><span class="op">&lt;</span><span class="ident">Box</span><span class="op">&lt;</span><span class="ident">DeviceKeyId</span><span class="op">&gt;</span>, <span class="ident">String</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+        <span class="ident">signatures</span>: <span class="kw-2">&amp;mut</span> <span class="ident">BTreeMap</span><span class="op">&lt;</span><span class="ident">OwnedUserId</span>, <span class="ident">BTreeMap</span><span class="op">&lt;</span><span class="ident">OwnedDeviceKeyId</span>, <span class="ident">String</span><span class="op">&gt;</span><span class="op">&gt;</span>,
     ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident"><span class="kw">crate</span>::SignatureError</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">identity</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="self">self</span>.<span class="ident">user_identity</span>.<span class="ident">lock</span>().<span class="kw">await</span>;
 
-        <span class="kw">let</span> <span class="ident">master_key</span>: <span class="ident">Box</span><span class="op">&lt;</span><span class="ident">DeviceId</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">identity</span>
+        <span class="kw">let</span> <span class="ident">master_key</span>: <span class="ident">OwnedDeviceId</span> <span class="op">=</span> <span class="ident">identity</span>
             .<span class="ident">master_public_key</span>()
             .<span class="kw">await</span>
             .<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">m</span><span class="op">|</span> <span class="ident">m</span>.<span class="ident">get_first_key</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">k</span><span class="op">|</span> <span class="ident">k</span>.<span class="ident">to_owned</span>()))
@@ -3712,7 +3710,7 @@
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">sign</span>(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         <span class="ident">message</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>,
-    ) -&gt; <span class="ident">BTreeMap</span><span class="op">&lt;</span><span class="ident">Box</span><span class="op">&lt;</span><span class="ident">UserId</span><span class="op">&gt;</span>, <span class="ident">BTreeMap</span><span class="op">&lt;</span><span class="ident">Box</span><span class="op">&lt;</span><span class="ident">DeviceKeyId</span><span class="op">&gt;</span>, <span class="ident">String</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+    ) -&gt; <span class="ident">BTreeMap</span><span class="op">&lt;</span><span class="ident">OwnedUserId</span>, <span class="ident">BTreeMap</span><span class="op">&lt;</span><span class="ident">OwnedDeviceKeyId</span>, <span class="ident">String</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">signatures</span>: <span class="ident">BTreeMap</span><span class="op">&lt;</span><span class="kw">_</span>, <span class="ident">BTreeMap</span><span class="op">&lt;</span><span class="kw">_</span>, <span class="kw">_</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">BTreeMap::new</span>();
 
         <span class="self">self</span>.<span class="ident">sign_account</span>(<span class="ident">message</span>, <span class="kw-2">&amp;mut</span> <span class="ident">signatures</span>).<span class="kw">await</span>;
@@ -3771,7 +3769,7 @@
         },
         <span class="ident">room_id</span>,
         <span class="ident">serde::Raw</span>,
-        <span class="ident">uint</span>, <span class="ident">user_id</span>, <span class="ident">DeviceId</span>, <span class="ident">DeviceKeyAlgorithm</span>, <span class="ident">DeviceKeyId</span>, <span class="ident">UserId</span>,
+        <span class="ident">uint</span>, <span class="ident">user_id</span>, <span class="ident">DeviceId</span>, <span class="ident">DeviceKeyAlgorithm</span>, <span class="ident">DeviceKeyId</span>, <span class="ident">OwnedDeviceKeyId</span>, <span class="ident">UserId</span>,
     };
     <span class="kw">use</span> <span class="ident">serde_json::json</span>;
     <span class="kw">use</span> <span class="ident">vodozemac::Ed25519PublicKey</span>;
@@ -3785,7 +3783,7 @@
     };
 
     <span class="doccomment">/// These keys need to be periodically uploaded to the server.</span>
-    <span class="kw">type</span> <span class="ident">OneTimeKeys</span> <span class="op">=</span> <span class="ident">BTreeMap</span><span class="op">&lt;</span><span class="ident">Box</span><span class="op">&lt;</span><span class="ident">DeviceKeyId</span><span class="op">&gt;</span>, <span class="ident">Raw</span><span class="op">&lt;</span><span class="ident">OneTimeKey</span><span class="op">&gt;</span><span class="op">&gt;</span>;
+    <span class="kw">type</span> <span class="ident">OneTimeKeys</span> <span class="op">=</span> <span class="ident">BTreeMap</span><span class="op">&lt;</span><span class="ident">OwnedDeviceKeyId</span>, <span class="ident">Raw</span><span class="op">&lt;</span><span class="ident">OneTimeKey</span><span class="op">&gt;</span><span class="op">&gt;</span>;
 
     <span class="kw">fn</span> <span class="ident">alice_id</span>() -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">UserId</span> {
         <span class="macro">user_id!</span>(<span class="string">&quot;@alice:example.org&quot;</span>)

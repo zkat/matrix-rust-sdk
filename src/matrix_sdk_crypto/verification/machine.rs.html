@@ -670,7 +670,6 @@
 <span id="665">665</span>
 <span id="666">666</span>
 <span id="667">667</span>
-<span id="668">668</span>
 </pre><pre class="rust"><code><span class="comment">// Copyright 2020 The Matrix.org Foundation C.I.C.</span>
 <span class="comment">//</span>
 <span class="comment">// Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);</span>
@@ -698,7 +697,8 @@
         <span class="ident">ToDeviceEvent</span>,
     },
     <span class="ident">serde::Raw</span>,
-    <span class="ident">DeviceId</span>, <span class="ident">EventId</span>, <span class="ident">MilliSecondsSinceUnixEpoch</span>, <span class="ident">RoomId</span>, <span class="ident">TransactionId</span>, <span class="ident">UserId</span>,
+    <span class="ident">DeviceId</span>, <span class="ident">EventId</span>, <span class="ident">MilliSecondsSinceUnixEpoch</span>, <span class="ident">OwnedDeviceId</span>, <span class="ident">OwnedUserId</span>, <span class="ident">RoomId</span>,
+    <span class="ident">TransactionId</span>, <span class="ident">UserId</span>,
 };
 <span class="kw">use</span> <span class="ident">tracing</span>::{<span class="ident">info</span>, <span class="ident">trace</span>, <span class="ident">warn</span>};
 
@@ -722,7 +722,7 @@
     <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">private_identity</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">Mutex</span><span class="op">&lt;</span><span class="ident">PrivateCrossSigningIdentity</span><span class="op">&gt;</span><span class="op">&gt;</span>,
     <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">store</span>: <span class="ident">VerificationStore</span>,
     <span class="ident">verifications</span>: <span class="ident">VerificationCache</span>,
-    <span class="ident">requests</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">DashMap</span><span class="op">&lt;</span><span class="ident">Box</span><span class="op">&lt;</span><span class="ident">UserId</span><span class="op">&gt;</span>, <span class="ident">DashMap</span><span class="op">&lt;</span><span class="ident">String</span>, <span class="ident">VerificationRequest</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+    <span class="ident">requests</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">DashMap</span><span class="op">&lt;</span><span class="ident">OwnedUserId</span>, <span class="ident">DashMap</span><span class="op">&lt;</span><span class="ident">String</span>, <span class="ident">VerificationRequest</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span>,
 }
 
 <span class="kw">impl</span> <span class="ident">VerificationMachine</span> {
@@ -750,7 +750,7 @@
     <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">request_to_device_verification</span>(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         <span class="ident">user_id</span>: <span class="kw-2">&amp;</span><span class="ident">UserId</span>,
-        <span class="ident">recipient_devices</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Box</span><span class="op">&lt;</span><span class="ident">DeviceId</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+        <span class="ident">recipient_devices</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">OwnedDeviceId</span><span class="op">&gt;</span>,
         <span class="ident">methods</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">VerificationMethod</span><span class="op">&gt;</span><span class="op">&gt;</span>,
     ) -&gt; (<span class="ident">VerificationRequest</span>, <span class="ident">OutgoingVerificationRequest</span>) {
         <span class="kw">let</span> <span class="ident">flow_id</span> <span class="op">=</span> <span class="ident">FlowId::from</span>(<span class="ident">TransactionId::new</span>());
@@ -1239,11 +1239,10 @@
 
         <span class="kw">let</span> <span class="ident">bob_store</span> <span class="op">=</span> <span class="ident">VerificationStore</span> { <span class="ident">account</span>: <span class="ident">bob</span>, <span class="ident">inner</span>: <span class="ident">Arc::new</span>(<span class="ident">bob_store</span>) };
 
-        <span class="kw">let</span> <span class="ident">identity</span> <span class="op">=</span>
-            <span class="ident">Arc::new</span>(<span class="ident">Mutex::new</span>(<span class="ident">PrivateCrossSigningIdentity::empty</span>(<span class="ident">alice_id</span>().<span class="ident">to_owned</span>())));
+        <span class="kw">let</span> <span class="ident">identity</span> <span class="op">=</span> <span class="ident">Arc::new</span>(<span class="ident">Mutex::new</span>(<span class="ident">PrivateCrossSigningIdentity::empty</span>(<span class="ident">alice_id</span>())));
         <span class="kw">let</span> <span class="ident">machine</span> <span class="op">=</span> <span class="ident">VerificationMachine::new</span>(<span class="ident">alice</span>, <span class="ident">identity</span>, <span class="ident">Arc::new</span>(<span class="ident">store</span>));
         <span class="kw">let</span> (<span class="ident">bob_sas</span>, <span class="ident">start_content</span>) <span class="op">=</span> <span class="ident">Sas::start</span>(
-            <span class="ident">PrivateCrossSigningIdentity::empty</span>(<span class="ident">bob_id</span>().<span class="ident">to_owned</span>()),
+            <span class="ident">PrivateCrossSigningIdentity::empty</span>(<span class="ident">bob_id</span>()),
             <span class="ident">alice_device</span>,
             <span class="ident">bob_store</span>,
             <span class="prelude-val">None</span>,
@@ -1264,8 +1263,7 @@
     <span class="attribute">#[<span class="ident">async_test</span>]</span>
     <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">create</span>() {
         <span class="kw">let</span> <span class="ident">alice</span> <span class="op">=</span> <span class="ident">ReadOnlyAccount::new</span>(<span class="ident">alice_id</span>(), <span class="ident">alice_device_id</span>());
-        <span class="kw">let</span> <span class="ident">identity</span> <span class="op">=</span>
-            <span class="ident">Arc::new</span>(<span class="ident">Mutex::new</span>(<span class="ident">PrivateCrossSigningIdentity::empty</span>(<span class="ident">alice_id</span>().<span class="ident">to_owned</span>())));
+        <span class="kw">let</span> <span class="ident">identity</span> <span class="op">=</span> <span class="ident">Arc::new</span>(<span class="ident">Mutex::new</span>(<span class="ident">PrivateCrossSigningIdentity::empty</span>(<span class="ident">alice_id</span>())));
         <span class="kw">let</span> <span class="ident">store</span> <span class="op">=</span> <span class="ident">MemoryStore::new</span>();
         <span class="kw">let</span> <span class="kw">_</span> <span class="op">=</span> <span class="ident">VerificationMachine::new</span>(<span class="ident">alice</span>, <span class="ident">identity</span>, <span class="ident">Arc::new</span>(<span class="ident">store</span>));
     }

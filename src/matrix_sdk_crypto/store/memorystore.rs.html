@@ -416,6 +416,8 @@
 <span id="411">411</span>
 <span id="412">412</span>
 <span id="413">413</span>
+<span id="414">414</span>
+<span id="415">415</span>
 </pre><pre class="rust"><code><span class="comment">// Copyright 2020 The Matrix.org Foundation C.I.C.</span>
 <span class="comment">//</span>
 <span class="comment">// Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);</span>
@@ -437,7 +439,9 @@
 
 <span class="kw">use</span> <span class="ident">dashmap</span>::{<span class="ident">DashMap</span>, <span class="ident">DashSet</span>};
 <span class="kw">use</span> <span class="ident">matrix_sdk_common</span>::{<span class="ident">async_trait</span>, <span class="ident">locks::Mutex</span>};
-<span class="kw">use</span> <span class="ident">ruma</span>::{<span class="ident">DeviceId</span>, <span class="ident">RoomId</span>, <span class="ident">TransactionId</span>, <span class="ident">UserId</span>};
+<span class="kw">use</span> <span class="ident">ruma</span>::{
+    <span class="ident">DeviceId</span>, <span class="ident">OwnedDeviceId</span>, <span class="ident">OwnedTransactionId</span>, <span class="ident">OwnedUserId</span>, <span class="ident">RoomId</span>, <span class="ident">TransactionId</span>, <span class="ident">UserId</span>,
+};
 
 <span class="kw">use</span> <span class="kw">super</span>::{
     <span class="ident">caches</span>::{<span class="ident">DeviceStore</span>, <span class="ident">GroupSessionStore</span>, <span class="ident">SessionStore</span>},
@@ -464,13 +468,13 @@
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">MemoryStore</span> {
     <span class="ident">sessions</span>: <span class="ident">SessionStore</span>,
     <span class="ident">inbound_group_sessions</span>: <span class="ident">GroupSessionStore</span>,
-    <span class="ident">tracked_users</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">DashSet</span><span class="op">&lt;</span><span class="ident">Box</span><span class="op">&lt;</span><span class="ident">UserId</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-    <span class="ident">users_for_key_query</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">DashSet</span><span class="op">&lt;</span><span class="ident">Box</span><span class="op">&lt;</span><span class="ident">UserId</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+    <span class="ident">tracked_users</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">DashSet</span><span class="op">&lt;</span><span class="ident">OwnedUserId</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+    <span class="ident">users_for_key_query</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">DashSet</span><span class="op">&lt;</span><span class="ident">OwnedUserId</span><span class="op">&gt;</span><span class="op">&gt;</span>,
     <span class="ident">olm_hashes</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">DashMap</span><span class="op">&lt;</span><span class="ident">String</span>, <span class="ident">DashSet</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span>,
     <span class="ident">devices</span>: <span class="ident">DeviceStore</span>,
-    <span class="ident">identities</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">DashMap</span><span class="op">&lt;</span><span class="ident">Box</span><span class="op">&lt;</span><span class="ident">UserId</span><span class="op">&gt;</span>, <span class="ident">ReadOnlyUserIdentities</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-    <span class="ident">outgoing_key_requests</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">DashMap</span><span class="op">&lt;</span><span class="ident">Box</span><span class="op">&lt;</span><span class="ident">TransactionId</span><span class="op">&gt;</span>, <span class="ident">GossipRequest</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-    <span class="ident">key_requests_by_info</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">DashMap</span><span class="op">&lt;</span><span class="ident">String</span>, <span class="ident">Box</span><span class="op">&lt;</span><span class="ident">TransactionId</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+    <span class="ident">identities</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">DashMap</span><span class="op">&lt;</span><span class="ident">OwnedUserId</span>, <span class="ident">ReadOnlyUserIdentities</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+    <span class="ident">outgoing_key_requests</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">DashMap</span><span class="op">&lt;</span><span class="ident">OwnedTransactionId</span>, <span class="ident">GossipRequest</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+    <span class="ident">key_requests_by_info</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">DashMap</span><span class="op">&lt;</span><span class="ident">String</span>, <span class="ident">OwnedTransactionId</span><span class="op">&gt;</span><span class="op">&gt;</span>,
 }
 
 <span class="kw">impl</span> <span class="ident">Default</span> <span class="kw">for</span> <span class="ident">MemoryStore</span> {
@@ -625,11 +629,11 @@
         <span class="op">!</span><span class="self">self</span>.<span class="ident">users_for_key_query</span>.<span class="ident">is_empty</span>()
     }
 
-    <span class="kw">fn</span> <span class="ident">users_for_key_query</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">HashSet</span><span class="op">&lt;</span><span class="ident">Box</span><span class="op">&lt;</span><span class="ident">UserId</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">users_for_key_query</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">HashSet</span><span class="op">&lt;</span><span class="ident">OwnedUserId</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">users_for_key_query</span>.<span class="ident">iter</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">u</span><span class="op">|</span> <span class="ident">u</span>.<span class="ident">clone</span>()).<span class="ident">collect</span>()
     }
 
-    <span class="kw">fn</span> <span class="ident">tracked_users</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">HashSet</span><span class="op">&lt;</span><span class="ident">Box</span><span class="op">&lt;</span><span class="ident">UserId</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">tracked_users</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">HashSet</span><span class="op">&lt;</span><span class="ident">OwnedUserId</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">tracked_users</span>.<span class="ident">iter</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">u</span><span class="op">|</span> <span class="ident">u</span>.<span class="ident">to_owned</span>()).<span class="ident">collect</span>()
     }
 
@@ -666,7 +670,7 @@
     <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">get_user_devices</span>(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         <span class="ident">user_id</span>: <span class="kw-2">&amp;</span><span class="ident">UserId</span>,
-    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">HashMap</span><span class="op">&lt;</span><span class="ident">Box</span><span class="op">&lt;</span><span class="ident">DeviceId</span><span class="op">&gt;</span>, <span class="ident">ReadOnlyDevice</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">HashMap</span><span class="op">&lt;</span><span class="ident">OwnedDeviceId</span>, <span class="ident">ReadOnlyDevice</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="prelude-val">Ok</span>(<span class="self">self</span>.<span class="ident">devices</span>.<span class="ident">user_devices</span>(<span class="ident">user_id</span>))
     }
 

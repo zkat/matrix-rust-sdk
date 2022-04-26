@@ -852,7 +852,8 @@
 <span class="kw">use</span> <span class="ident">futures_util::future::join_all</span>;
 <span class="kw">use</span> <span class="ident">matrix_sdk_common::executor::spawn</span>;
 <span class="kw">use</span> <span class="ident">ruma</span>::{
-    <span class="ident">api::client::keys::get_keys::v3::Response</span> <span class="kw">as</span> <span class="ident">KeysQueryResponse</span>, <span class="ident">serde::Raw</span>, <span class="ident">DeviceId</span>, <span class="ident">UserId</span>,
+    <span class="ident">api::client::keys::get_keys::v3::Response</span> <span class="kw">as</span> <span class="ident">KeysQueryResponse</span>, <span class="ident">serde::Raw</span>, <span class="ident">DeviceId</span>,
+    <span class="ident">OwnedDeviceId</span>, <span class="ident">OwnedUserId</span>, <span class="ident">UserId</span>,
 };
 <span class="kw">use</span> <span class="ident">tracing</span>::{<span class="ident">debug</span>, <span class="ident">info</span>, <span class="ident">trace</span>, <span class="ident">warn</span>};
 
@@ -1034,14 +1035,14 @@
         <span class="ident">store</span>: <span class="ident">Store</span>,
         <span class="ident">own_user_id</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">UserId</span><span class="op">&gt;</span>,
         <span class="ident">own_device_id</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">DeviceId</span><span class="op">&gt;</span>,
-        <span class="ident">user_id</span>: <span class="ident">Box</span><span class="op">&lt;</span><span class="ident">UserId</span><span class="op">&gt;</span>,
-        <span class="ident">device_map</span>: <span class="ident">BTreeMap</span><span class="op">&lt;</span><span class="ident">Box</span><span class="op">&lt;</span><span class="ident">DeviceId</span><span class="op">&gt;</span>, <span class="ident">Raw</span><span class="op">&lt;</span><span class="ident">ruma::encryption::DeviceKeys</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+        <span class="ident">user_id</span>: <span class="ident">OwnedUserId</span>,
+        <span class="ident">device_map</span>: <span class="ident">BTreeMap</span><span class="op">&lt;</span><span class="ident">OwnedDeviceId</span>, <span class="ident">Raw</span><span class="op">&lt;</span><span class="ident">ruma::encryption::DeviceKeys</span><span class="op">&gt;</span><span class="op">&gt;</span>,
     ) -&gt; <span class="ident">StoreResult</span><span class="op">&lt;</span><span class="ident">DeviceChanges</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">own_device_id</span> <span class="op">=</span> (<span class="kw-2">*</span><span class="ident">own_device_id</span>).<span class="ident">to_owned</span>();
 
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">changes</span> <span class="op">=</span> <span class="ident">DeviceChanges::default</span>();
 
-        <span class="kw">let</span> <span class="ident">current_devices</span>: <span class="ident">HashSet</span><span class="op">&lt;</span><span class="ident">Box</span><span class="op">&lt;</span><span class="ident">DeviceId</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">device_map</span>.<span class="ident">keys</span>().<span class="ident">cloned</span>().<span class="ident">collect</span>();
+        <span class="kw">let</span> <span class="ident">current_devices</span>: <span class="ident">HashSet</span><span class="op">&lt;</span><span class="ident">OwnedDeviceId</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">device_map</span>.<span class="ident">keys</span>().<span class="ident">cloned</span>().<span class="ident">collect</span>();
 
         <span class="kw">let</span> <span class="ident">tasks</span> <span class="op">=</span> <span class="ident">device_map</span>.<span class="ident">into_iter</span>().<span class="ident">filter_map</span>(<span class="op">|</span>(<span class="ident">device_id</span>, <span class="ident">device_keys</span>)<span class="op">|</span> <span class="kw">match</span> <span class="ident">device_keys</span>
             .<span class="ident">deserialize_as</span>::<span class="op">&lt;</span><span class="ident">DeviceKeys</span><span class="op">&gt;</span>(
@@ -1083,9 +1084,9 @@
             }
         }
 
-        <span class="kw">let</span> <span class="ident">current_devices</span>: <span class="ident">HashSet</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">Box</span><span class="op">&lt;</span><span class="ident">DeviceId</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">current_devices</span>.<span class="ident">iter</span>().<span class="ident">collect</span>();
+        <span class="kw">let</span> <span class="ident">current_devices</span>: <span class="ident">HashSet</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">OwnedDeviceId</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">current_devices</span>.<span class="ident">iter</span>().<span class="ident">collect</span>();
         <span class="kw">let</span> <span class="ident">stored_devices</span> <span class="op">=</span> <span class="ident">store</span>.<span class="ident">get_readonly_devices_unfiltered</span>(<span class="kw-2">&amp;</span><span class="ident">user_id</span>).<span class="kw">await</span><span class="question-mark">?</span>;
-        <span class="kw">let</span> <span class="ident">stored_devices_set</span>: <span class="ident">HashSet</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">Box</span><span class="op">&lt;</span><span class="ident">DeviceId</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">stored_devices</span>.<span class="ident">keys</span>().<span class="ident">collect</span>();
+        <span class="kw">let</span> <span class="ident">stored_devices_set</span>: <span class="ident">HashSet</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">OwnedDeviceId</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">stored_devices</span>.<span class="ident">keys</span>().<span class="ident">collect</span>();
         <span class="kw">let</span> <span class="ident">deleted_devices_set</span> <span class="op">=</span> <span class="ident">stored_devices_set</span>.<span class="ident">difference</span>(<span class="kw-2">&amp;</span><span class="ident">current_devices</span>);
 
         <span class="kw">for</span> <span class="ident">device_id</span> <span class="kw">in</span> <span class="ident">deleted_devices_set</span> {
@@ -1116,8 +1117,8 @@
     <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">handle_devices_from_key_query</span>(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         <span class="ident">device_keys_map</span>: <span class="ident">BTreeMap</span><span class="op">&lt;</span>
-            <span class="ident">Box</span><span class="op">&lt;</span><span class="ident">UserId</span><span class="op">&gt;</span>,
-            <span class="ident">BTreeMap</span><span class="op">&lt;</span><span class="ident">Box</span><span class="op">&lt;</span><span class="ident">DeviceId</span><span class="op">&gt;</span>, <span class="ident">Raw</span><span class="op">&lt;</span><span class="ident">ruma::encryption::DeviceKeys</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+            <span class="ident">OwnedUserId</span>,
+            <span class="ident">BTreeMap</span><span class="op">&lt;</span><span class="ident">OwnedDeviceId</span>, <span class="ident">Raw</span><span class="op">&lt;</span><span class="ident">ruma::encryption::DeviceKeys</span><span class="op">&gt;</span><span class="op">&gt;</span>,
         <span class="op">&gt;</span>,
     ) -&gt; <span class="ident">StoreResult</span><span class="op">&lt;</span><span class="ident">DeviceChanges</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">changes</span> <span class="op">=</span> <span class="ident">DeviceChanges::default</span>();
@@ -1320,7 +1321,7 @@
         <span class="kw">if</span> <span class="ident">users</span>.<span class="ident">is_empty</span>() {
             <span class="ident">Vec::new</span>()
         } <span class="kw">else</span> {
-            <span class="kw">let</span> <span class="ident">users</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Box</span><span class="op">&lt;</span><span class="ident">UserId</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">users</span>.<span class="ident">into_iter</span>().<span class="ident">collect</span>();
+            <span class="kw">let</span> <span class="ident">users</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">OwnedUserId</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">users</span>.<span class="ident">into_iter</span>().<span class="ident">collect</span>();
 
             <span class="ident">users</span>
                 .<span class="ident">chunks</span>(<span class="ident"><span class="self">Self</span>::MAX_KEY_QUERY_USERS</span>)
@@ -1405,8 +1406,7 @@
     }
 
     <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">manager</span>() -&gt; <span class="ident">IdentityManager</span> {
-        <span class="kw">let</span> <span class="ident">identity</span> <span class="op">=</span>
-            <span class="ident">Arc::new</span>(<span class="ident">Mutex::new</span>(<span class="ident">PrivateCrossSigningIdentity::empty</span>(<span class="ident">user_id</span>().<span class="ident">to_owned</span>())));
+        <span class="kw">let</span> <span class="ident">identity</span> <span class="op">=</span> <span class="ident">Arc::new</span>(<span class="ident">Mutex::new</span>(<span class="ident">PrivateCrossSigningIdentity::empty</span>(<span class="ident">user_id</span>())));
         <span class="kw">let</span> <span class="ident">user_id</span> <span class="op">=</span> <span class="ident">Arc::from</span>(<span class="ident">user_id</span>());
         <span class="kw">let</span> <span class="ident">account</span> <span class="op">=</span> <span class="ident">ReadOnlyAccount::new</span>(<span class="kw-2">&amp;</span><span class="ident">user_id</span>, <span class="ident">device_id</span>());
         <span class="kw">let</span> <span class="ident">store</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">CryptoStore</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">Arc::new</span>(<span class="ident">MemoryStore::new</span>());

@@ -259,7 +259,7 @@
     <span class="ident">stream</span>::{<span class="ident">BoxStream</span>, <span class="ident">Stream</span>},
     <span class="ident">task</span>::{<span class="ident">Context</span>, <span class="ident">Poll</span>},
 };
-<span class="kw">use</span> <span class="ident">ruma::EventId</span>;
+<span class="kw">use</span> <span class="ident">ruma::OwnedEventId</span>;
 <span class="kw">use</span> <span class="ident">thiserror::Error</span>;
 <span class="kw">use</span> <span class="ident">tracing::trace</span>;
 
@@ -290,7 +290,7 @@
     <span class="ident">receiver</span>: <span class="ident">mpsc::Receiver</span><span class="op">&lt;</span><span class="ident">TimelineSlice</span><span class="op">&gt;</span>,
     <span class="ident">stored_events</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">BoxStream</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">SyncRoomEvent</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span>,
     <span class="ident">pending</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">SyncRoomEvent</span><span class="op">&gt;</span>,
-    <span class="ident">event_ids</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">DashSet</span><span class="op">&lt;</span><span class="ident">Box</span><span class="op">&lt;</span><span class="ident">EventId</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+    <span class="ident">event_ids</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">DashSet</span><span class="op">&lt;</span><span class="ident">OwnedEventId</span><span class="op">&gt;</span><span class="op">&gt;</span>,
     <span class="ident">token</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
 }
 
@@ -325,7 +325,7 @@
     <span class="doccomment">/// * `stored_events` - A stream of events that are currently stored</span>
     <span class="doccomment">///   locally.</span>
     <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">new</span>(
-        <span class="ident">event_ids</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">DashSet</span><span class="op">&lt;</span><span class="ident">Box</span><span class="op">&lt;</span><span class="ident">EventId</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+        <span class="ident">event_ids</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">DashSet</span><span class="op">&lt;</span><span class="ident">OwnedEventId</span><span class="op">&gt;</span><span class="op">&gt;</span>,
         <span class="ident">token</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
         <span class="ident">stored_events</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">BoxStream</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">SyncRoomEvent</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span>,
     ) -&gt; (<span class="self">Self</span>, <span class="ident">mpsc::Sender</span><span class="op">&lt;</span><span class="ident">TimelineSlice</span><span class="op">&gt;</span>) {
@@ -422,7 +422,7 @@
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">TimelineStreamForward</span> {
     <span class="ident">receiver</span>: <span class="ident">mpsc::Receiver</span><span class="op">&lt;</span><span class="ident">TimelineSlice</span><span class="op">&gt;</span>,
     <span class="ident">pending</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">SyncRoomEvent</span><span class="op">&gt;</span>,
-    <span class="ident">event_ids</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">DashSet</span><span class="op">&lt;</span><span class="ident">Box</span><span class="op">&lt;</span><span class="ident">EventId</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+    <span class="ident">event_ids</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">DashSet</span><span class="op">&lt;</span><span class="ident">OwnedEventId</span><span class="op">&gt;</span><span class="op">&gt;</span>,
 }
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">tarpaulin_include</span>))]</span>
@@ -449,7 +449,7 @@
     <span class="doccomment">///   This should be shared</span>
     <span class="doccomment">/// between the `TimelineStreamBackward` and `TimelineStreamForward` stream.</span>
     <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">new</span>(
-        <span class="ident">event_ids</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">DashSet</span><span class="op">&lt;</span><span class="ident">Box</span><span class="op">&lt;</span><span class="ident">EventId</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+        <span class="ident">event_ids</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">DashSet</span><span class="op">&lt;</span><span class="ident">OwnedEventId</span><span class="op">&gt;</span><span class="op">&gt;</span>,
     ) -&gt; (<span class="self">Self</span>, <span class="ident">mpsc::Sender</span><span class="op">&lt;</span><span class="ident">TimelineSlice</span><span class="op">&gt;</span>) {
         <span class="kw">let</span> (<span class="ident">sender</span>, <span class="ident">receiver</span>) <span class="op">=</span> <span class="ident">mpsc::channel</span>(<span class="ident">CHANNEL_LIMIT</span>);
         <span class="kw">let</span> <span class="ident">self_</span> <span class="op">=</span> <span class="self">Self</span> { <span class="ident">event_ids</span>, <span class="ident">pending</span>: <span class="ident">Vec::new</span>(), <span class="ident">receiver</span> };

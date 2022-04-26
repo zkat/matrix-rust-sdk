@@ -364,7 +364,7 @@
         <span class="ident">AnyToDeviceEventContent</span>,
     },
     <span class="ident">to_device::DeviceIdOrAllDevices</span>,
-    <span class="ident">DeviceId</span>, <span class="ident">TransactionId</span>, <span class="ident">UserId</span>,
+    <span class="ident">DeviceId</span>, <span class="ident">OwnedDeviceId</span>, <span class="ident">OwnedTransactionId</span>, <span class="ident">OwnedUserId</span>, <span class="ident">TransactionId</span>, <span class="ident">UserId</span>,
 };
 <span class="kw">use</span> <span class="ident">serde</span>::{<span class="ident">Deserialize</span>, <span class="ident">Serialize</span>};
 <span class="kw">use</span> <span class="ident">thiserror::Error</span>;
@@ -399,9 +399,9 @@
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>, <span class="ident">Serialize</span>, <span class="ident">Deserialize</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">GossipRequest</span> {
     <span class="doccomment">/// The user we requested the secret from</span>
-    <span class="kw">pub</span> <span class="ident">request_recipient</span>: <span class="ident">Box</span><span class="op">&lt;</span><span class="ident">UserId</span><span class="op">&gt;</span>,
+    <span class="kw">pub</span> <span class="ident">request_recipient</span>: <span class="ident">OwnedUserId</span>,
     <span class="doccomment">/// The unique id of the secret request.</span>
-    <span class="kw">pub</span> <span class="ident">request_id</span>: <span class="ident">Box</span><span class="op">&lt;</span><span class="ident">TransactionId</span><span class="op">&gt;</span>,
+    <span class="kw">pub</span> <span class="ident">request_id</span>: <span class="ident">OwnedTransactionId</span>,
     <span class="doccomment">/// The info of the requested secret.</span>
     <span class="kw">pub</span> <span class="ident">info</span>: <span class="ident">SecretInfo</span>,
     <span class="doccomment">/// Has the request been sent out.</span>
@@ -448,7 +448,7 @@
 
 <span class="kw">impl</span> <span class="ident">GossipRequest</span> {
     <span class="doccomment">/// Create an ougoing secret request for the given secret.</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">from_secret_name</span>(<span class="ident">own_user_id</span>: <span class="ident">Box</span><span class="op">&lt;</span><span class="ident">UserId</span><span class="op">&gt;</span>, <span class="ident">secret_name</span>: <span class="ident">SecretName</span>) -&gt; <span class="self">Self</span> {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">from_secret_name</span>(<span class="ident">own_user_id</span>: <span class="ident">OwnedUserId</span>, <span class="ident">secret_name</span>: <span class="ident">SecretName</span>) -&gt; <span class="self">Self</span> {
         <span class="self">Self</span> {
             <span class="ident">request_recipient</span>: <span class="ident">own_user_id</span>,
             <span class="ident">request_id</span>: <span class="ident">TransactionId::new</span>(),
@@ -592,16 +592,16 @@
 
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>, <span class="ident">PartialEq</span>, <span class="ident">Eq</span>, <span class="ident">Hash</span>)]</span>
 <span class="kw">struct</span> <span class="ident">RequestInfo</span> {
-    <span class="ident">sender</span>: <span class="ident">Box</span><span class="op">&lt;</span><span class="ident">UserId</span><span class="op">&gt;</span>,
-    <span class="ident">requesting_device_id</span>: <span class="ident">Box</span><span class="op">&lt;</span><span class="ident">DeviceId</span><span class="op">&gt;</span>,
-    <span class="ident">request_id</span>: <span class="ident">Box</span><span class="op">&lt;</span><span class="ident">TransactionId</span><span class="op">&gt;</span>,
+    <span class="ident">sender</span>: <span class="ident">OwnedUserId</span>,
+    <span class="ident">requesting_device_id</span>: <span class="ident">OwnedDeviceId</span>,
+    <span class="ident">request_id</span>: <span class="ident">OwnedTransactionId</span>,
 }
 
 <span class="kw">impl</span> <span class="ident">RequestInfo</span> {
     <span class="kw">fn</span> <span class="ident">new</span>(
-        <span class="ident">sender</span>: <span class="ident">Box</span><span class="op">&lt;</span><span class="ident">UserId</span><span class="op">&gt;</span>,
-        <span class="ident">requesting_device_id</span>: <span class="ident">Box</span><span class="op">&lt;</span><span class="ident">DeviceId</span><span class="op">&gt;</span>,
-        <span class="ident">request_id</span>: <span class="ident">Box</span><span class="op">&lt;</span><span class="ident">TransactionId</span><span class="op">&gt;</span>,
+        <span class="ident">sender</span>: <span class="ident">OwnedUserId</span>,
+        <span class="ident">requesting_device_id</span>: <span class="ident">OwnedDeviceId</span>,
+        <span class="ident">request_id</span>: <span class="ident">OwnedTransactionId</span>,
     ) -&gt; <span class="self">Self</span> {
         <span class="self">Self</span> { <span class="ident">sender</span>, <span class="ident">requesting_device_id</span>, <span class="ident">request_id</span> }
     }
@@ -613,7 +613,7 @@
 <span class="kw">struct</span> <span class="ident">WaitQueue</span> {
     <span class="ident">requests_waiting_for_session</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">DashMap</span><span class="op">&lt;</span><span class="ident">RequestInfo</span>, <span class="ident">RequestEvent</span><span class="op">&gt;</span><span class="op">&gt;</span>,
     <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy::type_complexity</span>)]</span>
-    <span class="ident">requests_ids_waiting</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">DashMap</span><span class="op">&lt;</span>(<span class="ident">Box</span><span class="op">&lt;</span><span class="ident">UserId</span><span class="op">&gt;</span>, <span class="ident">Box</span><span class="op">&lt;</span><span class="ident">DeviceId</span><span class="op">&gt;</span>), <span class="ident">DashSet</span><span class="op">&lt;</span><span class="ident">Box</span><span class="op">&lt;</span><span class="ident">TransactionId</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+    <span class="ident">requests_ids_waiting</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">DashMap</span><span class="op">&lt;</span>(<span class="ident">OwnedUserId</span>, <span class="ident">OwnedDeviceId</span>), <span class="ident">DashSet</span><span class="op">&lt;</span><span class="ident">OwnedTransactionId</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span>,
 }
 
 <span class="kw">impl</span> <span class="ident">WaitQueue</span> {

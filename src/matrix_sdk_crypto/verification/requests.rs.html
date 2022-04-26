@@ -1546,7 +1546,7 @@
         <span class="ident">AnyMessageLikeEventContent</span>, <span class="ident">AnyToDeviceEventContent</span>,
     },
     <span class="ident">to_device::DeviceIdOrAllDevices</span>,
-    <span class="ident">DeviceId</span>, <span class="ident">RoomId</span>, <span class="ident">TransactionId</span>, <span class="ident">UserId</span>,
+    <span class="ident">DeviceId</span>, <span class="ident">OwnedDeviceId</span>, <span class="ident">OwnedUserId</span>, <span class="ident">RoomId</span>, <span class="ident">TransactionId</span>, <span class="ident">UserId</span>,
 };
 <span class="kw">use</span> <span class="ident">tracing</span>::{<span class="ident">info</span>, <span class="ident">trace</span>, <span class="ident">warn</span>};
 
@@ -1593,7 +1593,7 @@
     <span class="ident">inner</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">Mutex</span><span class="op">&lt;</span><span class="ident">InnerRequest</span><span class="op">&gt;</span><span class="op">&gt;</span>,
     <span class="ident">creation_time</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">Instant</span><span class="op">&gt;</span>,
     <span class="ident">we_started</span>: <span class="ident">bool</span>,
-    <span class="ident">recipient_devices</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Box</span><span class="op">&lt;</span><span class="ident">DeviceId</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+    <span class="ident">recipient_devices</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">OwnedDeviceId</span><span class="op">&gt;</span><span class="op">&gt;</span>,
 }
 
 <span class="doccomment">/// A handle to a request so child verification flows can cancel the request.</span>
@@ -1629,7 +1629,7 @@
         <span class="ident">store</span>: <span class="ident">VerificationStore</span>,
         <span class="ident">flow_id</span>: <span class="ident">FlowId</span>,
         <span class="ident">other_user</span>: <span class="kw-2">&amp;</span><span class="ident">UserId</span>,
-        <span class="ident">recipient_devices</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Box</span><span class="op">&lt;</span><span class="ident">DeviceId</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+        <span class="ident">recipient_devices</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">OwnedDeviceId</span><span class="op">&gt;</span>,
         <span class="ident">methods</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">VerificationMethod</span><span class="op">&gt;</span><span class="op">&gt;</span>,
     ) -&gt; <span class="self">Self</span> {
         <span class="kw">let</span> <span class="ident">account</span> <span class="op">=</span> <span class="ident">store</span>.<span class="ident">account</span>.<span class="ident">clone</span>();
@@ -1648,7 +1648,7 @@
             <span class="ident">verification_cache</span>: <span class="ident">cache</span>,
             <span class="ident">flow_id</span>: <span class="ident">flow_id</span>.<span class="ident">into</span>(),
             <span class="ident">inner</span>,
-            <span class="ident">other_user_id</span>: <span class="ident">other_user</span>.<span class="ident">to_owned</span>().<span class="ident">into</span>(),
+            <span class="ident">other_user_id</span>: <span class="ident">other_user</span>.<span class="ident">into</span>(),
             <span class="ident">creation_time</span>: <span class="ident">Instant::now</span>().<span class="ident">into</span>(),
             <span class="ident">we_started</span>: <span class="bool-val">true</span>,
             <span class="ident">recipient_devices</span>: <span class="ident">recipient_devices</span>.<span class="ident">into</span>(),
@@ -1718,7 +1718,7 @@
     }
 
     <span class="doccomment">/// The id of the other device that is participating in this verification.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">other_device_id</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Box</span><span class="op">&lt;</span><span class="ident">DeviceId</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">other_device_id</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">OwnedDeviceId</span><span class="op">&gt;</span> {
         <span class="kw">match</span> <span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">lock</span>().<span class="ident">unwrap</span>() {
             <span class="ident">InnerRequest::Requested</span>(<span class="ident">r</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">r</span>.<span class="ident">state</span>.<span class="ident">other_device_id</span>.<span class="ident">clone</span>()),
             <span class="ident">InnerRequest::Ready</span>(<span class="ident">r</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">r</span>.<span class="ident">state</span>.<span class="ident">other_device_id</span>.<span class="ident">clone</span>()),
@@ -1885,7 +1885,7 @@
                 <span class="ident">content</span>,
             )))),
             <span class="ident">account</span>,
-            <span class="ident">other_user_id</span>: <span class="ident">sender</span>.<span class="ident">to_owned</span>().<span class="ident">into</span>(),
+            <span class="ident">other_user_id</span>: <span class="ident">sender</span>.<span class="ident">into</span>(),
             <span class="ident">flow_id</span>: <span class="ident">flow_id</span>.<span class="ident">into</span>(),
             <span class="ident">we_started</span>: <span class="bool-val">false</span>,
             <span class="ident">creation_time</span>: <span class="ident">Instant::now</span>().<span class="ident">into</span>(),
@@ -2034,7 +2034,7 @@
         <span class="kw">let</span> <span class="ident">cancel_content</span> <span class="op">=</span> <span class="ident">cancelled</span>.<span class="ident">as_content</span>(<span class="self">self</span>.<span class="ident">flow_id</span>());
 
         <span class="kw">if</span> <span class="kw">let</span> <span class="ident">OutgoingContent::ToDevice</span>(<span class="ident">c</span>) <span class="op">=</span> <span class="ident">cancel_content</span> {
-            <span class="kw">let</span> <span class="ident">recipients</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Box</span><span class="op">&lt;</span><span class="ident">DeviceId</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="op">=</span> <span class="self">self</span>
+            <span class="kw">let</span> <span class="ident">recipients</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">OwnedDeviceId</span><span class="op">&gt;</span> <span class="op">=</span> <span class="self">self</span>
                 .<span class="ident">recipient_devices</span>
                 .<span class="ident">iter</span>()
                 .<span class="ident">filter</span>(<span class="op">|</span><span class="kw-2">&amp;</span><span class="ident">d</span><span class="op">|</span> <span class="ident">filter_device</span>.<span class="ident">map_or</span>(<span class="bool-val">true</span>, <span class="op">|</span><span class="ident">device</span><span class="op">|</span> <span class="kw-2">*</span><span class="kw-2">*</span><span class="ident">d</span> <span class="op">!</span><span class="op">=</span> <span class="kw-2">*</span><span class="ident">device</span>))
@@ -2279,7 +2279,7 @@
     <span class="ident">flow_id</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">FlowId</span><span class="op">&gt;</span>,
 
     <span class="doccomment">/// The id of the user which is participating in this verification request.</span>
-    <span class="kw">pub</span> <span class="ident">other_user_id</span>: <span class="ident">Box</span><span class="op">&lt;</span><span class="ident">UserId</span><span class="op">&gt;</span>,
+    <span class="kw">pub</span> <span class="ident">other_user_id</span>: <span class="ident">OwnedUserId</span>,
 
     <span class="doccomment">/// The verification request state we are in.</span>
     <span class="ident">state</span>: <span class="ident">S</span>,
@@ -2363,7 +2363,7 @@
     <span class="kw">pub</span> <span class="ident">their_methods</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">VerificationMethod</span><span class="op">&gt;</span>,
 
     <span class="doccomment">/// The device id of the device that responded to the verification request.</span>
-    <span class="kw">pub</span> <span class="ident">other_device_id</span>: <span class="ident">Box</span><span class="op">&lt;</span><span class="ident">DeviceId</span><span class="op">&gt;</span>,
+    <span class="kw">pub</span> <span class="ident">other_device_id</span>: <span class="ident">OwnedDeviceId</span>,
 }
 
 <span class="kw">impl</span> <span class="ident">RequestState</span><span class="op">&lt;</span><span class="ident">Requested</span><span class="op">&gt;</span> {
@@ -2449,7 +2449,7 @@
     <span class="kw">pub</span> <span class="ident">our_methods</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">VerificationMethod</span><span class="op">&gt;</span>,
 
     <span class="doccomment">/// The device id of the device that responded to the verification request.</span>
-    <span class="kw">pub</span> <span class="ident">other_device_id</span>: <span class="ident">Box</span><span class="op">&lt;</span><span class="ident">DeviceId</span><span class="op">&gt;</span>,
+    <span class="kw">pub</span> <span class="ident">other_device_id</span>: <span class="ident">OwnedDeviceId</span>,
 }
 
 <span class="kw">impl</span> <span class="ident">RequestState</span><span class="op">&lt;</span><span class="ident">Ready</span><span class="op">&gt;</span> {
@@ -2781,7 +2781,7 @@
 <span class="kw">struct</span> <span class="ident">Passive</span> {
     <span class="doccomment">/// The device id of the device that responded to the verification request.</span>
     <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">dead_code</span>)]</span>
-    <span class="kw">pub</span> <span class="ident">other_device_id</span>: <span class="ident">Box</span><span class="op">&lt;</span><span class="ident">DeviceId</span><span class="op">&gt;</span>,
+    <span class="kw">pub</span> <span class="ident">other_device_id</span>: <span class="ident">OwnedDeviceId</span>,
 }
 
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>)]</span>
@@ -2830,13 +2830,13 @@
 
         <span class="kw">let</span> <span class="ident">alice</span> <span class="op">=</span> <span class="ident">ReadOnlyAccount::new</span>(<span class="ident">alice_id</span>(), <span class="ident">alice_device_id</span>());
         <span class="kw">let</span> <span class="ident">alice_store</span>: <span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">CryptoStore</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">Box::new</span>(<span class="ident">MemoryStore::new</span>());
-        <span class="kw">let</span> <span class="ident">alice_identity</span> <span class="op">=</span> <span class="ident">PrivateCrossSigningIdentity::empty</span>(<span class="ident">alice_id</span>().<span class="ident">to_owned</span>());
+        <span class="kw">let</span> <span class="ident">alice_identity</span> <span class="op">=</span> <span class="ident">PrivateCrossSigningIdentity::empty</span>(<span class="ident">alice_id</span>());
 
         <span class="kw">let</span> <span class="ident">alice_store</span> <span class="op">=</span> <span class="ident">VerificationStore</span> { <span class="ident">account</span>: <span class="ident">alice</span>, <span class="ident">inner</span>: <span class="ident">alice_store</span>.<span class="ident">into</span>() };
 
         <span class="kw">let</span> <span class="ident">bob</span> <span class="op">=</span> <span class="ident">ReadOnlyAccount::new</span>(<span class="ident">bob_id</span>(), <span class="ident">bob_device_id</span>());
         <span class="kw">let</span> <span class="ident">bob_store</span>: <span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">CryptoStore</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">Box::new</span>(<span class="ident">MemoryStore::new</span>());
-        <span class="kw">let</span> <span class="ident">bob_identity</span> <span class="op">=</span> <span class="ident">PrivateCrossSigningIdentity::empty</span>(<span class="ident">alice_id</span>().<span class="ident">to_owned</span>());
+        <span class="kw">let</span> <span class="ident">bob_identity</span> <span class="op">=</span> <span class="ident">PrivateCrossSigningIdentity::empty</span>(<span class="ident">alice_id</span>());
 
         <span class="kw">let</span> <span class="ident">bob_store</span> <span class="op">=</span> <span class="ident">VerificationStore</span> { <span class="ident">account</span>: <span class="ident">bob</span>.<span class="ident">clone</span>(), <span class="ident">inner</span>: <span class="ident">bob_store</span>.<span class="ident">into</span>() };
 
@@ -2883,14 +2883,14 @@
         <span class="kw">let</span> <span class="ident">alice_device</span> <span class="op">=</span> <span class="ident">ReadOnlyDevice::from_account</span>(<span class="kw-2">&amp;</span><span class="ident">alice</span>).<span class="kw">await</span>;
 
         <span class="kw">let</span> <span class="ident">alice_store</span>: <span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">CryptoStore</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">Box::new</span>(<span class="ident">MemoryStore::new</span>());
-        <span class="kw">let</span> <span class="ident">alice_identity</span> <span class="op">=</span> <span class="ident">PrivateCrossSigningIdentity::empty</span>(<span class="ident">alice_id</span>().<span class="ident">to_owned</span>());
+        <span class="kw">let</span> <span class="ident">alice_identity</span> <span class="op">=</span> <span class="ident">PrivateCrossSigningIdentity::empty</span>(<span class="ident">alice_id</span>());
 
         <span class="kw">let</span> <span class="ident">alice_store</span> <span class="op">=</span> <span class="ident">VerificationStore</span> { <span class="ident">account</span>: <span class="ident">alice</span>.<span class="ident">clone</span>(), <span class="ident">inner</span>: <span class="ident">alice_store</span>.<span class="ident">into</span>() };
 
         <span class="kw">let</span> <span class="ident">bob</span> <span class="op">=</span> <span class="ident">ReadOnlyAccount::new</span>(<span class="ident">bob_id</span>(), <span class="ident">bob_device_id</span>());
         <span class="kw">let</span> <span class="ident">bob_device</span> <span class="op">=</span> <span class="ident">ReadOnlyDevice::from_account</span>(<span class="kw-2">&amp;</span><span class="ident">bob</span>).<span class="kw">await</span>;
         <span class="kw">let</span> <span class="ident">bob_store</span>: <span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">CryptoStore</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">Box::new</span>(<span class="ident">MemoryStore::new</span>());
-        <span class="kw">let</span> <span class="ident">bob_identity</span> <span class="op">=</span> <span class="ident">PrivateCrossSigningIdentity::empty</span>(<span class="ident">alice_id</span>().<span class="ident">to_owned</span>());
+        <span class="kw">let</span> <span class="ident">bob_identity</span> <span class="op">=</span> <span class="ident">PrivateCrossSigningIdentity::empty</span>(<span class="ident">alice_id</span>());
 
         <span class="kw">let</span> <span class="ident">bob_store</span> <span class="op">=</span> <span class="ident">VerificationStore</span> { <span class="ident">account</span>: <span class="ident">bob</span>.<span class="ident">clone</span>(), <span class="ident">inner</span>: <span class="ident">bob_store</span>.<span class="ident">into</span>() };
 
@@ -2953,14 +2953,14 @@
         <span class="kw">let</span> <span class="ident">alice_device</span> <span class="op">=</span> <span class="ident">ReadOnlyDevice::from_account</span>(<span class="kw-2">&amp;</span><span class="ident">alice</span>).<span class="kw">await</span>;
 
         <span class="kw">let</span> <span class="ident">alice_store</span>: <span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">CryptoStore</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">Box::new</span>(<span class="ident">MemoryStore::new</span>());
-        <span class="kw">let</span> <span class="ident">alice_identity</span> <span class="op">=</span> <span class="ident">PrivateCrossSigningIdentity::empty</span>(<span class="ident">alice_id</span>().<span class="ident">to_owned</span>());
+        <span class="kw">let</span> <span class="ident">alice_identity</span> <span class="op">=</span> <span class="ident">PrivateCrossSigningIdentity::empty</span>(<span class="ident">alice_id</span>());
 
         <span class="kw">let</span> <span class="ident">alice_store</span> <span class="op">=</span> <span class="ident">VerificationStore</span> { <span class="ident">account</span>: <span class="ident">alice</span>.<span class="ident">clone</span>(), <span class="ident">inner</span>: <span class="ident">alice_store</span>.<span class="ident">into</span>() };
 
         <span class="kw">let</span> <span class="ident">bob</span> <span class="op">=</span> <span class="ident">ReadOnlyAccount::new</span>(<span class="ident">bob_id</span>(), <span class="ident">bob_device_id</span>());
         <span class="kw">let</span> <span class="ident">bob_device</span> <span class="op">=</span> <span class="ident">ReadOnlyDevice::from_account</span>(<span class="kw-2">&amp;</span><span class="ident">bob</span>).<span class="kw">await</span>;
         <span class="kw">let</span> <span class="ident">bob_store</span>: <span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">CryptoStore</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">Box::new</span>(<span class="ident">MemoryStore::new</span>());
-        <span class="kw">let</span> <span class="ident">bob_identity</span> <span class="op">=</span> <span class="ident">PrivateCrossSigningIdentity::empty</span>(<span class="ident">alice_id</span>().<span class="ident">to_owned</span>());
+        <span class="kw">let</span> <span class="ident">bob_identity</span> <span class="op">=</span> <span class="ident">PrivateCrossSigningIdentity::empty</span>(<span class="ident">alice_id</span>());
 
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">changes</span> <span class="op">=</span> <span class="ident">Changes::default</span>();
         <span class="ident">changes</span>.<span class="ident">devices</span>.<span class="ident">new</span>.<span class="ident">push</span>(<span class="ident">bob_device</span>.<span class="ident">clone</span>());

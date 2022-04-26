@@ -349,7 +349,7 @@
     },
     <span class="ident">assign</span>,
     <span class="ident">events::EventContent</span>,
-    <span class="ident">TransactionId</span>, <span class="ident">UserId</span>,
+    <span class="ident">OwnedTransactionId</span>, <span class="ident">UserId</span>,
 };
 <span class="kw">use</span> <span class="ident">serde_json::json</span>;
 
@@ -497,8 +497,8 @@
     }
 }
 
-<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span>(<span class="ident">Box</span><span class="op">&lt;</span><span class="ident">TransactionId</span><span class="op">&gt;</span>, <span class="ident">KeysClaimRequest</span>)<span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Request</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">request_tuple</span>: (<span class="ident">Box</span><span class="op">&lt;</span><span class="ident">TransactionId</span><span class="op">&gt;</span>, <span class="ident">KeysClaimRequest</span>)) -&gt; <span class="self">Self</span> {
+<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span>(<span class="ident">OwnedTransactionId</span>, <span class="ident">KeysClaimRequest</span>)<span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Request</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">request_tuple</span>: (<span class="ident">OwnedTransactionId</span>, <span class="ident">KeysClaimRequest</span>)) -&gt; <span class="self">Self</span> {
         <span class="kw">let</span> (<span class="ident">request_id</span>, <span class="ident">request</span>) <span class="op">=</span> <span class="ident">request_tuple</span>;
 
         <span class="ident">Request::KeysClaim</span> {

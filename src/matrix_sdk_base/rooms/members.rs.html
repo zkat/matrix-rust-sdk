@@ -121,8 +121,6 @@
 <span id="116">116</span>
 <span id="117">117</span>
 <span id="118">118</span>
-<span id="119">119</span>
-<span id="120">120</span>
 </pre><pre class="rust"><code><span class="comment">// Copyright 2020 The Matrix.org Foundation C.I.C.</span>
 <span class="comment">//</span>
 <span class="comment">// Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);</span>
@@ -143,19 +141,17 @@
     <span class="ident">events</span>::{
         <span class="ident">presence::PresenceEvent</span>,
         <span class="ident">room</span>::{
-            <span class="ident">member</span>::{<span class="ident">MembershipState</span>, <span class="ident">RoomMemberEventContent</span>},
+            <span class="ident">member</span>::{<span class="ident">MembershipState</span>, <span class="ident">OriginalSyncRoomMemberEvent</span>, <span class="ident">RoomMemberEventContent</span>},
             <span class="ident">power_levels::SyncRoomPowerLevelsEvent</span>,
         },
     },
     <span class="ident">MxcUri</span>, <span class="ident">UserId</span>,
 };
 
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::deserialized_responses::MemberEvent</span>;
-
 <span class="doccomment">/// A member of a room.</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">RoomMember</span> {
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">event</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">MemberEvent</span><span class="op">&gt;</span>,
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">event</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">OriginalSyncRoomMemberEvent</span><span class="op">&gt;</span>,
     <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">profile</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">RoomMemberEventContent</span><span class="op">&gt;</span><span class="op">&gt;</span>,
     <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">dead_code</span>)]</span>
     <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">presence</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">PresenceEvent</span><span class="op">&gt;</span><span class="op">&gt;</span>,

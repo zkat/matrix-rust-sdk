@@ -219,20 +219,20 @@
 
 <span class="kw">use</span> <span class="ident">std::collections::BTreeMap</span>;
 
-<span class="kw">use</span> <span class="ident">ruma</span>::{<span class="ident">encryption::KeyUsage</span>, <span class="ident">serde::Raw</span>, <span class="ident">DeviceKeyAlgorithm</span>, <span class="ident">DeviceKeyId</span>, <span class="ident">UserId</span>};
+<span class="kw">use</span> <span class="ident">ruma</span>::{<span class="ident">encryption::KeyUsage</span>, <span class="ident">serde::Raw</span>, <span class="ident">DeviceKeyAlgorithm</span>, <span class="ident">OwnedDeviceKeyId</span>, <span class="ident">OwnedUserId</span>};
 <span class="kw">use</span> <span class="ident">serde</span>::{<span class="ident">Deserialize</span>, <span class="ident">Serialize</span>};
 <span class="kw">use</span> <span class="ident">serde_json</span>::{<span class="ident">value::to_raw_value</span>, <span class="ident">Value</span>};
 <span class="kw">use</span> <span class="ident">vodozemac::Ed25519PublicKey</span>;
 
 <span class="doccomment">/// Signatures for a `CrossSigningKey` object.</span>
-<span class="kw">pub</span> <span class="kw">type</span> <span class="ident">CrossSigningKeySignatures</span> <span class="op">=</span> <span class="ident">BTreeMap</span><span class="op">&lt;</span><span class="ident">Box</span><span class="op">&lt;</span><span class="ident">UserId</span><span class="op">&gt;</span>, <span class="ident">BTreeMap</span><span class="op">&lt;</span><span class="ident">Box</span><span class="op">&lt;</span><span class="ident">DeviceKeyId</span><span class="op">&gt;</span>, <span class="ident">String</span><span class="op">&gt;</span><span class="op">&gt;</span>;
+<span class="kw">pub</span> <span class="kw">type</span> <span class="ident">CrossSigningKeySignatures</span> <span class="op">=</span> <span class="ident">BTreeMap</span><span class="op">&lt;</span><span class="ident">OwnedUserId</span>, <span class="ident">BTreeMap</span><span class="op">&lt;</span><span class="ident">OwnedDeviceKeyId</span>, <span class="ident">String</span><span class="op">&gt;</span><span class="op">&gt;</span>;
 
 <span class="doccomment">/// A cross signing key.</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>)]</span>
 <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">try_from</span> <span class="op">=</span> <span class="string">&quot;CrossSigningKeyHelper&quot;</span>, <span class="ident">into</span> <span class="op">=</span> <span class="string">&quot;CrossSigningKeyHelper&quot;</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">CrossSigningKey</span> {
     <span class="doccomment">/// The ID of the user the key belongs to.</span>
-    <span class="kw">pub</span> <span class="ident">user_id</span>: <span class="ident">Box</span><span class="op">&lt;</span><span class="ident">UserId</span><span class="op">&gt;</span>,
+    <span class="kw">pub</span> <span class="ident">user_id</span>: <span class="ident">OwnedUserId</span>,
 
     <span class="doccomment">/// What the key is used for.</span>
     <span class="kw">pub</span> <span class="ident">usage</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">KeyUsage</span><span class="op">&gt;</span>,
@@ -240,7 +240,7 @@
     <span class="doccomment">/// The public key.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// The object must have exactly one property.</span>
-    <span class="kw">pub</span> <span class="ident">keys</span>: <span class="ident">BTreeMap</span><span class="op">&lt;</span><span class="ident">Box</span><span class="op">&lt;</span><span class="ident">DeviceKeyId</span><span class="op">&gt;</span>, <span class="ident">SigningKey</span><span class="op">&gt;</span>,
+    <span class="kw">pub</span> <span class="ident">keys</span>: <span class="ident">BTreeMap</span><span class="op">&lt;</span><span class="ident">OwnedDeviceKeyId</span>, <span class="ident">SigningKey</span><span class="op">&gt;</span>,
 
     <span class="doccomment">/// Signatures of the key.</span>
     <span class="doccomment">///</span>
@@ -256,9 +256,9 @@
     <span class="doccomment">/// Creates a new `CrossSigningKey` with the given user ID, usage, keys and</span>
     <span class="doccomment">/// signatures.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(
-        <span class="ident">user_id</span>: <span class="ident">Box</span><span class="op">&lt;</span><span class="ident">UserId</span><span class="op">&gt;</span>,
+        <span class="ident">user_id</span>: <span class="ident">OwnedUserId</span>,
         <span class="ident">usage</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">KeyUsage</span><span class="op">&gt;</span>,
-        <span class="ident">keys</span>: <span class="ident">BTreeMap</span><span class="op">&lt;</span><span class="ident">Box</span><span class="op">&lt;</span><span class="ident">DeviceKeyId</span><span class="op">&gt;</span>, <span class="ident">SigningKey</span><span class="op">&gt;</span>,
+        <span class="ident">keys</span>: <span class="ident">BTreeMap</span><span class="op">&lt;</span><span class="ident">OwnedDeviceKeyId</span>, <span class="ident">SigningKey</span><span class="op">&gt;</span>,
         <span class="ident">signatures</span>: <span class="ident">CrossSigningKeySignatures</span>,
     ) -&gt; <span class="self">Self</span> {
         <span class="self">Self</span> { <span class="ident">user_id</span>, <span class="ident">usage</span>, <span class="ident">keys</span>, <span class="ident">signatures</span>, <span class="ident">other</span>: <span class="ident">BTreeMap::new</span>() }
@@ -301,9 +301,9 @@
 
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>)]</span>
 <span class="kw">struct</span> <span class="ident">CrossSigningKeyHelper</span> {
-    <span class="kw">pub</span> <span class="ident">user_id</span>: <span class="ident">Box</span><span class="op">&lt;</span><span class="ident">UserId</span><span class="op">&gt;</span>,
+    <span class="kw">pub</span> <span class="ident">user_id</span>: <span class="ident">OwnedUserId</span>,
     <span class="kw">pub</span> <span class="ident">usage</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">KeyUsage</span><span class="op">&gt;</span>,
-    <span class="kw">pub</span> <span class="ident">keys</span>: <span class="ident">BTreeMap</span><span class="op">&lt;</span><span class="ident">Box</span><span class="op">&lt;</span><span class="ident">DeviceKeyId</span><span class="op">&gt;</span>, <span class="ident">String</span><span class="op">&gt;</span>,
+    <span class="kw">pub</span> <span class="ident">keys</span>: <span class="ident">BTreeMap</span><span class="op">&lt;</span><span class="ident">OwnedDeviceKeyId</span>, <span class="ident">String</span><span class="op">&gt;</span>,
     <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">default</span>, <span class="ident">skip_serializing_if</span> <span class="op">=</span> <span class="string">&quot;BTreeMap::is_empty&quot;</span>)]</span>
     <span class="kw">pub</span> <span class="ident">signatures</span>: <span class="ident">CrossSigningKeySignatures</span>,
     <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">flatten</span>)]</span>
@@ -314,7 +314,7 @@
     <span class="kw">type</span> <span class="ident">Error</span> <span class="op">=</span> <span class="ident">vodozemac::KeyError</span>;
 
     <span class="kw">fn</span> <span class="ident">try_from</span>(<span class="ident">value</span>: <span class="ident">CrossSigningKeyHelper</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident"><span class="self">Self</span>::Error</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">keys</span>: <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">BTreeMap</span><span class="op">&lt;</span><span class="ident">Box</span><span class="op">&lt;</span><span class="ident">DeviceKeyId</span><span class="op">&gt;</span>, <span class="ident">SigningKey</span><span class="op">&gt;</span>, <span class="ident">vodozemac::KeyError</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">value</span>
+        <span class="kw">let</span> <span class="ident">keys</span>: <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">BTreeMap</span><span class="op">&lt;</span><span class="ident">OwnedDeviceKeyId</span>, <span class="ident">SigningKey</span><span class="op">&gt;</span>, <span class="ident">vodozemac::KeyError</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">value</span>
             .<span class="ident">keys</span>
             .<span class="ident">into_iter</span>()
             .<span class="ident">map</span>(<span class="op">|</span>(<span class="ident">k</span>, <span class="ident">v</span>)<span class="op">|</span> {
@@ -341,7 +341,7 @@
 
 <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">CrossSigningKey</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">CrossSigningKeyHelper</span> {
     <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">value</span>: <span class="ident">CrossSigningKey</span>) -&gt; <span class="self">Self</span> {
-        <span class="kw">let</span> <span class="ident">keys</span>: <span class="ident">BTreeMap</span><span class="op">&lt;</span><span class="ident">Box</span><span class="op">&lt;</span><span class="ident">DeviceKeyId</span><span class="op">&gt;</span>, <span class="ident">String</span><span class="op">&gt;</span> <span class="op">=</span>
+        <span class="kw">let</span> <span class="ident">keys</span>: <span class="ident">BTreeMap</span><span class="op">&lt;</span><span class="ident">OwnedDeviceKeyId</span>, <span class="ident">String</span><span class="op">&gt;</span> <span class="op">=</span>
             <span class="ident">value</span>.<span class="ident">keys</span>.<span class="ident">into_iter</span>().<span class="ident">map</span>(<span class="op">|</span>(<span class="ident">k</span>, <span class="ident">v</span>)<span class="op">|</span> (<span class="ident">k</span>, <span class="ident">v</span>.<span class="ident">to_base64</span>())).<span class="ident">collect</span>();
 
         <span class="self">Self</span> {

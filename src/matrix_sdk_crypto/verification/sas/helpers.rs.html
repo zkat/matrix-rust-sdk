@@ -586,7 +586,7 @@
         <span class="ident">AnyMessageLikeEventContent</span>, <span class="ident">AnyToDeviceEventContent</span>,
     },
     <span class="ident">serde::Base64</span>,
-    <span class="ident">DeviceKeyAlgorithm</span>, <span class="ident">DeviceKeyId</span>, <span class="ident">UserId</span>,
+    <span class="ident">DeviceKeyAlgorithm</span>, <span class="ident">DeviceKeyId</span>, <span class="ident">OwnedDeviceKeyId</span>, <span class="ident">UserId</span>,
 };
 <span class="kw">use</span> <span class="ident">sha2</span>::{<span class="ident">Digest</span>, <span class="ident">Sha256</span>};
 <span class="kw">use</span> <span class="ident">tracing</span>::{<span class="ident">trace</span>, <span class="ident">warn</span>};
@@ -784,7 +784,7 @@
             <span class="ident">ids</span>.<span class="ident">other_device</span>.<span class="ident">device_id</span>()
         );
 
-        <span class="kw">let</span> <span class="ident">key_id</span>: <span class="ident">Box</span><span class="op">&lt;</span><span class="ident">DeviceKeyId</span><span class="op">&gt;</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">key_id</span>.<span class="ident">as_str</span>().<span class="ident">try_into</span>() {
+        <span class="kw">let</span> <span class="ident">key_id</span>: <span class="ident">OwnedDeviceKeyId</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">key_id</span>.<span class="ident">as_str</span>().<span class="ident">try_into</span>() {
             <span class="prelude-val">Ok</span>(<span class="ident">id</span>) =&gt; <span class="ident">id</span>,
             <span class="prelude-val">Err</span>(<span class="kw">_</span>) =&gt; <span class="kw">continue</span>,
         };

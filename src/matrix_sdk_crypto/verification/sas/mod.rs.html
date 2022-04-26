@@ -706,7 +706,7 @@
         <span class="ident">key::verification</span>::{<span class="ident">cancel::CancelCode</span>, <span class="ident">ShortAuthenticationString</span>},
         <span class="ident">AnyMessageLikeEventContent</span>, <span class="ident">AnyToDeviceEventContent</span>,
     },
-    <span class="ident">DeviceId</span>, <span class="ident">EventId</span>, <span class="ident">RoomId</span>, <span class="ident">TransactionId</span>, <span class="ident">UserId</span>,
+    <span class="ident">DeviceId</span>, <span class="ident">OwnedEventId</span>, <span class="ident">OwnedRoomId</span>, <span class="ident">OwnedTransactionId</span>, <span class="ident">RoomId</span>, <span class="ident">TransactionId</span>, <span class="ident">UserId</span>,
 };
 <span class="kw">use</span> <span class="ident">tracing::trace</span>;
 
@@ -868,7 +868,7 @@
         <span class="ident">store</span>: <span class="ident">VerificationStore</span>,
         <span class="ident">own_identity</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ReadOnlyOwnUserIdentity</span><span class="op">&gt;</span>,
         <span class="ident">other_identity</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ReadOnlyUserIdentities</span><span class="op">&gt;</span>,
-        <span class="ident">transaction_id</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Box</span><span class="op">&lt;</span><span class="ident">TransactionId</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+        <span class="ident">transaction_id</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">OwnedTransactionId</span><span class="op">&gt;</span>,
         <span class="ident">we_started</span>: <span class="ident">bool</span>,
         <span class="ident">request_handle</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">RequestHandle</span><span class="op">&gt;</span>,
     ) -&gt; (<span class="ident">Sas</span>, <span class="ident">OutgoingContent</span>) {
@@ -906,8 +906,8 @@
     <span class="doccomment">/// sent out through the server to the other device.</span>
     <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy::too_many_arguments</span>)]</span>
     <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">start_in_room</span>(
-        <span class="ident">flow_id</span>: <span class="ident">Box</span><span class="op">&lt;</span><span class="ident">EventId</span><span class="op">&gt;</span>,
-        <span class="ident">room_id</span>: <span class="ident">Box</span><span class="op">&lt;</span><span class="ident">RoomId</span><span class="op">&gt;</span>,
+        <span class="ident">flow_id</span>: <span class="ident">OwnedEventId</span>,
+        <span class="ident">room_id</span>: <span class="ident">OwnedRoomId</span>,
         <span class="ident">private_identity</span>: <span class="ident">PrivateCrossSigningIdentity</span>,
         <span class="ident">other_device</span>: <span class="ident">ReadOnlyDevice</span>,
         <span class="ident">store</span>: <span class="ident">VerificationStore</span>,
@@ -1286,7 +1286,7 @@
         <span class="kw">let</span> <span class="ident">bob_store</span> <span class="op">=</span> <span class="ident">VerificationStore</span> { <span class="ident">account</span>: <span class="ident">bob</span>.<span class="ident">clone</span>(), <span class="ident">inner</span>: <span class="ident">Arc::new</span>(<span class="ident">bob_store</span>) };
 
         <span class="kw">let</span> (<span class="ident">alice</span>, <span class="ident">content</span>) <span class="op">=</span> <span class="ident">Sas::start</span>(
-            <span class="ident">PrivateCrossSigningIdentity::empty</span>(<span class="ident">alice_id</span>().<span class="ident">to_owned</span>()),
+            <span class="ident">PrivateCrossSigningIdentity::empty</span>(<span class="ident">alice_id</span>()),
             <span class="ident">bob_device</span>,
             <span class="ident">alice_store</span>,
             <span class="prelude-val">None</span>,
@@ -1303,7 +1303,7 @@
             <span class="ident">flow_id</span>,
             <span class="kw-2">&amp;</span><span class="ident">content</span>,
             <span class="ident">bob_store</span>,
-            <span class="ident">PrivateCrossSigningIdentity::empty</span>(<span class="ident">bob_id</span>().<span class="ident">to_owned</span>()),
+            <span class="ident">PrivateCrossSigningIdentity::empty</span>(<span class="ident">bob_id</span>()),
             <span class="ident">alice_device</span>,
             <span class="prelude-val">None</span>,
             <span class="prelude-val">None</span>,

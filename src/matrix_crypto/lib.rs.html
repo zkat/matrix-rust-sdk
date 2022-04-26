@@ -603,7 +603,7 @@
     <span class="ident">BootstrapCrossSigningResult</span>, <span class="ident">DeviceLists</span>, <span class="ident">KeysImportResult</span>, <span class="ident">OutgoingVerificationRequest</span>,
     <span class="ident">Request</span>, <span class="ident">RequestType</span>, <span class="ident">SignatureUploadRequest</span>, <span class="ident">UploadSigningKeysRequest</span>,
 };
-<span class="kw">use</span> <span class="ident">ruma</span>::{<span class="ident">DeviceId</span>, <span class="ident">DeviceKeyAlgorithm</span>, <span class="ident">RoomId</span>, <span class="ident">SecondsSinceUnixEpoch</span>, <span class="ident">UserId</span>};
+<span class="kw">use</span> <span class="ident">ruma</span>::{<span class="ident">DeviceId</span>, <span class="ident">DeviceKeyAlgorithm</span>, <span class="ident">OwnedUserId</span>, <span class="ident">RoomId</span>, <span class="ident">SecondsSinceUnixEpoch</span>, <span class="ident">UserId</span>};
 <span class="kw">use</span> <span class="ident">serde</span>::{<span class="ident">Deserialize</span>, <span class="ident">Serialize</span>};
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">users::UserIdentity</span>;
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">verification</span>::{
@@ -763,7 +763,7 @@
     <span class="ident">processed_steps</span> <span class="op">+</span><span class="op">=</span> <span class="number">1</span>;
     <span class="ident">listener</span>(<span class="ident">processed_steps</span>, <span class="ident">total_steps</span>);
 
-    <span class="kw">let</span> <span class="ident">user_id</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">UserId</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">parse_user_id</span>(<span class="kw-2">&amp;</span><span class="ident">data</span>.<span class="ident">account</span>.<span class="ident">user_id</span>)<span class="question-mark">?</span>.<span class="ident">into</span>();
+    <span class="kw">let</span> <span class="ident">user_id</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">UserId</span><span class="op">&gt;</span> <span class="op">=</span> (<span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="ident">parse_user_id</span>(<span class="kw-2">&amp;</span><span class="ident">data</span>.<span class="ident">account</span>.<span class="ident">user_id</span>)<span class="question-mark">?</span>).<span class="ident">into</span>();
     <span class="kw">let</span> <span class="ident">device_id</span>: <span class="ident">Box</span><span class="op">&lt;</span><span class="ident">DeviceId</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">data</span>.<span class="ident">account</span>.<span class="ident">device_id</span>.<span class="ident">into</span>();
     <span class="kw">let</span> <span class="ident">device_id</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">DeviceId</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">device_id</span>.<span class="ident">into</span>();
 
@@ -1007,8 +1007,8 @@
     }
 }
 
-<span class="kw">fn</span> <span class="ident">parse_user_id</span>(<span class="ident">user_id</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Box</span><span class="op">&lt;</span><span class="ident">UserId</span><span class="op">&gt;</span>, <span class="ident">CryptoStoreError</span><span class="op">&gt;</span> {
-    <span class="ident">UserId::parse</span>(<span class="ident">user_id</span>).<span class="ident">map_err</span>(<span class="op">|</span><span class="ident">e</span><span class="op">|</span> <span class="ident">CryptoStoreError::InvalidUserId</span>(<span class="ident">user_id</span>.<span class="ident">to_owned</span>(), <span class="ident">e</span>))
+<span class="kw">fn</span> <span class="ident">parse_user_id</span>(<span class="ident">user_id</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">OwnedUserId</span>, <span class="ident">CryptoStoreError</span><span class="op">&gt;</span> {
+    <span class="ident">ruma::UserId::parse</span>(<span class="ident">user_id</span>).<span class="ident">map_err</span>(<span class="op">|</span><span class="ident">e</span><span class="op">|</span> <span class="ident">CryptoStoreError::InvalidUserId</span>(<span class="ident">user_id</span>.<span class="ident">to_owned</span>(), <span class="ident">e</span>))
 }
 
 <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">warnings</span>)]</span>

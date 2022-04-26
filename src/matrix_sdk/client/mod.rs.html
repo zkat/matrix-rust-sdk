@@ -4013,6 +4013,7 @@
 <span id="4008">4008</span>
 <span id="4009">4009</span>
 <span id="4010">4010</span>
+<span id="4011">4011</span>
 </pre><pre class="rust"><code><span class="comment">// Copyright 2020 Damir Jelić</span>
 <span class="comment">// Copyright 2020 The Matrix.org Foundation C.I.C.</span>
 <span class="comment">//</span>
@@ -4077,7 +4078,8 @@
     <span class="ident">assign</span>,
     <span class="ident">events::room::MediaSource</span>,
     <span class="ident">presence::PresenceState</span>,
-    <span class="ident">DeviceId</span>, <span class="ident">MxcUri</span>, <span class="ident">RoomId</span>, <span class="ident">RoomOrAliasId</span>, <span class="ident">ServerName</span>, <span class="ident">UInt</span>, <span class="ident">UserId</span>,
+    <span class="ident">MxcUri</span>, <span class="ident">OwnedDeviceId</span>, <span class="ident">OwnedRoomId</span>, <span class="ident">OwnedServerName</span>, <span class="ident">OwnedUserId</span>, <span class="ident">RoomId</span>, <span class="ident">RoomOrAliasId</span>,
+    <span class="ident">ServerName</span>, <span class="ident">UInt</span>,
 };
 <span class="kw">use</span> <span class="ident">serde::de::DeserializeOwned</span>;
 <span class="kw">use</span> <span class="ident">tracing</span>::{<span class="ident">error</span>, <span class="ident">info</span>, <span class="ident">instrument</span>, <span class="ident">warn</span>};
@@ -4147,12 +4149,12 @@
     <span class="doccomment">/// Locks making sure we only have one group session sharing request in</span>
     <span class="doccomment">/// flight per room.</span>
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;encryption&quot;</span>)]</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">group_session_locks</span>: <span class="ident">DashMap</span><span class="op">&lt;</span><span class="ident">Box</span><span class="op">&lt;</span><span class="ident">RoomId</span><span class="op">&gt;</span>, <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">Mutex</span><span class="op">&lt;</span>()<span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">group_session_locks</span>: <span class="ident">DashMap</span><span class="op">&lt;</span><span class="ident">OwnedRoomId</span>, <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">Mutex</span><span class="op">&lt;</span>()<span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span>,
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;encryption&quot;</span>)]</span>
     <span class="doccomment">/// Lock making sure we&#39;re only doing one key claim request at a time.</span>
     <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">key_claim_lock</span>: <span class="ident">Mutex</span><span class="op">&lt;</span>()<span class="op">&gt;</span>,
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">members_request_locks</span>: <span class="ident">DashMap</span><span class="op">&lt;</span><span class="ident">Box</span><span class="op">&lt;</span><span class="ident">RoomId</span><span class="op">&gt;</span>, <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">Mutex</span><span class="op">&lt;</span>()<span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">typing_notice_times</span>: <span class="ident">DashMap</span><span class="op">&lt;</span><span class="ident">Box</span><span class="op">&lt;</span><span class="ident">RoomId</span><span class="op">&gt;</span>, <span class="ident">Instant</span><span class="op">&gt;</span>,
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">members_request_locks</span>: <span class="ident">DashMap</span><span class="op">&lt;</span><span class="ident">OwnedRoomId</span>, <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">Mutex</span><span class="op">&lt;</span>()<span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">typing_notice_times</span>: <span class="ident">DashMap</span><span class="op">&lt;</span><span class="ident">OwnedRoomId</span>, <span class="ident">Instant</span><span class="op">&gt;</span>,
     <span class="doccomment">/// Event handlers. See `register_event_handler`.</span>
     <span class="ident">event_handlers</span>: <span class="ident">RwLock</span><span class="op">&lt;</span><span class="ident">EventHandlerMap</span><span class="op">&gt;</span>,
     <span class="doccomment">/// Custom event handler context. See `register_event_handler_context`.</span>
@@ -4269,7 +4271,7 @@
         <span class="ident">incoming_transaction</span>: <span class="ident">ruma::api::appservice::event::push_events::v1::IncomingRequest</span>,
     ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">txn_id</span> <span class="op">=</span> <span class="ident">incoming_transaction</span>.<span class="ident">txn_id</span>.<span class="ident">clone</span>();
-        <span class="kw">let</span> <span class="ident">response</span> <span class="op">=</span> <span class="ident">incoming_transaction</span>.<span class="ident">try_into_sync_response</span>(<span class="ident">txn_id</span>)<span class="question-mark">?</span>;
+        <span class="kw">let</span> <span class="ident">response</span> <span class="op">=</span> <span class="ident">incoming_transaction</span>.<span class="ident">try_into_sync_response</span>(<span class="ident">txn_id</span>.<span class="ident">as_str</span>())<span class="question-mark">?</span>;
         <span class="self">self</span>.<span class="ident">process_sync</span>(<span class="ident">response</span>).<span class="kw">await</span><span class="question-mark">?</span>;
 
         <span class="prelude-val">Ok</span>(())
@@ -4286,13 +4288,13 @@
     }
 
     <span class="doccomment">/// Get the user id of the current owner of the client.</span>
-    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">user_id</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Box</span><span class="op">&lt;</span><span class="ident">UserId</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">user_id</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">OwnedUserId</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">session</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">base_client</span>.<span class="ident">session</span>().<span class="ident">read</span>().<span class="kw">await</span>;
         <span class="ident">session</span>.<span class="ident">as_ref</span>().<span class="ident">cloned</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">s</span><span class="op">|</span> <span class="ident">s</span>.<span class="ident">user_id</span>)
     }
 
     <span class="doccomment">/// Get the device id that identifies the current session.</span>
-    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">device_id</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Box</span><span class="op">&lt;</span><span class="ident">DeviceId</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">device_id</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">OwnedDeviceId</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">session</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">base_client</span>.<span class="ident">session</span>().<span class="ident">read</span>().<span class="kw">await</span>;
         <span class="ident">session</span>.<span class="ident">as_ref</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">s</span><span class="op">|</span> <span class="ident">s</span>.<span class="ident">device_id</span>.<span class="ident">clone</span>())
     }
@@ -5258,7 +5260,7 @@
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">join_room_by_id_or_alias</span>(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         <span class="ident">alias</span>: <span class="kw-2">&amp;</span><span class="ident">RoomOrAliasId</span>,
-        <span class="ident">server_names</span>: <span class="kw-2">&amp;</span>[<span class="ident">Box</span><span class="op">&lt;</span><span class="ident">ServerName</span><span class="op">&gt;</span>],
+        <span class="ident">server_names</span>: <span class="kw-2">&amp;</span>[<span class="ident">OwnedServerName</span>],
     ) -&gt; <span class="ident">HttpResult</span><span class="op">&lt;</span><span class="ident">join_room_by_id_or_alias::v3::Response</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">request</span> <span class="op">=</span> <span class="macro">assign!</span>(<span class="ident">join_room_by_id_or_alias::v3::Request::new</span>(<span class="ident">alias</span>), {
             <span class="ident">server_name</span>: <span class="ident">server_names</span>,
@@ -5607,7 +5609,7 @@
     <span class="doccomment">/// # Result::&lt;_, matrix_sdk::Error&gt;::Ok(()) });</span>
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">delete_devices</span>(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
-        <span class="ident">devices</span>: <span class="kw-2">&amp;</span>[<span class="ident">Box</span><span class="op">&lt;</span><span class="ident">DeviceId</span><span class="op">&gt;</span>],
+        <span class="ident">devices</span>: <span class="kw-2">&amp;</span>[<span class="ident">OwnedDeviceId</span>],
         <span class="ident">auth_data</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">AuthData</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span><span class="op">&gt;</span>,
     ) -&gt; <span class="ident">HttpResult</span><span class="op">&lt;</span><span class="ident">delete_devices::v3::Response</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">request</span> <span class="op">=</span> <span class="ident">delete_devices::v3::Request::new</span>(<span class="ident">devices</span>);

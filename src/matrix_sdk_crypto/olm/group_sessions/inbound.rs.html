@@ -495,7 +495,7 @@
         <span class="ident">AnyRoomEvent</span>,
     },
     <span class="ident">serde::Raw</span>,
-    <span class="ident">DeviceKeyAlgorithm</span>, <span class="ident">EventEncryptionAlgorithm</span>, <span class="ident">RoomId</span>,
+    <span class="ident">DeviceKeyAlgorithm</span>, <span class="ident">EventEncryptionAlgorithm</span>, <span class="ident">OwnedRoomId</span>, <span class="ident">RoomId</span>,
 };
 <span class="kw">use</span> <span class="ident">serde</span>::{<span class="ident">Deserialize</span>, <span class="ident">Serialize</span>};
 <span class="kw">use</span> <span class="ident">serde_json::Value</span>;
@@ -641,7 +641,7 @@
             <span class="ident">first_known_index</span>,
             <span class="ident">history_visibility</span>: <span class="prelude-val">None</span>.<span class="ident">into</span>(),
             <span class="ident">signing_keys</span>: <span class="ident">sender_claimed_key</span>.<span class="ident">into</span>(),
-            <span class="ident">room_id</span>: <span class="ident">content</span>.<span class="ident">room_id</span>.<span class="ident">clone</span>().<span class="ident">into</span>(),
+            <span class="ident">room_id</span>: (<span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="ident">content</span>.<span class="ident">room_id</span>).<span class="ident">into</span>(),
             <span class="ident">forwarding_chains</span>: <span class="ident">forwarding_chains</span>.<span class="ident">into</span>(),
             <span class="ident">imported</span>: <span class="bool-val">true</span>,
             <span class="ident">backed_up</span>: <span class="ident">AtomicBool::new</span>(<span class="bool-val">false</span>).<span class="ident">into</span>(),
@@ -753,7 +753,7 @@
             <span class="ident">history_visibility</span>: <span class="ident">pickle</span>.<span class="ident">history_visibility</span>.<span class="ident">into</span>(),
             <span class="ident">first_known_index</span>,
             <span class="ident">signing_keys</span>: <span class="ident">pickle</span>.<span class="ident">signing_key</span>.<span class="ident">into</span>(),
-            <span class="ident">room_id</span>: <span class="ident">pickle</span>.<span class="ident">room_id</span>.<span class="ident">into</span>(),
+            <span class="ident">room_id</span>: (<span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="ident">pickle</span>.<span class="ident">room_id</span>).<span class="ident">into</span>(),
             <span class="ident">forwarding_chains</span>: <span class="ident">pickle</span>.<span class="ident">forwarding_chains</span>.<span class="ident">into</span>(),
             <span class="ident">backed_up</span>: <span class="ident">AtomicBool::from</span>(<span class="ident">pickle</span>.<span class="ident">backed_up</span>).<span class="ident">into</span>(),
             <span class="ident">imported</span>: <span class="ident">pickle</span>.<span class="ident">imported</span>,
@@ -881,7 +881,7 @@
     <span class="doccomment">/// The public ed25519 key of the account that sent us the session.</span>
     <span class="kw">pub</span> <span class="ident">signing_key</span>: <span class="ident">BTreeMap</span><span class="op">&lt;</span><span class="ident">DeviceKeyAlgorithm</span>, <span class="ident">String</span><span class="op">&gt;</span>,
     <span class="doccomment">/// The id of the room that the session is used in.</span>
-    <span class="kw">pub</span> <span class="ident">room_id</span>: <span class="ident">Box</span><span class="op">&lt;</span><span class="ident">RoomId</span><span class="op">&gt;</span>,
+    <span class="kw">pub</span> <span class="ident">room_id</span>: <span class="ident">OwnedRoomId</span>,
     <span class="doccomment">/// The list of claimed ed25519 that forwarded us this key. Will be None if</span>
     <span class="doccomment">/// we directly received this session.</span>
     <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">default</span>)]</span>
@@ -908,7 +908,7 @@
             <span class="ident">history_visibility</span>: <span class="prelude-val">None</span>.<span class="ident">into</span>(),
             <span class="ident">first_known_index</span>,
             <span class="ident">signing_keys</span>: <span class="ident">key</span>.<span class="ident">sender_claimed_keys</span>.<span class="ident">into</span>(),
-            <span class="ident">room_id</span>: <span class="ident">key</span>.<span class="ident">room_id</span>.<span class="ident">into</span>(),
+            <span class="ident">room_id</span>: (<span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="ident">key</span>.<span class="ident">room_id</span>).<span class="ident">into</span>(),
             <span class="ident">forwarding_chains</span>: <span class="ident">key</span>.<span class="ident">forwarding_curve25519_key_chain</span>.<span class="ident">into</span>(),
             <span class="ident">imported</span>: <span class="bool-val">true</span>,
             <span class="ident">backed_up</span>: <span class="ident">AtomicBool::from</span>(<span class="bool-val">false</span>).<span class="ident">into</span>(),

@@ -702,7 +702,7 @@
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;decode_image&quot;</span>)]</span>
 <span class="kw">use</span> <span class="ident">image</span>::{<span class="ident">DynamicImage</span>, <span class="ident">GenericImage</span>, <span class="ident">GenericImageView</span>, <span class="ident">ImageBuffer</span>, <span class="ident">Luma</span>};
 <span class="kw">use</span> <span class="ident">qrcode::QrCode</span>;
-<span class="kw">use</span> <span class="ident">ruma_common</span>::{<span class="ident">serde::Base64</span>, <span class="ident">EventId</span>};
+<span class="kw">use</span> <span class="ident">ruma_common</span>::{<span class="ident">serde::Base64</span>, <span class="ident">OwnedEventId</span>};
 <span class="kw">use</span> <span class="ident">vodozemac::Ed25519PublicKey</span>;
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;decode_image&quot;</span>)]</span>
@@ -1058,7 +1058,7 @@
 <span class="doccomment">/// cross signing keys.</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">PartialEq</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">VerificationData</span> {
-    <span class="ident">event_id</span>: <span class="ident">Box</span><span class="op">&lt;</span><span class="ident">EventId</span><span class="op">&gt;</span>,
+    <span class="ident">event_id</span>: <span class="ident">OwnedEventId</span>,
     <span class="ident">first_master_key</span>: <span class="ident">Ed25519PublicKey</span>,
     <span class="ident">second_master_key</span>: <span class="ident">Ed25519PublicKey</span>,
     <span class="ident">shared_secret</span>: <span class="ident">Base64</span>,
@@ -1081,7 +1081,7 @@
     <span class="doccomment">/// * ` shared_secret` - A random bytestring encoded as unpadded base64,</span>
     <span class="doccomment">/// needs to be at least 8 bytes long.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(
-        <span class="ident">event_id</span>: <span class="ident">Box</span><span class="op">&lt;</span><span class="ident">EventId</span><span class="op">&gt;</span>,
+        <span class="ident">event_id</span>: <span class="ident">OwnedEventId</span>,
         <span class="ident">first_key</span>: <span class="ident">Ed25519PublicKey</span>,
         <span class="ident">second_key</span>: <span class="ident">Ed25519PublicKey</span>,
         <span class="ident">shared_secret</span>: <span class="ident">Base64</span>,

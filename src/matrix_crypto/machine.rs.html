@@ -1381,7 +1381,7 @@
         <span class="ident">key::verification::VerificationMethod</span>, <span class="ident">room::encrypted::OriginalSyncRoomEncryptedEvent</span>,
         <span class="ident">AnyMessageLikeEventContent</span>, <span class="ident">EventContent</span>,
     },
-    <span class="ident">DeviceKeyAlgorithm</span>, <span class="ident">EventId</span>, <span class="ident">RoomId</span>, <span class="ident">TransactionId</span>, <span class="ident">UserId</span>,
+    <span class="ident">DeviceKeyAlgorithm</span>, <span class="ident">EventId</span>, <span class="ident">OwnedTransactionId</span>, <span class="ident">OwnedUserId</span>, <span class="ident">RoomId</span>, <span class="ident">UserId</span>,
 };
 <span class="kw">use</span> <span class="ident">serde</span>::{<span class="ident">Deserialize</span>, <span class="ident">Serialize</span>};
 <span class="kw">use</span> <span class="ident">serde_json</span>::{<span class="ident">value::RawValue</span>, <span class="ident">Value</span>};
@@ -1459,7 +1459,7 @@
         <span class="ident">passphrase</span>.<span class="ident">zeroize</span>();
 
         <span class="prelude-val">Ok</span>(<span class="ident">OlmMachine</span> {
-            <span class="ident">inner</span>: <span class="ident">runtime</span>.<span class="ident">block_on</span>(<span class="ident">InnerMachine::with_store</span>(<span class="ident">user_id</span>, <span class="ident">device_id</span>, <span class="ident">store</span>))<span class="question-mark">?</span>,
+            <span class="ident">inner</span>: <span class="ident">runtime</span>.<span class="ident">block_on</span>(<span class="ident">InnerMachine::with_store</span>(<span class="kw-2">&amp;</span><span class="ident">user_id</span>, <span class="ident">device_id</span>, <span class="ident">store</span>))<span class="question-mark">?</span>,
             <span class="ident">runtime</span>,
         })
     }
@@ -1654,7 +1654,7 @@
         <span class="ident">request_type</span>: <span class="ident">RequestType</span>,
         <span class="ident">response_body</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>,
     ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">CryptoStoreError</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">id</span>: <span class="ident">Box</span><span class="op">&lt;</span><span class="ident">TransactionId</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">request_id</span>.<span class="ident">into</span>();
+        <span class="kw">let</span> <span class="ident">id</span>: <span class="ident">OwnedTransactionId</span> <span class="op">=</span> <span class="ident">request_id</span>.<span class="ident">into</span>();
 
         <span class="kw">let</span> <span class="ident">response</span> <span class="op">=</span> <span class="ident">response_from_string</span>(<span class="ident">response_body</span>);
 
@@ -1745,7 +1745,7 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// `users` - The users that should be queued up for a key query.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">update_tracked_users</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">users</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>) {
-        <span class="kw">let</span> <span class="ident">users</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Box</span><span class="op">&lt;</span><span class="ident">UserId</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="op">=</span>
+        <span class="kw">let</span> <span class="ident">users</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">OwnedUserId</span><span class="op">&gt;</span> <span class="op">=</span>
             <span class="ident">users</span>.<span class="ident">into_iter</span>().<span class="ident">filter_map</span>(<span class="op">|</span><span class="ident">u</span><span class="op">|</span> <span class="ident">UserId::parse</span>(<span class="ident">u</span>).<span class="ident">ok</span>()).<span class="ident">collect</span>();
 
         <span class="self">self</span>.<span class="ident">runtime</span>.<span class="ident">block_on</span>(<span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">update_tracked_users</span>(<span class="ident">users</span>.<span class="ident">iter</span>().<span class="ident">map</span>(<span class="ident">Deref::deref</span>)));
@@ -1778,7 +1778,7 @@
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         <span class="ident">users</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
     ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Request</span><span class="op">&gt;</span>, <span class="ident">CryptoStoreError</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">users</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Box</span><span class="op">&lt;</span><span class="ident">UserId</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="op">=</span>
+        <span class="kw">let</span> <span class="ident">users</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">OwnedUserId</span><span class="op">&gt;</span> <span class="op">=</span>
             <span class="ident">users</span>.<span class="ident">into_iter</span>().<span class="ident">filter_map</span>(<span class="op">|</span><span class="ident">u</span><span class="op">|</span> <span class="ident">UserId::parse</span>(<span class="ident">u</span>).<span class="ident">ok</span>()).<span class="ident">collect</span>();
 
         <span class="prelude-val">Ok</span>(<span class="self">self</span>
@@ -1809,7 +1809,7 @@
         <span class="ident">room_id</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>,
         <span class="ident">users</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
     ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Request</span><span class="op">&gt;</span>, <span class="ident">CryptoStoreError</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">users</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Box</span><span class="op">&lt;</span><span class="ident">UserId</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="op">=</span>
+        <span class="kw">let</span> <span class="ident">users</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">OwnedUserId</span><span class="op">&gt;</span> <span class="op">=</span>
             <span class="ident">users</span>.<span class="ident">into_iter</span>().<span class="ident">filter_map</span>(<span class="op">|</span><span class="ident">u</span><span class="op">|</span> <span class="ident">UserId::parse</span>(<span class="ident">u</span>).<span class="ident">ok</span>()).<span class="ident">collect</span>();
 
         <span class="kw">let</span> <span class="ident">room_id</span> <span class="op">=</span> <span class="ident">RoomId::parse</span>(<span class="ident">room_id</span>)<span class="question-mark">?</span>;
