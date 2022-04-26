@@ -88,6 +88,7 @@
 <span id="83">83</span>
 <span id="84">84</span>
 <span id="85">85</span>
+<span id="86">86</span>
 </pre><pre class="rust"><code><span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">target_arch</span> <span class="op">=</span> <span class="string">&quot;wasm32&quot;</span>)]</span>
 <span class="kw">use</span> <span class="ident">matrix_sdk_base::store</span>::{<span class="ident">StoreConfig</span>, <span class="ident">StoreError</span>};
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">target_arch</span> <span class="op">=</span> <span class="string">&quot;wasm32&quot;</span>)]</span>
@@ -123,7 +124,8 @@
 
     <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">passphrase</span>) <span class="op">=</span> <span class="ident">passphrase</span> {
         <span class="kw">let</span> <span class="ident">state_store</span> <span class="op">=</span> <span class="ident">StateStore::open_with_passphrase</span>(<span class="ident">name</span>.<span class="ident">clone</span>(), <span class="ident">passphrase</span>).<span class="kw">await</span><span class="question-mark">?</span>;
-        <span class="kw">let</span> <span class="ident">crypto_store</span> <span class="op">=</span> <span class="ident">CryptoStore::open_with_passphrase</span>(<span class="ident">name</span>, <span class="ident">passphrase</span>).<span class="kw">await</span><span class="question-mark">?</span>;
+        <span class="kw">let</span> <span class="ident">crypto_store</span> <span class="op">=</span>
+            <span class="ident">CryptoStore::open_with_store_cipher</span>(<span class="ident">name</span>, <span class="ident">state_store</span>.<span class="ident">store_cipher</span>.<span class="ident">clone</span>()).<span class="kw">await</span><span class="question-mark">?</span>;
         <span class="prelude-val">Ok</span>((<span class="ident">Box::new</span>(<span class="ident">state_store</span>), <span class="ident">Box::new</span>(<span class="ident">crypto_store</span>)))
     } <span class="kw">else</span> {
         <span class="kw">let</span> <span class="ident">state_store</span> <span class="op">=</span> <span class="ident">StateStore::open_with_name</span>(<span class="ident">name</span>.<span class="ident">clone</span>()).<span class="kw">await</span><span class="question-mark">?</span>;
