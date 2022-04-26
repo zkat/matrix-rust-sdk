@@ -737,6 +737,14 @@
 <span id="732">732</span>
 <span id="733">733</span>
 <span id="734">734</span>
+<span id="735">735</span>
+<span id="736">736</span>
+<span id="737">737</span>
+<span id="738">738</span>
+<span id="739">739</span>
+<span id="740">740</span>
+<span id="741">741</span>
+<span id="742">742</span>
 </pre><pre class="rust"><code><span class="comment">// Copyright 2020 The Matrix.org Foundation C.I.C.</span>
 <span class="comment">//</span>
 <span class="comment">// Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);</span>
@@ -779,6 +787,8 @@
 <span class="kw">use</span> <span class="ident">vodozemac</span>::{<span class="ident">Curve25519PublicKey</span>, <span class="ident">Ed25519PublicKey</span>};
 
 <span class="kw">use</span> <span class="kw">super</span>::{<span class="ident">atomic_bool_deserializer</span>, <span class="ident">atomic_bool_serializer</span>};
+<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">any</span>(<span class="ident">test</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;testing&quot;</span>))]</span>
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::OlmMachine</span>;
 <span class="kw">use</span> <span class="kw">crate</span>::{
     <span class="ident">error</span>::{<span class="ident">EventError</span>, <span class="ident">OlmError</span>, <span class="ident">OlmResult</span>, <span class="ident">SignatureError</span>},
     <span class="ident">identities</span>::{<span class="ident">ReadOnlyOwnUserIdentity</span>, <span class="ident">ReadOnlyUserIdentities</span>},
@@ -786,10 +796,8 @@
     <span class="ident">store</span>::{<span class="ident">Changes</span>, <span class="ident">CryptoStore</span>, <span class="ident">DeviceChanges</span>, <span class="prelude-ty">Result</span> <span class="kw">as</span> <span class="ident">StoreResult</span>},
     <span class="ident">types</span>::{<span class="ident">DeviceKey</span>, <span class="ident">DeviceKeys</span>, <span class="ident">SignedKey</span>},
     <span class="ident">verification::VerificationMachine</span>,
-    <span class="ident">OutgoingVerificationRequest</span>, <span class="ident">Sas</span>, <span class="ident">ToDeviceRequest</span>, <span class="ident">VerificationRequest</span>,
+    <span class="ident">OutgoingVerificationRequest</span>, <span class="ident">ReadOnlyAccount</span>, <span class="ident">Sas</span>, <span class="ident">ToDeviceRequest</span>, <span class="ident">VerificationRequest</span>,
 };
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">any</span>(<span class="ident">test</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;testing&quot;</span>))]</span>
-<span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">OlmMachine</span>, <span class="ident">ReadOnlyAccount</span>};
 
 <span class="doccomment">/// A read-only version of a `Device`.</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Serialize</span>, <span class="ident">Deserialize</span>)]</span>
@@ -1256,10 +1264,10 @@
             <span class="ident">k</span>
         } <span class="kw">else</span> {
             <span class="macro">warn!</span>(
-                <span class="string">&quot;Trying to encrypt a Megolm session for user {} on device {}, \
-                but the device doesn&#39;t have a curve25519 key&quot;</span>,
-                <span class="self">self</span>.<span class="ident">user_id</span>(),
-                <span class="self">self</span>.<span class="ident">device_id</span>()
+                <span class="ident">user_id</span> <span class="op">=</span> <span class="op">%</span><span class="self">self</span>.<span class="ident">user_id</span>(),
+                <span class="ident">device_id</span> <span class="op">=</span> <span class="op">%</span><span class="self">self</span>.<span class="ident">device_id</span>(),
+                <span class="string">&quot;Trying to encrypt a Megolm session, but the device doesn&#39;t \
+                have a curve25519 key&quot;</span>,
             );
             <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">EventError::MissingSenderKey</span>.<span class="ident">into</span>());
         };
@@ -1340,14 +1348,22 @@
         <span class="ident">ReadOnlyDevice::from_account</span>(<span class="ident">machine</span>.<span class="ident">account</span>()).<span class="kw">await</span>
     }
 
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">any</span>(<span class="ident">test</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;testing&quot;</span>))]</span>
-    <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">dead_code</span>)]</span>
-    <span class="doccomment">/// Generate the Device from the reference of an Account.</span>
+    <span class="doccomment">/// Create a `ReadOnlyDevice` from an `Account`</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// TESTING FACILITY ONLY, DO NOT USE OUTSIDE OF TESTS</span>
+    <span class="doccomment">/// We will have our own device in the store once we receive a keys/query</span>
+    <span class="doccomment">/// response, but this is useful to create it before we receive such a</span>
+    <span class="doccomment">/// response.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// It also makes it easier to check that the server doesn&#39;t lie about our</span>
+    <span class="doccomment">/// own device.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// *Don&#39;t* use this after we received a keys/query response, other</span>
+    <span class="doccomment">/// users/devices might add signatures to our own device, which can&#39;t be</span>
+    <span class="doccomment">/// replicated locally.</span>
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">from_account</span>(<span class="ident">account</span>: <span class="kw-2">&amp;</span><span class="ident">ReadOnlyAccount</span>) -&gt; <span class="ident">ReadOnlyDevice</span> {
         <span class="kw">let</span> <span class="ident">device_keys</span> <span class="op">=</span> <span class="ident">account</span>.<span class="ident">device_keys</span>().<span class="kw">await</span>;
-        <span class="ident">ReadOnlyDevice::try_from</span>(<span class="kw-2">&amp;</span><span class="ident">device_keys</span>).<span class="ident">unwrap</span>()
+        <span class="ident">ReadOnlyDevice::try_from</span>(<span class="kw-2">&amp;</span><span class="ident">device_keys</span>)
+            .<span class="ident">expect</span>(<span class="string">&quot;Creating a device from our own account should always succeed&quot;</span>)
     }
 }
 

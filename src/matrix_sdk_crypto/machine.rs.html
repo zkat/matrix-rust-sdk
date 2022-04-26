@@ -2227,6 +2227,8 @@
 <span id="2222">2222</span>
 <span id="2223">2223</span>
 <span id="2224">2224</span>
+<span id="2225">2225</span>
+<span id="2226">2226</span>
 </pre><pre class="rust"><code><span class="comment">// Copyright 2020 The Matrix.org Foundation C.I.C.</span>
 <span class="comment">//</span>
 <span class="comment">// Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);</span>
@@ -2296,7 +2298,7 @@
         <span class="ident">SecretImportError</span>, <span class="ident">Store</span>,
     },
     <span class="ident">verification</span>::{<span class="ident">Verification</span>, <span class="ident">VerificationMachine</span>, <span class="ident">VerificationRequest</span>},
-    <span class="ident">CrossSigningKeyExport</span>, <span class="ident">RoomKeyImportResult</span>, <span class="ident">ToDeviceRequest</span>,
+    <span class="ident">CrossSigningKeyExport</span>, <span class="ident">ReadOnlyDevice</span>, <span class="ident">RoomKeyImportResult</span>, <span class="ident">ToDeviceRequest</span>,
 };
 
 <span class="doccomment">/// State machine implementation of the Olm/Megolm encryption protocol used for</span>
@@ -2321,7 +2323,7 @@
     <span class="doccomment">/// A state machine that handles Olm sessions creation.</span>
     <span class="ident">session_manager</span>: <span class="ident">SessionManager</span>,
     <span class="doccomment">/// A state machine that keeps track of our outbound group sessions.</span>
-    <span class="ident">group_session_manager</span>: <span class="ident">GroupSessionManager</span>,
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">group_session_manager</span>: <span class="ident">GroupSessionManager</span>,
     <span class="doccomment">/// A state machine that is responsible to handle and keep track of SAS</span>
     <span class="doccomment">/// verification flows.</span>
     <span class="ident">verification_machine</span>: <span class="ident">VerificationMachine</span>,
@@ -2357,17 +2359,12 @@
     <span class="doccomment">/// * `user_id` - The unique id of the user that owns this machine.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// * `device_id` - The unique id of the device that owns this machine.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">user_id</span>: <span class="kw-2">&amp;</span><span class="ident">UserId</span>, <span class="ident">device_id</span>: <span class="kw-2">&amp;</span><span class="ident">DeviceId</span>) -&gt; <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">user_id</span>: <span class="kw-2">&amp;</span><span class="ident">UserId</span>, <span class="ident">device_id</span>: <span class="kw-2">&amp;</span><span class="ident">DeviceId</span>) -&gt; <span class="self">Self</span> {
         <span class="kw">let</span> <span class="ident">store</span>: <span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">CryptoStore</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">Box::new</span>(<span class="ident">MemoryStore::new</span>());
-        <span class="kw">let</span> <span class="ident">account</span> <span class="op">=</span> <span class="ident">ReadOnlyAccount::new</span>(<span class="ident">user_id</span>, <span class="ident">device_id</span>);
 
-        <span class="ident">OlmMachine::new_helper</span>(
-            <span class="ident">user_id</span>,
-            <span class="ident">device_id</span>,
-            <span class="ident">store</span>,
-            <span class="ident">account</span>,
-            <span class="ident">PrivateCrossSigningIdentity::empty</span>(<span class="ident">user_id</span>),
-        )
+        <span class="ident">OlmMachine::with_store</span>(<span class="ident">user_id</span>, <span class="ident">device_id</span>, <span class="ident">store</span>)
+            .<span class="kw">await</span>
+            .<span class="ident">expect</span>(<span class="string">&quot;Reading and writing to the memory store always succeeds&quot;</span>)
     }
 
     <span class="kw">fn</span> <span class="ident">new_helper</span>(
@@ -2462,11 +2459,18 @@
             }
             <span class="prelude-val">None</span> =&gt; {
                 <span class="kw">let</span> <span class="ident">account</span> <span class="op">=</span> <span class="ident">ReadOnlyAccount::new</span>(<span class="ident">user_id</span>, <span class="ident">device_id</span>);
+                <span class="kw">let</span> <span class="ident">device</span> <span class="op">=</span> <span class="ident">ReadOnlyDevice::from_account</span>(<span class="kw-2">&amp;</span><span class="ident">account</span>).<span class="kw">await</span>;
+
                 <span class="macro">debug!</span>(
                     <span class="ident">ed25519_key</span> <span class="op">=</span> <span class="ident">account</span>.<span class="ident">identity_keys</span>().<span class="ident">ed25519</span>.<span class="ident">to_base64</span>().<span class="ident">as_str</span>(),
                     <span class="string">&quot;Created a new Olm account&quot;</span>
                 );
-                <span class="ident">store</span>.<span class="ident">save_account</span>(<span class="ident">account</span>.<span class="ident">clone</span>()).<span class="kw">await</span><span class="question-mark">?</span>;
+                <span class="kw">let</span> <span class="ident">changes</span> <span class="op">=</span> <span class="ident">Changes</span> {
+                    <span class="ident">account</span>: <span class="prelude-val">Some</span>(<span class="ident">account</span>.<span class="ident">clone</span>()),
+                    <span class="ident">devices</span>: <span class="ident">DeviceChanges</span> { <span class="ident">new</span>: <span class="macro">vec!</span>[<span class="ident">device</span>], ..<span class="ident">Default::default</span>() },
+                    ..<span class="ident">Default::default</span>()
+                };
+                <span class="ident">store</span>.<span class="ident">save_changes</span>(<span class="ident">changes</span>).<span class="kw">await</span><span class="question-mark">?</span>;
                 <span class="ident">account</span>
             }
         };
@@ -3407,8 +3411,8 @@
     <span class="doccomment">/// # use ruma::{device_id, user_id};</span>
     <span class="doccomment">/// # use futures::executor::block_on;</span>
     <span class="doccomment">/// # let alice = user_id!(&quot;@alice:example.org&quot;).to_owned();</span>
-    <span class="doccomment">/// # let machine = OlmMachine::new(&amp;alice, device_id!(&quot;DEVICEID&quot;));</span>
     <span class="doccomment">/// # block_on(async {</span>
+    <span class="doccomment">/// # let machine = OlmMachine::new(&amp;alice, device_id!(&quot;DEVICEID&quot;)).await;</span>
     <span class="doccomment">/// let device = machine.get_device(&amp;alice, device_id!(&quot;DEVICEID&quot;)).await;</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// println!(&quot;{:?}&quot;, device);</span>
@@ -3448,8 +3452,8 @@
     <span class="doccomment">/// # use ruma::{device_id, user_id};</span>
     <span class="doccomment">/// # use futures::executor::block_on;</span>
     <span class="doccomment">/// # let alice = user_id!(&quot;@alice:example.org&quot;).to_owned();</span>
-    <span class="doccomment">/// # let machine = OlmMachine::new(&amp;alice, device_id!(&quot;DEVICEID&quot;));</span>
     <span class="doccomment">/// # block_on(async {</span>
+    <span class="doccomment">/// # let machine = OlmMachine::new(&amp;alice, device_id!(&quot;DEVICEID&quot;)).await;</span>
     <span class="doccomment">/// let devices = machine.get_user_devices(&amp;alice).await.unwrap();</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// for device in devices.devices() {</span>
@@ -3484,8 +3488,8 @@
     <span class="doccomment">/// # use ruma::{device_id, user_id};</span>
     <span class="doccomment">/// # use futures::executor::block_on;</span>
     <span class="doccomment">/// # let alice = user_id!(&quot;@alice:example.org&quot;);</span>
-    <span class="doccomment">/// # let machine = OlmMachine::new(&amp;alice, device_id!(&quot;DEVICEID&quot;));</span>
     <span class="doccomment">/// # block_on(async {</span>
+    <span class="doccomment">/// # let machine = OlmMachine::new(&amp;alice, device_id!(&quot;DEVICEID&quot;)).await;</span>
     <span class="doccomment">/// # let export = Cursor::new(&quot;&quot;.to_owned());</span>
     <span class="doccomment">/// let exported_keys = decrypt_key_export(export, &quot;1234&quot;).unwrap();</span>
     <span class="doccomment">/// machine.import_keys(exported_keys, false, |_, _| {}).await.unwrap();</span>
@@ -3596,8 +3600,8 @@
     <span class="doccomment">/// # use ruma::{device_id, user_id, room_id};</span>
     <span class="doccomment">/// # use futures::executor::block_on;</span>
     <span class="doccomment">/// # let alice = user_id!(&quot;@alice:example.org&quot;);</span>
-    <span class="doccomment">/// # let machine = OlmMachine::new(&amp;alice, device_id!(&quot;DEVICEID&quot;));</span>
     <span class="doccomment">/// # block_on(async {</span>
+    <span class="doccomment">/// # let machine = OlmMachine::new(&amp;alice, device_id!(&quot;DEVICEID&quot;)).await;</span>
     <span class="doccomment">/// let room_id = room_id!(&quot;!test:localhost&quot;);</span>
     <span class="doccomment">/// let exported_keys = machine.export_keys(|s| s.room_id() == room_id).await.unwrap();</span>
     <span class="doccomment">/// let encrypted_export = encrypt_key_export(&amp;exported_keys, &quot;1234&quot;, 1);</span>
@@ -3827,7 +3831,7 @@
     }
 
     <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">get_prepared_machine</span>() -&gt; (<span class="ident">OlmMachine</span>, <span class="ident">OneTimeKeys</span>) {
-        <span class="kw">let</span> <span class="ident">machine</span> <span class="op">=</span> <span class="ident">OlmMachine::new</span>(<span class="ident">user_id</span>(), <span class="ident">alice_device_id</span>());
+        <span class="kw">let</span> <span class="ident">machine</span> <span class="op">=</span> <span class="ident">OlmMachine::new</span>(<span class="ident">user_id</span>(), <span class="ident">alice_device_id</span>()).<span class="kw">await</span>;
         <span class="ident">machine</span>.<span class="ident">account</span>.<span class="ident">inner</span>.<span class="ident">update_uploaded_key_count</span>(<span class="number">0</span>);
         <span class="kw">let</span> <span class="ident">request</span> <span class="op">=</span> <span class="ident">machine</span>.<span class="ident">keys_for_upload</span>().<span class="kw">await</span>.<span class="ident">expect</span>(<span class="string">&quot;Can&#39;t prepare initial key upload&quot;</span>);
         <span class="kw">let</span> <span class="ident">response</span> <span class="op">=</span> <span class="ident">keys_upload_response</span>();
@@ -3850,7 +3854,7 @@
 
         <span class="kw">let</span> <span class="ident">alice_id</span> <span class="op">=</span> <span class="ident">alice_id</span>();
         <span class="kw">let</span> <span class="ident">alice_device</span> <span class="op">=</span> <span class="ident">alice_device_id</span>();
-        <span class="kw">let</span> <span class="ident">alice</span> <span class="op">=</span> <span class="ident">OlmMachine::new</span>(<span class="ident">alice_id</span>, <span class="ident">alice_device</span>);
+        <span class="kw">let</span> <span class="ident">alice</span> <span class="op">=</span> <span class="ident">OlmMachine::new</span>(<span class="ident">alice_id</span>, <span class="ident">alice_device</span>).<span class="kw">await</span>;
 
         <span class="kw">let</span> <span class="ident">alice_device</span> <span class="op">=</span> <span class="ident">ReadOnlyDevice::from_machine</span>(<span class="kw-2">&amp;</span><span class="ident">alice</span>).<span class="kw">await</span>;
         <span class="kw">let</span> <span class="ident">bob_device</span> <span class="op">=</span> <span class="ident">ReadOnlyDevice::from_machine</span>(<span class="kw-2">&amp;</span><span class="ident">bob</span>).<span class="kw">await</span>;
@@ -3901,13 +3905,13 @@
 
     <span class="attribute">#[<span class="ident">async_test</span>]</span>
     <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">create_olm_machine</span>() {
-        <span class="kw">let</span> <span class="ident">machine</span> <span class="op">=</span> <span class="ident">OlmMachine::new</span>(<span class="ident">user_id</span>(), <span class="ident">alice_device_id</span>());
+        <span class="kw">let</span> <span class="ident">machine</span> <span class="op">=</span> <span class="ident">OlmMachine::new</span>(<span class="ident">user_id</span>(), <span class="ident">alice_device_id</span>()).<span class="kw">await</span>;
         <span class="macro">assert!</span>(<span class="op">!</span><span class="ident">machine</span>.<span class="ident">account</span>().<span class="ident">shared</span>());
     }
 
     <span class="attribute">#[<span class="ident">async_test</span>]</span>
     <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">generate_one_time_keys</span>() {
-        <span class="kw">let</span> <span class="ident">machine</span> <span class="op">=</span> <span class="ident">OlmMachine::new</span>(<span class="ident">user_id</span>(), <span class="ident">alice_device_id</span>());
+        <span class="kw">let</span> <span class="ident">machine</span> <span class="op">=</span> <span class="ident">OlmMachine::new</span>(<span class="ident">user_id</span>(), <span class="ident">alice_device_id</span>()).<span class="kw">await</span>;
 
         <span class="macro">assert!</span>(<span class="ident">machine</span>.<span class="ident">account</span>.<span class="ident">generate_one_time_keys</span>().<span class="kw">await</span>.<span class="ident">is_some</span>());
 
@@ -3923,7 +3927,7 @@
 
     <span class="attribute">#[<span class="ident">async_test</span>]</span>
     <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">test_device_key_signing</span>() {
-        <span class="kw">let</span> <span class="ident">machine</span> <span class="op">=</span> <span class="ident">OlmMachine::new</span>(<span class="ident">user_id</span>(), <span class="ident">alice_device_id</span>());
+        <span class="kw">let</span> <span class="ident">machine</span> <span class="op">=</span> <span class="ident">OlmMachine::new</span>(<span class="ident">user_id</span>(), <span class="ident">alice_device_id</span>()).<span class="kw">await</span>;
 
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">device_keys</span> <span class="op">=</span> <span class="ident">machine</span>.<span class="ident">account</span>.<span class="ident">device_keys</span>().<span class="kw">await</span>;
         <span class="kw">let</span> <span class="ident">identity_keys</span> <span class="op">=</span> <span class="ident">machine</span>.<span class="ident">account</span>.<span class="ident">identity_keys</span>();
@@ -3939,7 +3943,7 @@
 
     <span class="attribute">#[<span class="ident">async_test</span>]</span>
     <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">tests_session_invalidation</span>() {
-        <span class="kw">let</span> <span class="ident">machine</span> <span class="op">=</span> <span class="ident">OlmMachine::new</span>(<span class="ident">user_id</span>(), <span class="ident">alice_device_id</span>());
+        <span class="kw">let</span> <span class="ident">machine</span> <span class="op">=</span> <span class="ident">OlmMachine::new</span>(<span class="ident">user_id</span>(), <span class="ident">alice_device_id</span>()).<span class="kw">await</span>;
         <span class="kw">let</span> <span class="ident">room_id</span> <span class="op">=</span> <span class="macro">room_id!</span>(<span class="string">&quot;!test:example.org&quot;</span>);
 
         <span class="ident">machine</span>.<span class="ident">create_outbound_group_session_with_defaults</span>(<span class="ident">room_id</span>).<span class="kw">await</span>.<span class="ident">unwrap</span>();
@@ -3956,7 +3960,7 @@
 
     <span class="attribute">#[<span class="ident">async_test</span>]</span>
     <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">test_invalid_signature</span>() {
-        <span class="kw">let</span> <span class="ident">machine</span> <span class="op">=</span> <span class="ident">OlmMachine::new</span>(<span class="ident">user_id</span>(), <span class="ident">alice_device_id</span>());
+        <span class="kw">let</span> <span class="ident">machine</span> <span class="op">=</span> <span class="ident">OlmMachine::new</span>(<span class="ident">user_id</span>(), <span class="ident">alice_device_id</span>()).<span class="kw">await</span>;
 
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">device_keys</span> <span class="op">=</span> <span class="ident">machine</span>.<span class="ident">account</span>.<span class="ident">device_keys</span>().<span class="kw">await</span>;
 
@@ -3972,7 +3976,7 @@
 
     <span class="attribute">#[<span class="ident">async_test</span>]</span>
     <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">one_time_key_signing</span>() {
-        <span class="kw">let</span> <span class="ident">machine</span> <span class="op">=</span> <span class="ident">OlmMachine::new</span>(<span class="ident">user_id</span>(), <span class="ident">alice_device_id</span>());
+        <span class="kw">let</span> <span class="ident">machine</span> <span class="op">=</span> <span class="ident">OlmMachine::new</span>(<span class="ident">user_id</span>(), <span class="ident">alice_device_id</span>()).<span class="kw">await</span>;
         <span class="ident">machine</span>.<span class="ident">account</span>.<span class="ident">inner</span>.<span class="ident">update_uploaded_key_count</span>(<span class="number">49</span>);
 
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">one_time_keys</span> <span class="op">=</span> <span class="ident">machine</span>.<span class="ident">account</span>.<span class="ident">signed_one_time_keys</span>().<span class="kw">await</span>;
@@ -3992,7 +3996,7 @@
 
     <span class="attribute">#[<span class="ident">async_test</span>]</span>
     <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">test_keys_for_upload</span>() {
-        <span class="kw">let</span> <span class="ident">machine</span> <span class="op">=</span> <span class="ident">OlmMachine::new</span>(<span class="ident">user_id</span>(), <span class="ident">alice_device_id</span>());
+        <span class="kw">let</span> <span class="ident">machine</span> <span class="op">=</span> <span class="ident">OlmMachine::new</span>(<span class="ident">user_id</span>(), <span class="ident">alice_device_id</span>()).<span class="kw">await</span>;
         <span class="ident">machine</span>.<span class="ident">account</span>.<span class="ident">inner</span>.<span class="ident">update_uploaded_key_count</span>(<span class="number">0</span>);
 
         <span class="kw">let</span> <span class="ident">ed25519_key</span> <span class="op">=</span> <span class="ident">machine</span>.<span class="ident">account</span>.<span class="ident">identity_keys</span>().<span class="ident">ed25519</span>;
