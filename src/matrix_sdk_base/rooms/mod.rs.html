@@ -281,7 +281,7 @@
 </pre><pre class="rust"><code><span class="kw">mod</span> <span class="ident">members</span>;
 <span class="kw">mod</span> <span class="ident">normal</span>;
 
-<span class="kw">use</span> <span class="ident">std::cmp::max</span>;
+<span class="kw">use</span> <span class="ident">std</span>::{<span class="ident">cmp::max</span>, <span class="ident">collections::HashSet</span>};
 
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">members::RoomMember</span>;
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">normal</span>::{<span class="ident">Room</span>, <span class="ident">RoomInfo</span>, <span class="ident">RoomType</span>};
@@ -309,9 +309,9 @@
     <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">canonical_alias</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">OwnedRoomAliasId</span><span class="op">&gt;</span>,
     <span class="doccomment">/// The `m.room.create` event content of this room.</span>
     <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">create</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">RoomCreateEventContent</span><span class="op">&gt;</span>,
-    <span class="doccomment">/// The user id this room is sharing the direct message with, if the room is</span>
-    <span class="doccomment">/// a direct message.</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">dm_target</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">OwnedUserId</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// A list of user ids this room is considered as direct message, if this</span>
+    <span class="doccomment">/// room is a DM.</span>
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">dm_targets</span>: <span class="ident">HashSet</span><span class="op">&lt;</span><span class="ident">OwnedUserId</span><span class="op">&gt;</span>,
     <span class="doccomment">/// The `m.room.encryption` event content that enabled E2EE in this room.</span>
     <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">encryption</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">RoomEncryptionEventContent</span><span class="op">&gt;</span>,
     <span class="doccomment">/// The guest access policy of this room.</span>
@@ -463,7 +463,7 @@
             <span class="ident">avatar_url</span>: <span class="prelude-val">None</span>,
             <span class="ident">canonical_alias</span>: <span class="prelude-val">None</span>,
             <span class="ident">create</span>: <span class="prelude-val">None</span>,
-            <span class="ident">dm_target</span>: <span class="prelude-val">None</span>,
+            <span class="ident">dm_targets</span>: <span class="ident">Default::default</span>(),
             <span class="ident">encryption</span>: <span class="prelude-val">None</span>,
             <span class="ident">guest_access</span>: <span class="ident">GuestAccess::Forbidden</span>,
             <span class="ident">history_visibility</span>: <span class="ident">HistoryVisibility::WorldReadable</span>,
@@ -554,5 +554,5 @@
     }
 }
 </code></pre></div>
-</section><section id="search" class="content hidden"></section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="matrix_sdk_base" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.62.0-nightly (055bf4ccd 2022-04-25)" ></div>
+</section><section id="search" class="content hidden"></section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="matrix_sdk_base" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.62.0-nightly (082e4ca49 2022-04-26)" ></div>
 </body></html>

@@ -722,6 +722,9 @@
 <span id="717">717</span>
 <span id="718">718</span>
 <span id="719">719</span>
+<span id="720">720</span>
+<span id="721">721</span>
+<span id="722">722</span>
 </pre><pre class="rust"><code><span class="comment">// Copyright 2020 The Matrix.org Foundation C.I.C.</span>
 <span class="comment">//</span>
 <span class="comment">// Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);</span>
@@ -736,7 +739,10 @@
 <span class="comment">// See the License for the specific language governing permissions and</span>
 <span class="comment">// limitations under the License.</span>
 
-<span class="kw">use</span> <span class="ident">std::sync</span>::{<span class="ident">Arc</span>, <span class="ident">RwLock</span> <span class="kw">as</span> <span class="ident">SyncRwLock</span>};
+<span class="kw">use</span> <span class="ident">std</span>::{
+    <span class="ident">collections::HashSet</span>,
+    <span class="ident">sync</span>::{<span class="ident">Arc</span>, <span class="ident">RwLock</span> <span class="kw">as</span> <span class="ident">SyncRwLock</span>},
+};
 
 <span class="kw">use</span> <span class="ident">dashmap::DashSet</span>;
 <span class="kw">use</span> <span class="ident">futures_channel::mpsc</span>;
@@ -908,17 +914,17 @@
 
     <span class="doccomment">/// Is this room considered a direct message.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_direct</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">read</span>().<span class="ident">unwrap</span>().<span class="ident">base_info</span>.<span class="ident">dm_target</span>.<span class="ident">is_some</span>()
+        <span class="op">!</span><span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">read</span>().<span class="ident">unwrap</span>().<span class="ident">base_info</span>.<span class="ident">dm_targets</span>.<span class="ident">is_empty</span>()
     }
 
-    <span class="doccomment">/// If this room is a direct message, get the member that we&#39;re sharing the</span>
+    <span class="doccomment">/// If this room is a direct message, get the members that we&#39;re sharing the</span>
     <span class="doccomment">/// room with.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// *Note*: The member list might have been modified in the meantime and</span>
-    <span class="doccomment">/// the target might not even be in the room anymore. This setting should</span>
+    <span class="doccomment">/// the targets might not even be in the room anymore. This setting should</span>
     <span class="doccomment">/// only be considered as guidance.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">direct_target</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">OwnedUserId</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">read</span>().<span class="ident">unwrap</span>().<span class="ident">base_info</span>.<span class="ident">dm_target</span>.<span class="ident">clone</span>()
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">direct_targets</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">HashSet</span><span class="op">&lt;</span><span class="ident">OwnedUserId</span><span class="op">&gt;</span> {
+        <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">read</span>().<span class="ident">unwrap</span>().<span class="ident">base_info</span>.<span class="ident">dm_targets</span>.<span class="ident">clone</span>()
     }
 
     <span class="doccomment">/// Is the room encrypted.</span>
@@ -1442,5 +1448,5 @@
     }
 }
 </code></pre></div>
-</section><section id="search" class="content hidden"></section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="matrix_sdk_base" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.62.0-nightly (055bf4ccd 2022-04-25)" ></div>
+</section><section id="search" class="content hidden"></section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="matrix_sdk_base" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.62.0-nightly (082e4ca49 2022-04-26)" ></div>
 </body></html>
