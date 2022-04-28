@@ -1,1 +1,1 @@
-initSidebarItems({"struct":[["MEMBERS",""]]});
+initSidebarItems({"static":[["MEMBERS",""]]});

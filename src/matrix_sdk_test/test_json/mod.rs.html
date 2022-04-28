@@ -88,7 +88,7 @@
 <span class="doccomment">//! truth. When running `cargo publish` no external folders are allowed so all</span>
 <span class="doccomment">//! the test data needs to be contained within this crate.</span>
 
-<span class="kw">use</span> <span class="ident">lazy_static::lazy_static</span>;
+<span class="kw">use</span> <span class="ident">once_cell::sync::Lazy</span>;
 <span class="kw">use</span> <span class="ident">serde_json</span>::{<span class="ident">json</span>, <span class="ident">Value</span> <span class="kw">as</span> <span class="ident">JsonValue</span>};
 
 <span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">events</span>;
@@ -109,8 +109,8 @@
     <span class="ident">VOIP_SYNC</span>,
 };
 
-<span class="macro">lazy_static!</span> {
-    <span class="kw">pub</span> <span class="kw">static</span> <span class="kw-2">ref</span> <span class="ident">DEVICES</span>: <span class="ident">JsonValue</span> <span class="op">=</span> <span class="macro">json!</span>({
+<span class="kw">pub</span> <span class="kw">static</span> <span class="ident">DEVICES</span>: <span class="ident">Lazy</span><span class="op">&lt;</span><span class="ident">JsonValue</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">Lazy::new</span>(<span class="op">|</span><span class="op">|</span> {
+    <span class="macro">json!</span>({
         <span class="string">&quot;devices&quot;</span>: [
             {
                 <span class="string">&quot;device_id&quot;</span>: <span class="string">&quot;BNYQQWUMXO&quot;</span>,
@@ -127,19 +127,19 @@
                 <span class="string">&quot;user_id&quot;</span>: <span class="string">&quot;@example:localhost&quot;</span>
             }
         ]
-    });
-}
+    })
+});
 
-<span class="macro">lazy_static!</span> {
-    <span class="kw">pub</span> <span class="kw">static</span> <span class="kw-2">ref</span> <span class="ident">WELL_KNOWN</span>: <span class="ident">JsonValue</span> <span class="op">=</span> <span class="macro">json!</span>({
+<span class="kw">pub</span> <span class="kw">static</span> <span class="ident">WELL_KNOWN</span>: <span class="ident">Lazy</span><span class="op">&lt;</span><span class="ident">JsonValue</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">Lazy::new</span>(<span class="op">|</span><span class="op">|</span> {
+    <span class="macro">json!</span>({
         <span class="string">&quot;m.homeserver&quot;</span>: {
             <span class="string">&quot;base_url&quot;</span>: <span class="string">&quot;HOMESERVER_URL&quot;</span>
         }
-    });
-}
+    })
+});
 
-<span class="macro">lazy_static!</span> {
-    <span class="kw">pub</span> <span class="kw">static</span> <span class="kw-2">ref</span> <span class="ident">VERSIONS</span>: <span class="ident">JsonValue</span> <span class="op">=</span> <span class="macro">json!</span>({
+<span class="kw">pub</span> <span class="kw">static</span> <span class="ident">VERSIONS</span>: <span class="ident">Lazy</span><span class="op">&lt;</span><span class="ident">JsonValue</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">Lazy::new</span>(<span class="op">|</span><span class="op">|</span> {
+    <span class="macro">json!</span>({
         <span class="string">&quot;versions&quot;</span>: [
             <span class="string">&quot;r0.0.1&quot;</span>,
             <span class="string">&quot;r0.1.0&quot;</span>,
@@ -153,14 +153,14 @@
             <span class="string">&quot;org.matrix.label_based_filtering&quot;</span>:<span class="bool-val">true</span>,
             <span class="string">&quot;org.matrix.e2e_cross_signing&quot;</span>:<span class="bool-val">true</span>
         }
-    });
-}
+    })
+});
 
-<span class="macro">lazy_static!</span> {
-    <span class="kw">pub</span> <span class="kw">static</span> <span class="kw-2">ref</span> <span class="ident">WHOAMI</span>: <span class="ident">JsonValue</span> <span class="op">=</span> <span class="macro">json!</span>({
+<span class="kw">pub</span> <span class="kw">static</span> <span class="ident">WHOAMI</span>: <span class="ident">Lazy</span><span class="op">&lt;</span><span class="ident">JsonValue</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">Lazy::new</span>(<span class="op">|</span><span class="op">|</span> {
+    <span class="macro">json!</span>({
         <span class="string">&quot;user_id&quot;</span>: <span class="string">&quot;@joe:example.org&quot;</span>
-    });
-}
+    })
+});
 </code></pre></div>
-</section><section id="search" class="content hidden"></section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="matrix_sdk_test" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.62.0-nightly (082e4ca49 2022-04-26)" ></div>
+</section><section id="search" class="content hidden"></section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="matrix_sdk_test" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.62.0-nightly (69a5d2481 2022-04-27)" ></div>
 </body></html>

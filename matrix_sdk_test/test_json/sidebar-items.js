@@ -1,1 +1,1 @@
-initSidebarItems({"mod":[["events",""],["members",""],["sync",""]],"struct":[["DEVICES",""],["VERSIONS",""],["WELL_KNOWN",""],["WHOAMI",""]]});
+initSidebarItems({"mod":[["events",""],["members",""],["sync",""]],"static":[["DEVICES",""],["VERSIONS",""],["WELL_KNOWN",""],["WHOAMI",""]]});
