@@ -22,7 +22,16 @@
 <span id="17">17</span>
 <span id="18">18</span>
 <span id="19">19</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">instant::SystemTime</span>;
+<span id="20">20</span>
+<span id="21">21</span>
+<span id="22">22</span>
+<span id="23">23</span>
+<span id="24">24</span>
+<span id="25">25</span>
+<span id="26">26</span>
+<span id="27">27</span>
+<span id="28">28</span>
+</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">instant</span>::{<span class="ident">Duration</span>, <span class="ident">SystemTime</span>};
 <span class="kw">use</span> <span class="ident">ruma</span>::{<span class="ident">MilliSecondsSinceUnixEpoch</span>, <span class="ident">SecondsSinceUnixEpoch</span>};
 
 <span class="doccomment">/// Platform agnostic helper function to create MilliSecondsSinceUnixEpoch</span>
@@ -36,8 +45,17 @@
 
 <span class="doccomment">/// Platform agnostic helper function to create SecondsSinceUnixEpoch</span>
 <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">seconds_since_unix_epoch</span>() -&gt; <span class="ident">SecondsSinceUnixEpoch</span> {
+    <span class="ident">modified_seconds_since_unix_epoch</span>(<span class="op">|</span><span class="ident">e</span><span class="op">|</span> <span class="ident">e</span>)
+}
+
+<span class="doccomment">/// Platform agnostic helper function to create SecondsSinceUnixEpoch with</span>
+<span class="doccomment">/// modifications</span>
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">modified_seconds_since_unix_epoch</span><span class="op">&lt;</span><span class="ident">F</span>: <span class="ident">Fn</span>(<span class="ident">Duration</span>) -&gt; <span class="ident">Duration</span><span class="op">&gt;</span>(
+    <span class="ident">f</span>: <span class="ident">F</span>,
+) -&gt; <span class="ident">SecondsSinceUnixEpoch</span> {
     <span class="kw">let</span> <span class="ident">duration</span> <span class="op">=</span>
-        <span class="ident">SystemTime::now</span>().<span class="ident">duration_since</span>(<span class="ident">SystemTime::UNIX_EPOCH</span>).<span class="ident">expect</span>(<span class="string">&quot;now is always higher&quot;</span>);
+        <span class="ident">f</span>(<span class="ident">SystemTime::now</span>().<span class="ident">duration_since</span>(<span class="ident">SystemTime::UNIX_EPOCH</span>).<span class="ident">expect</span>(<span class="string">&quot;now is always higher&quot;</span>));
+
     <span class="kw">let</span> <span class="ident">millis</span> <span class="op">=</span> <span class="ident">duration</span>.<span class="ident">as_secs</span>().<span class="ident">try_into</span>().<span class="ident">expect</span>(<span class="string">&quot;can&#39;t convert seconds since UNIXEPOCH&quot;</span>);
     <span class="ident">SecondsSinceUnixEpoch</span>(<span class="ident">millis</span>)
 }

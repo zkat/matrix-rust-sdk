@@ -1326,7 +1326,7 @@
     <span class="kw">use</span> <span class="ident">std::time::Duration</span>;
 
     <span class="kw">use</span> <span class="ident">atomic::Ordering</span>;
-    <span class="kw">use</span> <span class="ident">matrix_sdk_common::instant::SystemTime</span>;
+    <span class="kw">use</span> <span class="ident">matrix_sdk_common::util::modified_seconds_since_unix_epoch</span>;
     <span class="kw">use</span> <span class="ident">matrix_sdk_test::async_test</span>;
     <span class="kw">use</span> <span class="ident">ruma</span>::{
         <span class="ident">device_id</span>,
@@ -1334,7 +1334,7 @@
             <span class="ident">encryption::RoomEncryptionEventContent</span>, <span class="ident">history_visibility::HistoryVisibility</span>,
             <span class="ident">message::RoomMessageEventContent</span>,
         },
-        <span class="ident">room_id</span>, <span class="ident">uint</span>, <span class="ident">user_id</span>, <span class="ident">EventEncryptionAlgorithm</span>, <span class="ident">SecondsSinceUnixEpoch</span>,
+        <span class="ident">room_id</span>, <span class="ident">uint</span>, <span class="ident">user_id</span>, <span class="ident">EventEncryptionAlgorithm</span>,
     };
 
     <span class="kw">use</span> <span class="kw">super</span>::{<span class="ident">EncryptionSettings</span>, <span class="ident">ROTATION_MESSAGES</span>, <span class="ident">ROTATION_PERIOD</span>};
@@ -1390,8 +1390,8 @@
 
         <span class="macro">assert!</span>(<span class="op">!</span><span class="ident">session</span>.<span class="ident">expired</span>());
         <span class="comment">// FIXME: this might break on macosx and windows</span>
-        <span class="kw">let</span> <span class="ident">time</span> <span class="op">=</span> <span class="ident">SystemTime::now</span>() <span class="op">-</span> <span class="ident">Duration::from_secs</span>(<span class="number">60</span> <span class="op">*</span> <span class="number">60</span>);
-        <span class="ident">session</span>.<span class="ident">creation_time</span> <span class="op">=</span> <span class="ident">SecondsSinceUnixEpoch::from_system_time</span>(<span class="ident">time</span>).<span class="ident">unwrap</span>();
+        <span class="ident">session</span>.<span class="ident">creation_time</span> <span class="op">=</span>
+            <span class="ident">modified_seconds_since_unix_epoch</span>(<span class="op">|</span><span class="ident">e</span><span class="op">|</span> <span class="ident">e</span> <span class="op">-</span> <span class="ident">Duration::from_secs</span>(<span class="number">60</span> <span class="op">*</span> <span class="number">60</span>));
         <span class="macro">assert!</span>(<span class="ident">session</span>.<span class="ident">expired</span>());
 
         <span class="kw">let</span> <span class="ident">settings</span> <span class="op">=</span> <span class="ident">EncryptionSettings</span> { <span class="ident">rotation_period_msgs</span>: <span class="number">0</span>, ..<span class="ident">Default::default</span>() };
