@@ -1,1 +1,0 @@
-initSidebarItems({"mod":[["v1","`/v1/` (spec)"],["v2","`/v2/` (spec)"]]});

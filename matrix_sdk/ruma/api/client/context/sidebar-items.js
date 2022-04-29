@@ -1,1 +1,0 @@
-initSidebarItems({"mod":[["get_context","`GET /_matrix/client/*/rooms/{roomId}/context/{eventId}`"]]});

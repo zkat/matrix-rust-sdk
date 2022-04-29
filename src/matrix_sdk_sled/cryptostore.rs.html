@@ -1062,8 +1062,6 @@
 <span id="1057">1057</span>
 <span id="1058">1058</span>
 <span id="1059">1059</span>
-<span id="1060">1060</span>
-<span id="1061">1061</span>
 </pre><pre class="rust"><code><span class="comment">// Copyright 2020 The Matrix.org Foundation C.I.C.</span>
 <span class="comment">//</span>
 <span class="comment">// Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);</span>
@@ -1086,15 +1084,9 @@
 };
 
 <span class="kw">use</span> <span class="ident">anyhow::anyhow</span>;
+<span class="kw">use</span> <span class="ident">async_trait::async_trait</span>;
 <span class="kw">use</span> <span class="ident">dashmap::DashSet</span>;
-<span class="kw">use</span> <span class="ident">matrix_sdk_common</span>::{
-    <span class="ident">async_trait</span>,
-    <span class="ident">locks::Mutex</span>,
-    <span class="ident">ruma</span>::{
-        <span class="ident">events::room_key_request::RequestedKeyInfo</span>, <span class="ident">DeviceId</span>, <span class="ident">OwnedDeviceId</span>, <span class="ident">OwnedUserId</span>, <span class="ident">RoomId</span>,
-        <span class="ident">TransactionId</span>, <span class="ident">UserId</span>,
-    },
-};
+<span class="kw">use</span> <span class="ident">matrix_sdk_common::locks::Mutex</span>;
 <span class="kw">use</span> <span class="ident">matrix_sdk_crypto</span>::{
     <span class="ident">olm</span>::{
         <span class="ident">IdentityKeys</span>, <span class="ident">InboundGroupSession</span>, <span class="ident">OutboundGroupSession</span>, <span class="ident">PickledInboundGroupSession</span>,
@@ -1107,6 +1099,10 @@
     <span class="ident">GossipRequest</span>, <span class="ident">ReadOnlyAccount</span>, <span class="ident">ReadOnlyDevice</span>, <span class="ident">ReadOnlyUserIdentities</span>, <span class="ident">SecretInfo</span>,
 };
 <span class="kw">use</span> <span class="ident">matrix_sdk_store_encryption::StoreCipher</span>;
+<span class="kw">use</span> <span class="ident">ruma</span>::{
+    <span class="ident">events::room_key_request::RequestedKeyInfo</span>, <span class="ident">DeviceId</span>, <span class="ident">OwnedDeviceId</span>, <span class="ident">OwnedUserId</span>, <span class="ident">RoomId</span>,
+    <span class="ident">TransactionId</span>, <span class="ident">UserId</span>,
+};
 <span class="kw">use</span> <span class="ident">serde</span>::{<span class="ident">Deserialize</span>, <span class="ident">Serialize</span>};
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">sled::Error</span>;
 <span class="kw">use</span> <span class="ident">sled</span>::{

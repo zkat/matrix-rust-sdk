@@ -1,1 +1,0 @@
-initSidebarItems({"mod":[["get_backfill","`GET /_matrix/federation/*/backfill/{roomId}`"]]});

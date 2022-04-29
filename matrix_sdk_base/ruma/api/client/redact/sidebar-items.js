@@ -1,1 +1,0 @@
-initSidebarItems({"mod":[["redact_event","`PUT /_matrix/client/*/rooms/{roomId}/redact/{eventId}/{txnId}`"]]});

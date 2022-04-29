@@ -1425,8 +1425,6 @@
 <span id="1420">1420</span>
 <span id="1421">1421</span>
 <span id="1422">1422</span>
-<span id="1423">1423</span>
-<span id="1424">1424</span>
 </pre><pre class="rust"><code><span class="comment">// Copyright 2021 The Matrix.org Foundation C.I.C.</span>
 <span class="comment">//</span>
 <span class="comment">// Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);</span>
@@ -1450,6 +1448,7 @@
 
 <span class="kw">use</span> <span class="ident">anyhow::anyhow</span>;
 <span class="kw">use</span> <span class="ident">async_stream::stream</span>;
+<span class="kw">use</span> <span class="ident">async_trait::async_trait</span>;
 <span class="kw">use</span> <span class="ident">futures_core::stream::Stream</span>;
 <span class="kw">use</span> <span class="ident">futures_util::stream</span>::{<span class="self">self</span>, <span class="ident">StreamExt</span>, <span class="ident">TryStreamExt</span>};
 <span class="kw">use</span> <span class="ident">matrix_sdk_base</span>::{
@@ -1458,27 +1457,24 @@
     <span class="ident">store</span>::{<span class="ident">BoxStream</span>, <span class="prelude-ty">Result</span> <span class="kw">as</span> <span class="ident">StoreResult</span>, <span class="ident">StateChanges</span>, <span class="ident">StateStore</span>, <span class="ident">StoreError</span>},
     <span class="ident">RoomInfo</span>,
 };
-<span class="kw">use</span> <span class="ident">matrix_sdk_common</span>::{
-    <span class="ident">async_trait</span>,
-    <span class="ident">ruma</span>::{
-        <span class="ident">events</span>::{
-            <span class="ident">presence::PresenceEvent</span>,
-            <span class="ident">receipt::Receipt</span>,
-            <span class="ident">room</span>::{
-                <span class="ident">member</span>::{<span class="ident">MembershipState</span>, <span class="ident">OriginalSyncRoomMemberEvent</span>, <span class="ident">RoomMemberEventContent</span>},
-                <span class="ident">redaction::SyncRoomRedactionEvent</span>,
-            },
-            <span class="ident">AnyGlobalAccountDataEvent</span>, <span class="ident">AnyRoomAccountDataEvent</span>, <span class="ident">AnySyncMessageLikeEvent</span>,
-            <span class="ident">AnySyncRoomEvent</span>, <span class="ident">AnySyncStateEvent</span>, <span class="ident">GlobalAccountDataEventType</span>,
-            <span class="ident">RoomAccountDataEventType</span>, <span class="ident">StateEventType</span>,
-        },
-        <span class="ident">receipt::ReceiptType</span>,
-        <span class="ident">serde::Raw</span>,
-        <span class="ident">signatures</span>::{<span class="ident">redact_in_place</span>, <span class="ident">CanonicalJsonObject</span>},
-        <span class="ident">EventId</span>, <span class="ident">IdParseError</span>, <span class="ident">MxcUri</span>, <span class="ident">OwnedEventId</span>, <span class="ident">OwnedUserId</span>, <span class="ident">RoomId</span>, <span class="ident">RoomVersionId</span>, <span class="ident">UserId</span>,
-    },
-};
 <span class="kw">use</span> <span class="ident">matrix_sdk_store_encryption</span>::{<span class="ident">Error</span> <span class="kw">as</span> <span class="ident">KeyEncryptionError</span>, <span class="ident">StoreCipher</span>};
+<span class="kw">use</span> <span class="ident">ruma</span>::{
+    <span class="ident">events</span>::{
+        <span class="ident">presence::PresenceEvent</span>,
+        <span class="ident">receipt::Receipt</span>,
+        <span class="ident">room</span>::{
+            <span class="ident">member</span>::{<span class="ident">MembershipState</span>, <span class="ident">OriginalSyncRoomMemberEvent</span>, <span class="ident">RoomMemberEventContent</span>},
+            <span class="ident">redaction::SyncRoomRedactionEvent</span>,
+        },
+        <span class="ident">AnyGlobalAccountDataEvent</span>, <span class="ident">AnyRoomAccountDataEvent</span>, <span class="ident">AnySyncMessageLikeEvent</span>,
+        <span class="ident">AnySyncRoomEvent</span>, <span class="ident">AnySyncStateEvent</span>, <span class="ident">GlobalAccountDataEventType</span>, <span class="ident">RoomAccountDataEventType</span>,
+        <span class="ident">StateEventType</span>,
+    },
+    <span class="ident">receipt::ReceiptType</span>,
+    <span class="ident">serde::Raw</span>,
+    <span class="ident">signatures</span>::{<span class="ident">redact_in_place</span>, <span class="ident">CanonicalJsonObject</span>},
+    <span class="ident">EventId</span>, <span class="ident">IdParseError</span>, <span class="ident">MxcUri</span>, <span class="ident">OwnedEventId</span>, <span class="ident">OwnedUserId</span>, <span class="ident">RoomId</span>, <span class="ident">RoomVersionId</span>, <span class="ident">UserId</span>,
+};
 <span class="kw">use</span> <span class="ident">serde</span>::{<span class="ident">Deserialize</span>, <span class="ident">Serialize</span>};
 <span class="kw">use</span> <span class="ident">sled</span>::{
     <span class="ident">transaction</span>::{<span class="ident">ConflictableTransactionError</span>, <span class="ident">TransactionError</span>},

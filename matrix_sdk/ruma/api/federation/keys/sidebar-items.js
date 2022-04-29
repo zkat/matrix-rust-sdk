@@ -1,1 +1,0 @@
-initSidebarItems({"mod":[["claim_keys","`POST /_matrix/federation/*/user/keys/claim`"],["get_keys","`POST /_matrix/federation/*/user/keys/query`"]]});
