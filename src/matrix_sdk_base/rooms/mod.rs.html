@@ -272,12 +272,6 @@
 <span id="267">267</span>
 <span id="268">268</span>
 <span id="269">269</span>
-<span id="270">270</span>
-<span id="271">271</span>
-<span id="272">272</span>
-<span id="273">273</span>
-<span id="274">274</span>
-<span id="275">275</span>
 </pre><pre class="rust"><code><span class="kw">mod</span> <span class="ident">members</span>;
 <span class="kw">mod</span> <span class="ident">normal</span>;
 
@@ -369,10 +363,7 @@
                 <span class="self">self</span>.<span class="ident">create</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">c</span>.<span class="ident">content</span>.<span class="ident">clone</span>());
             }
             <span class="ident">AnySyncStateEvent::RoomHistoryVisibility</span>(<span class="ident">h</span>) =&gt; {
-                <span class="self">self</span>.<span class="ident">history_visibility</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">h</span> {
-                    <span class="ident">SyncStateEvent::Original</span>(<span class="ident">h</span>) =&gt; <span class="ident">h</span>.<span class="ident">content</span>.<span class="ident">history_visibility</span>.<span class="ident">clone</span>(),
-                    <span class="ident">SyncStateEvent::Redacted</span>(<span class="ident">h</span>) =&gt; <span class="ident">h</span>.<span class="ident">content</span>.<span class="ident">history_visibility</span>.<span class="ident">clone</span>(),
-                };
+                <span class="self">self</span>.<span class="ident">history_visibility</span> <span class="op">=</span> <span class="ident">h</span>.<span class="ident">history_visibility</span>().<span class="ident">clone</span>();
             }
             <span class="ident">AnySyncStateEvent::RoomGuestAccess</span>(<span class="ident">g</span>) =&gt; {
                 <span class="self">self</span>.<span class="ident">guest_access</span> <span class="op">=</span> <span class="ident">g</span>
@@ -380,10 +371,7 @@
                     .<span class="ident">map_or</span>(<span class="ident">GuestAccess::Forbidden</span>, <span class="op">|</span><span class="ident">g</span><span class="op">|</span> <span class="ident">g</span>.<span class="ident">content</span>.<span class="ident">guest_access</span>.<span class="ident">clone</span>());
             }
             <span class="ident">AnySyncStateEvent::RoomJoinRules</span>(<span class="ident">c</span>) =&gt; {
-                <span class="self">self</span>.<span class="ident">join_rule</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">c</span> {
-                    <span class="ident">SyncStateEvent::Original</span>(<span class="ident">c</span>) =&gt; <span class="ident">c</span>.<span class="ident">content</span>.<span class="ident">join_rule</span>.<span class="ident">clone</span>(),
-                    <span class="ident">SyncStateEvent::Redacted</span>(<span class="ident">c</span>) =&gt; <span class="ident">c</span>.<span class="ident">content</span>.<span class="ident">join_rule</span>.<span class="ident">clone</span>(),
-                };
+                <span class="self">self</span>.<span class="ident">join_rule</span> <span class="op">=</span> <span class="ident">c</span>.<span class="ident">join_rule</span>().<span class="ident">clone</span>();
             }
             <span class="ident">AnySyncStateEvent::RoomCanonicalAlias</span>(<span class="ident">a</span>) =&gt; {
                 <span class="self">self</span>.<span class="ident">canonical_alias</span> <span class="op">=</span> <span class="ident">a</span>.<span class="ident">as_original</span>().<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">a</span><span class="op">|</span> <span class="ident">a</span>.<span class="ident">content</span>.<span class="ident">alias</span>.<span class="ident">clone</span>());
@@ -554,5 +542,5 @@
     }
 }
 </code></pre></div>
-</section><section id="search" class="content hidden"></section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="matrix_sdk_base" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.62.0-nightly (69a5d2481 2022-04-27)" ></div>
+</section><section id="search" class="content hidden"></section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="matrix_sdk_base" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.62.0-nightly (e85edd9a8 2022-04-28)" ></div>
 </body></html>

@@ -498,7 +498,6 @@
 <span id="493">493</span>
 <span id="494">494</span>
 <span id="495">495</span>
-<span id="496">496</span>
 </pre><pre class="rust"><code><span class="comment">// Copyright 2020 The Matrix.org Foundation C.I.C.</span>
 <span class="comment">//</span>
 <span class="comment">// Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);</span>
@@ -520,7 +519,6 @@
 };
 
 <span class="kw">use</span> <span class="ident">dashmap</span>::{<span class="ident">DashMap</span>, <span class="ident">DashSet</span>};
-<span class="kw">use</span> <span class="ident">matrix_sdk_common::util::seconds_since_unix_epoch</span>;
 <span class="kw">use</span> <span class="ident">ruma</span>::{
     <span class="ident">api::client::keys::claim_keys::v3</span>::{
         <span class="ident">Request</span> <span class="kw">as</span> <span class="ident">KeysClaimRequest</span>, <span class="ident">Response</span> <span class="kw">as</span> <span class="ident">KeysClaimResponse</span>,
@@ -528,7 +526,7 @@
     <span class="ident">assign</span>,
     <span class="ident">events</span>::{<span class="ident">dummy::ToDeviceDummyEventContent</span>, <span class="ident">AnyToDeviceEventContent</span>},
     <span class="ident">DeviceId</span>, <span class="ident">DeviceKeyAlgorithm</span>, <span class="ident">EventEncryptionAlgorithm</span>, <span class="ident">OwnedDeviceId</span>, <span class="ident">OwnedTransactionId</span>,
-    <span class="ident">OwnedUserId</span>, <span class="ident">TransactionId</span>, <span class="ident">UserId</span>,
+    <span class="ident">OwnedUserId</span>, <span class="ident">SecondsSinceUnixEpoch</span>, <span class="ident">TransactionId</span>, <span class="ident">UserId</span>,
 };
 <span class="kw">use</span> <span class="ident">tracing</span>::{<span class="ident">debug</span>, <span class="ident">error</span>, <span class="ident">info</span>, <span class="ident">warn</span>};
 
@@ -598,7 +596,7 @@
                     );
 
                     <span class="kw">let</span> <span class="ident">creation_time</span> <span class="op">=</span> <span class="ident">Duration::from_secs</span>(<span class="ident">session</span>.<span class="ident">creation_time</span>.<span class="ident">get</span>().<span class="ident">into</span>());
-                    <span class="kw">let</span> <span class="ident">now</span> <span class="op">=</span> <span class="ident">Duration::from_secs</span>(<span class="ident">seconds_since_unix_epoch</span>().<span class="ident">get</span>().<span class="ident">into</span>());
+                    <span class="kw">let</span> <span class="ident">now</span> <span class="op">=</span> <span class="ident">Duration::from_secs</span>(<span class="ident">SecondsSinceUnixEpoch::now</span>().<span class="ident">get</span>().<span class="ident">into</span>());
 
                     <span class="kw">let</span> <span class="ident">should_unwedge</span> <span class="op">=</span> <span class="ident">now</span>
                         .<span class="ident">checked_sub</span>(<span class="ident">creation_time</span>)
@@ -996,5 +994,5 @@
     }
 }
 </code></pre></div>
-</section><section id="search" class="content hidden"></section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="matrix_sdk_crypto" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.62.0-nightly (69a5d2481 2022-04-27)" ></div>
+</section><section id="search" class="content hidden"></section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="matrix_sdk_crypto" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.62.0-nightly (e85edd9a8 2022-04-28)" ></div>
 </body></html>
