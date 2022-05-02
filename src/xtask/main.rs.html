@@ -58,10 +58,17 @@
 <span id="53">53</span>
 <span id="54">54</span>
 <span id="55">55</span>
+<span id="56">56</span>
+<span id="57">57</span>
+<span id="58">58</span>
+<span id="59">59</span>
+<span id="60">60</span>
 </pre><pre class="rust"><code><span class="kw">mod</span> <span class="ident">ci</span>;
+<span class="kw">mod</span> <span class="ident">fixup</span>;
 
 <span class="kw">use</span> <span class="ident">ci::CiArgs</span>;
 <span class="kw">use</span> <span class="ident">clap</span>::{<span class="ident">Parser</span>, <span class="ident">Subcommand</span>};
+<span class="kw">use</span> <span class="ident">fixup::FixupArgs</span>;
 <span class="kw">use</span> <span class="ident">xshell::cmd</span>;
 
 <span class="kw">type</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">E</span> <span class="op">=</span> <span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">std::error::Error</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">std::result::Result</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">E</span><span class="op">&gt;</span>;
@@ -76,6 +83,8 @@
 <span class="kw">enum</span> <span class="ident">Command</span> {
     <span class="doccomment">/// Run continuous integration checks</span>
     <span class="ident">Ci</span>(<span class="ident">CiArgs</span>),
+    <span class="doccomment">/// Fix up automatic checks</span>
+    <span class="ident">Fixup</span>(<span class="ident">FixupArgs</span>),
     <span class="doccomment">/// Build the SDKs documentation</span>
     <span class="ident">Doc</span> {
         <span class="doccomment">/// Opens the docs in a browser after the operation</span>
@@ -87,6 +96,7 @@
 <span class="kw">fn</span> <span class="ident">main</span>() -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
     <span class="kw">match</span> <span class="ident">Xtask::parse</span>().<span class="ident">cmd</span> {
         <span class="ident">Command::Ci</span>(<span class="ident">ci</span>) =&gt; <span class="ident">ci</span>.<span class="ident">run</span>(),
+        <span class="ident">Command::Fixup</span>(<span class="ident">cfg</span>) =&gt; <span class="ident">cfg</span>.<span class="ident">run</span>(),
         <span class="ident">Command::Doc</span> { <span class="ident">open</span> } =&gt; <span class="ident">build_docs</span>(<span class="ident">open</span>.<span class="ident">then</span>(<span class="op">|</span><span class="op">|</span> <span class="string">&quot;--open&quot;</span>), <span class="ident">DenyWarnings::No</span>),
     }
 }
@@ -114,5 +124,5 @@
     <span class="prelude-val">Ok</span>(())
 }
 </code></pre></div>
-</section><section id="search" class="content hidden"></section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="xtask" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.62.0-nightly (e85edd9a8 2022-04-28)" ></div>
+</section><section id="search" class="content hidden"></section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="xtask" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.62.0-nightly (4dd8b420c 2022-05-01)" ></div>
 </body></html>

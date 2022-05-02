@@ -12,5 +12,5 @@ sourcesIndex["matrix_sdk_store_encryption"] = {"name":"","files":["lib.rs"]};
 sourcesIndex["matrix_sdk_test"] = {"name":"","dirs":[{"name":"test_json","files":["events.rs","members.rs","mod.rs","sync.rs"]}],"files":["appservice.rs","lib.rs"]};
 sourcesIndex["matrix_sdk_test_macros"] = {"name":"","files":["lib.rs"]};
 sourcesIndex["sled_state_inspector"] = {"name":"","files":["main.rs"]};
-sourcesIndex["xtask"] = {"name":"","files":["ci.rs","main.rs"]};
+sourcesIndex["xtask"] = {"name":"","files":["ci.rs","fixup.rs","main.rs"]};
 createSourceSidebar();
