@@ -324,6 +324,16 @@
 <span id="319">319</span>
 <span id="320">320</span>
 <span id="321">321</span>
+<span id="322">322</span>
+<span id="323">323</span>
+<span id="324">324</span>
+<span id="325">325</span>
+<span id="326">326</span>
+<span id="327">327</span>
+<span id="328">328</span>
+<span id="329">329</span>
+<span id="330">330</span>
+<span id="331">331</span>
 </pre><pre class="rust"><code><span class="attribute">#![<span class="ident">allow</span>(<span class="ident">missing_docs</span>)]</span>
 
 <span class="kw">use</span> <span class="ident">std::collections::HashMap</span>;
@@ -344,6 +354,7 @@
                 <span class="ident">Request</span> <span class="kw">as</span> <span class="ident">RustSignatureUploadRequest</span>, <span class="ident">Response</span> <span class="kw">as</span> <span class="ident">SignatureUploadResponse</span>,
             },
         },
+        <span class="ident">message::send_message_event::v3::Response</span> <span class="kw">as</span> <span class="ident">RoomMessageResponse</span>,
         <span class="ident">sync::sync_events::v3::DeviceLists</span> <span class="kw">as</span> <span class="ident">RumaDeviceLists</span>,
         <span class="ident">to_device::send_event_to_device::v3::Response</span> <span class="kw">as</span> <span class="ident">ToDeviceResponse</span>,
     },
@@ -552,6 +563,7 @@
     <span class="ident">ToDevice</span>,
     <span class="ident">SignatureUpload</span>,
     <span class="ident">KeysBackup</span>,
+    <span class="ident">RoomMessage</span>,
 }
 
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">DeviceLists</span> {
@@ -595,6 +607,7 @@
     <span class="ident">ToDevice</span>(<span class="ident">ToDeviceResponse</span>),
     <span class="ident">SignatureUpload</span>(<span class="ident">SignatureUploadResponse</span>),
     <span class="ident">KeysBackup</span>(<span class="ident">KeysBackupResponse</span>),
+    <span class="ident">RoomMessage</span>(<span class="ident">RoomMessageResponse</span>),
 }
 
 <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">KeysClaimResponse</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">OwnedResponse</span> {
@@ -633,6 +646,12 @@
     }
 }
 
+<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">RoomMessageResponse</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">OwnedResponse</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">response</span>: <span class="ident">RoomMessageResponse</span>) -&gt; <span class="self">Self</span> {
+        <span class="ident">OwnedResponse::RoomMessage</span>(<span class="ident">response</span>)
+    }
+}
+
 <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">From</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">OwnedResponse</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">IncomingResponse</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
     <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">r</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">OwnedResponse</span>) -&gt; <span class="self">Self</span> {
         <span class="kw">match</span> <span class="ident">r</span> {
@@ -642,6 +661,7 @@
             <span class="ident">OwnedResponse::ToDevice</span>(<span class="ident">r</span>) =&gt; <span class="ident">IncomingResponse::ToDevice</span>(<span class="ident">r</span>),
             <span class="ident">OwnedResponse::SignatureUpload</span>(<span class="ident">r</span>) =&gt; <span class="ident">IncomingResponse::SignatureUpload</span>(<span class="ident">r</span>),
             <span class="ident">OwnedResponse::KeysBackup</span>(<span class="ident">r</span>) =&gt; <span class="ident">IncomingResponse::KeysBackup</span>(<span class="ident">r</span>),
+            <span class="ident">OwnedResponse::RoomMessage</span>(<span class="ident">r</span>) =&gt; <span class="ident">IncomingResponse::RoomMessage</span>(<span class="ident">r</span>),
         }
     }
 }

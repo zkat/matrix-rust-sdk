@@ -1367,6 +1367,10 @@
 <span id="1362">1362</span>
 <span id="1363">1363</span>
 <span id="1364">1364</span>
+<span id="1365">1365</span>
+<span id="1366">1366</span>
+<span id="1367">1367</span>
+<span id="1368">1368</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">std</span>::{
     <span class="ident">collections</span>::{<span class="ident">BTreeMap</span>, <span class="ident">HashMap</span>},
     <span class="ident">convert::TryInto</span>,
@@ -1394,6 +1398,7 @@
                 <span class="ident">upload_keys::v3::Response</span> <span class="kw">as</span> <span class="ident">KeysUploadResponse</span>,
                 <span class="ident">upload_signatures::v3::Response</span> <span class="kw">as</span> <span class="ident">SignatureUploadResponse</span>,
             },
+            <span class="ident">message::send_message_event::v3::Response</span> <span class="kw">as</span> <span class="ident">RoomMessageResponse</span>,
             <span class="ident">sync::sync_events::v3</span>::{<span class="ident">DeviceLists</span> <span class="kw">as</span> <span class="ident">RumaDeviceLists</span>, <span class="ident">ToDevice</span>},
             <span class="ident">to_device::send_event_to_device::v3::Response</span> <span class="kw">as</span> <span class="ident">ToDeviceResponse</span>,
         },
@@ -1698,6 +1703,9 @@
             }
             <span class="ident">RequestType::KeysBackup</span> =&gt; {
                 <span class="ident">KeysBackupResponse::try_from_http_response</span>(<span class="ident">response</span>).<span class="ident">map</span>(<span class="ident">Into::into</span>)
+            }
+            <span class="ident">RequestType::RoomMessage</span> =&gt; {
+                <span class="ident">RoomMessageResponse::try_from_http_response</span>(<span class="ident">response</span>).<span class="ident">map</span>(<span class="ident">Into::into</span>)
             }
         }
         .<span class="ident">expect</span>(<span class="string">&quot;Can&#39;t convert json string to response&quot;</span>);
