@@ -2275,49 +2275,49 @@
     <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">remove_room</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">room_id</span>: <span class="kw-2">&amp;</span><span class="ident">RoomId</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">members_batch</span> <span class="op">=</span> <span class="ident">sled::Batch::default</span>();
         <span class="kw">for</span> <span class="ident">key</span> <span class="kw">in</span> <span class="self">self</span>.<span class="ident">members</span>.<span class="ident">scan_prefix</span>(<span class="self">self</span>.<span class="ident">encode_key</span>(<span class="ident">MEMBER</span>, <span class="ident">room_id</span>)).<span class="ident">keys</span>() {
-            <span class="ident">members_batch</span>.<span class="ident">remove</span>(<span class="ident">key</span><span class="question-mark">?</span>)
+            <span class="ident">members_batch</span>.<span class="ident">remove</span>(<span class="ident">key</span><span class="question-mark">?</span>);
         }
 
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">profiles_batch</span> <span class="op">=</span> <span class="ident">sled::Batch::default</span>();
         <span class="kw">for</span> <span class="ident">key</span> <span class="kw">in</span> <span class="self">self</span>.<span class="ident">profiles</span>.<span class="ident">scan_prefix</span>(<span class="self">self</span>.<span class="ident">encode_key</span>(<span class="ident">PROFILE</span>, <span class="ident">room_id</span>)).<span class="ident">keys</span>() {
-            <span class="ident">profiles_batch</span>.<span class="ident">remove</span>(<span class="ident">key</span><span class="question-mark">?</span>)
+            <span class="ident">profiles_batch</span>.<span class="ident">remove</span>(<span class="ident">key</span><span class="question-mark">?</span>);
         }
 
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">display_names_batch</span> <span class="op">=</span> <span class="ident">sled::Batch::default</span>();
         <span class="kw">for</span> <span class="ident">key</span> <span class="kw">in</span> <span class="self">self</span>.<span class="ident">display_names</span>.<span class="ident">scan_prefix</span>(<span class="self">self</span>.<span class="ident">encode_key</span>(<span class="ident">DISPLAY_NAME</span>, <span class="ident">room_id</span>)).<span class="ident">keys</span>() {
-            <span class="ident">display_names_batch</span>.<span class="ident">remove</span>(<span class="ident">key</span><span class="question-mark">?</span>)
+            <span class="ident">display_names_batch</span>.<span class="ident">remove</span>(<span class="ident">key</span><span class="question-mark">?</span>);
         }
 
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">joined_user_ids_batch</span> <span class="op">=</span> <span class="ident">sled::Batch::default</span>();
         <span class="kw">for</span> <span class="ident">key</span> <span class="kw">in</span> <span class="self">self</span>.<span class="ident">joined_user_ids</span>.<span class="ident">scan_prefix</span>(<span class="self">self</span>.<span class="ident">encode_key</span>(<span class="ident">JOINED_USER_ID</span>, <span class="ident">room_id</span>)).<span class="ident">keys</span>()
         {
-            <span class="ident">joined_user_ids_batch</span>.<span class="ident">remove</span>(<span class="ident">key</span><span class="question-mark">?</span>)
+            <span class="ident">joined_user_ids_batch</span>.<span class="ident">remove</span>(<span class="ident">key</span><span class="question-mark">?</span>);
         }
 
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">invited_user_ids_batch</span> <span class="op">=</span> <span class="ident">sled::Batch::default</span>();
         <span class="kw">for</span> <span class="ident">key</span> <span class="kw">in</span>
             <span class="self">self</span>.<span class="ident">invited_user_ids</span>.<span class="ident">scan_prefix</span>(<span class="self">self</span>.<span class="ident">encode_key</span>(<span class="ident">INVITED_USER_ID</span>, <span class="ident">room_id</span>)).<span class="ident">keys</span>()
         {
-            <span class="ident">invited_user_ids_batch</span>.<span class="ident">remove</span>(<span class="ident">key</span><span class="question-mark">?</span>)
+            <span class="ident">invited_user_ids_batch</span>.<span class="ident">remove</span>(<span class="ident">key</span><span class="question-mark">?</span>);
         }
 
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">room_state_batch</span> <span class="op">=</span> <span class="ident">sled::Batch::default</span>();
         <span class="kw">for</span> <span class="ident">key</span> <span class="kw">in</span> <span class="self">self</span>.<span class="ident">room_state</span>.<span class="ident">scan_prefix</span>(<span class="self">self</span>.<span class="ident">encode_key</span>(<span class="ident">ROOM_STATE</span>, <span class="ident">room_id</span>)).<span class="ident">keys</span>() {
-            <span class="ident">room_state_batch</span>.<span class="ident">remove</span>(<span class="ident">key</span><span class="question-mark">?</span>)
+            <span class="ident">room_state_batch</span>.<span class="ident">remove</span>(<span class="ident">key</span><span class="question-mark">?</span>);
         }
 
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">room_account_data_batch</span> <span class="op">=</span> <span class="ident">sled::Batch::default</span>();
         <span class="kw">for</span> <span class="ident">key</span> <span class="kw">in</span>
             <span class="self">self</span>.<span class="ident">room_account_data</span>.<span class="ident">scan_prefix</span>(<span class="self">self</span>.<span class="ident">encode_key</span>(<span class="ident">ROOM_ACCOUNT_DATA</span>, <span class="ident">room_id</span>)).<span class="ident">keys</span>()
         {
-            <span class="ident">room_account_data_batch</span>.<span class="ident">remove</span>(<span class="ident">key</span><span class="question-mark">?</span>)
+            <span class="ident">room_account_data_batch</span>.<span class="ident">remove</span>(<span class="ident">key</span><span class="question-mark">?</span>);
         }
 
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">stripped_members_batch</span> <span class="op">=</span> <span class="ident">sled::Batch::default</span>();
         <span class="kw">for</span> <span class="ident">key</span> <span class="kw">in</span>
             <span class="self">self</span>.<span class="ident">stripped_members</span>.<span class="ident">scan_prefix</span>(<span class="self">self</span>.<span class="ident">encode_key</span>(<span class="ident">STRIPPED_ROOM_MEMBER</span>, <span class="ident">room_id</span>)).<span class="ident">keys</span>()
         {
-            <span class="ident">stripped_members_batch</span>.<span class="ident">remove</span>(<span class="ident">key</span><span class="question-mark">?</span>)
+            <span class="ident">stripped_members_batch</span>.<span class="ident">remove</span>(<span class="ident">key</span><span class="question-mark">?</span>);
         }
 
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">stripped_room_state_batch</span> <span class="op">=</span> <span class="ident">sled::Batch::default</span>();
@@ -2326,14 +2326,14 @@
             .<span class="ident">scan_prefix</span>(<span class="self">self</span>.<span class="ident">encode_key</span>(<span class="ident">STRIPPED_ROOM_STATE</span>, <span class="ident">room_id</span>))
             .<span class="ident">keys</span>()
         {
-            <span class="ident">stripped_room_state_batch</span>.<span class="ident">remove</span>(<span class="ident">key</span><span class="question-mark">?</span>)
+            <span class="ident">stripped_room_state_batch</span>.<span class="ident">remove</span>(<span class="ident">key</span><span class="question-mark">?</span>);
         }
 
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">room_user_receipts_batch</span> <span class="op">=</span> <span class="ident">sled::Batch::default</span>();
         <span class="kw">for</span> <span class="ident">key</span> <span class="kw">in</span>
             <span class="self">self</span>.<span class="ident">room_user_receipts</span>.<span class="ident">scan_prefix</span>(<span class="self">self</span>.<span class="ident">encode_key</span>(<span class="ident">ROOM_USER_RECEIPT</span>, <span class="ident">room_id</span>)).<span class="ident">keys</span>()
         {
-            <span class="ident">room_user_receipts_batch</span>.<span class="ident">remove</span>(<span class="ident">key</span><span class="question-mark">?</span>)
+            <span class="ident">room_user_receipts_batch</span>.<span class="ident">remove</span>(<span class="ident">key</span><span class="question-mark">?</span>);
         }
 
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">room_event_receipts_batch</span> <span class="op">=</span> <span class="ident">sled::Batch::default</span>();
@@ -2342,7 +2342,7 @@
             .<span class="ident">scan_prefix</span>(<span class="self">self</span>.<span class="ident">encode_key</span>(<span class="ident">ROOM_EVENT_RECEIPT</span>, <span class="ident">room_id</span>))
             .<span class="ident">keys</span>()
         {
-            <span class="ident">room_event_receipts_batch</span>.<span class="ident">remove</span>(<span class="ident">key</span><span class="question-mark">?</span>)
+            <span class="ident">room_event_receipts_batch</span>.<span class="ident">remove</span>(<span class="ident">key</span><span class="question-mark">?</span>);
         }
 
         <span class="kw">let</span> <span class="ident">ret</span>: <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">TransactionError</span><span class="op">&lt;</span><span class="ident">SledStoreError</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="op">=</span> (
@@ -2444,7 +2444,7 @@
 
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">timeline_batch</span> <span class="op">=</span> <span class="ident">sled::Batch::default</span>();
         <span class="kw">for</span> <span class="ident">key</span> <span class="kw">in</span> <span class="self">self</span>.<span class="ident">room_timeline</span>.<span class="ident">scan_prefix</span>(<span class="self">self</span>.<span class="ident">encode_key</span>(<span class="ident">TIMELINE</span>, <span class="kw-2">&amp;</span><span class="ident">room_id</span>)).<span class="ident">keys</span>() {
-            <span class="ident">timeline_batch</span>.<span class="ident">remove</span>(<span class="ident">key</span><span class="question-mark">?</span>)
+            <span class="ident">timeline_batch</span>.<span class="ident">remove</span>(<span class="ident">key</span><span class="question-mark">?</span>);
         }
 
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">event_id_to_position_batch</span> <span class="op">=</span> <span class="ident">sled::Batch::default</span>();
@@ -2453,7 +2453,7 @@
             .<span class="ident">scan_prefix</span>(<span class="self">self</span>.<span class="ident">encode_key</span>(<span class="ident">ROOM_EVENT_ID_POSITION</span>, <span class="kw-2">&amp;</span><span class="ident">room_id</span>))
             .<span class="ident">keys</span>()
         {
-            <span class="ident">event_id_to_position_batch</span>.<span class="ident">remove</span>(<span class="ident">key</span><span class="question-mark">?</span>)
+            <span class="ident">event_id_to_position_batch</span>.<span class="ident">remove</span>(<span class="ident">key</span><span class="question-mark">?</span>);
         }
 
         <span class="kw">let</span> <span class="ident">ret</span>: <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">TransactionError</span><span class="op">&lt;</span><span class="ident">SledStoreError</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="op">=</span>
