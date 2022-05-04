@@ -1362,6 +1362,105 @@
 <span id="1357">1357</span>
 <span id="1358">1358</span>
 <span id="1359">1359</span>
+<span id="1360">1360</span>
+<span id="1361">1361</span>
+<span id="1362">1362</span>
+<span id="1363">1363</span>
+<span id="1364">1364</span>
+<span id="1365">1365</span>
+<span id="1366">1366</span>
+<span id="1367">1367</span>
+<span id="1368">1368</span>
+<span id="1369">1369</span>
+<span id="1370">1370</span>
+<span id="1371">1371</span>
+<span id="1372">1372</span>
+<span id="1373">1373</span>
+<span id="1374">1374</span>
+<span id="1375">1375</span>
+<span id="1376">1376</span>
+<span id="1377">1377</span>
+<span id="1378">1378</span>
+<span id="1379">1379</span>
+<span id="1380">1380</span>
+<span id="1381">1381</span>
+<span id="1382">1382</span>
+<span id="1383">1383</span>
+<span id="1384">1384</span>
+<span id="1385">1385</span>
+<span id="1386">1386</span>
+<span id="1387">1387</span>
+<span id="1388">1388</span>
+<span id="1389">1389</span>
+<span id="1390">1390</span>
+<span id="1391">1391</span>
+<span id="1392">1392</span>
+<span id="1393">1393</span>
+<span id="1394">1394</span>
+<span id="1395">1395</span>
+<span id="1396">1396</span>
+<span id="1397">1397</span>
+<span id="1398">1398</span>
+<span id="1399">1399</span>
+<span id="1400">1400</span>
+<span id="1401">1401</span>
+<span id="1402">1402</span>
+<span id="1403">1403</span>
+<span id="1404">1404</span>
+<span id="1405">1405</span>
+<span id="1406">1406</span>
+<span id="1407">1407</span>
+<span id="1408">1408</span>
+<span id="1409">1409</span>
+<span id="1410">1410</span>
+<span id="1411">1411</span>
+<span id="1412">1412</span>
+<span id="1413">1413</span>
+<span id="1414">1414</span>
+<span id="1415">1415</span>
+<span id="1416">1416</span>
+<span id="1417">1417</span>
+<span id="1418">1418</span>
+<span id="1419">1419</span>
+<span id="1420">1420</span>
+<span id="1421">1421</span>
+<span id="1422">1422</span>
+<span id="1423">1423</span>
+<span id="1424">1424</span>
+<span id="1425">1425</span>
+<span id="1426">1426</span>
+<span id="1427">1427</span>
+<span id="1428">1428</span>
+<span id="1429">1429</span>
+<span id="1430">1430</span>
+<span id="1431">1431</span>
+<span id="1432">1432</span>
+<span id="1433">1433</span>
+<span id="1434">1434</span>
+<span id="1435">1435</span>
+<span id="1436">1436</span>
+<span id="1437">1437</span>
+<span id="1438">1438</span>
+<span id="1439">1439</span>
+<span id="1440">1440</span>
+<span id="1441">1441</span>
+<span id="1442">1442</span>
+<span id="1443">1443</span>
+<span id="1444">1444</span>
+<span id="1445">1445</span>
+<span id="1446">1446</span>
+<span id="1447">1447</span>
+<span id="1448">1448</span>
+<span id="1449">1449</span>
+<span id="1450">1450</span>
+<span id="1451">1451</span>
+<span id="1452">1452</span>
+<span id="1453">1453</span>
+<span id="1454">1454</span>
+<span id="1455">1455</span>
+<span id="1456">1456</span>
+<span id="1457">1457</span>
+<span id="1458">1458</span>
 </pre><pre class="rust"><code><span class="comment">// Copyright 2020 Damir Jelić</span>
 <span class="comment">// Copyright 2020 The Matrix.org Foundation C.I.C.</span>
 <span class="comment">//</span>
@@ -2658,12 +2757,15 @@
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
 <span class="kw">mod</span> <span class="ident">tests</span> {
-    <span class="kw">use</span> <span class="ident">matrix_sdk_test</span>::{<span class="ident">async_test</span>, <span class="ident">EventBuilder</span>};
-    <span class="kw">use</span> <span class="ident">ruma</span>::{<span class="ident">room_id</span>, <span class="ident">user_id</span>};
+    <span class="kw">use</span> <span class="ident">matrix_sdk_test</span>::{<span class="ident">async_test</span>, <span class="ident">response_from_file</span>, <span class="ident">EventBuilder</span>};
+    <span class="kw">use</span> <span class="ident">ruma</span>::{
+        <span class="ident">api</span>::{<span class="ident">client</span> <span class="kw">as</span> <span class="ident">api</span>, <span class="ident">IncomingResponse</span>},
+        <span class="ident">room_id</span>, <span class="ident">user_id</span>,
+    };
     <span class="kw">use</span> <span class="ident">serde_json::json</span>;
 
     <span class="kw">use</span> <span class="ident"><span class="kw">super</span>::BaseClient</span>;
-    <span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">RoomType</span>, <span class="ident">Session</span>};
+    <span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">DisplayName</span>, <span class="ident">RoomType</span>, <span class="ident">Session</span>};
 
     <span class="attribute">#[<span class="ident">async_test</span>]</span>
     <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">invite_after_leaving</span>() {
@@ -2719,6 +2821,102 @@
             .<span class="ident">build_sync_response</span>();
         <span class="ident">client</span>.<span class="ident">receive_sync_response</span>(<span class="ident">response</span>).<span class="kw">await</span>.<span class="ident">unwrap</span>();
         <span class="macro">assert_eq!</span>(<span class="ident">client</span>.<span class="ident">get_room</span>(<span class="ident">room_id</span>).<span class="ident">unwrap</span>().<span class="ident">room_type</span>(), <span class="ident">RoomType::Invited</span>);
+    }
+
+    <span class="attribute">#[<span class="ident">async_test</span>]</span>
+    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">invite_displayname_integration_test</span>() {
+        <span class="kw">let</span> <span class="ident">user_id</span> <span class="op">=</span> <span class="macro">user_id!</span>(<span class="string">&quot;@alice:example.org&quot;</span>);
+        <span class="kw">let</span> <span class="ident">room_id</span> <span class="op">=</span> <span class="macro">room_id!</span>(<span class="string">&quot;!ithpyNKDtmhneaTQja:example.org&quot;</span>);
+
+        <span class="kw">let</span> <span class="ident">client</span> <span class="op">=</span> <span class="ident">BaseClient::new</span>();
+        <span class="ident">client</span>
+            .<span class="ident">restore_login</span>(<span class="ident">Session</span> {
+                <span class="ident">access_token</span>: <span class="string">&quot;token&quot;</span>.<span class="ident">to_owned</span>(),
+                <span class="ident">user_id</span>: <span class="ident">user_id</span>.<span class="ident">to_owned</span>(),
+                <span class="ident">device_id</span>: <span class="string">&quot;FOOBAR&quot;</span>.<span class="ident">into</span>(),
+            })
+            .<span class="kw">await</span>
+            .<span class="ident">unwrap</span>();
+
+        <span class="kw">let</span> <span class="ident">response</span> <span class="op">=</span> <span class="ident">api::sync::sync_events::v3::Response::try_from_http_response</span>(<span class="ident">response_from_file</span>(<span class="kw-2">&amp;</span><span class="macro">json!</span>({
+            <span class="string">&quot;next_batch&quot;</span>: <span class="string">&quot;asdkl;fjasdkl;fj;asdkl;f&quot;</span>,
+            <span class="string">&quot;device_one_time_keys_count&quot;</span>: {
+                <span class="string">&quot;signed_curve25519&quot;</span>: <span class="number">50u64</span>
+            },
+            <span class="string">&quot;device_unused_fallback_key_types&quot;</span>: [
+                <span class="string">&quot;signed_curve25519&quot;</span>
+            ],
+            <span class="string">&quot;rooms&quot;</span>: {
+                <span class="string">&quot;invite&quot;</span>: {
+                    <span class="string">&quot;!ithpyNKDtmhneaTQja:example.org&quot;</span>: {
+                        <span class="string">&quot;invite_state&quot;</span>: {
+                            <span class="string">&quot;events&quot;</span>: [
+                                {
+                                    <span class="string">&quot;content&quot;</span>: {
+                                        <span class="string">&quot;creator&quot;</span>: <span class="string">&quot;@test:example.org&quot;</span>,
+                                        <span class="string">&quot;room_version&quot;</span>: <span class="string">&quot;9&quot;</span>
+                                    },
+                                    <span class="string">&quot;sender&quot;</span>: <span class="string">&quot;@test:example.org&quot;</span>,
+                                    <span class="string">&quot;state_key&quot;</span>: <span class="string">&quot;&quot;</span>,
+                                    <span class="string">&quot;type&quot;</span>: <span class="string">&quot;m.room.create&quot;</span>
+                                },
+                                {
+                                    <span class="string">&quot;content&quot;</span>: {
+                                        <span class="string">&quot;join_rule&quot;</span>: <span class="string">&quot;invite&quot;</span>
+                                    },
+                                    <span class="string">&quot;sender&quot;</span>: <span class="string">&quot;@test:example.org&quot;</span>,
+                                    <span class="string">&quot;state_key&quot;</span>: <span class="string">&quot;&quot;</span>,
+                                    <span class="string">&quot;type&quot;</span>: <span class="string">&quot;m.room.join_rules&quot;</span>
+                                },
+                                {
+                                    <span class="string">&quot;content&quot;</span>: {
+                                        <span class="string">&quot;algorithm&quot;</span>: <span class="string">&quot;m.megolm.v1.aes-sha2&quot;</span>
+                                    },
+                                    <span class="string">&quot;sender&quot;</span>: <span class="string">&quot;@test:example.org&quot;</span>,
+                                    <span class="string">&quot;state_key&quot;</span>: <span class="string">&quot;&quot;</span>,
+                                    <span class="string">&quot;type&quot;</span>: <span class="string">&quot;m.room.encryption&quot;</span>
+                                },
+                                {
+                                    <span class="string">&quot;content&quot;</span>: {
+                                        <span class="string">&quot;avatar_url&quot;</span>: <span class="string">&quot;mxc://example.org/dcBBDwuWEUrjfrOchvkirUST&quot;</span>,
+                                        <span class="string">&quot;displayname&quot;</span>: <span class="string">&quot;Kyra&quot;</span>,
+                                        <span class="string">&quot;membership&quot;</span>: <span class="string">&quot;join&quot;</span>
+                                    },
+                                    <span class="string">&quot;sender&quot;</span>: <span class="string">&quot;@test:example.org&quot;</span>,
+                                    <span class="string">&quot;state_key&quot;</span>: <span class="string">&quot;@test:example.org&quot;</span>,
+                                    <span class="string">&quot;type&quot;</span>: <span class="string">&quot;m.room.member&quot;</span>
+                                },
+                                {
+                                    <span class="string">&quot;content&quot;</span>: {
+                                        <span class="string">&quot;avatar_url&quot;</span>: <span class="string">&quot;mxc://example.org/ABFEXSDrESxovWwEnCYdNcHT&quot;</span>,
+                                        <span class="string">&quot;displayname&quot;</span>: <span class="string">&quot;alice&quot;</span>,
+                                        <span class="string">&quot;is_direct&quot;</span>: <span class="bool-val">true</span>,
+                                        <span class="string">&quot;membership&quot;</span>: <span class="string">&quot;invite&quot;</span>
+                                    },
+                                    <span class="string">&quot;origin_server_ts&quot;</span>: <span class="number">1650878657984u64</span>,
+                                    <span class="string">&quot;sender&quot;</span>: <span class="string">&quot;@test:example.org&quot;</span>,
+                                    <span class="string">&quot;state_key&quot;</span>: <span class="string">&quot;@alice:example.org&quot;</span>,
+                                    <span class="string">&quot;type&quot;</span>: <span class="string">&quot;m.room.member&quot;</span>,
+                                    <span class="string">&quot;unsigned&quot;</span>: {
+                                        <span class="string">&quot;age&quot;</span>: <span class="number">14u64</span>
+                                    },
+                                    <span class="string">&quot;event_id&quot;</span>: <span class="string">&quot;$fLDqltg9Puj-kWItLSFVHPGN4YkgpYQf2qImPzdmgrE&quot;</span>
+                                }
+                            ]
+                        }
+                    }
+                }
+            }
+        }))).<span class="ident">expect</span>(<span class="string">&quot;static json doesn&#39;t fail to parse&quot;</span>);
+
+        <span class="ident">client</span>.<span class="ident">receive_sync_response</span>(<span class="ident">response</span>).<span class="kw">await</span>.<span class="ident">unwrap</span>();
+
+        <span class="kw">let</span> <span class="ident">room</span> <span class="op">=</span> <span class="ident">client</span>.<span class="ident">get_room</span>(<span class="ident">room_id</span>).<span class="ident">expect</span>(<span class="string">&quot;Room not found&quot;</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">room</span>.<span class="ident">room_type</span>(), <span class="ident">RoomType::Invited</span>);
+        <span class="macro">assert_eq!</span>(
+            <span class="ident">room</span>.<span class="ident">display_name</span>().<span class="kw">await</span>.<span class="ident">expect</span>(<span class="string">&quot;fetching display name failed&quot;</span>),
+            <span class="ident">DisplayName::Calculated</span>(<span class="string">&quot;Kyra&quot;</span>.<span class="ident">to_owned</span>())
+        );
     }
 }
 </code></pre></div>

@@ -4014,6 +4014,15 @@
 <span id="4009">4009</span>
 <span id="4010">4010</span>
 <span id="4011">4011</span>
+<span id="4012">4012</span>
+<span id="4013">4013</span>
+<span id="4014">4014</span>
+<span id="4015">4015</span>
+<span id="4016">4016</span>
+<span id="4017">4017</span>
+<span id="4018">4018</span>
+<span id="4019">4019</span>
+<span id="4020">4020</span>
 </pre><pre class="rust"><code><span class="comment">// Copyright 2020 Damir Jelić</span>
 <span class="comment">// Copyright 2020 The Matrix.org Foundation C.I.C.</span>
 <span class="comment">//</span>
@@ -6265,7 +6274,10 @@
 
     <span class="kw">use</span> <span class="ident">std</span>::{<span class="ident">collections::BTreeMap</span>, <span class="ident">convert::TryInto</span>, <span class="ident">io::Cursor</span>, <span class="ident">str::FromStr</span>, <span class="ident">time::Duration</span>};
 
-    <span class="kw">use</span> <span class="ident">matrix_sdk_base::media</span>::{<span class="ident">MediaFormat</span>, <span class="ident">MediaRequest</span>, <span class="ident">MediaThumbnailSize</span>};
+    <span class="kw">use</span> <span class="ident">matrix_sdk_base</span>::{
+        <span class="ident">media</span>::{<span class="ident">MediaFormat</span>, <span class="ident">MediaRequest</span>, <span class="ident">MediaThumbnailSize</span>},
+        <span class="ident">DisplayName</span>,
+    };
     <span class="kw">use</span> <span class="ident">matrix_sdk_common::deserialized_responses::SyncRoomEvent</span>;
     <span class="kw">use</span> <span class="ident">matrix_sdk_test</span>::{<span class="ident">test_json</span>, <span class="ident">EventBuilder</span>, <span class="ident">EventsJson</span>};
     <span class="kw">use</span> <span class="ident">mockito</span>::{<span class="ident">mock</span>, <span class="ident">Matcher</span>};
@@ -7381,7 +7393,10 @@
         <span class="kw">let</span> <span class="ident">_response</span> <span class="op">=</span> <span class="ident">client</span>.<span class="ident">sync_once</span>(<span class="ident">sync_settings</span>).<span class="kw">await</span>.<span class="ident">unwrap</span>();
         <span class="kw">let</span> <span class="ident">room</span> <span class="op">=</span> <span class="ident">client</span>.<span class="ident">get_joined_room</span>(<span class="macro">room_id!</span>(<span class="string">&quot;!SVkFJHzfwvuaIEawgC:localhost&quot;</span>)).<span class="ident">unwrap</span>();
 
-        <span class="macro">assert_eq!</span>(<span class="string">&quot;example2&quot;</span>, <span class="ident">room</span>.<span class="ident">display_name</span>().<span class="kw">await</span>.<span class="ident">unwrap</span>());
+        <span class="macro">assert_eq!</span>(
+            <span class="ident">DisplayName::Calculated</span>(<span class="string">&quot;example2&quot;</span>.<span class="ident">to_owned</span>()),
+            <span class="ident">room</span>.<span class="ident">display_name</span>().<span class="kw">await</span>.<span class="ident">unwrap</span>()
+        );
     }
 
     <span class="attribute">#[<span class="ident">async_test</span>]</span>
@@ -7459,7 +7474,7 @@
         <span class="macro">assert_eq!</span>(<span class="ident">client</span>.<span class="ident">rooms</span>().<span class="ident">len</span>(), <span class="number">1</span>);
         <span class="kw">let</span> <span class="ident">room</span> <span class="op">=</span> <span class="ident">client</span>.<span class="ident">get_joined_room</span>(<span class="macro">room_id!</span>(<span class="string">&quot;!SVkFJHzfwvuaIEawgC:localhost&quot;</span>)).<span class="ident">unwrap</span>();
 
-        <span class="macro">assert_eq!</span>(<span class="string">&quot;tutorial&quot;</span>.<span class="ident">to_owned</span>(), <span class="ident">room</span>.<span class="ident">display_name</span>().<span class="kw">await</span>.<span class="ident">unwrap</span>());
+        <span class="macro">assert_eq!</span>(<span class="ident">DisplayName::Aliased</span>(<span class="string">&quot;tutorial&quot;</span>.<span class="ident">to_owned</span>()), <span class="ident">room</span>.<span class="ident">display_name</span>().<span class="kw">await</span>.<span class="ident">unwrap</span>());
 
         <span class="kw">let</span> <span class="ident">_m</span> <span class="op">=</span> <span class="ident">mock</span>(<span class="string">&quot;GET&quot;</span>, <span class="ident">Matcher::Regex</span>(<span class="string">r&quot;^/_matrix/client/r0/sync\?.*$&quot;</span>.<span class="ident">to_owned</span>()))
             .<span class="ident">with_status</span>(<span class="number">200</span>)
@@ -7473,7 +7488,10 @@
         <span class="macro">assert_eq!</span>(<span class="ident">client</span>.<span class="ident">rooms</span>().<span class="ident">len</span>(), <span class="number">1</span>);
         <span class="kw">let</span> <span class="ident">invited_room</span> <span class="op">=</span> <span class="ident">client</span>.<span class="ident">get_invited_room</span>(<span class="macro">room_id!</span>(<span class="string">&quot;!696r7674:example.com&quot;</span>)).<span class="ident">unwrap</span>();
 
-        <span class="macro">assert_eq!</span>(<span class="string">&quot;My Room Name&quot;</span>.<span class="ident">to_owned</span>(), <span class="ident">invited_room</span>.<span class="ident">display_name</span>().<span class="kw">await</span>.<span class="ident">unwrap</span>());
+        <span class="macro">assert_eq!</span>(
+            <span class="ident">DisplayName::Named</span>(<span class="string">&quot;My Room Name&quot;</span>.<span class="ident">to_owned</span>()),
+            <span class="ident">invited_room</span>.<span class="ident">display_name</span>().<span class="kw">await</span>.<span class="ident">unwrap</span>()
+        );
     }
 
     <span class="attribute">#[<span class="ident">async_test</span>]</span>
