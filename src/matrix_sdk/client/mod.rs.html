@@ -4051,7 +4051,7 @@
     <span class="ident">locks</span>::{<span class="ident">Mutex</span>, <span class="ident">RwLock</span>, <span class="ident">RwLockReadGuard</span>},
 };
 <span class="kw">use</span> <span class="ident">mime</span>::{<span class="self">self</span>, <span class="ident">Mime</span>};
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;encryption&quot;</span>)]</span>
+<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;e2e-encryption&quot;</span>)]</span>
 <span class="kw">use</span> <span class="ident">ruma::TransactionId</span>;
 <span class="kw">use</span> <span class="ident">ruma</span>::{
     <span class="ident">api</span>::{
@@ -4085,7 +4085,7 @@
 <span class="kw">use</span> <span class="ident">tracing</span>::{<span class="ident">error</span>, <span class="ident">info</span>, <span class="ident">instrument</span>, <span class="ident">warn</span>};
 <span class="kw">use</span> <span class="ident">url::Url</span>;
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;encryption&quot;</span>)]</span>
+<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;e2e-encryption&quot;</span>)]</span>
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::encryption::Encryption</span>;
 <span class="kw">use</span> <span class="kw">crate</span>::{
     <span class="ident">attachment</span>::{<span class="ident">AttachmentInfo</span>, <span class="ident">Thumbnail</span>},
@@ -4148,9 +4148,9 @@
     <span class="ident">server_versions</span>: <span class="ident">Mutex</span><span class="op">&lt;</span><span class="ident">Arc</span><span class="op">&lt;</span>[<span class="ident">MatrixVersion</span>]<span class="op">&gt;</span><span class="op">&gt;</span>,
     <span class="doccomment">/// Locks making sure we only have one group session sharing request in</span>
     <span class="doccomment">/// flight per room.</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;encryption&quot;</span>)]</span>
+    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;e2e-encryption&quot;</span>)]</span>
     <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">group_session_locks</span>: <span class="ident">DashMap</span><span class="op">&lt;</span><span class="ident">OwnedRoomId</span>, <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">Mutex</span><span class="op">&lt;</span>()<span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;encryption&quot;</span>)]</span>
+    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;e2e-encryption&quot;</span>)]</span>
     <span class="doccomment">/// Lock making sure we&#39;re only doing one key claim request at a time.</span>
     <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">key_claim_lock</span>: <span class="ident">Mutex</span><span class="op">&lt;</span>()<span class="op">&gt;</span>,
     <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">members_request_locks</span>: <span class="ident">DashMap</span><span class="op">&lt;</span><span class="ident">OwnedRoomId</span>, <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">Mutex</span><span class="op">&lt;</span>()<span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span>,
@@ -4206,12 +4206,12 @@
         <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">base_client</span>
     }
 
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;encryption&quot;</span>)]</span>
+    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;e2e-encryption&quot;</span>)]</span>
     <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">olm_machine</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">matrix_sdk_base::crypto::OlmMachine</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">base_client</span>().<span class="ident">olm_machine</span>().<span class="kw">await</span>
     }
 
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;encryption&quot;</span>)]</span>
+    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;e2e-encryption&quot;</span>)]</span>
     <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">mark_request_as_sent</span>(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         <span class="ident">request_id</span>: <span class="kw-2">&amp;</span><span class="ident">TransactionId</span>,
@@ -4320,7 +4320,7 @@
     }
 
     <span class="doccomment">/// Get the encryption manager of the client.</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;encryption&quot;</span>)]</span>
+    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;e2e-encryption&quot;</span>)]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">encryption</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Encryption</span> {
         <span class="ident">Encryption::new</span>(<span class="self">self</span>.<span class="ident">clone</span>())
     }
@@ -5720,7 +5720,7 @@
         <span class="comment">// crypto requests were sent out.</span>
         <span class="comment">//</span>
         <span class="comment">// This will mostly be a no-op.</span>
-        <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;encryption&quot;</span>)]</span>
+        <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;e2e-encryption&quot;</span>)]</span>
         <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Err</span>(<span class="ident">e</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">send_outgoing_requests</span>().<span class="kw">await</span> {
             <span class="macro">error!</span>(<span class="ident">error</span> <span class="op">=</span> <span class="question-mark">?</span><span class="ident">e</span>, <span class="string">&quot;Error while sending outgoing E2EE requests&quot;</span>);
         }
@@ -5741,7 +5741,7 @@
         <span class="kw">let</span> <span class="ident">response</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">send</span>(<span class="ident">request</span>, <span class="prelude-val">Some</span>(<span class="ident">request_config</span>)).<span class="kw">await</span><span class="question-mark">?</span>;
         <span class="kw">let</span> <span class="ident">response</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">process_sync</span>(<span class="ident">response</span>).<span class="kw">await</span><span class="question-mark">?</span>;
 
-        <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;encryption&quot;</span>)]</span>
+        <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;e2e-encryption&quot;</span>)]</span>
         <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Err</span>(<span class="ident">e</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">send_outgoing_requests</span>().<span class="kw">await</span> {
             <span class="macro">error!</span>(<span class="ident">error</span> <span class="op">=</span> <span class="question-mark">?</span><span class="ident">e</span>, <span class="string">&quot;Error while sending outgoing E2EE requests&quot;</span>);
         }
@@ -5983,7 +5983,7 @@
                     <span class="kw">let</span> <span class="ident">content</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span> <span class="op">=</span>
                         <span class="self">self</span>.<span class="ident">send</span>(<span class="ident">get_content::v3::Request::from_url</span>(<span class="kw-2">&amp;</span><span class="ident">file</span>.<span class="ident">url</span>)<span class="question-mark">?</span>, <span class="prelude-val">None</span>).<span class="kw">await</span><span class="question-mark">?</span>.<span class="ident">file</span>;
 
-                    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;encryption&quot;</span>)]</span>
+                    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;e2e-encryption&quot;</span>)]</span>
                     <span class="kw">let</span> <span class="ident">content</span> <span class="op">=</span> {
                         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">cursor</span> <span class="op">=</span> <span class="ident">std::io::Cursor::new</span>(<span class="ident">content</span>);
                         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">reader</span> <span class="op">=</span> <span class="ident">matrix_sdk_base::crypto::AttachmentDecryptor::new</span>(
@@ -8026,5 +8026,5 @@
     }
 }
 </code></pre></div>
-</section><section id="search" class="content hidden"></section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="matrix_sdk" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.62.0-nightly (bed05e996 2022-05-02)" ></div>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="matrix_sdk" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.62.0-nightly (e1b71feb5 2022-05-03)" ></div>
 </body></html>

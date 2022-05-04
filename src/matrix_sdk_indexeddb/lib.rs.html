@@ -100,20 +100,20 @@
 <span class="kw">mod</span> <span class="ident">state_store</span>;
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">target_arch</span> <span class="op">=</span> <span class="string">&quot;wasm32&quot;</span>)]</span>
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;encryption&quot;</span>)]</span>
+<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;e2e-encryption&quot;</span>)]</span>
 <span class="kw">mod</span> <span class="ident">cryptostore</span>;
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">target_arch</span> <span class="op">=</span> <span class="string">&quot;wasm32&quot;</span>)]</span>
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;encryption&quot;</span>)]</span>
+<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;e2e-encryption&quot;</span>)]</span>
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">cryptostore::IndexeddbStore</span> <span class="kw">as</span> <span class="ident">CryptoStore</span>;
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">target_arch</span> <span class="op">=</span> <span class="string">&quot;wasm32&quot;</span>)]</span>
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;encryption&quot;</span>)]</span>
+<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;e2e-encryption&quot;</span>)]</span>
 <span class="kw">use</span> <span class="ident">cryptostore::IndexeddbStoreError</span>;
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">target_arch</span> <span class="op">=</span> <span class="string">&quot;wasm32&quot;</span>)]</span>
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">state_store::IndexeddbStore</span> <span class="kw">as</span> <span class="ident">StateStore</span>;
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">target_arch</span> <span class="op">=</span> <span class="string">&quot;wasm32&quot;</span>)]</span>
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;encryption&quot;</span>)]</span>
+<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;e2e-encryption&quot;</span>)]</span>
 <span class="doccomment">/// Create a [`StateStore`] and a [`CryptoStore`] that use the same name and</span>
 <span class="doccomment">/// passphrase.</span>
 <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">open_stores_with_name</span>(
@@ -144,13 +144,13 @@
 ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">StoreConfig</span>, <span class="ident">OpenStoreError</span><span class="op">&gt;</span> {
     <span class="kw">let</span> <span class="ident">name</span> <span class="op">=</span> <span class="ident">name</span>.<span class="ident">into</span>();
 
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;encryption&quot;</span>)]</span>
+    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;e2e-encryption&quot;</span>)]</span>
     {
         <span class="kw">let</span> (<span class="ident">state_store</span>, <span class="ident">crypto_store</span>) <span class="op">=</span> <span class="ident">open_stores_with_name</span>(<span class="ident">name</span>, <span class="ident">passphrase</span>).<span class="kw">await</span><span class="question-mark">?</span>;
         <span class="prelude-val">Ok</span>(<span class="ident">StoreConfig::new</span>().<span class="ident">state_store</span>(<span class="ident">state_store</span>).<span class="ident">crypto_store</span>(<span class="ident">crypto_store</span>))
     }
 
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;encryption&quot;</span>))]</span>
+    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;e2e-encryption&quot;</span>))]</span>
     {
         <span class="kw">let</span> <span class="ident">state_store</span> <span class="op">=</span> <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">passphrase</span>) <span class="op">=</span> <span class="ident">passphrase</span> {
             <span class="ident">StateStore::open_with_passphrase</span>(<span class="ident">name</span>, <span class="ident">passphrase</span>).<span class="kw">await</span><span class="question-mark">?</span>
@@ -171,10 +171,10 @@
     <span class="ident">State</span>(<span class="attribute">#[<span class="ident">from</span>]</span> <span class="ident">StoreError</span>),
 
     <span class="doccomment">/// An error occurred with the crypto store implementation.</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;encryption&quot;</span>)]</span>
+    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;e2e-encryption&quot;</span>)]</span>
     <span class="attribute">#[<span class="ident">error</span>(<span class="ident">transparent</span>)]</span>
     <span class="ident">Crypto</span>(<span class="attribute">#[<span class="ident">from</span>]</span> <span class="ident">IndexeddbStoreError</span>),
 }
 </code></pre></div>
-</section><section id="search" class="content hidden"></section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="matrix_sdk_indexeddb" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.62.0-nightly (bed05e996 2022-05-02)" ></div>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="matrix_sdk_indexeddb" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.62.0-nightly (e1b71feb5 2022-05-03)" ></div>
 </body></html>

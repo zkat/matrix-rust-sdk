@@ -931,7 +931,7 @@
 <span id="926">926</span>
 </pre><pre class="rust"><code><span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;image-proc&quot;</span>)]</span>
 <span class="kw">use</span> <span class="ident">std::io::Cursor</span>;
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;encryption&quot;</span>)]</span>
+<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;e2e-encryption&quot;</span>)]</span>
 <span class="kw">use</span> <span class="ident">std::sync::Arc</span>;
 <span class="kw">use</span> <span class="ident">std</span>::{
     <span class="ident">io</span>::{<span class="ident">BufReader</span>, <span class="ident">Read</span>, <span class="ident">Seek</span>},
@@ -939,7 +939,7 @@
 };
 
 <span class="kw">use</span> <span class="ident">matrix_sdk_common::instant</span>::{<span class="ident">Duration</span>, <span class="ident">Instant</span>};
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;encryption&quot;</span>)]</span>
+<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;e2e-encryption&quot;</span>)]</span>
 <span class="kw">use</span> <span class="ident">matrix_sdk_common::locks::Mutex</span>;
 <span class="kw">use</span> <span class="ident">mime</span>::{<span class="self">self</span>, <span class="ident">Mime</span>};
 <span class="kw">use</span> <span class="ident">ruma</span>::{
@@ -964,7 +964,7 @@
 };
 <span class="kw">use</span> <span class="ident">serde_json::Value</span>;
 <span class="kw">use</span> <span class="ident">tracing::debug</span>;
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;encryption&quot;</span>)]</span>
+<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;e2e-encryption&quot;</span>)]</span>
 <span class="kw">use</span> <span class="ident">tracing::instrument</span>;
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;image-proc&quot;</span>)]</span>
@@ -1247,7 +1247,7 @@
     <span class="doccomment">/// room if necessary and share a group session with them.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// Does nothing if no group session needs to be shared.</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;encryption&quot;</span>)]</span>
+    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;e2e-encryption&quot;</span>)]</span>
     <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">preshare_group_session</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="comment">// TODO expose this publicly so people can pre-share a group session if</span>
         <span class="comment">// e.g. a user starts to type a message for a room.</span>
@@ -1298,7 +1298,7 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// Panics if the client isn&#39;t logged in.</span>
     <span class="attribute">#[<span class="ident">instrument</span>]</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;encryption&quot;</span>)]</span>
+    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;e2e-encryption&quot;</span>)]</span>
     <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">share_group_session</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">requests</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">client</span>.<span class="ident">base_client</span>().<span class="ident">share_group_session</span>(<span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">room_id</span>()).<span class="kw">await</span><span class="question-mark">?</span>;
 
@@ -1471,7 +1471,7 @@
     ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">send_message_event::v3::Response</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">txn_id</span>: <span class="ident">OwnedTransactionId</span> <span class="op">=</span> <span class="ident">txn_id</span>.<span class="ident">map_or_else</span>(<span class="ident">TransactionId::new</span>, <span class="ident">ToOwned::to_owned</span>);
 
-        <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;encryption&quot;</span>))]</span>
+        <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;e2e-encryption&quot;</span>))]</span>
         <span class="kw">let</span> <span class="ident">content</span> <span class="op">=</span> {
             <span class="macro">debug!</span>(
                 <span class="ident">room_id</span> <span class="op">=</span> <span class="op">%</span><span class="self">self</span>.<span class="ident">room_id</span>(),
@@ -1480,7 +1480,7 @@
             <span class="ident">Raw::new</span>(<span class="kw-2">&amp;</span><span class="ident">content</span>)<span class="question-mark">?</span>.<span class="ident">cast</span>()
         };
 
-        <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;encryption&quot;</span>)]</span>
+        <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;e2e-encryption&quot;</span>)]</span>
         <span class="kw">let</span> (<span class="ident">content</span>, <span class="ident">event_type</span>) <span class="op">=</span> <span class="kw">if</span> <span class="self">self</span>.<span class="ident">is_encrypted</span>() {
             <span class="comment">// Reactions are currently famously not encrypted, skip encrypting</span>
             <span class="comment">// them until they are.</span>
@@ -1667,7 +1667,7 @@
         <span class="ident">reader</span>: <span class="kw-2">&amp;mut</span> <span class="ident">R</span>,
         <span class="ident">config</span>: <span class="ident">AttachmentConfig</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">T</span><span class="op">&gt;</span>,
     ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">send_message_event::v3::Response</span><span class="op">&gt;</span> {
-        <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;encryption&quot;</span>)]</span>
+        <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;e2e-encryption&quot;</span>)]</span>
         <span class="kw">let</span> <span class="ident">content</span> <span class="op">=</span> <span class="kw">if</span> <span class="self">self</span>.<span class="ident">is_encrypted</span>() {
             <span class="self">self</span>.<span class="ident">client</span>
                 .<span class="ident">prepare_encrypted_attachment_message</span>(
@@ -1690,7 +1690,7 @@
                 .<span class="kw">await</span><span class="question-mark">?</span>
         };
 
-        <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;encryption&quot;</span>))]</span>
+        <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;e2e-encryption&quot;</span>))]</span>
         <span class="kw">let</span> <span class="ident">content</span> <span class="op">=</span> <span class="self">self</span>
             .<span class="ident">client</span>
             .<span class="ident">prepare_attachment_message</span>(<span class="ident">body</span>, <span class="ident">content_type</span>, <span class="ident">reader</span>, <span class="ident">config</span>.<span class="ident">info</span>, <span class="ident">config</span>.<span class="ident">thumbnail</span>)
@@ -1856,5 +1856,5 @@
     }
 }
 </code></pre></div>
-</section><section id="search" class="content hidden"></section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="matrix_sdk" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.62.0-nightly (bed05e996 2022-05-02)" ></div>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="matrix_sdk" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.62.0-nightly (e1b71feb5 2022-05-03)" ></div>
 </body></html>
