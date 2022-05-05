@@ -4023,6 +4023,10 @@
 <span id="4018">4018</span>
 <span id="4019">4019</span>
 <span id="4020">4020</span>
+<span id="4021">4021</span>
+<span id="4022">4022</span>
+<span id="4023">4023</span>
+<span id="4024">4024</span>
 </pre><pre class="rust"><code><span class="comment">// Copyright 2020 Damir Jelić</span>
 <span class="comment">// Copyright 2020 The Matrix.org Foundation C.I.C.</span>
 <span class="comment">//</span>
@@ -6278,6 +6282,7 @@
         <span class="ident">media</span>::{<span class="ident">MediaFormat</span>, <span class="ident">MediaRequest</span>, <span class="ident">MediaThumbnailSize</span>},
         <span class="ident">DisplayName</span>,
     };
+    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;experimental-timeline&quot;</span>)]</span>
     <span class="kw">use</span> <span class="ident">matrix_sdk_common::deserialized_responses::SyncRoomEvent</span>;
     <span class="kw">use</span> <span class="ident">matrix_sdk_test</span>::{<span class="ident">test_json</span>, <span class="ident">EventBuilder</span>, <span class="ident">EventsJson</span>};
     <span class="kw">use</span> <span class="ident">mockito</span>::{<span class="ident">mock</span>, <span class="ident">Matcher</span>};
@@ -7809,6 +7814,7 @@
     <span class="comment">// inconsistent manners, isn&#39;t activated.</span>
     <span class="comment">//#[async_test]</span>
     <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">dead_code</span>)]</span>
+    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;experimental-timeline&quot;</span>)]</span>
     <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">room_timeline_with_remove</span>() {
         <span class="kw">let</span> <span class="ident">client</span> <span class="op">=</span> <span class="ident">logged_in_client</span>().<span class="kw">await</span>;
         <span class="kw">let</span> <span class="ident">sync_settings</span> <span class="op">=</span> <span class="ident">SyncSettings::new</span>().<span class="ident">timeout</span>(<span class="ident">Duration::from_millis</span>(<span class="number">3000</span>));
@@ -7932,7 +7938,9 @@
         <span class="ident">mocked_messages</span>.<span class="ident">assert</span>();
         <span class="ident">mocked_messages_2</span>.<span class="ident">assert</span>();
     }
+
     <span class="attribute">#[<span class="ident">async_test</span>]</span>
+    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;experimental-timeline&quot;</span>)]</span>
     <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">room_timeline</span>() {
         <span class="kw">let</span> <span class="ident">client</span> <span class="op">=</span> <span class="ident">logged_in_client</span>().<span class="kw">await</span>;
         <span class="kw">let</span> <span class="ident">sync_settings</span> <span class="op">=</span> <span class="ident">SyncSettings::new</span>().<span class="ident">timeout</span>(<span class="ident">Duration::from_millis</span>(<span class="number">3000</span>));

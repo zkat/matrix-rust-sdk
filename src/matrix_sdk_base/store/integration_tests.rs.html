@@ -768,6 +768,15 @@
 <span id="763">763</span>
 <span id="764">764</span>
 <span id="765">765</span>
+<span id="766">766</span>
+<span id="767">767</span>
+<span id="768">768</span>
+<span id="769">769</span>
+<span id="770">770</span>
+<span id="771">771</span>
+<span id="772">772</span>
+<span id="773">773</span>
+<span id="774">774</span>
 </pre><pre class="rust"><code><span class="doccomment">//! Macro of integration tests for StateStore implementions.</span>
 
 <span class="doccomment">/// Macro building to allow your StateStore implementation to run the entire</span>
@@ -803,17 +812,21 @@
         $(
             <span class="kw">mod</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span> {
 
+                <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;experimental-timeline&quot;</span>)]</span>
                 <span class="kw">use</span> <span class="ident">futures_util::StreamExt</span>;
-                <span class="kw">use</span> <span class="ident">matrix_sdk_test</span>::{<span class="ident">async_test</span>, <span class="ident">test_json</span>};
+                <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;experimental-timeline&quot;</span>)]</span>
                 <span class="kw">use</span> <span class="ident">ruma</span>::{
                     <span class="ident">api</span>::{
                         <span class="ident">client</span>::{
-                            <span class="ident">media::get_content_thumbnail::v3::Method</span>,
                             <span class="ident">message::get_message_events::v3::Response</span> <span class="kw">as</span> <span class="ident">MessageResponse</span>,
                             <span class="ident">sync::sync_events::v3::Response</span> <span class="kw">as</span> <span class="ident">SyncResponse</span>,
                         },
                         <span class="ident">IncomingResponse</span>,
-                    },
+                    }
+                };
+                <span class="kw">use</span> <span class="ident">matrix_sdk_test</span>::{<span class="ident">async_test</span>, <span class="ident">test_json</span>};
+                <span class="kw">use</span> <span class="ident">ruma</span>::{
+                    <span class="ident">api::client::media::get_content_thumbnail::v3::Method</span>,
                     <span class="ident">device_id</span>, <span class="ident">event_id</span>,
                     <span class="ident">events</span>::{
                         <span class="ident">presence::PresenceEvent</span>,
@@ -841,10 +854,13 @@
 
                 <span class="kw">use</span> <span class="ident">std::collections</span>::{<span class="ident">BTreeMap</span>, <span class="ident">BTreeSet</span>};
 
+                <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;experimental-timeline&quot;</span>)]</span>
                 <span class="kw">use</span> <span class="macro-nonterminal">$</span><span class="kw">crate</span>::{
                     <span class="macro-nonterminal">http::Response</span>,
-                    <span class="ident">RoomType</span>, <span class="ident">Session</span>,
                     <span class="ident">deserialized_responses</span>::{ <span class="ident">RoomEvent</span>, <span class="ident">SyncRoomEvent</span>, <span class="ident">TimelineSlice</span>},
+                };
+                <span class="kw">use</span> <span class="macro-nonterminal">$</span><span class="kw">crate</span>::{
+                    <span class="macro-nonterminal">RoomType</span>, <span class="ident">Session</span>,
                     <span class="ident">media</span>::{<span class="ident">MediaFormat</span>, <span class="ident">MediaRequest</span>, <span class="ident">MediaThumbnailSize</span>},
                     <span class="ident">store</span>::{
                         <span class="ident">Store</span>,
@@ -1376,6 +1392,7 @@
                 }
 
                 <span class="attribute">#[<span class="ident">async_test</span>]</span>
+                <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;experimental-timeline&quot;</span>)]</span>
                 <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">test_room_timeline</span>() {
                     <span class="kw">let</span> <span class="ident">store</span> <span class="op">=</span> <span class="ident">get_store</span>().<span class="kw">await</span>.<span class="ident">unwrap</span>();
                     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">stored_events</span> <span class="op">=</span> <span class="ident">Vec::new</span>();
@@ -1503,6 +1520,7 @@
                     <span class="ident">check_timeline_events</span>(<span class="ident">room_id</span>, <span class="kw-2">&amp;</span><span class="ident">store</span>, <span class="kw-2">&amp;</span><span class="ident">Vec::new</span>(), <span class="ident">end_token</span>.<span class="ident">as_deref</span>()).<span class="kw">await</span>;
                 }
 
+                <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;experimental-timeline&quot;</span>)]</span>
                 <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">check_timeline_events</span>(
                     <span class="ident">room_id</span>: <span class="kw-2">&amp;</span><span class="ident">RoomId</span>,
                     <span class="ident">store</span>: <span class="kw-2">&amp;</span><span class="kw">dyn</span> <span class="ident">StateStore</span>,
