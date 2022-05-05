@@ -997,11 +997,6 @@
 <span id="992">992</span>
 <span id="993">993</span>
 <span id="994">994</span>
-<span id="995">995</span>
-<span id="996">996</span>
-<span id="997">997</span>
-<span id="998">998</span>
-<span id="999">999</span>
 </pre><pre class="rust"><code><span class="comment">// Copyright 2021 The Matrix.org Foundation C.I.C.</span>
 <span class="comment">//</span>
 <span class="comment">// Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);</span>
@@ -1051,8 +1046,8 @@
     <span class="ident">VerificationStore</span>,
 };
 <span class="kw">use</span> <span class="kw">crate</span>::{
-    <span class="ident">olm::PrivateCrossSigningIdentity</span>, <span class="ident">CryptoStoreError</span>, <span class="ident">OutgoingVerificationRequest</span>,
-    <span class="ident">ReadOnlyDevice</span>, <span class="ident">ReadOnlyUserIdentities</span>, <span class="ident">RoomMessageRequest</span>, <span class="ident">ToDeviceRequest</span>,
+    <span class="ident">CryptoStoreError</span>, <span class="ident">OutgoingVerificationRequest</span>, <span class="ident">ReadOnlyDevice</span>, <span class="ident">ReadOnlyUserIdentities</span>,
+    <span class="ident">RoomMessageRequest</span>, <span class="ident">ToDeviceRequest</span>,
 };
 
 <span class="kw">const</span> <span class="ident">SECRET_SIZE</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="number">16</span>;
@@ -1508,10 +1503,8 @@
         <span class="ident"><span class="self">Self</span>::new_helper</span>(<span class="ident">flow_id</span>, <span class="ident">inner</span>, <span class="ident">identities</span>, <span class="ident">we_started</span>, <span class="ident">request_handle</span>)
     }
 
-    <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy::too_many_arguments</span>)]</span>
     <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">from_scan</span>(
         <span class="ident">store</span>: <span class="ident">VerificationStore</span>,
-        <span class="ident">private_identity</span>: <span class="ident">PrivateCrossSigningIdentity</span>,
         <span class="ident">other_user_id</span>: <span class="ident">OwnedUserId</span>,
         <span class="ident">other_device_id</span>: <span class="ident">OwnedDeviceId</span>,
         <span class="ident">flow_id</span>: <span class="ident">FlowId</span>,
@@ -1526,18 +1519,21 @@
             });
         }
 
-        <span class="kw">let</span> <span class="ident">own_identity</span> <span class="op">=</span>
-            <span class="ident">store</span>.<span class="ident">get_user_identity</span>(<span class="ident">store</span>.<span class="ident">account</span>.<span class="ident">user_id</span>()).<span class="kw">await</span><span class="question-mark">?</span>.<span class="ident">ok_or_else</span>(<span class="op">|</span><span class="op">|</span> {
-                <span class="ident">ScanError::MissingCrossSigningIdentity</span>(<span class="ident">store</span>.<span class="ident">account</span>.<span class="ident">user_id</span>().<span class="ident">to_owned</span>())
-            })<span class="question-mark">?</span>;
-        <span class="kw">let</span> <span class="ident">other_identity</span> <span class="op">=</span> <span class="ident">store</span>
-            .<span class="ident">get_user_identity</span>(<span class="kw-2">&amp;</span><span class="ident">other_user_id</span>)
-            .<span class="kw">await</span><span class="question-mark">?</span>
-            .<span class="ident">ok_or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">ScanError::MissingCrossSigningIdentity</span>(<span class="ident">other_user_id</span>.<span class="ident">clone</span>()))<span class="question-mark">?</span>;
         <span class="kw">let</span> <span class="ident">other_device</span> <span class="op">=</span>
             <span class="ident">store</span>.<span class="ident">get_device</span>(<span class="kw-2">&amp;</span><span class="ident">other_user_id</span>, <span class="kw-2">&amp;</span><span class="ident">other_device_id</span>).<span class="kw">await</span><span class="question-mark">?</span>.<span class="ident">ok_or_else</span>(<span class="op">|</span><span class="op">|</span> {
                 <span class="ident">ScanError::MissingDeviceKeys</span>(<span class="ident">other_user_id</span>.<span class="ident">clone</span>(), <span class="ident">other_device_id</span>.<span class="ident">clone</span>())
             })<span class="question-mark">?</span>;
+
+        <span class="kw">let</span> <span class="ident">identities</span> <span class="op">=</span> <span class="ident">store</span>.<span class="ident">get_identities</span>(<span class="ident">other_device</span>).<span class="kw">await</span><span class="question-mark">?</span>;
+
+        <span class="kw">let</span> <span class="ident">own_identity</span> <span class="op">=</span> <span class="ident">identities</span>.<span class="ident">own_identity</span>.<span class="ident">as_ref</span>().<span class="ident">ok_or_else</span>(<span class="op">|</span><span class="op">|</span> {
+            <span class="ident">ScanError::MissingCrossSigningIdentity</span>(<span class="ident">store</span>.<span class="ident">account</span>.<span class="ident">user_id</span>().<span class="ident">to_owned</span>())
+        })<span class="question-mark">?</span>;
+
+        <span class="kw">let</span> <span class="ident">other_identity</span> <span class="op">=</span> <span class="ident">identities</span>
+            .<span class="ident">identity_being_verified</span>
+            .<span class="ident">as_ref</span>()
+            .<span class="ident">ok_or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">ScanError::MissingCrossSigningIdentity</span>(<span class="ident">other_user_id</span>.<span class="ident">clone</span>()))<span class="question-mark">?</span>;
 
         <span class="kw">let</span> <span class="ident">check_master_key</span> <span class="op">=</span> <span class="op">|</span><span class="ident">key</span>, <span class="ident">identity</span>: <span class="kw-2">&amp;</span><span class="ident">ReadOnlyUserIdentities</span><span class="op">|</span> {
             <span class="kw">let</span> <span class="ident">master_key</span> <span class="op">=</span> <span class="ident">identity</span>.<span class="ident">master_key</span>().<span class="ident">get_first_key</span>().<span class="ident">ok_or_else</span>(<span class="op">|</span><span class="op">|</span> {
@@ -1554,28 +1550,25 @@
             }
         };
 
-        <span class="kw">let</span> (<span class="ident">device_being_verified</span>, <span class="ident">identity_being_verified</span>) <span class="op">=</span> <span class="kw">match</span> <span class="ident">qr_code</span> {
+        <span class="kw">match</span> <span class="ident">qr_code</span> {
             <span class="ident">QrVerificationData::Verification</span>(<span class="kw">_</span>) =&gt; {
-                <span class="ident">check_master_key</span>(<span class="ident">qr_code</span>.<span class="ident">first_key</span>(), <span class="kw-2">&amp;</span><span class="ident">other_identity</span>)<span class="question-mark">?</span>;
-                <span class="ident">check_master_key</span>(<span class="ident">qr_code</span>.<span class="ident">second_key</span>(), <span class="kw-2">&amp;</span><span class="ident">own_identity</span>)<span class="question-mark">?</span>;
-
-                (<span class="ident">other_device</span>, <span class="prelude-val">Some</span>(<span class="ident">other_identity</span>))
+                <span class="ident">check_master_key</span>(<span class="ident">qr_code</span>.<span class="ident">first_key</span>(), <span class="ident">other_identity</span>)<span class="question-mark">?</span>;
+                <span class="ident">check_master_key</span>(<span class="ident">qr_code</span>.<span class="ident">second_key</span>(), <span class="kw-2">&amp;</span><span class="ident">own_identity</span>.<span class="ident">to_owned</span>().<span class="ident">into</span>())<span class="question-mark">?</span>;
             }
             <span class="ident">QrVerificationData::SelfVerification</span>(<span class="kw">_</span>) =&gt; {
-                <span class="ident">check_master_key</span>(<span class="ident">qr_code</span>.<span class="ident">first_key</span>(), <span class="kw-2">&amp;</span><span class="ident">other_identity</span>)<span class="question-mark">?</span>;
+                <span class="ident">check_master_key</span>(<span class="ident">qr_code</span>.<span class="ident">first_key</span>(), <span class="ident">other_identity</span>)<span class="question-mark">?</span>;
                 <span class="kw">if</span> <span class="ident">qr_code</span>.<span class="ident">second_key</span>() <span class="op">!</span><span class="op">=</span> <span class="ident">store</span>.<span class="ident">account</span>.<span class="ident">identity_keys</span>().<span class="ident">ed25519</span> {
                     <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">ScanError::KeyMismatch</span> {
                         <span class="ident">expected</span>: <span class="ident">store</span>.<span class="ident">account</span>.<span class="ident">identity_keys</span>().<span class="ident">ed25519</span>.<span class="ident">to_base64</span>(),
                         <span class="ident">found</span>: <span class="ident">qr_code</span>.<span class="ident">second_key</span>().<span class="ident">to_base64</span>(),
                     });
                 }
-
-                (<span class="ident">other_device</span>, <span class="prelude-val">Some</span>(<span class="ident">other_identity</span>))
             }
             <span class="ident">QrVerificationData::SelfVerificationNoMasterKey</span>(<span class="kw">_</span>) =&gt; {
-                <span class="kw">let</span> <span class="ident">device_key</span> <span class="op">=</span> <span class="ident">other_device</span>.<span class="ident">ed25519_key</span>().<span class="ident">ok_or_else</span>(<span class="op">|</span><span class="op">|</span> {
-                    <span class="ident">ScanError::MissingDeviceKeys</span>(<span class="ident">other_user_id</span>.<span class="ident">clone</span>(), <span class="ident">other_device_id</span>.<span class="ident">clone</span>())
-                })<span class="question-mark">?</span>;
+                <span class="kw">let</span> <span class="ident">device_key</span> <span class="op">=</span>
+                    <span class="ident">identities</span>.<span class="ident">device_being_verified</span>.<span class="ident">ed25519_key</span>().<span class="ident">ok_or_else</span>(<span class="op">|</span><span class="op">|</span> {
+                        <span class="ident">ScanError::MissingDeviceKeys</span>(<span class="ident">other_user_id</span>.<span class="ident">clone</span>(), <span class="ident">other_device_id</span>.<span class="ident">clone</span>())
+                    })<span class="question-mark">?</span>;
 
                 <span class="kw">if</span> <span class="ident">qr_code</span>.<span class="ident">first_key</span>() <span class="op">!</span><span class="op">=</span> <span class="ident">device_key</span> {
                     <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">ScanError::KeyMismatch</span> {
@@ -1583,16 +1576,8 @@
                         <span class="ident">found</span>: <span class="ident">qr_code</span>.<span class="ident">first_key</span>().<span class="ident">to_base64</span>(),
                     });
                 }
-                <span class="ident">check_master_key</span>(<span class="ident">qr_code</span>.<span class="ident">second_key</span>(), <span class="kw-2">&amp;</span><span class="ident">other_identity</span>)<span class="question-mark">?</span>;
-                (<span class="ident">other_device</span>, <span class="prelude-val">Some</span>(<span class="ident">other_identity</span>))
+                <span class="ident">check_master_key</span>(<span class="ident">qr_code</span>.<span class="ident">second_key</span>(), <span class="ident">other_identity</span>)<span class="question-mark">?</span>;
             }
-        };
-
-        <span class="kw">let</span> <span class="ident">identities</span> <span class="op">=</span> <span class="ident">IdentitiesBeingVerified</span> {
-            <span class="ident">private_identity</span>,
-            <span class="ident">store</span>: <span class="ident">store</span>.<span class="ident">clone</span>(),
-            <span class="ident">device_being_verified</span>,
-            <span class="ident">identity_being_verified</span>,
         };
 
         <span class="kw">let</span> <span class="ident">secret</span> <span class="op">=</span> <span class="ident">qr_code</span>.<span class="ident">secret</span>().<span class="ident">to_owned</span>();
@@ -1804,6 +1789,7 @@
     <span class="kw">use</span> <span class="ident">std</span>::{<span class="ident">convert::TryFrom</span>, <span class="ident">sync::Arc</span>};
 
     <span class="kw">use</span> <span class="ident">matrix_qrcode::QrVerificationData</span>;
+    <span class="kw">use</span> <span class="ident">matrix_sdk_common::locks::Mutex</span>;
     <span class="kw">use</span> <span class="ident">matrix_sdk_test::async_test</span>;
     <span class="kw">use</span> <span class="ident">ruma</span>::{<span class="ident">device_id</span>, <span class="ident">event_id</span>, <span class="ident">room_id</span>, <span class="ident">user_id</span>, <span class="ident">DeviceId</span>, <span class="ident">UserId</span>};
 
@@ -1812,7 +1798,7 @@
         <span class="ident">store</span>::{<span class="ident">Changes</span>, <span class="ident">CryptoStore</span>, <span class="ident">MemoryStore</span>},
         <span class="ident">verification</span>::{
             <span class="ident">event_enums</span>::{<span class="ident">DoneContent</span>, <span class="ident">OutgoingContent</span>, <span class="ident">StartContent</span>},
-            <span class="ident">FlowId</span>, <span class="ident">IdentitiesBeingVerified</span>, <span class="ident">VerificationStore</span>,
+            <span class="ident">FlowId</span>, <span class="ident">VerificationStore</span>,
         },
         <span class="ident">QrVerification</span>, <span class="ident">ReadOnlyDevice</span>,
     };
@@ -1834,23 +1820,22 @@
         <span class="kw">let</span> <span class="ident">store</span> <span class="op">=</span> <span class="ident">memory_store</span>();
         <span class="kw">let</span> <span class="ident">account</span> <span class="op">=</span> <span class="ident">ReadOnlyAccount::new</span>(<span class="ident">user_id</span>(), <span class="ident">device_id</span>());
 
-        <span class="kw">let</span> <span class="ident">store</span> <span class="op">=</span> <span class="ident">VerificationStore</span> { <span class="ident">account</span>: <span class="ident">account</span>.<span class="ident">clone</span>(), <span class="ident">inner</span>: <span class="ident">store</span> };
-
         <span class="kw">let</span> <span class="ident">private_identity</span> <span class="op">=</span> <span class="ident">PrivateCrossSigningIdentity::new</span>(<span class="ident">user_id</span>().<span class="ident">to_owned</span>()).<span class="kw">await</span>;
-        <span class="kw">let</span> <span class="ident">flow_id</span> <span class="op">=</span> <span class="ident">FlowId::ToDevice</span>(<span class="string">&quot;test_transaction&quot;</span>.<span class="ident">into</span>());
-
-        <span class="kw">let</span> <span class="ident">device_key</span> <span class="op">=</span> <span class="ident">account</span>.<span class="ident">identity_keys</span>.<span class="ident">ed25519</span>;
         <span class="kw">let</span> <span class="ident">master_key</span> <span class="op">=</span> <span class="ident">private_identity</span>.<span class="ident">master_public_key</span>().<span class="kw">await</span>.<span class="ident">unwrap</span>();
         <span class="kw">let</span> <span class="ident">master_key</span> <span class="op">=</span> <span class="ident">master_key</span>.<span class="ident">get_first_key</span>().<span class="ident">unwrap</span>().<span class="ident">to_owned</span>();
 
+        <span class="kw">let</span> <span class="ident">store</span> <span class="op">=</span> <span class="ident">VerificationStore</span> {
+            <span class="ident">account</span>: <span class="ident">account</span>.<span class="ident">clone</span>(),
+            <span class="ident">inner</span>: <span class="ident">store</span>,
+            <span class="ident">private_identity</span>: <span class="ident">Mutex::new</span>(<span class="ident">private_identity</span>).<span class="ident">into</span>(),
+        };
+
+        <span class="kw">let</span> <span class="ident">flow_id</span> <span class="op">=</span> <span class="ident">FlowId::ToDevice</span>(<span class="string">&quot;test_transaction&quot;</span>.<span class="ident">into</span>());
+
+        <span class="kw">let</span> <span class="ident">device_key</span> <span class="op">=</span> <span class="ident">account</span>.<span class="ident">identity_keys</span>.<span class="ident">ed25519</span>;
         <span class="kw">let</span> <span class="ident">alice_device</span> <span class="op">=</span> <span class="ident">ReadOnlyDevice::from_account</span>(<span class="kw-2">&amp;</span><span class="ident">account</span>).<span class="kw">await</span>;
 
-        <span class="kw">let</span> <span class="ident">identities</span> <span class="op">=</span> <span class="ident">IdentitiesBeingVerified</span> {
-            <span class="ident">private_identity</span>,
-            <span class="ident">store</span>: <span class="ident">store</span>.<span class="ident">clone</span>(),
-            <span class="ident">device_being_verified</span>: <span class="ident">alice_device</span>,
-            <span class="ident">identity_being_verified</span>: <span class="prelude-val">None</span>,
-        };
+        <span class="kw">let</span> <span class="ident">identities</span> <span class="op">=</span> <span class="ident">store</span>.<span class="ident">get_identities</span>(<span class="ident">alice_device</span>).<span class="kw">await</span>.<span class="ident">unwrap</span>();
 
         <span class="kw">let</span> <span class="ident">verification</span> <span class="op">=</span> <span class="ident">QrVerification::new_self_no_master</span>(
             <span class="ident">store</span>.<span class="ident">clone</span>(),
@@ -1897,7 +1882,13 @@
             <span class="kw">let</span> <span class="ident">alice_account</span> <span class="op">=</span> <span class="ident">ReadOnlyAccount::new</span>(<span class="ident">user_id</span>(), <span class="ident">device_id</span>());
             <span class="kw">let</span> <span class="ident">store</span> <span class="op">=</span> <span class="ident">memory_store</span>();
 
-            <span class="kw">let</span> <span class="ident">store</span> <span class="op">=</span> <span class="ident">VerificationStore</span> { <span class="ident">account</span>: <span class="ident">alice_account</span>.<span class="ident">clone</span>(), <span class="ident">inner</span>: <span class="ident">store</span> };
+            <span class="kw">let</span> <span class="ident">private_identity</span> <span class="op">=</span> <span class="ident">PrivateCrossSigningIdentity::new</span>(<span class="ident">user_id</span>().<span class="ident">to_owned</span>()).<span class="kw">await</span>;
+
+            <span class="kw">let</span> <span class="ident">store</span> <span class="op">=</span> <span class="ident">VerificationStore</span> {
+                <span class="ident">account</span>: <span class="ident">alice_account</span>.<span class="ident">clone</span>(),
+                <span class="ident">inner</span>: <span class="ident">store</span>,
+                <span class="ident">private_identity</span>: <span class="ident">Mutex::new</span>(<span class="ident">private_identity</span>).<span class="ident">into</span>(),
+            };
 
             <span class="kw">let</span> <span class="ident">bob_account</span> <span class="op">=</span>
                 <span class="ident">ReadOnlyAccount::new</span>(<span class="ident">alice_account</span>.<span class="ident">user_id</span>(), <span class="macro">device_id!</span>(<span class="string">&quot;BOBDEVICE&quot;</span>));
@@ -1916,12 +1907,7 @@
             <span class="ident">changes</span>.<span class="ident">devices</span>.<span class="ident">new</span>.<span class="ident">push</span>(<span class="ident">bob_device</span>.<span class="ident">clone</span>());
             <span class="ident">store</span>.<span class="ident">save_changes</span>(<span class="ident">changes</span>).<span class="kw">await</span>.<span class="ident">unwrap</span>();
 
-            <span class="kw">let</span> <span class="ident">identities</span> <span class="op">=</span> <span class="ident">IdentitiesBeingVerified</span> {
-                <span class="ident">private_identity</span>: <span class="ident">PrivateCrossSigningIdentity::empty</span>(<span class="ident">alice_account</span>.<span class="ident">user_id</span>()),
-                <span class="ident">store</span>: <span class="ident">store</span>.<span class="ident">clone</span>(),
-                <span class="ident">device_being_verified</span>: <span class="ident">alice_device</span>.<span class="ident">clone</span>(),
-                <span class="ident">identity_being_verified</span>: <span class="prelude-val">Some</span>(<span class="ident">identity</span>.<span class="ident">clone</span>().<span class="ident">into</span>()),
-            };
+            <span class="kw">let</span> <span class="ident">identities</span> <span class="op">=</span> <span class="ident">store</span>.<span class="ident">get_identities</span>(<span class="ident">alice_device</span>.<span class="ident">clone</span>()).<span class="kw">await</span>.<span class="ident">unwrap</span>();
 
             <span class="kw">let</span> <span class="ident">alice_verification</span> <span class="op">=</span> <span class="ident">QrVerification::new_self_no_master</span>(
                 <span class="ident">store</span>,
@@ -1934,7 +1920,12 @@
 
             <span class="kw">let</span> <span class="ident">bob_store</span> <span class="op">=</span> <span class="ident">memory_store</span>();
 
-            <span class="kw">let</span> <span class="ident">bob_store</span> <span class="op">=</span> <span class="ident">VerificationStore</span> { <span class="ident">account</span>: <span class="ident">bob_account</span>.<span class="ident">clone</span>(), <span class="ident">inner</span>: <span class="ident">bob_store</span> };
+            <span class="kw">let</span> <span class="ident">private_identity</span> <span class="op">=</span> <span class="ident">PrivateCrossSigningIdentity::new</span>(<span class="ident">user_id</span>().<span class="ident">to_owned</span>()).<span class="kw">await</span>;
+            <span class="kw">let</span> <span class="ident">bob_store</span> <span class="op">=</span> <span class="ident">VerificationStore</span> {
+                <span class="ident">account</span>: <span class="ident">bob_account</span>.<span class="ident">clone</span>(),
+                <span class="ident">inner</span>: <span class="ident">bob_store</span>,
+                <span class="ident">private_identity</span>: <span class="ident">Mutex::new</span>(<span class="ident">private_identity</span>).<span class="ident">into</span>(),
+            };
 
             <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">changes</span> <span class="op">=</span> <span class="ident">Changes::default</span>();
             <span class="ident">changes</span>.<span class="ident">identities</span>.<span class="ident">new</span>.<span class="ident">push</span>(<span class="ident">identity</span>.<span class="ident">into</span>());
@@ -1946,7 +1937,6 @@
 
             <span class="kw">let</span> <span class="ident">bob_verification</span> <span class="op">=</span> <span class="ident">QrVerification::from_scan</span>(
                 <span class="ident">bob_store</span>,
-                <span class="ident">private_identity</span>,
                 <span class="ident">alice_account</span>.<span class="ident">user_id</span>().<span class="ident">to_owned</span>(),
                 <span class="ident">alice_account</span>.<span class="ident">device_id</span>().<span class="ident">to_owned</span>(),
                 <span class="ident">flow_id</span>,

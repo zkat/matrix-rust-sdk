@@ -753,6 +753,27 @@
 <span id="748">748</span>
 <span id="749">749</span>
 <span id="750">750</span>
+<span id="751">751</span>
+<span id="752">752</span>
+<span id="753">753</span>
+<span id="754">754</span>
+<span id="755">755</span>
+<span id="756">756</span>
+<span id="757">757</span>
+<span id="758">758</span>
+<span id="759">759</span>
+<span id="760">760</span>
+<span id="761">761</span>
+<span id="762">762</span>
+<span id="763">763</span>
+<span id="764">764</span>
+<span id="765">765</span>
+<span id="766">766</span>
+<span id="767">767</span>
+<span id="768">768</span>
+<span id="769">769</span>
+<span id="770">770</span>
+<span id="771">771</span>
 </pre><pre class="rust"><code><span class="comment">// Copyright 2020 The Matrix.org Foundation C.I.C.</span>
 <span class="comment">//</span>
 <span class="comment">// Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);</span>
@@ -813,12 +834,13 @@
     <span class="ident">gossiping</span>::{<span class="ident">GossipMachine</span>, <span class="ident">GossipRequest</span>},
     <span class="ident">olm</span>::{<span class="ident">PrivateCrossSigningIdentity</span>, <span class="ident">ReadOnlyAccount</span>, <span class="ident">Session</span>},
     <span class="ident">store</span>::{<span class="ident">Changes</span>, <span class="ident">CryptoStore</span>},
-    <span class="ident">CryptoStoreError</span>, <span class="ident">LocalTrust</span>, <span class="ident">ReadOnlyDevice</span>, <span class="ident">ReadOnlyUserIdentities</span>,
+    <span class="ident">CryptoStoreError</span>, <span class="ident">LocalTrust</span>, <span class="ident">ReadOnlyDevice</span>, <span class="ident">ReadOnlyOwnUserIdentity</span>, <span class="ident">ReadOnlyUserIdentities</span>,
 };
 
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>)]</span>
 <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct</span> <span class="ident">VerificationStore</span> {
     <span class="kw">pub</span> <span class="ident">account</span>: <span class="ident">ReadOnlyAccount</span>,
+    <span class="kw">pub</span> <span class="ident">private_identity</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">Mutex</span><span class="op">&lt;</span><span class="ident">PrivateCrossSigningIdentity</span><span class="op">&gt;</span><span class="op">&gt;</span>,
     <span class="ident">inner</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">CryptoStore</span><span class="op">&gt;</span>,
 }
 
@@ -854,6 +876,25 @@
         <span class="ident">user_id</span>: <span class="kw-2">&amp;</span><span class="ident">UserId</span>,
     ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ReadOnlyUserIdentities</span><span class="op">&gt;</span>, <span class="ident">CryptoStoreError</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">get_user_identity</span>(<span class="ident">user_id</span>).<span class="kw">await</span>
+    }
+
+    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">get_identities</span>(
+        <span class="kw-2">&amp;</span><span class="self">self</span>,
+        <span class="ident">device_being_verified</span>: <span class="ident">ReadOnlyDevice</span>,
+    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">IdentitiesBeingVerified</span>, <span class="ident">CryptoStoreError</span><span class="op">&gt;</span> {
+        <span class="kw">let</span> <span class="ident">identity_being_verified</span> <span class="op">=</span>
+            <span class="self">self</span>.<span class="ident">get_user_identity</span>(<span class="ident">device_being_verified</span>.<span class="ident">user_id</span>()).<span class="kw">await</span><span class="question-mark">?</span>;
+
+        <span class="prelude-val">Ok</span>(<span class="ident">IdentitiesBeingVerified</span> {
+            <span class="ident">private_identity</span>: <span class="self">self</span>.<span class="ident">private_identity</span>.<span class="ident">lock</span>().<span class="kw">await</span>.<span class="ident">clone</span>(),
+            <span class="ident">store</span>: <span class="self">self</span>.<span class="ident">clone</span>(),
+            <span class="ident">device_being_verified</span>,
+            <span class="ident">own_identity</span>: <span class="self">self</span>
+                .<span class="ident">get_user_identity</span>(<span class="self">self</span>.<span class="ident">account</span>.<span class="ident">user_id</span>())
+                .<span class="kw">await</span><span class="question-mark">?</span>
+                .<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">i</span><span class="op">|</span> <span class="ident">i</span>.<span class="ident">into_own</span>()),
+            <span class="ident">identity_being_verified</span>,
+        })
     }
 
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">save_changes</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">changes</span>: <span class="ident">Changes</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">CryptoStoreError</span><span class="op">&gt;</span> {
@@ -1168,6 +1209,7 @@
     <span class="ident">private_identity</span>: <span class="ident">PrivateCrossSigningIdentity</span>,
     <span class="ident">store</span>: <span class="ident">VerificationStore</span>,
     <span class="ident">device_being_verified</span>: <span class="ident">ReadOnlyDevice</span>,
+    <span class="ident">own_identity</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ReadOnlyOwnUserIdentity</span><span class="op">&gt;</span>,
     <span class="ident">identity_being_verified</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ReadOnlyUserIdentities</span><span class="op">&gt;</span>,
 }
 

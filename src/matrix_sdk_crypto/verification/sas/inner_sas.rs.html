@@ -407,39 +407,6 @@
 <span id="402">402</span>
 <span id="403">403</span>
 <span id="404">404</span>
-<span id="405">405</span>
-<span id="406">406</span>
-<span id="407">407</span>
-<span id="408">408</span>
-<span id="409">409</span>
-<span id="410">410</span>
-<span id="411">411</span>
-<span id="412">412</span>
-<span id="413">413</span>
-<span id="414">414</span>
-<span id="415">415</span>
-<span id="416">416</span>
-<span id="417">417</span>
-<span id="418">418</span>
-<span id="419">419</span>
-<span id="420">420</span>
-<span id="421">421</span>
-<span id="422">422</span>
-<span id="423">423</span>
-<span id="424">424</span>
-<span id="425">425</span>
-<span id="426">426</span>
-<span id="427">427</span>
-<span id="428">428</span>
-<span id="429">429</span>
-<span id="430">430</span>
-<span id="431">431</span>
-<span id="432">432</span>
-<span id="433">433</span>
-<span id="434">434</span>
-<span id="435">435</span>
-<span id="436">436</span>
-<span id="437">437</span>
 </pre><pre class="rust"><code><span class="comment">// Copyright 2020 The Matrix.org Foundation C.I.C.</span>
 <span class="comment">//</span>
 <span class="comment">// Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);</span>
@@ -460,7 +427,7 @@
 <span class="kw">use</span> <span class="ident">matrix_sdk_common::instant::Instant</span>;
 <span class="kw">use</span> <span class="ident">ruma</span>::{
     <span class="ident">events::key::verification</span>::{<span class="ident">cancel::CancelCode</span>, <span class="ident">ShortAuthenticationString</span>},
-    <span class="ident">OwnedEventId</span>, <span class="ident">OwnedRoomId</span>, <span class="ident">OwnedTransactionId</span>, <span class="ident">UserId</span>,
+    <span class="ident">UserId</span>,
 };
 
 <span class="kw">use</span> <span class="kw">super</span>::{
@@ -499,7 +466,8 @@
         <span class="ident">other_device</span>: <span class="ident">ReadOnlyDevice</span>,
         <span class="ident">own_identity</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ReadOnlyOwnUserIdentity</span><span class="op">&gt;</span>,
         <span class="ident">other_identity</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ReadOnlyUserIdentities</span><span class="op">&gt;</span>,
-        <span class="ident">transaction_id</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">OwnedTransactionId</span><span class="op">&gt;</span>,
+        <span class="ident">transaction_id</span>: <span class="ident">FlowId</span>,
+        <span class="ident">started_from_request</span>: <span class="ident">bool</span>,
     ) -&gt; (<span class="ident">InnerSas</span>, <span class="ident">OutgoingContent</span>) {
         <span class="kw">let</span> <span class="ident">sas</span> <span class="op">=</span> <span class="ident">SasState</span>::<span class="op">&lt;</span><span class="ident">Created</span><span class="op">&gt;</span><span class="ident">::new</span>(
             <span class="ident">account</span>,
@@ -507,6 +475,7 @@
             <span class="ident">own_identity</span>,
             <span class="ident">other_identity</span>,
             <span class="ident">transaction_id</span>,
+            <span class="ident">started_from_request</span>,
         );
         <span class="kw">let</span> <span class="ident">content</span> <span class="op">=</span> <span class="ident">sas</span>.<span class="ident">as_content</span>();
         (<span class="ident">InnerSas::Created</span>(<span class="ident">sas</span>), <span class="ident">content</span>.<span class="ident">into</span>())
@@ -573,26 +542,6 @@
             <span class="ident">InnerSas::Done</span>(<span class="kw">_</span>) =&gt; <span class="bool-val">false</span>,
             <span class="ident">InnerSas::Cancelled</span>(<span class="kw">_</span>) =&gt; <span class="bool-val">false</span>,
         }
-    }
-
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">start_in_room</span>(
-        <span class="ident">event_id</span>: <span class="ident">OwnedEventId</span>,
-        <span class="ident">room_id</span>: <span class="ident">OwnedRoomId</span>,
-        <span class="ident">account</span>: <span class="ident">ReadOnlyAccount</span>,
-        <span class="ident">other_device</span>: <span class="ident">ReadOnlyDevice</span>,
-        <span class="ident">own_identity</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ReadOnlyOwnUserIdentity</span><span class="op">&gt;</span>,
-        <span class="ident">other_identity</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ReadOnlyUserIdentities</span><span class="op">&gt;</span>,
-    ) -&gt; (<span class="ident">InnerSas</span>, <span class="ident">OutgoingContent</span>) {
-        <span class="kw">let</span> <span class="ident">sas</span> <span class="op">=</span> <span class="ident">SasState</span>::<span class="op">&lt;</span><span class="ident">Created</span><span class="op">&gt;</span><span class="ident">::new_in_room</span>(
-            <span class="ident">room_id</span>,
-            <span class="ident">event_id</span>,
-            <span class="ident">account</span>,
-            <span class="ident">other_device</span>,
-            <span class="ident">own_identity</span>,
-            <span class="ident">other_identity</span>,
-        );
-        <span class="kw">let</span> <span class="ident">content</span> <span class="op">=</span> <span class="ident">sas</span>.<span class="ident">as_content</span>();
-        (<span class="ident">InnerSas::Created</span>(<span class="ident">sas</span>), <span class="ident">content</span>.<span class="ident">into</span>())
     }
 
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">from_start_event</span>(
@@ -819,21 +768,6 @@
             <span class="ident">InnerSas::WaitingForDone</span>(<span class="ident">s</span>) =&gt; <span class="ident">s</span>.<span class="ident">timed_out</span>(),
             <span class="ident">InnerSas::Done</span>(<span class="ident">s</span>) =&gt; <span class="ident">s</span>.<span class="ident">timed_out</span>(),
             <span class="ident">InnerSas::WeAccepted</span>(<span class="ident">s</span>) =&gt; <span class="ident">s</span>.<span class="ident">timed_out</span>(),
-        }
-    }
-
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">verification_flow_id</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">FlowId</span><span class="op">&gt;</span> {
-        <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">InnerSas::Created</span>(<span class="ident">s</span>) =&gt; <span class="ident">s</span>.<span class="ident">verification_flow_id</span>.<span class="ident">clone</span>(),
-            <span class="ident">InnerSas::Started</span>(<span class="ident">s</span>) =&gt; <span class="ident">s</span>.<span class="ident">verification_flow_id</span>.<span class="ident">clone</span>(),
-            <span class="ident">InnerSas::Cancelled</span>(<span class="ident">s</span>) =&gt; <span class="ident">s</span>.<span class="ident">verification_flow_id</span>.<span class="ident">clone</span>(),
-            <span class="ident">InnerSas::Accepted</span>(<span class="ident">s</span>) =&gt; <span class="ident">s</span>.<span class="ident">verification_flow_id</span>.<span class="ident">clone</span>(),
-            <span class="ident">InnerSas::KeyReceived</span>(<span class="ident">s</span>) =&gt; <span class="ident">s</span>.<span class="ident">verification_flow_id</span>.<span class="ident">clone</span>(),
-            <span class="ident">InnerSas::Confirmed</span>(<span class="ident">s</span>) =&gt; <span class="ident">s</span>.<span class="ident">verification_flow_id</span>.<span class="ident">clone</span>(),
-            <span class="ident">InnerSas::MacReceived</span>(<span class="ident">s</span>) =&gt; <span class="ident">s</span>.<span class="ident">verification_flow_id</span>.<span class="ident">clone</span>(),
-            <span class="ident">InnerSas::WaitingForDone</span>(<span class="ident">s</span>) =&gt; <span class="ident">s</span>.<span class="ident">verification_flow_id</span>.<span class="ident">clone</span>(),
-            <span class="ident">InnerSas::Done</span>(<span class="ident">s</span>) =&gt; <span class="ident">s</span>.<span class="ident">verification_flow_id</span>.<span class="ident">clone</span>(),
-            <span class="ident">InnerSas::WeAccepted</span>(<span class="ident">s</span>) =&gt; <span class="ident">s</span>.<span class="ident">verification_flow_id</span>.<span class="ident">clone</span>(),
         }
     }
 
