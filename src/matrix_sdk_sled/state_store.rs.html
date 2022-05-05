@@ -1534,6 +1534,47 @@
 <span id="1529">1529</span>
 <span id="1530">1530</span>
 <span id="1531">1531</span>
+<span id="1532">1532</span>
+<span id="1533">1533</span>
+<span id="1534">1534</span>
+<span id="1535">1535</span>
+<span id="1536">1536</span>
+<span id="1537">1537</span>
+<span id="1538">1538</span>
+<span id="1539">1539</span>
+<span id="1540">1540</span>
+<span id="1541">1541</span>
+<span id="1542">1542</span>
+<span id="1543">1543</span>
+<span id="1544">1544</span>
+<span id="1545">1545</span>
+<span id="1546">1546</span>
+<span id="1547">1547</span>
+<span id="1548">1548</span>
+<span id="1549">1549</span>
+<span id="1550">1550</span>
+<span id="1551">1551</span>
+<span id="1552">1552</span>
+<span id="1553">1553</span>
+<span id="1554">1554</span>
+<span id="1555">1555</span>
+<span id="1556">1556</span>
+<span id="1557">1557</span>
+<span id="1558">1558</span>
+<span id="1559">1559</span>
+<span id="1560">1560</span>
+<span id="1561">1561</span>
+<span id="1562">1562</span>
+<span id="1563">1563</span>
+<span id="1564">1564</span>
+<span id="1565">1565</span>
+<span id="1566">1566</span>
+<span id="1567">1567</span>
+<span id="1568">1568</span>
+<span id="1569">1569</span>
+<span id="1570">1570</span>
+<span id="1571">1571</span>
+<span id="1572">1572</span>
 </pre><pre class="rust"><code><span class="comment">// Copyright 2021 The Matrix.org Foundation C.I.C.</span>
 <span class="comment">//</span>
 <span class="comment">// Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);</span>
@@ -1647,6 +1688,9 @@
         }
     }
 }
+<span class="kw">const</span> <span class="ident">DATABASE_VERSION</span>: <span class="ident">u8</span> <span class="op">=</span> <span class="number">1</span>;
+
+<span class="kw">const</span> <span class="ident">VERSION_KEY</span>: <span class="kw-2">&amp;</span><span class="ident">str</span> <span class="op">=</span> <span class="string">&quot;state-store-version&quot;</span>;
 
 <span class="kw">const</span> <span class="ident">ACCOUNT_DATA</span>: <span class="kw-2">&amp;</span><span class="ident">str</span> <span class="op">=</span> <span class="string">&quot;account-data&quot;</span>;
 <span class="kw">const</span> <span class="ident">CUSTOM</span>: <span class="kw-2">&amp;</span><span class="ident">str</span> <span class="op">=</span> <span class="string">&quot;custom&quot;</span>;
@@ -1752,7 +1796,7 @@
         <span class="kw">let</span> <span class="ident">room_timeline_metadata</span> <span class="op">=</span> <span class="ident">db</span>.<span class="ident">open_tree</span>(<span class="ident">TIMELINE_METADATA</span>)<span class="question-mark">?</span>;
         <span class="kw">let</span> <span class="ident">room_event_id_to_position</span> <span class="op">=</span> <span class="ident">db</span>.<span class="ident">open_tree</span>(<span class="ident">ROOM_EVENT_ID_POSITION</span>)<span class="question-mark">?</span>;
 
-        <span class="prelude-val">Ok</span>(<span class="self">Self</span> {
+        <span class="kw">let</span> <span class="ident">database</span> <span class="op">=</span> <span class="self">Self</span> {
             <span class="ident">path</span>,
             <span class="ident">inner</span>: <span class="ident">db</span>,
             <span class="ident">store_cipher</span>,
@@ -1779,7 +1823,10 @@
             <span class="ident">room_timeline</span>,
             <span class="ident">room_timeline_metadata</span>,
             <span class="ident">room_event_id_to_position</span>,
-        })
+        };
+
+        <span class="ident">database</span>.<span class="ident">upgrade</span>()<span class="question-mark">?</span>;
+        <span class="prelude-val">Ok</span>(<span class="ident">database</span>)
     }
 
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">open</span>() -&gt; <span class="ident">StoreResult</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
@@ -1832,6 +1879,41 @@
         <span class="kw">let</span> <span class="ident">db</span> <span class="op">=</span> <span class="ident">Config::new</span>().<span class="ident">temporary</span>(<span class="bool-val">false</span>).<span class="ident">path</span>(<span class="kw-2">&amp;</span><span class="ident">path</span>).<span class="ident">open</span>()<span class="question-mark">?</span>;
 
         <span class="ident">SledStore::open_helper</span>(<span class="ident">db</span>, <span class="prelude-val">Some</span>(<span class="ident">path</span>), <span class="prelude-val">None</span>)
+    }
+
+    <span class="kw">fn</span> <span class="ident">upgrade</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">StoreResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+        <span class="kw">let</span> <span class="ident">db_version</span> <span class="op">=</span>
+            <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">get</span>(<span class="ident">VERSION_KEY</span>).<span class="ident">map_err</span>(<span class="op">|</span><span class="ident">e</span><span class="op">|</span> <span class="ident">StoreError::Backend</span>(<span class="macro">anyhow!</span>(<span class="ident">e</span>)))<span class="question-mark">?</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">v</span><span class="op">|</span> {
+                <span class="kw">let</span> (<span class="ident">version_bytes</span>, <span class="kw">_</span>) <span class="op">=</span> <span class="ident">v</span>.<span class="ident">split_at</span>(<span class="ident">std::mem::size_of</span>::<span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>());
+                <span class="ident">u8::from_be_bytes</span>(<span class="ident">version_bytes</span>.<span class="ident">try_into</span>().<span class="ident">unwrap_or_default</span>())
+            });
+
+        <span class="kw">let</span> <span class="ident">old_version</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">db_version</span> {
+            <span class="prelude-val">None</span> =&gt; {
+                <span class="comment">// we are fresh, let&#39;s write the current version</span>
+                <span class="self">self</span>.<span class="ident">inner</span>
+                    .<span class="ident">insert</span>(<span class="ident">VERSION_KEY</span>, <span class="ident">DATABASE_VERSION</span>.<span class="ident">to_be_bytes</span>().<span class="ident">as_ref</span>())
+                    .<span class="ident">map_err</span>(<span class="op">|</span><span class="ident">e</span><span class="op">|</span> <span class="ident">StoreError::Backend</span>(<span class="macro">anyhow!</span>(<span class="ident">e</span>)))<span class="question-mark">?</span>;
+                <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">flush</span>().<span class="ident">map_err</span>(<span class="op">|</span><span class="ident">e</span><span class="op">|</span> <span class="ident">StoreError::Backend</span>(<span class="macro">anyhow!</span>(<span class="ident">e</span>)))<span class="question-mark">?</span>;
+                <span class="kw">return</span> <span class="prelude-val">Ok</span>(());
+            }
+            <span class="prelude-val">Some</span>(<span class="ident">version</span>) <span class="kw">if</span> <span class="ident">version</span> <span class="op">==</span> <span class="ident">DATABASE_VERSION</span> =&gt; {
+                <span class="comment">// current, we don&#39;t have to do anything</span>
+                <span class="kw">return</span> <span class="prelude-val">Ok</span>(());
+            }
+            <span class="prelude-val">Some</span>(<span class="ident">version</span>) =&gt; <span class="ident">version</span>,
+        };
+
+        <span class="macro">tracing::debug!</span>(
+            <span class="ident">old_version</span>,
+            <span class="ident">new_version</span> <span class="op">=</span> <span class="ident">DATABASE_VERSION</span>,
+            <span class="string">&quot;Upgrading the Sled state store&quot;</span>
+        );
+
+        <span class="comment">// FUTURE UPGRADE CODE GOES HERE</span>
+
+        <span class="comment">// can&#39;t upgrade from that version to the new one</span>
+        <span class="prelude-val">Err</span>(<span class="ident">StoreError::UnsupportedDatabaseVersion</span>(<span class="ident">old_version</span>.<span class="ident">into</span>(), <span class="ident">DATABASE_VERSION</span>.<span class="ident">into</span>()))
     }
 
     <span class="doccomment">/// Open a `CryptoStore` that uses the same database as this store.</span>
@@ -3066,5 +3148,5 @@
     <span class="macro">statestore_integration_tests!</span> { <span class="ident">integration</span> }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="matrix_sdk_sled" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.62.0-nightly (e1b71feb5 2022-05-03)" ></div>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="matrix_sdk_sled" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.62.0-nightly (4c60a0ea5 2022-05-04)" ></div>
 </body></html>
