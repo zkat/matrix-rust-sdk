@@ -1370,7 +1370,6 @@
 <span id="1365">1365</span>
 <span id="1366">1366</span>
 <span id="1367">1367</span>
-<span id="1368">1368</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">std</span>::{
     <span class="ident">collections</span>::{<span class="ident">BTreeMap</span>, <span class="ident">HashMap</span>},
     <span class="ident">convert::TryInto</span>,
@@ -1378,7 +1377,6 @@
     <span class="ident">ops::Deref</span>,
 };
 
-<span class="kw">use</span> <span class="ident">anyhow::anyhow</span>;
 <span class="kw">use</span> <span class="ident">base64</span>::{<span class="ident">decode_config</span>, <span class="ident">encode</span>, <span class="ident">STANDARD_NO_PAD</span>};
 <span class="kw">use</span> <span class="ident">js_int::UInt</span>;
 <span class="kw">use</span> <span class="ident">matrix_sdk_common::deserialized_responses::AlgorithmInfo</span>;
@@ -1475,9 +1473,9 @@
                         <span class="comment">// variant for the state store. Not sure what to do about</span>
                         <span class="comment">// this.</span>
                         <span class="ident">matrix_sdk_sled::OpenStoreError::Crypto</span>(<span class="ident">r</span>) =&gt; <span class="ident">r</span>.<span class="ident">into</span>(),
-                        <span class="ident">matrix_sdk_sled::OpenStoreError::Sled</span>(<span class="ident">s</span>) =&gt; {
-                            <span class="ident">CryptoStoreError::CryptoStore</span>(<span class="macro">anyhow!</span>(<span class="ident">s</span>).<span class="ident">into</span>())
-                        }
+                        <span class="ident">matrix_sdk_sled::OpenStoreError::Sled</span>(<span class="ident">s</span>) =&gt; <span class="ident">CryptoStoreError::CryptoStore</span>(
+                            <span class="ident">matrix_sdk_crypto::store::CryptoStoreError::Backend</span>(<span class="ident">Box::new</span>(<span class="ident">s</span>)),
+                        ),
                         <span class="kw">_</span> =&gt; <span class="macro">unreachable!</span>(),
                     }
                 })<span class="question-mark">?</span>,
