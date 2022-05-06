@@ -892,8 +892,6 @@
 <span id="887">887</span>
 <span id="888">888</span>
 <span id="889">889</span>
-<span id="890">890</span>
-<span id="891">891</span>
 </pre><pre class="rust"><code><span class="comment">// Copyright 2021 The Matrix.org Foundation C.I.C.</span>
 <span class="comment">//</span>
 <span class="comment">// Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);</span>
@@ -1298,9 +1296,7 @@
             <span class="kw">let</span> <span class="ident">make_room_version</span> <span class="op">=</span> <span class="op">|</span><span class="op">|</span> {
                 <span class="self">self</span>.<span class="ident">room_info</span>
                     .<span class="ident">get</span>(<span class="ident">room</span>)
-                    .<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">info</span><span class="op">|</span> {
-                        <span class="ident">info</span>.<span class="ident">base_info</span>.<span class="ident">create</span>.<span class="ident">as_ref</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">event</span><span class="op">|</span> <span class="ident">event</span>.<span class="ident">room_version</span>.<span class="ident">clone</span>())
-                    })
+                    .<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">info</span><span class="op">|</span> <span class="ident">info</span>.<span class="ident">room_version</span>().<span class="ident">cloned</span>())
                     .<span class="ident">unwrap_or_else</span>(<span class="op">|</span><span class="op">|</span> {
                         <span class="macro">tracing::warn!</span>(
                             <span class="string">&quot;Unable to find the room version for {}, assume version 9&quot;</span>,
