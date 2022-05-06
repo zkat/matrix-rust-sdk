@@ -4027,6 +4027,17 @@
 <span id="4022">4022</span>
 <span id="4023">4023</span>
 <span id="4024">4024</span>
+<span id="4025">4025</span>
+<span id="4026">4026</span>
+<span id="4027">4027</span>
+<span id="4028">4028</span>
+<span id="4029">4029</span>
+<span id="4030">4030</span>
+<span id="4031">4031</span>
+<span id="4032">4032</span>
+<span id="4033">4033</span>
+<span id="4034">4034</span>
+<span id="4035">4035</span>
 </pre><pre class="rust"><code><span class="comment">// Copyright 2020 Damir Jelić</span>
 <span class="comment">// Copyright 2020 The Matrix.org Foundation C.I.C.</span>
 <span class="comment">//</span>
@@ -4052,6 +4063,8 @@
 };
 
 <span class="kw">use</span> <span class="ident">anymap2::any::CloneAnySendSync</span>;
+<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">target_arch</span> <span class="op">=</span> <span class="string">&quot;wasm32&quot;</span>)]</span>
+<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">async_once_cell::OnceCell</span>;
 <span class="kw">use</span> <span class="ident">dashmap::DashMap</span>;
 <span class="kw">use</span> <span class="ident">futures_core::stream::Stream</span>;
 <span class="kw">use</span> <span class="ident">matrix_sdk_base</span>::{
@@ -4095,6 +4108,8 @@
     <span class="ident">ServerName</span>, <span class="ident">UInt</span>,
 };
 <span class="kw">use</span> <span class="ident">serde::de::DeserializeOwned</span>;
+<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">target_arch</span> <span class="op">=</span> <span class="string">&quot;wasm32&quot;</span>))]</span>
+<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">tokio::sync::OnceCell</span>;
 <span class="kw">use</span> <span class="ident">tracing</span>::{<span class="ident">error</span>, <span class="ident">info</span>, <span class="ident">instrument</span>, <span class="ident">warn</span>};
 <span class="kw">use</span> <span class="ident">url::Url</span>;
 
@@ -4158,7 +4173,7 @@
     <span class="doccomment">/// User session data.</span>
     <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">base_client</span>: <span class="ident">BaseClient</span>,
     <span class="doccomment">/// The Matrix versions the server supports (well-known ones only)</span>
-    <span class="ident">server_versions</span>: <span class="ident">Mutex</span><span class="op">&lt;</span><span class="ident">Arc</span><span class="op">&lt;</span>[<span class="ident">MatrixVersion</span>]<span class="op">&gt;</span><span class="op">&gt;</span>,
+    <span class="ident">server_versions</span>: <span class="ident">OnceCell</span><span class="op">&lt;</span><span class="ident">Arc</span><span class="op">&lt;</span>[<span class="ident">MatrixVersion</span>]<span class="op">&gt;</span><span class="op">&gt;</span>,
     <span class="doccomment">/// Locks making sure we only have one group session sharing request in</span>
     <span class="doccomment">/// flight per room.</span>
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;e2e-encryption&quot;</span>)]</span>
@@ -5515,28 +5530,35 @@
         <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">http_client</span>.<span class="ident">send</span>(<span class="ident">request</span>, <span class="ident">config</span>, <span class="self">self</span>.<span class="ident">server_versions</span>().<span class="kw">await</span><span class="question-mark">?</span>).<span class="kw">await</span>
     }
 
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">server_versions</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">HttpResult</span><span class="op">&lt;</span><span class="ident">Arc</span><span class="op">&lt;</span>[<span class="ident">MatrixVersion</span>]<span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">server_versions</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">server_versions</span>.<span class="ident">lock</span>().<span class="kw">await</span>;
+    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">request_server_versions</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">HttpResult</span><span class="op">&lt;</span><span class="ident">Arc</span><span class="op">&lt;</span>[<span class="ident">MatrixVersion</span>]<span class="op">&gt;</span><span class="op">&gt;</span> {
+        <span class="kw">let</span> <span class="ident">server_versions</span>: <span class="ident">Arc</span><span class="op">&lt;</span>[<span class="ident">MatrixVersion</span>]<span class="op">&gt;</span> <span class="op">=</span> <span class="self">self</span>
+            .<span class="ident">inner</span>
+            .<span class="ident">http_client</span>
+            .<span class="ident">send</span>(
+                <span class="ident">get_supported_versions::Request::new</span>(),
+                <span class="prelude-val">None</span>,
+                [<span class="ident">MatrixVersion::V1_0</span>].<span class="ident">into_iter</span>().<span class="ident">collect</span>(),
+            )
+            .<span class="kw">await</span><span class="question-mark">?</span>
+            .<span class="ident">known_versions</span>()
+            .<span class="ident">into_iter</span>()
+            .<span class="ident">collect</span>();
 
         <span class="kw">if</span> <span class="ident">server_versions</span>.<span class="ident">is_empty</span>() {
-            <span class="comment">// Not initialized before</span>
-            <span class="kw-2">*</span><span class="ident">server_versions</span> <span class="op">=</span> <span class="self">self</span>
-                .<span class="ident">inner</span>
-                .<span class="ident">http_client</span>
-                .<span class="ident">send</span>(
-                    <span class="ident">get_supported_versions::Request::new</span>(),
-                    <span class="prelude-val">None</span>,
-                    [<span class="ident">MatrixVersion::V1_0</span>].<span class="ident">into_iter</span>().<span class="ident">collect</span>(),
-                )
-                .<span class="kw">await</span><span class="question-mark">?</span>
-                .<span class="ident">known_versions</span>()
-                .<span class="ident">collect</span>();
-
-            <span class="kw">if</span> <span class="ident">server_versions</span>.<span class="ident">is_empty</span>() {
-                <span class="comment">// No known versions, fall back to v1.0 (r0 paths)</span>
-                <span class="kw-2">*</span><span class="ident">server_versions</span> <span class="op">=</span> <span class="macro">vec!</span>[<span class="ident">MatrixVersion::V1_0</span>].<span class="ident">into</span>();
-            }
+            <span class="prelude-val">Ok</span>(<span class="macro">vec!</span>[<span class="ident">MatrixVersion::V1_0</span>].<span class="ident">into</span>())
+        } <span class="kw">else</span> {
+            <span class="prelude-val">Ok</span>(<span class="ident">server_versions</span>)
         }
+    }
+
+    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">server_versions</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">HttpResult</span><span class="op">&lt;</span><span class="ident">Arc</span><span class="op">&lt;</span>[<span class="ident">MatrixVersion</span>]<span class="op">&gt;</span><span class="op">&gt;</span> {
+        <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">target_arch</span> <span class="op">=</span> <span class="string">&quot;wasm32&quot;</span>)]</span>
+        <span class="kw">let</span> <span class="ident">server_versions</span> <span class="op">=</span>
+            <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">server_versions</span>.<span class="ident">get_or_try_init</span>(<span class="self">self</span>.<span class="ident">request_server_versions</span>()).<span class="kw">await</span><span class="question-mark">?</span>;
+
+        <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">target_arch</span> <span class="op">=</span> <span class="string">&quot;wasm32&quot;</span>))]</span>
+        <span class="kw">let</span> <span class="ident">server_versions</span> <span class="op">=</span>
+            <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">server_versions</span>.<span class="ident">get_or_try_init</span>(<span class="op">|</span><span class="op">|</span> <span class="self">self</span>.<span class="ident">request_server_versions</span>()).<span class="kw">await</span><span class="question-mark">?</span>;
 
         <span class="prelude-val">Ok</span>(<span class="ident">server_versions</span>.<span class="ident">clone</span>())
     }
