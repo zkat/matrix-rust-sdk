@@ -392,9 +392,6 @@
 <span id="387">387</span>
 <span id="388">388</span>
 <span id="389">389</span>
-<span id="390">390</span>
-<span id="391">391</span>
-<span id="392">392</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">std::collections::BTreeMap</span>;
 
 <span class="kw">use</span> <span class="ident">ruma</span>::{
@@ -407,8 +404,8 @@
     },
     <span class="ident">events</span>::{
         <span class="ident">room::member</span>::{
-            <span class="ident">OriginalRoomMemberEvent</span>, <span class="ident">OriginalSyncRoomMemberEvent</span>, <span class="ident">RoomMemberEventContent</span>,
-            <span class="ident">StrippedRoomMemberEvent</span>,
+            <span class="ident">MembershipState</span>, <span class="ident">RoomMemberEvent</span>, <span class="ident">RoomMemberEventContent</span>, <span class="ident">StrippedRoomMemberEvent</span>,
+            <span class="ident">SyncRoomMemberEvent</span>,
         },
         <span class="ident">AnyRoomEvent</span>, <span class="ident">AnySyncRoomEvent</span>,
     },
@@ -697,36 +694,33 @@
 <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy::large_enum_variant</span>)]</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>)]</span>
 <span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">MemberEvent</span> {
+    <span class="ident">Sync</span>(<span class="ident">SyncRoomMemberEvent</span>),
     <span class="ident">Stripped</span>(<span class="ident">StrippedRoomMemberEvent</span>),
-    <span class="ident">Original</span>(<span class="ident">OriginalSyncRoomMemberEvent</span>),
 }
 
 <span class="kw">impl</span> <span class="ident">MemberEvent</span> {
     <span class="doccomment">/// The inner Content of the wrapped Event</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">content</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">RoomMemberEventContent</span> {
-        <span class="kw">match</span> <span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="self">self</span> {
-            <span class="ident">MemberEvent::Stripped</span>(<span class="ident">e</span>) =&gt; <span class="kw-2">&amp;</span><span class="ident">e</span>.<span class="ident">content</span>,
-            <span class="ident">MemberEvent::Original</span>(<span class="ident">e</span>) =&gt; <span class="kw-2">&amp;</span><span class="ident">e</span>.<span class="ident">content</span>,
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">original_content</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">RoomMemberEventContent</span><span class="op">&gt;</span> {
+        <span class="kw">match</span> <span class="self">self</span> {
+            <span class="ident">MemberEvent::Sync</span>(<span class="ident">e</span>) =&gt; <span class="ident">e</span>.<span class="ident">as_original</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">e</span><span class="op">|</span> <span class="kw-2">&amp;</span><span class="ident">e</span>.<span class="ident">content</span>),
+            <span class="ident">MemberEvent::Stripped</span>(<span class="ident">e</span>) =&gt; <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="ident">e</span>.<span class="ident">content</span>),
+        }
+    }
+
+    <span class="doccomment">/// The membership state of the user</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">membership</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">MembershipState</span> {
+        <span class="kw">match</span> <span class="self">self</span> {
+            <span class="ident">MemberEvent::Sync</span>(<span class="ident">e</span>) =&gt; <span class="ident">e</span>.<span class="ident">membership</span>(),
+            <span class="ident">MemberEvent::Stripped</span>(<span class="ident">e</span>) =&gt; <span class="kw-2">&amp;</span><span class="ident">e</span>.<span class="ident">content</span>.<span class="ident">membership</span>,
         }
     }
 
     <span class="doccomment">/// The user id associated to this member event</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">user_id</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">UserId</span> {
-        <span class="kw">match</span> <span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="self">self</span> {
+        <span class="kw">match</span> <span class="self">self</span> {
+            <span class="ident">MemberEvent::Sync</span>(<span class="ident">e</span>) =&gt; <span class="ident">e</span>.<span class="ident">state_key</span>(),
             <span class="ident">MemberEvent::Stripped</span>(<span class="ident">e</span>) =&gt; <span class="kw-2">&amp;</span><span class="ident">e</span>.<span class="ident">state_key</span>,
-            <span class="ident">MemberEvent::Original</span>(<span class="ident">e</span>) =&gt; <span class="kw-2">&amp;</span><span class="ident">e</span>.<span class="ident">state_key</span>,
         }
-    }
-}
-
-<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">StrippedRoomMemberEvent</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">MemberEvent</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">other</span>: <span class="ident">StrippedRoomMemberEvent</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident">MemberEvent::Stripped</span>(<span class="ident">other</span>)
-    }
-}
-<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">OriginalSyncRoomMemberEvent</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">MemberEvent</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">other</span>: <span class="ident">OriginalSyncRoomMemberEvent</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident">MemberEvent::Original</span>(<span class="ident">other</span>)
     }
 }
 
@@ -736,7 +730,7 @@
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Default</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">MembersResponse</span> {
     <span class="doccomment">/// The list of members events.</span>
-    <span class="kw">pub</span> <span class="ident">chunk</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">OriginalRoomMemberEvent</span><span class="op">&gt;</span>,
+    <span class="kw">pub</span> <span class="ident">chunk</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">RoomMemberEvent</span><span class="op">&gt;</span>,
     <span class="doccomment">/// Collection of ambiguity changes that room member events trigger.</span>
     <span class="kw">pub</span> <span class="ident">ambiguity_changes</span>: <span class="ident">AmbiguityChanges</span>,
 }
@@ -788,5 +782,5 @@
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="matrix_sdk_common" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.62.0-nightly (30f386087 2022-05-05)" ></div>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="matrix_sdk_common" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.62.0-nightly (cb1219871 2022-05-08)" ></div>
 </body></html>
