@@ -1044,25 +1044,6 @@
 <span id="1039">1039</span>
 <span id="1040">1040</span>
 <span id="1041">1041</span>
-<span id="1042">1042</span>
-<span id="1043">1043</span>
-<span id="1044">1044</span>
-<span id="1045">1045</span>
-<span id="1046">1046</span>
-<span id="1047">1047</span>
-<span id="1048">1048</span>
-<span id="1049">1049</span>
-<span id="1050">1050</span>
-<span id="1051">1051</span>
-<span id="1052">1052</span>
-<span id="1053">1053</span>
-<span id="1054">1054</span>
-<span id="1055">1055</span>
-<span id="1056">1056</span>
-<span id="1057">1057</span>
-<span id="1058">1058</span>
-<span id="1059">1059</span>
-<span id="1060">1060</span>
 </pre><pre class="rust"><code><span class="comment">// Copyright 2020 The Matrix.org Foundation C.I.C.</span>
 <span class="comment">//</span>
 <span class="comment">// Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);</span>
@@ -1277,11 +1258,8 @@
         <span class="ident">passphrase</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span>,
     ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">OpenStoreError</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">path</span> <span class="op">=</span> <span class="ident">path</span>.<span class="ident">as_ref</span>().<span class="ident">join</span>(<span class="string">&quot;matrix-sdk-crypto&quot;</span>);
-        <span class="kw">let</span> <span class="ident">db</span> <span class="op">=</span> <span class="ident">Config::new</span>()
-            .<span class="ident">temporary</span>(<span class="bool-val">false</span>)
-            .<span class="ident">path</span>(<span class="kw-2">&amp;</span><span class="ident">path</span>)
-            .<span class="ident">open</span>()
-            .<span class="ident">map_err</span>(<span class="op">|</span><span class="ident">e</span><span class="op">|</span> <span class="ident">CryptoStoreError::Backend</span>(<span class="ident">Box::new</span>(<span class="ident">e</span>)))<span class="question-mark">?</span>;
+        <span class="kw">let</span> <span class="ident">db</span> <span class="op">=</span>
+            <span class="ident">Config::new</span>().<span class="ident">temporary</span>(<span class="bool-val">false</span>).<span class="ident">path</span>(<span class="kw-2">&amp;</span><span class="ident">path</span>).<span class="ident">open</span>().<span class="ident">map_err</span>(<span class="ident">CryptoStoreError::backend</span>)<span class="question-mark">?</span>;
 
         <span class="kw">let</span> <span class="ident">store_cipher</span> <span class="op">=</span> <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">passphrase</span>) <span class="op">=</span> <span class="ident">passphrase</span> {
             <span class="prelude-val">Some</span>(<span class="ident"><span class="self">Self</span>::get_or_create_store_cipher</span>(<span class="ident">passphrase</span>, <span class="kw-2">&amp;</span><span class="ident">db</span>)<span class="question-mark">?</span>.<span class="ident">into</span>())
@@ -1307,7 +1285,7 @@
 
     <span class="kw">fn</span> <span class="ident">serialize_value</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">event</span>: <span class="kw-2">&amp;</span><span class="kw">impl</span> <span class="ident">Serialize</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>, <span class="ident">CryptoStoreError</span><span class="op">&gt;</span> {
         <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">key</span>) <span class="op">=</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">store_cipher</span> {
-            <span class="ident">key</span>.<span class="ident">encrypt_value</span>(<span class="ident">event</span>).<span class="ident">map_err</span>(<span class="op">|</span><span class="ident">e</span><span class="op">|</span> <span class="ident">CryptoStoreError::Backend</span>(<span class="ident">Box::new</span>(<span class="ident">e</span>)))
+            <span class="ident">key</span>.<span class="ident">encrypt_value</span>(<span class="ident">event</span>).<span class="ident">map_err</span>(<span class="ident">CryptoStoreError::backend</span>)
         } <span class="kw">else</span> {
             <span class="prelude-val">Ok</span>(<span class="ident">serde_json::to_vec</span>(<span class="ident">event</span>)<span class="question-mark">?</span>)
         }
@@ -1318,7 +1296,7 @@
         <span class="ident">event</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>],
     ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">CryptoStoreError</span><span class="op">&gt;</span> {
         <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">key</span>) <span class="op">=</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">store_cipher</span> {
-            <span class="ident">key</span>.<span class="ident">decrypt_value</span>(<span class="ident">event</span>).<span class="ident">map_err</span>(<span class="op">|</span><span class="ident">e</span><span class="op">|</span> <span class="ident">CryptoStoreError::Backend</span>(<span class="ident">Box::new</span>(<span class="ident">e</span>)))
+            <span class="ident">key</span>.<span class="ident">decrypt_value</span>(<span class="ident">event</span>).<span class="ident">map_err</span>(<span class="ident">CryptoStoreError::backend</span>)
         } <span class="kw">else</span> {
             <span class="prelude-val">Ok</span>(<span class="ident">serde_json::from_slice</span>(<span class="ident">event</span>)<span class="question-mark">?</span>)
         }
@@ -1337,7 +1315,7 @@
             .<span class="ident">inbound_group_sessions</span>
             .<span class="ident">iter</span>()
             .<span class="ident">map</span>(<span class="op">|</span><span class="ident">p</span><span class="op">|</span> {
-                <span class="kw">let</span> <span class="ident">item</span> <span class="op">=</span> <span class="ident">p</span>.<span class="ident">map_err</span>(<span class="op">|</span><span class="ident">e</span><span class="op">|</span> <span class="ident">CryptoStoreError::Backend</span>(<span class="ident">Box::new</span>(<span class="ident">e</span>)))<span class="question-mark">?</span>;
+                <span class="kw">let</span> <span class="ident">item</span> <span class="op">=</span> <span class="ident">p</span>.<span class="ident">map_err</span>(<span class="ident">CryptoStoreError::backend</span>)<span class="question-mark">?</span>;
                 <span class="prelude-val">Ok</span>((<span class="ident">item</span>.<span class="number">0</span>, <span class="self">self</span>.<span class="ident">deserialize_value</span>(<span class="kw-2">&amp;</span><span class="ident">item</span>.<span class="number">1</span>)<span class="question-mark">?</span>))
             })
             .<span class="ident">collect</span>::<span class="op">&lt;</span><span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span><span class="op">&gt;</span>()<span class="question-mark">?</span>;
@@ -1359,9 +1337,9 @@
                 <span class="prelude-val">Ok</span>(())
             });
 
-        <span class="ident">ret</span>.<span class="ident">map_err</span>(<span class="op">|</span><span class="ident">e</span><span class="op">|</span> <span class="ident">CryptoStoreError::Backend</span>(<span class="ident">Box::new</span>(<span class="ident">e</span>)))<span class="question-mark">?</span>;
+        <span class="ident">ret</span>.<span class="ident">map_err</span>(<span class="ident">CryptoStoreError::backend</span>)<span class="question-mark">?</span>;
 
-        <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">flush_async</span>().<span class="kw">await</span>.<span class="ident">map_err</span>(<span class="op">|</span><span class="ident">e</span><span class="op">|</span> <span class="ident">CryptoStoreError::Backend</span>(<span class="ident">Box::new</span>(<span class="ident">e</span>)))<span class="question-mark">?</span>;
+        <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">flush_async</span>().<span class="kw">await</span>.<span class="ident">map_err</span>(<span class="ident">CryptoStoreError::backend</span>)<span class="question-mark">?</span>;
 
         <span class="prelude-val">Ok</span>(())
     }
@@ -1370,7 +1348,7 @@
         <span class="kw">let</span> <span class="ident">version</span> <span class="op">=</span> <span class="self">self</span>
             .<span class="ident">inner</span>
             .<span class="ident">get</span>(<span class="string">&quot;store_version&quot;</span>)
-            .<span class="ident">map_err</span>(<span class="op">|</span><span class="ident">e</span><span class="op">|</span> <span class="ident">CryptoStoreError::Backend</span>(<span class="ident">Box::new</span>(<span class="ident">e</span>)))<span class="question-mark">?</span>
+            .<span class="ident">map_err</span>(<span class="ident">CryptoStoreError::backend</span>)<span class="question-mark">?</span>
             .<span class="ident">map</span>(<span class="op">|</span><span class="ident">v</span><span class="op">|</span> {
                 <span class="kw">let</span> (<span class="ident">version_bytes</span>, <span class="kw">_</span>) <span class="op">=</span> <span class="ident">v</span>.<span class="ident">split_at</span>(<span class="ident">std::mem::size_of</span>::<span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>());
                 <span class="ident">u8::from_be_bytes</span>(<span class="ident">version_bytes</span>.<span class="ident">try_into</span>().<span class="ident">unwrap_or_default</span>())
@@ -1390,25 +1368,23 @@
 
         <span class="self">self</span>.<span class="ident">inner</span>
             .<span class="ident">insert</span>(<span class="string">&quot;store_version&quot;</span>, <span class="ident">DATABASE_VERSION</span>.<span class="ident">to_be_bytes</span>().<span class="ident">as_ref</span>())
-            .<span class="ident">map_err</span>(<span class="op">|</span><span class="ident">e</span><span class="op">|</span> <span class="ident">CryptoStoreError::Backend</span>(<span class="ident">Box::new</span>(<span class="ident">e</span>)))<span class="question-mark">?</span>;
-        <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">flush</span>().<span class="ident">map_err</span>(<span class="op">|</span><span class="ident">e</span><span class="op">|</span> <span class="ident">CryptoStoreError::Backend</span>(<span class="ident">Box::new</span>(<span class="ident">e</span>)))<span class="question-mark">?</span>;
+            .<span class="ident">map_err</span>(<span class="ident">CryptoStoreError::backend</span>)<span class="question-mark">?</span>;
+        <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">flush</span>().<span class="ident">map_err</span>(<span class="ident">CryptoStoreError::backend</span>)<span class="question-mark">?</span>;
 
         <span class="prelude-val">Ok</span>(())
     }
 
     <span class="kw">fn</span> <span class="ident">get_or_create_store_cipher</span>(<span class="ident">passphrase</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">database</span>: <span class="kw-2">&amp;</span><span class="ident">Db</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">StoreCipher</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">key</span> <span class="op">=</span> <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">key</span>) <span class="op">=</span> <span class="ident">database</span>
-            .<span class="ident">get</span>(<span class="string">&quot;store_cipher&quot;</span>.<span class="ident">encode</span>())
-            .<span class="ident">map_err</span>(<span class="op">|</span><span class="ident">e</span><span class="op">|</span> <span class="ident">CryptoStoreError::Backend</span>(<span class="ident">Box::new</span>(<span class="ident">e</span>)))<span class="question-mark">?</span>
+        <span class="kw">let</span> <span class="ident">key</span> <span class="op">=</span> <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">key</span>) <span class="op">=</span>
+            <span class="ident">database</span>.<span class="ident">get</span>(<span class="string">&quot;store_cipher&quot;</span>.<span class="ident">encode</span>()).<span class="ident">map_err</span>(<span class="ident">CryptoStoreError::backend</span>)<span class="question-mark">?</span>
         {
             <span class="ident">StoreCipher::import</span>(<span class="ident">passphrase</span>, <span class="kw-2">&amp;</span><span class="ident">key</span>).<span class="ident">map_err</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="ident">CryptoStoreError::UnpicklingError</span>)<span class="question-mark">?</span>
         } <span class="kw">else</span> {
-            <span class="kw">let</span> <span class="ident">key</span> <span class="op">=</span> <span class="ident">StoreCipher::new</span>().<span class="ident">map_err</span>(<span class="op">|</span><span class="ident">e</span><span class="op">|</span> <span class="ident">CryptoStoreError::Backend</span>(<span class="ident">Box::new</span>(<span class="ident">e</span>)))<span class="question-mark">?</span>;
-            <span class="kw">let</span> <span class="ident">encrypted</span> <span class="op">=</span>
-                <span class="ident">key</span>.<span class="ident">export</span>(<span class="ident">passphrase</span>).<span class="ident">map_err</span>(<span class="op">|</span><span class="ident">e</span><span class="op">|</span> <span class="ident">CryptoStoreError::Backend</span>(<span class="ident">Box::new</span>(<span class="ident">e</span>)))<span class="question-mark">?</span>;
+            <span class="kw">let</span> <span class="ident">key</span> <span class="op">=</span> <span class="ident">StoreCipher::new</span>().<span class="ident">map_err</span>(<span class="ident">CryptoStoreError::backend</span>)<span class="question-mark">?</span>;
+            <span class="kw">let</span> <span class="ident">encrypted</span> <span class="op">=</span> <span class="ident">key</span>.<span class="ident">export</span>(<span class="ident">passphrase</span>).<span class="ident">map_err</span>(<span class="ident">CryptoStoreError::backend</span>)<span class="question-mark">?</span>;
             <span class="ident">database</span>
                 .<span class="ident">insert</span>(<span class="string">&quot;store_cipher&quot;</span>.<span class="ident">encode</span>(), <span class="ident">encrypted</span>)
-                .<span class="ident">map_err</span>(<span class="op">|</span><span class="ident">e</span><span class="op">|</span> <span class="ident">CryptoStoreError::Backend</span>(<span class="ident">Box::new</span>(<span class="ident">e</span>)))<span class="question-mark">?</span>;
+                .<span class="ident">map_err</span>(<span class="ident">CryptoStoreError::backend</span>)<span class="question-mark">?</span>;
             <span class="ident">key</span>
         };
 
@@ -1469,7 +1445,7 @@
 
     <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">load_tracked_users</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="kw">for</span> <span class="ident">value</span> <span class="kw">in</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">tracked_users</span> {
-            <span class="kw">let</span> (<span class="kw">_</span>, <span class="ident">user</span>) <span class="op">=</span> <span class="ident">value</span>.<span class="ident">map_err</span>(<span class="op">|</span><span class="ident">e</span><span class="op">|</span> <span class="ident">CryptoStoreError::Backend</span>(<span class="ident">Box::new</span>(<span class="ident">e</span>)))<span class="question-mark">?</span>;
+            <span class="kw">let</span> (<span class="kw">_</span>, <span class="ident">user</span>) <span class="op">=</span> <span class="ident">value</span>.<span class="ident">map_err</span>(<span class="ident">CryptoStoreError::backend</span>)<span class="question-mark">?</span>;
             <span class="kw">let</span> <span class="ident">user</span>: <span class="ident">TrackedUser</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">deserialize_value</span>(<span class="kw-2">&amp;</span><span class="ident">user</span>)<span class="question-mark">?</span>;
 
             <span class="self">self</span>.<span class="ident">tracked_users_cache</span>.<span class="ident">insert</span>(<span class="ident">user</span>.<span class="ident">user_id</span>.<span class="ident">to_owned</span>());
@@ -1490,7 +1466,7 @@
 
         <span class="self">self</span>.<span class="ident">outbound_group_sessions</span>
             .<span class="ident">get</span>(<span class="self">self</span>.<span class="ident">encode_key</span>(<span class="ident">OUTBOUND_GROUP_TABLE_NAME</span>, <span class="ident">room_id</span>))
-            .<span class="ident">map_err</span>(<span class="op">|</span><span class="ident">e</span><span class="op">|</span> <span class="ident">CryptoStoreError::Backend</span>(<span class="ident">Box::new</span>(<span class="ident">e</span>)))<span class="question-mark">?</span>
+            .<span class="ident">map_err</span>(<span class="ident">CryptoStoreError::backend</span>)<span class="question-mark">?</span>
             .<span class="ident">map</span>(<span class="op">|</span><span class="ident">p</span><span class="op">|</span> <span class="self">self</span>.<span class="ident">deserialize_value</span>(<span class="kw-2">&amp;</span><span class="ident">p</span>))
             .<span class="ident">transpose</span>()<span class="question-mark">?</span>
             .<span class="ident">map</span>(<span class="op">|</span><span class="ident">p</span><span class="op">|</span> {
@@ -1695,8 +1671,8 @@
                 },
             );
 
-        <span class="ident">ret</span>.<span class="ident">map_err</span>(<span class="op">|</span><span class="ident">e</span><span class="op">|</span> <span class="ident">CryptoStoreError::Backend</span>(<span class="ident">Box::new</span>(<span class="ident">e</span>)))<span class="question-mark">?</span>;
-        <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">flush</span>().<span class="ident">map_err</span>(<span class="op">|</span><span class="ident">e</span><span class="op">|</span> <span class="ident">CryptoStoreError::Backend</span>(<span class="ident">Box::new</span>(<span class="ident">e</span>)))<span class="question-mark">?</span>;
+        <span class="ident">ret</span>.<span class="ident">map_err</span>(<span class="ident">CryptoStoreError::backend</span>)<span class="question-mark">?</span>;
+        <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">flush</span>().<span class="ident">map_err</span>(<span class="ident">CryptoStoreError::backend</span>)<span class="question-mark">?</span>;
 
         <span class="prelude-val">Ok</span>(())
     }
@@ -1705,14 +1681,14 @@
         <span class="kw">let</span> <span class="ident">request</span> <span class="op">=</span> <span class="self">self</span>
             .<span class="ident">outgoing_secret_requests</span>
             .<span class="ident">get</span>(<span class="ident">id</span>)
-            .<span class="ident">map_err</span>(<span class="op">|</span><span class="ident">e</span><span class="op">|</span> <span class="ident">CryptoStoreError::Backend</span>(<span class="ident">Box::new</span>(<span class="ident">e</span>)))<span class="question-mark">?</span>
+            .<span class="ident">map_err</span>(<span class="ident">CryptoStoreError::backend</span>)<span class="question-mark">?</span>
             .<span class="ident">map</span>(<span class="op">|</span><span class="ident">r</span><span class="op">|</span> <span class="self">self</span>.<span class="ident">deserialize_value</span>(<span class="kw-2">&amp;</span><span class="ident">r</span>))
             .<span class="ident">transpose</span>()<span class="question-mark">?</span>;
 
         <span class="kw">let</span> <span class="ident">request</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">request</span>.<span class="ident">is_none</span>() {
             <span class="self">self</span>.<span class="ident">unsent_secret_requests</span>
                 .<span class="ident">get</span>(<span class="ident">id</span>)
-                .<span class="ident">map_err</span>(<span class="op">|</span><span class="ident">e</span><span class="op">|</span> <span class="ident">CryptoStoreError::Backend</span>(<span class="ident">Box::new</span>(<span class="ident">e</span>)))<span class="question-mark">?</span>
+                .<span class="ident">map_err</span>(<span class="ident">CryptoStoreError::backend</span>)<span class="question-mark">?</span>
                 .<span class="ident">map</span>(<span class="op">|</span><span class="ident">r</span><span class="op">|</span> <span class="self">self</span>.<span class="ident">deserialize_value</span>(<span class="kw-2">&amp;</span><span class="ident">r</span>))
                 .<span class="ident">transpose</span>()<span class="question-mark">?</span>
         } <span class="kw">else</span> {
@@ -1747,17 +1723,15 @@
             );
         }
 
-        <span class="self">self</span>.<span class="ident">tracked_users</span>.<span class="ident">apply_batch</span>(<span class="ident">batch</span>).<span class="ident">map_err</span>(<span class="op">|</span><span class="ident">e</span><span class="op">|</span> <span class="ident">CryptoStoreError::Backend</span>(<span class="ident">Box::new</span>(<span class="ident">e</span>)))
+        <span class="self">self</span>.<span class="ident">tracked_users</span>.<span class="ident">apply_batch</span>(<span class="ident">batch</span>).<span class="ident">map_err</span>(<span class="ident">CryptoStoreError::backend</span>)
     }
 }
 
 <span class="attribute">#[<span class="ident">async_trait</span>]</span>
 <span class="kw">impl</span> <span class="ident">CryptoStore</span> <span class="kw">for</span> <span class="ident">SledStore</span> {
     <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">load_account</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ReadOnlyAccount</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">pickle</span>) <span class="op">=</span> <span class="self">self</span>
-            .<span class="ident">account</span>
-            .<span class="ident">get</span>(<span class="string">&quot;account&quot;</span>.<span class="ident">encode</span>())
-            .<span class="ident">map_err</span>(<span class="op">|</span><span class="ident">e</span><span class="op">|</span> <span class="ident">CryptoStoreError::Backend</span>(<span class="ident">Box::new</span>(<span class="ident">e</span>)))<span class="question-mark">?</span>
+        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">pickle</span>) <span class="op">=</span>
+            <span class="self">self</span>.<span class="ident">account</span>.<span class="ident">get</span>(<span class="string">&quot;account&quot;</span>.<span class="ident">encode</span>()).<span class="ident">map_err</span>(<span class="ident">CryptoStoreError::backend</span>)<span class="question-mark">?</span>
         {
             <span class="kw">let</span> <span class="ident">pickle</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">deserialize_value</span>(<span class="kw-2">&amp;</span><span class="ident">pickle</span>)<span class="question-mark">?</span>;
 
@@ -1783,10 +1757,8 @@
     }
 
     <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">load_identity</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">PrivateCrossSigningIdentity</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">i</span>) <span class="op">=</span> <span class="self">self</span>
-            .<span class="ident">private_identity</span>
-            .<span class="ident">get</span>(<span class="string">&quot;identity&quot;</span>.<span class="ident">encode</span>())
-            .<span class="ident">map_err</span>(<span class="op">|</span><span class="ident">e</span><span class="op">|</span> <span class="ident">CryptoStoreError::Backend</span>(<span class="ident">Box::new</span>(<span class="ident">e</span>)))<span class="question-mark">?</span>
+        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">i</span>) <span class="op">=</span>
+            <span class="self">self</span>.<span class="ident">private_identity</span>.<span class="ident">get</span>(<span class="string">&quot;identity&quot;</span>.<span class="ident">encode</span>()).<span class="ident">map_err</span>(<span class="ident">CryptoStoreError::backend</span>)<span class="question-mark">?</span>
         {
             <span class="kw">let</span> <span class="ident">pickle</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">deserialize_value</span>(<span class="kw-2">&amp;</span><span class="ident">i</span>)<span class="question-mark">?</span>;
             <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(
@@ -1810,11 +1782,7 @@
             <span class="kw">let</span> <span class="ident">sessions</span>: <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Session</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="op">=</span> <span class="self">self</span>
                 .<span class="ident">sessions</span>
                 .<span class="ident">scan_prefix</span>(<span class="self">self</span>.<span class="ident">encode_key</span>(<span class="ident">SESSIONS_TABLE_NAME</span>, <span class="ident">sender_key</span>))
-                .<span class="ident">map</span>(<span class="op">|</span><span class="ident">s</span><span class="op">|</span> {
-                    <span class="self">self</span>.<span class="ident">deserialize_value</span>(
-                        <span class="kw-2">&amp;</span><span class="ident">s</span>.<span class="ident">map_err</span>(<span class="op">|</span><span class="ident">e</span><span class="op">|</span> <span class="ident">CryptoStoreError::Backend</span>(<span class="ident">Box::new</span>(<span class="ident">e</span>)))<span class="question-mark">?</span>.<span class="number">1</span>,
-                    )
-                })
+                .<span class="ident">map</span>(<span class="op">|</span><span class="ident">s</span><span class="op">|</span> <span class="self">self</span>.<span class="ident">deserialize_value</span>(<span class="kw-2">&amp;</span><span class="ident">s</span>.<span class="ident">map_err</span>(<span class="ident">CryptoStoreError::backend</span>)<span class="question-mark">?</span>.<span class="number">1</span>))
                 .<span class="ident">map</span>(<span class="op">|</span><span class="ident">p</span><span class="op">|</span> {
                     <span class="prelude-val">Ok</span>(<span class="ident">Session::from_pickle</span>(
                         <span class="ident">account_info</span>.<span class="ident">user_id</span>.<span class="ident">clone</span>(),
@@ -1841,7 +1809,7 @@
         <span class="kw">let</span> <span class="ident">pickle</span> <span class="op">=</span> <span class="self">self</span>
             .<span class="ident">inbound_group_sessions</span>
             .<span class="ident">get</span>(<span class="kw-2">&amp;</span><span class="ident">key</span>)
-            .<span class="ident">map_err</span>(<span class="op">|</span><span class="ident">e</span><span class="op">|</span> <span class="ident">CryptoStoreError::Backend</span>(<span class="ident">Box::new</span>(<span class="ident">e</span>)))<span class="question-mark">?</span>
+            .<span class="ident">map_err</span>(<span class="ident">CryptoStoreError::backend</span>)<span class="question-mark">?</span>
             .<span class="ident">map</span>(<span class="op">|</span><span class="ident">p</span><span class="op">|</span> <span class="self">self</span>.<span class="ident">deserialize_value</span>(<span class="kw-2">&amp;</span><span class="ident">p</span>));
 
         <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">pickle</span>) <span class="op">=</span> <span class="ident">pickle</span> {
@@ -1855,9 +1823,7 @@
         <span class="kw">let</span> <span class="ident">pickles</span>: <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">PickledInboundGroupSession</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="op">=</span> <span class="self">self</span>
             .<span class="ident">inbound_group_sessions</span>
             .<span class="ident">iter</span>()
-            .<span class="ident">map</span>(<span class="op">|</span><span class="ident">p</span><span class="op">|</span> {
-                <span class="self">self</span>.<span class="ident">deserialize_value</span>(<span class="kw-2">&amp;</span><span class="ident">p</span>.<span class="ident">map_err</span>(<span class="op">|</span><span class="ident">e</span><span class="op">|</span> <span class="ident">CryptoStoreError::Backend</span>(<span class="ident">Box::new</span>(<span class="ident">e</span>)))<span class="question-mark">?</span>.<span class="number">1</span>)
-            })
+            .<span class="ident">map</span>(<span class="op">|</span><span class="ident">p</span><span class="op">|</span> <span class="self">self</span>.<span class="ident">deserialize_value</span>(<span class="kw-2">&amp;</span><span class="ident">p</span>.<span class="ident">map_err</span>(<span class="ident">CryptoStoreError::backend</span>)<span class="question-mark">?</span>.<span class="number">1</span>))
             .<span class="ident">collect</span>();
 
         <span class="prelude-val">Ok</span>(<span class="ident">pickles</span><span class="question-mark">?</span>.<span class="ident">into_iter</span>().<span class="ident">filter_map</span>(<span class="op">|</span><span class="ident">p</span><span class="op">|</span> <span class="ident">InboundGroupSession::from_pickle</span>(<span class="ident">p</span>).<span class="ident">ok</span>()).<span class="ident">collect</span>())
@@ -1868,7 +1834,7 @@
             .<span class="ident">inbound_group_sessions</span>
             .<span class="ident">iter</span>()
             .<span class="ident">map</span>(<span class="op">|</span><span class="ident">p</span><span class="op">|</span> {
-                <span class="kw">let</span> <span class="ident">item</span> <span class="op">=</span> <span class="ident">p</span>.<span class="ident">map_err</span>(<span class="op">|</span><span class="ident">e</span><span class="op">|</span> <span class="ident">CryptoStoreError::Backend</span>(<span class="ident">Box::new</span>(<span class="ident">e</span>)))<span class="question-mark">?</span>;
+                <span class="kw">let</span> <span class="ident">item</span> <span class="op">=</span> <span class="ident">p</span>.<span class="ident">map_err</span>(<span class="ident">CryptoStoreError::backend</span>)<span class="question-mark">?</span>;
                 <span class="self">self</span>.<span class="ident">deserialize_value</span>(<span class="kw-2">&amp;</span><span class="ident">item</span>.<span class="number">1</span>)
             })
             .<span class="ident">collect</span>::<span class="op">&lt;</span><span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span><span class="op">&gt;</span>()<span class="question-mark">?</span>;
@@ -1887,7 +1853,7 @@
             .<span class="ident">inbound_group_sessions</span>
             .<span class="ident">iter</span>()
             .<span class="ident">map</span>(<span class="op">|</span><span class="ident">p</span><span class="op">|</span> {
-                <span class="kw">let</span> <span class="ident">item</span> <span class="op">=</span> <span class="ident">p</span>.<span class="ident">map_err</span>(<span class="op">|</span><span class="ident">e</span><span class="op">|</span> <span class="ident">CryptoStoreError::Backend</span>(<span class="ident">Box::new</span>(<span class="ident">e</span>)))<span class="question-mark">?</span>;
+                <span class="kw">let</span> <span class="ident">item</span> <span class="op">=</span> <span class="ident">p</span>.<span class="ident">map_err</span>(<span class="ident">CryptoStoreError::backend</span>)<span class="question-mark">?</span>;
                 <span class="self">self</span>.<span class="ident">deserialize_value</span>(<span class="kw-2">&amp;</span><span class="ident">item</span>.<span class="number">1</span>)
             })
             .<span class="ident">filter_map</span>(<span class="op">|</span><span class="ident">p</span>: <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">PickledInboundGroupSession</span>, <span class="ident">CryptoStoreError</span><span class="op">&gt;</span><span class="op">|</span> <span class="kw">match</span> <span class="ident">p</span> {
@@ -1958,7 +1924,7 @@
         <span class="prelude-val">Ok</span>(<span class="self">self</span>
             .<span class="ident">devices</span>
             .<span class="ident">get</span>(<span class="ident">key</span>)
-            .<span class="ident">map_err</span>(<span class="op">|</span><span class="ident">e</span><span class="op">|</span> <span class="ident">CryptoStoreError::Backend</span>(<span class="ident">Box::new</span>(<span class="ident">e</span>)))<span class="question-mark">?</span>
+            .<span class="ident">map_err</span>(<span class="ident">CryptoStoreError::backend</span>)<span class="question-mark">?</span>
             .<span class="ident">map</span>(<span class="op">|</span><span class="ident">d</span><span class="op">|</span> <span class="self">self</span>.<span class="ident">deserialize_value</span>(<span class="kw-2">&amp;</span><span class="ident">d</span>))
             .<span class="ident">transpose</span>()<span class="question-mark">?</span>)
     }
@@ -1970,9 +1936,7 @@
         <span class="kw">let</span> <span class="ident">key</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">encode_key</span>(<span class="ident">DEVICE_TABLE_NAME</span>, <span class="ident">user_id</span>);
         <span class="self">self</span>.<span class="ident">devices</span>
             .<span class="ident">scan_prefix</span>(<span class="ident">key</span>)
-            .<span class="ident">map</span>(<span class="op">|</span><span class="ident">d</span><span class="op">|</span> {
-                <span class="self">self</span>.<span class="ident">deserialize_value</span>(<span class="kw-2">&amp;</span><span class="ident">d</span>.<span class="ident">map_err</span>(<span class="op">|</span><span class="ident">e</span><span class="op">|</span> <span class="ident">CryptoStoreError::Backend</span>(<span class="ident">Box::new</span>(<span class="ident">e</span>)))<span class="question-mark">?</span>.<span class="number">1</span>)
-            })
+            .<span class="ident">map</span>(<span class="op">|</span><span class="ident">d</span><span class="op">|</span> <span class="self">self</span>.<span class="ident">deserialize_value</span>(<span class="kw-2">&amp;</span><span class="ident">d</span>.<span class="ident">map_err</span>(<span class="ident">CryptoStoreError::backend</span>)<span class="question-mark">?</span>.<span class="number">1</span>))
             .<span class="ident">map</span>(<span class="op">|</span><span class="ident">d</span><span class="op">|</span> {
                 <span class="kw">let</span> <span class="ident">d</span>: <span class="ident">ReadOnlyDevice</span> <span class="op">=</span> <span class="ident">d</span><span class="question-mark">?</span>;
                 <span class="prelude-val">Ok</span>((<span class="ident">d</span>.<span class="ident">device_id</span>().<span class="ident">to_owned</span>(), <span class="ident">d</span>))
@@ -1986,7 +1950,7 @@
         <span class="prelude-val">Ok</span>(<span class="self">self</span>
             .<span class="ident">identities</span>
             .<span class="ident">get</span>(<span class="ident">key</span>)
-            .<span class="ident">map_err</span>(<span class="op">|</span><span class="ident">e</span><span class="op">|</span> <span class="ident">CryptoStoreError::Backend</span>(<span class="ident">Box::new</span>(<span class="ident">e</span>)))<span class="question-mark">?</span>
+            .<span class="ident">map_err</span>(<span class="ident">CryptoStoreError::backend</span>)<span class="question-mark">?</span>
             .<span class="ident">map</span>(<span class="op">|</span><span class="ident">i</span><span class="op">|</span> <span class="self">self</span>.<span class="ident">deserialize_value</span>(<span class="kw-2">&amp;</span><span class="ident">i</span>))
             .<span class="ident">transpose</span>()<span class="question-mark">?</span>)
     }
@@ -1998,7 +1962,7 @@
         <span class="prelude-val">Ok</span>(<span class="self">self</span>
             .<span class="ident">olm_hashes</span>
             .<span class="ident">contains_key</span>(<span class="ident">serde_json::to_vec</span>(<span class="ident">message_hash</span>)<span class="question-mark">?</span>)
-            .<span class="ident">map_err</span>(<span class="op">|</span><span class="ident">e</span><span class="op">|</span> <span class="ident">CryptoStoreError::Backend</span>(<span class="ident">Box::new</span>(<span class="ident">e</span>)))<span class="question-mark">?</span>)
+            .<span class="ident">map_err</span>(<span class="ident">CryptoStoreError::backend</span>)<span class="question-mark">?</span>)
     }
 
     <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">get_outgoing_secret_requests</span>(
@@ -2017,7 +1981,7 @@
         <span class="kw">let</span> <span class="ident">id</span> <span class="op">=</span> <span class="self">self</span>
             .<span class="ident">secret_requests_by_info</span>
             .<span class="ident">get</span>(<span class="self">self</span>.<span class="ident">encode_key</span>(<span class="ident">SECRET_REQUEST_BY_INFO_TABLE</span>, <span class="ident">key_info</span>))
-            .<span class="ident">map_err</span>(<span class="op">|</span><span class="ident">e</span><span class="op">|</span> <span class="ident">CryptoStoreError::Backend</span>(<span class="ident">Box::new</span>(<span class="ident">e</span>)))<span class="question-mark">?</span>;
+            .<span class="ident">map_err</span>(<span class="ident">CryptoStoreError::backend</span>)<span class="question-mark">?</span>;
 
         <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">id</span>) <span class="op">=</span> <span class="ident">id</span> {
             <span class="self">self</span>.<span class="ident">get_outgoing_key_request_helper</span>(<span class="kw-2">&amp;</span><span class="ident">id</span>).<span class="kw">await</span>
@@ -2030,9 +1994,7 @@
         <span class="kw">let</span> <span class="ident">requests</span>: <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">GossipRequest</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="op">=</span> <span class="self">self</span>
             .<span class="ident">unsent_secret_requests</span>
             .<span class="ident">iter</span>()
-            .<span class="ident">map</span>(<span class="op">|</span><span class="ident">i</span><span class="op">|</span> {
-                <span class="self">self</span>.<span class="ident">deserialize_value</span>(<span class="kw-2">&amp;</span><span class="ident">i</span>.<span class="ident">map_err</span>(<span class="op">|</span><span class="ident">e</span><span class="op">|</span> <span class="ident">CryptoStoreError::Backend</span>(<span class="ident">Box::new</span>(<span class="ident">e</span>)))<span class="question-mark">?</span>.<span class="number">1</span>)
-            })
+            .<span class="ident">map</span>(<span class="op">|</span><span class="ident">i</span><span class="op">|</span> <span class="self">self</span>.<span class="ident">deserialize_value</span>(<span class="kw-2">&amp;</span><span class="ident">i</span>.<span class="ident">map_err</span>(<span class="ident">CryptoStoreError::backend</span>)<span class="question-mark">?</span>.<span class="number">1</span>))
             .<span class="ident">collect</span>();
 
         <span class="ident">requests</span>
@@ -2072,8 +2034,8 @@
                 },
             );
 
-        <span class="ident">ret</span>.<span class="ident">map_err</span>(<span class="op">|</span><span class="ident">e</span><span class="op">|</span> <span class="ident">CryptoStoreError::Backend</span>(<span class="ident">Box::new</span>(<span class="ident">e</span>)))<span class="question-mark">?</span>;
-        <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">flush_async</span>().<span class="kw">await</span>.<span class="ident">map_err</span>(<span class="op">|</span><span class="ident">e</span><span class="op">|</span> <span class="ident">CryptoStoreError::Backend</span>(<span class="ident">Box::new</span>(<span class="ident">e</span>)))<span class="question-mark">?</span>;
+        <span class="ident">ret</span>.<span class="ident">map_err</span>(<span class="ident">CryptoStoreError::backend</span>)<span class="question-mark">?</span>;
+        <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">flush_async</span>().<span class="kw">await</span>.<span class="ident">map_err</span>(<span class="ident">CryptoStoreError::backend</span>)<span class="question-mark">?</span>;
 
         <span class="prelude-val">Ok</span>(())
     }
@@ -2083,14 +2045,14 @@
             <span class="kw">let</span> <span class="ident">backup_version</span> <span class="op">=</span> <span class="self">self</span>
                 .<span class="ident">account</span>
                 .<span class="ident">get</span>(<span class="string">&quot;backup_version_v1&quot;</span>.<span class="ident">encode</span>())
-                .<span class="ident">map_err</span>(<span class="op">|</span><span class="ident">e</span><span class="op">|</span> <span class="ident">CryptoStoreError::Backend</span>(<span class="ident">Box::new</span>(<span class="ident">e</span>)))<span class="question-mark">?</span>
+                .<span class="ident">map_err</span>(<span class="ident">CryptoStoreError::backend</span>)<span class="question-mark">?</span>
                 .<span class="ident">map</span>(<span class="op">|</span><span class="ident">v</span><span class="op">|</span> <span class="self">self</span>.<span class="ident">deserialize_value</span>(<span class="kw-2">&amp;</span><span class="ident">v</span>))
                 .<span class="ident">transpose</span>()<span class="question-mark">?</span>;
 
             <span class="kw">let</span> <span class="ident">recovery_key</span> <span class="op">=</span> {
                 <span class="self">self</span>.<span class="ident">account</span>
                     .<span class="ident">get</span>(<span class="string">&quot;recovery_key_v1&quot;</span>.<span class="ident">encode</span>())
-                    .<span class="ident">map_err</span>(<span class="op">|</span><span class="ident">e</span><span class="op">|</span> <span class="ident">CryptoStoreError::Backend</span>(<span class="ident">Box::new</span>(<span class="ident">e</span>)))<span class="question-mark">?</span>
+                    .<span class="ident">map_err</span>(<span class="ident">CryptoStoreError::backend</span>)<span class="question-mark">?</span>
                     .<span class="ident">map</span>(<span class="op">|</span><span class="ident">p</span><span class="op">|</span> <span class="self">self</span>.<span class="ident">deserialize_value</span>(<span class="kw-2">&amp;</span><span class="ident">p</span>))
                     .<span class="ident">transpose</span>()<span class="question-mark">?</span>
             };

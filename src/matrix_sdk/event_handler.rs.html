@@ -667,6 +667,13 @@
 <span id="662">662</span>
 <span id="663">663</span>
 <span id="664">664</span>
+<span id="665">665</span>
+<span id="666">666</span>
+<span id="667">667</span>
+<span id="668">668</span>
+<span id="669">669</span>
+<span id="670">670</span>
+<span id="671">671</span>
 </pre><pre class="rust"><code><span class="comment">// Copyright 2021 Jonas Platte</span>
 <span class="comment">//</span>
 <span class="comment">// Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);</span>
@@ -1163,9 +1170,16 @@
             (<span class="ident">EventKind::MessageLike</span>, <span class="ident">events::room::redaction::RoomRedactionEventContent::TYPE</span>);
     }
 
-    <span class="kw">impl</span> <span class="ident">SyncEvent</span> <span class="kw">for</span> <span class="ident">events::room::redaction::RedactedSyncRoomRedactionEvent</span> {
+    <span class="kw">impl</span> <span class="ident">SyncEvent</span> <span class="kw">for</span> <span class="ident">events::room::redaction::OriginalSyncRoomRedactionEvent</span> {
         <span class="kw">const</span> <span class="ident">ID</span>: (<span class="ident">EventKind</span>, <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>) <span class="op">=</span> (
             <span class="ident">EventKind::OriginalMessageLike</span>,
+            <span class="ident">events::room::redaction::RoomRedactionEventContent::TYPE</span>,
+        );
+    }
+
+    <span class="kw">impl</span> <span class="ident">SyncEvent</span> <span class="kw">for</span> <span class="ident">events::room::redaction::RedactedSyncRoomRedactionEvent</span> {
+        <span class="kw">const</span> <span class="ident">ID</span>: (<span class="ident">EventKind</span>, <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>) <span class="op">=</span> (
+            <span class="ident">EventKind::RedactedMessageLike</span>,
             <span class="ident">events::room::redaction::RoomRedactionEventContent::TYPE</span>,
         );
     }
